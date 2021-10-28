@@ -28,6 +28,12 @@ Accès à django par docker-compose exec :
 $ docker-compose exec back /bin/sh
 ```
 
+Installation des pre-commit hooks :
+```
+$ pip install pre-commit
+$ pre-commit install
+```
+
 # Développement d'une feature
 
 Toujours travailler sur une nouvelle branche :
