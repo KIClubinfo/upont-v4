@@ -58,3 +58,25 @@ Mettre les changements en ligne :
 $ git checkout master
 $ git push
 ```
+
+# Commandes Django
+
+Commencer par entrer dans le conteneur :
+```
+$ docker-compose exec back /bin/sh
+```
+
+Ajouter un administrateur :
+```
+$ python manage.py createsuperuser
+```
+
+Créer les migrations :
+```
+$ python manage.py makemigrations
+```
+
+Appliquer les migrations :
+```
+$ python manage.py migrate
+```
