@@ -18,8 +18,6 @@ class Student(models.Model):
         VET = 'VET', _('Ville, environnement, transport')
         GI = 'GI',_('Génie industriel')
         A1 = '1A',_('Première année')
-        GI = 'GI',_('Génie industriel')
-        1A = '1A',_('Première année')
     department = models.CharField(
         max_length=4,
         choices=Department.choices,
