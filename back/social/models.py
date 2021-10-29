@@ -16,6 +16,8 @@ class Student(models.Model):
         GMM = 'GMM', _('Génie mécanique et matériaux')
         SEGF = 'SEGF', _('Sciences économiques, gestion, finance')
         VET = 'VET', _('Ville, environnement, transport')
+        GI = 'GI',_('Génie industriel')
+        1A = '1A',_('Première année')
     department = models.CharField(
         max_length=4,
         choices=Department.choices,
