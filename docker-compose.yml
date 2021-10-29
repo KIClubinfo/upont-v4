@@ -13,7 +13,7 @@ services:
     volumes:
       - ./back:/src
     ports:
-      - "$back_port:8000"
+      - "$BACK_PORT:8000"
     depends_on:
       - db
     links:
