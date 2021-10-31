@@ -25,6 +25,11 @@ class Role(models.Model):
         return self.name
 
 
+class Membership(models.Model):
+    is_admin = models.BooleanField()
+    role = models.ForeignKey('Role', on_delete=models.CASCADE)
+
+
 class Student(models.Model):
     user = models.OneToOneField(models2.User(), on_delete=models.CASCADE, null=True)
     promo = models.ForeignKey('Promotion', on_delete=models.CASCADE, null=True)
@@ -65,17 +70,9 @@ class Student(models.Model):
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # validators should be a list
     picture = models.ImageField(upload_to='pictures', null=True, blank=True)
     nationality = models.ForeignKey('Nationality', on_delete=models.CASCADE, null=True)
+    clubs = models.ManyToManyField(Membership())
     def __str__(self):
         return self.user.username
-
-    def clubs(self):
-        values = Membership.objects.filter(student=self).values_list('club__name', flat=True)
-        text = ""
-        for name in values:
-            text = text + name + ", "
-        if text!="":
-            return text[:-2]
-    clubs.empty_value_display = 'Aucun club'
 
 
 class Category(models.Model):
@@ -92,22 +89,6 @@ class Club(models.Model):
     active = models.BooleanField()
     has_fee = models.BooleanField()
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    members = models.ManyToManyField(Membership())
     def __str__(self):
         return self.name
-    def membres(self):
-        values = Membership.objects.filter(club=self).values_list('student__user__username', flat=True)
-        text = ""
-        for name in values:
-            text = text + name + ", "
-        if text!="":
-            return text[:-2]
-    membres.empty_value_display = 'Aucun membre'
-
-
-class Membership(models.Model):
-    is_admin = models.BooleanField()
-    student = models.ForeignKey('Student', on_delete=models.CASCADE, null=True)
-    club = models.ForeignKey('Club', on_delete=models.CASCADE, null=True)
-    role = models.ForeignKey('Role', on_delete=models.CASCADE)
-    def __str__(self):
-        return self.club.name + ' : ' + self.student.user.username

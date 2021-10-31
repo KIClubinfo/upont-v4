@@ -7,7 +7,6 @@ class StudentAdmin(admin.ModelAdmin):
     list_display = (
         'user',
         'promo',
-        'clubs',
         'department'
     )
 
@@ -15,8 +14,7 @@ class StudentAdmin(admin.ModelAdmin):
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'category',
-        'membres'
+        'category'
     )
 
 
