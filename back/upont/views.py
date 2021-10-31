@@ -10,3 +10,6 @@ def proposition_1(request):
 
 def proposition_2(request):
     return render(request, "index2.html")
+
+def proposition_3(request):
+    return render(request, "index3.html")
