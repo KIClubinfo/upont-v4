@@ -54,6 +54,10 @@ class Student(models.Model):
 
     class Origin(models.TextChoices):
         CC = "Concours Commun"
+        BCPST = "BCPST"
+        AST = "Admission Sur Titre"
+        DD = "Double Diplôme"
+        ETR = "Université étrangère"
 
     origin = models.CharField(max_length=20, choices=Origin.choices, default=Origin.CC)
 
