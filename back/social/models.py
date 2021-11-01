@@ -25,14 +25,9 @@ class Role(models.Model):
         return self.name
 
 
-class Membership(models.Model):
-    is_admin = models.BooleanField()
-    role = models.ForeignKey('Role', on_delete=models.CASCADE)
-
-
 class Student(models.Model):
-    user = models.OneToOneField(models2.User(), on_delete=models.CASCADE, null=True)
-    promo = models.ForeignKey('Promotion', on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(models2.User(), on_delete=models.CASCADE)
+    promo = models.ForeignKey('Promotion', on_delete=models.CASCADE)
 
     class Department(models.TextChoices):
         IMI = 'IMI', _('Ingénierie mathématique et informatique')
@@ -67,10 +62,9 @@ class Student(models.Model):
     )
 
     phone_regex = RegexValidator(regex=r'^\+?\d{9,16}$', message="Le numéro doit être entré au format: '+999999999'. Jusqu'à 16 chiffres sont autorisés.")
-    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # validators should be a list
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, null=True, blank=True) # validators should be a list
     picture = models.ImageField(upload_to='pictures', null=True, blank=True)
-    nationality = models.ForeignKey('Nationality', on_delete=models.CASCADE, null=True)
-    clubs = models.ManyToManyField(Membership())
+    nationality = models.ForeignKey('Nationality', on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return self.user.username
 
@@ -89,6 +83,20 @@ class Club(models.Model):
     active = models.BooleanField()
     has_fee = models.BooleanField()
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
-    members = models.ManyToManyField(Membership())
+    members = models.ManyToManyField(
+        Student,
+        through="Membership",
+        related_name="clubs",
+        blank=True,
+    )
     def __str__(self):
         return self.name
+
+
+class Membership(models.Model):
+    is_admin = models.BooleanField()
+    role = models.ForeignKey('Role', on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.club.name + ' : ' + self.student.user.username
