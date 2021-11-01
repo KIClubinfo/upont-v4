@@ -1,3 +1,7 @@
 from django.db import models
+from trade.models import Good
 
-# Create your models here.
+
+class Alcohol(Good):
+    degree = models.FloatField()
+    volume = models.FloatField()
