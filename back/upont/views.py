@@ -2,14 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 
+def login(request):
+    return render(request, "login.html")
+
 def index(request):
     return render(request, "index.html")
-
-def proposition_1(request):
-    return render(request, "index1.html")
-
-def proposition_2(request):
-    return render(request, "index2.html")
-
-def proposition_3(request):
-    return render(request, "index3.html")
