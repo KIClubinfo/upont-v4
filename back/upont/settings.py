@@ -32,6 +32,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'news.apps.NewsConfig',
+    'pochtron.apps.PochtronConfig',
+    'social.apps.SocialConfig',
+    'trade.apps.TradeConfig',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
