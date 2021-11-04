@@ -6,7 +6,7 @@
 */
 :root {
     --header-height: 3rem;
-    --nav-width: 68px;
+    --sidenav-width: 68px;
     --first-color: #000e5e;
     --first-color-light: #26408B;
     --white-color: #ffffff;
@@ -69,11 +69,21 @@ a {
     width: 40px
 }
 
-.l-navbar {
+.user_card_img {
+    width: 75px;
+    height: 75px;
+    display: flex;
+    margin-right: 1rem;
+    border-radius: 50%;
+    border: 2px solid white;
+    overflow: hidden
+}
+
+.l-sidenavbar {
     position: fixed;
     top: 0;
     left: -30%;
-    width: var(--nav-width);
+    width: var(--sidenav-width);
     height: 100vh;
     background-color: var(--first-color);
     padding: .5rem 1rem 0 0;
@@ -81,7 +91,7 @@ a {
     z-index: var(--z-fixed)
 }
 
-.nav {
+.sidenav {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -89,8 +99,8 @@ a {
     overflow: hidden
 }
 
-.nav_logo,
-.nav_link {
+.sidenav_logo,
+.sidenav_link {
     display: grid;
     grid-template-columns: max-content max-content;
     align-items: center;
@@ -98,32 +108,32 @@ a {
     padding: .5rem 0 .5rem 1.5rem
 }
 
-.nav_logo {
+.sidenav_logo {
     margin-bottom: 2rem
 }
 
-.nav_logo-icon {
+.sidenav_logo-icon {
     font-size: 1.25rem;
     color: var(--white-color)
 }
 
-.nav_logo-name {
+.sidenav_logo-name {
     color: var(--white-color);
     font-weight: 700
 }
 
-.nav_link {
+.sidenav_link {
     position: relative;
     color: var(--first-color-light);
     margin-bottom: 1.5rem;
     transition: .3s
 }
 
-.nav_link:hover {
+.sidenav_link:hover {
     color: var(--white-color)
 }
 
-.nav_icon {
+.sidenav_icon {
     font-size: 1.25rem
 }
 
@@ -132,14 +142,14 @@ a {
 }
 
 .body-pd {
-    padding-left: calc(var(--nav-width) + 1rem)
+    padding-left: calc(var(--sidenav-width) + 1rem)
 }
 
-.active {
+.active_link {
     color: var(--white-color)
 }
 
-.active::before {
+.active_link::before {
     content: '';
     position: absolute;
     left: 0;
@@ -155,12 +165,12 @@ a {
 @media screen and (min-width: 768px) {
     body {
         margin: calc(var(--header-height) + 1rem) 0 0 0;
-        padding-left: calc(var(--nav-width) + 2rem)
+        padding-left: calc(var(--sidenav-width) + 2rem)
     }
 
     .header {
         height: calc(var(--header-height) + 1rem);
-        padding: 0 2rem 0 calc(var(--nav-width) + 2rem)
+        padding: 0 2rem 0 calc(var(--sidenav-width) + 2rem)
     }
 
     .header_img {
@@ -172,16 +182,16 @@ a {
         width: 45px
     }
 
-    .l-navbar {
+    .l-sidenavbar {
         left: 0;
         padding: 1rem 1rem 0 0
     }
 
     .show {
-        width: calc(var(--nav-width) + 156px)
+        width: calc(var(--sidenav-width) + 156px)
     }
 
     .body-pd {
-        padding-left: calc(var(--nav-width) + 188px)
+        padding-left: calc(var(--sidenav-width) + 188px)
     }
 }
