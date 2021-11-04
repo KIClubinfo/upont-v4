@@ -13,28 +13,29 @@
         <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
         <!--Nav Style-->
         <link rel="stylesheet" href="{% static 'css/nav_style.css' %}">
+        <link rel="stylesheet" href="{% static 'css/users_grid.css' %}">
     </head>
     <body id="body-pd">
         <!--Header Nav-->
         <header class="header" id="header">
             <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle" ></i> </div>
             <div style="margin-top: 1rem;">
-                <h4 style="font-weight: 800; color: #000e5e;" >Admin</h4>
+                <h4 style="font-weight: 800; color: #000e5e;" >Header</h4>
             </div>
             <div class="header_img"> <img src="https://i.imgur.com/hczKIze.jpg" alt=""> </div>
         </header>
         <!--SideNav-->
         <div class="l-sidenavbar" id="sidenav-bar">
             <nav class="sidenav">
-                <div>
+                <div> 
                     <a href="#" class="sidenav_logo"><img src="{% static 'assets/img/logo.png' %}" alt="" height="25"><span class="sidenav_logo-name" style="font-size: 1.5rem;">uPont</span></a>
                     <div class="sidenav_list">
-                        <a href="#" class="sidenav_link"> <i class='bx bx-message-square-detail sidenav_icon'></i> <span class="sidenav_name">News</span> </a>
-                        <a href="#" class="sidenav_link"> <i class='bx bx-user sidenav_icon'></i> <span class="sidenav_name">Élèves</span> </a>
-                        <a href="#" class="sidenav_link"> <i class='bx bx-joystick sidenav_icon'></i> <span class="sidenav_name">Clubs</span> </a>
-                        <a href="#" class="sidenav_link"> <i class='bx bx-file sidenav_icon'></i> <span class="sidenav_name">Ressources</span> </a>
-                        <a href="#" class="sidenav_link"> <i class='bx bx-user-circle sidenav_icon'></i> <span class="sidenav_name">Profil</span> </a>
-                        <a href="#" class="sidenav_link active_link"> <i class='bx bx-edit sidenav_icon'></i> <span class="sidenav_name">Admin</span> </a>
+                        <a href="#" class="sidenav_link"> <i class='bx bx-message-square-detail sidenav_icon'></i> <span class="sidenav_name">News</span> </a> 
+                        <a href="#" class="sidenav_link active_link"> <i class='bx bx-user sidenav_icon'></i> <span class="sidenav_name">Élèves</span> </a>
+                        <a href="#" class="sidenav_link"> <i class='bx bx-joystick sidenav_icon'></i> <span class="sidenav_name">Clubs</span> </a> 
+                        <a href="#" class="sidenav_link"> <i class='bx bx-file sidenav_icon'></i> <span class="sidenav_name">Ressources</span> </a> 
+                        <a href="#" class="sidenav_link"> <i class='bx bx-user-circle sidenav_icon'></i> <span class="sidenav_name">Profil</span> </a> 
+                        <a href="#" class="sidenav_link"> <i class='bx bx-edit sidenav_icon'></i> <span class="sidenav_name">Admin</span> </a> 
                     </div>
                 </div> 
                 <a href="#" class="sidenav_link"> <i class='bx bx-log-out sidenav_icon'></i> <span class="sidenav_name">Se déconnecter</span> </a>
@@ -43,15 +44,92 @@
         <!--Container Main start-->
         <div style="margin-top: 5rem;">
             <div class="row">
-                <div class="col-sm-6 col-lg-6 col-xl-4">
-                    <div class="card text-white bg-primary mb-3">
-                        <div class="row h-100 justify-content-center align-items-center" style="min-height: 8rem;">
+                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
+                    <div class="card bg-light mb-3">
+                        <div class="row h-100 justify-content-center align-items-center">
                             <div class="col-4">
-                                <img class="user_card_img" src="{% static 'assets/img/back.jpg' %}" alt="">
+                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
                             </div>
-                            <div class="col-8 text-center" style="max-height: 8rem;">
-                                <h4 class="card-title" style="margin:0rem; font-size: large;">Prénom Nom</h4>
-                                <p class="card-text" style="margin:0rem;">Dpt - Promo '0XX</p>
+                            <div class="col-8">
+                                <div class="card-body" style="margin-left: 1rem;">
+                                    <h6 class="card-title" style="margin: 0rem;">Bonjour j'ai un nom très long konichiwalamif</h6>
+                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
+                    <div class="card bg-light mb-3">
+                        <div class="row h-100 justify-content-center align-items-center">
+                            <div class="col-4">
+                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body" style="margin-left: 1rem;">
+                                    <h6 class="card-title" style="margin: 0rem;">Maïmone David Nahmias</h6>
+                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
+                    <div class="card bg-light mb-3">
+                        <div class="row h-100 justify-content-center align-items-center">
+                            <div class="col-4">
+                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body" style="margin-left: 1rem;">
+                                    <h6 class="card-title" style="margin: 0rem;">Bastien Le Chenadec</h6>
+                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
+                    <div class="card bg-light mb-3">
+                        <div class="row h-100 justify-content-center align-items-center">
+                            <div class="col-4">
+                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body" style="margin-left: 1rem;">
+                                    <h6 class="card-title" style="margin: 0rem;">Thomas Buiron</h6>
+                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
+                    <div class="card bg-light mb-3">
+                        <div class="row h-100 justify-content-center align-items-center">
+                            <div class="col-4">
+                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body" style="margin-left: 1rem;">
+                                    <h6 class="card-title" style="margin: 0rem;">Theilo Terisse</h6>
+                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
+                    <div class="card bg-light mb-3">
+                        <div class="row h-100 justify-content-center align-items-center">
+                            <div class="col-4">
+                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body" style="margin-left: 1rem;">
+                                    <h6 class="card-title" style="margin: 0rem;">Louis Boilly</h6>
+                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
+                                </div>
                             </div>
                         </div>
                     </div>
