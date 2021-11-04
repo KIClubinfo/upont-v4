@@ -21,15 +21,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
     }
     
-    showNavbar('header-toggle','nav-bar','body-pd','header')
+    showNavbar('header-toggle','sidenav-bar','body-pd','header')
     
     /*===== LINK ACTIVE =====*/
-    const linkColor = document.querySelectorAll('.nav_link')
+    const linkColor = document.querySelectorAll('.sidenav_link')
     
     function colorLink(){
     if(linkColor){
-    linkColor.forEach(l=> l.classList.remove('active'))
-    this.classList.add('active')
+    linkColor.forEach(l=> l.classList.remove('active_link'))
+    this.classList.add('active_link')
     }
     }
     linkColor.forEach(l=> l.addEventListener('click', colorLink))
