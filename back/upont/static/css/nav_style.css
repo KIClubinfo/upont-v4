@@ -24,7 +24,6 @@
 body {
     position: relative;
     margin: var(--header-height) 0 0 0;
-    padding: 0 1rem;
     font-family: var(--body-font);
     font-size: var(--normal-font-size);
     transition: .5s
@@ -70,8 +69,9 @@ a {
 }
 
 .user_card_img {
-    width: 75px;
-    height: 75px;
+    margin: 1rem 0rem 1rem 0px;
+    width: 90px;
+    height: 90px;
     display: flex;
     margin-right: 1rem;
     border-radius: 50%;
@@ -165,7 +165,7 @@ a {
 @media screen and (min-width: 768px) {
     body {
         margin: calc(var(--header-height) + 1rem) 0 0 0;
-        padding-left: calc(var(--sidenav-width) + 2rem)
+        padding-left: calc(var(--sidenav-width) + 0.5rem)
     }
 
     .header {
@@ -192,6 +192,6 @@ a {
     }
 
     .body-pd {
-        padding-left: calc(var(--sidenav-width) + 188px)
+        padding-left: calc(var(--sidenav-width) + 160px)
     }
 }
