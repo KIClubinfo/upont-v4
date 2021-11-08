@@ -81,7 +81,7 @@ class Category(models.Model):
     name = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.type
+        return self.name
 
 
 class Club(models.Model):
