@@ -72,6 +72,11 @@ Commencer par entrer dans le conteneur :
 $ docker-compose exec back /bin/sh
 ```
 
+Remplir la base de données avec des données de test :
+```
+$ python manage.py loaddata upont/fixtures/populate.json
+```
+
 Ajouter un administrateur :
 ```
 $ python manage.py createsuperuser

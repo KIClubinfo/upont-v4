@@ -86,12 +86,16 @@ class Category(models.Model):
 
 class Club(models.Model):
     name = models.CharField(max_length=50, default="Club")
-    nickname = models.CharField(max_length=10, default="Club")
+    nickname = models.CharField(max_length=10, default="Club", null=True, blank=True)
     logo = models.ImageField(upload_to="logos", null=True, blank=True)
     description = models.TextField()
     active = models.BooleanField()
     has_fee = models.BooleanField()
-    category = models.ForeignKey("Category", on_delete=models.SET_NULL, null=True)
+    category = models.ManyToManyField(
+        Category,
+        related_name="category",
+        blank=True,
+    )
     members = models.ManyToManyField(
         Student,
         through="Membership",
