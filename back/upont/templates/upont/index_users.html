@@ -44,96 +44,28 @@
         <!--Container Main start-->
         <div style="margin-top: 5rem;">
             <div class="row">
+                    {% if all_student_list %}
+                        {% for student in all_student_list %}
                 <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
-                    <div class="card bg-light mb-3">
-                        <div class="row h-100 justify-content-center align-items-center">
-                            <div class="col-4">
-                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body" style="margin-left: 1rem;">
-                                    <h6 class="card-title" style="margin: 0rem;">Bonjour j'ai un nom très long konichiwalamif</h6>
-                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
+                            <div class="card bg-light mb-3">
+                                <div class="row h-100 justify-content-center align-items-center">
+                                    <div class="col-4">
+                                        <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
+                                    </div>
+                                    <div class="col-8">
+                                        <div class="card-body" style="margin-left: 1rem;">
+                                            <h6 class="card-title" style="margin: 0rem;">{{student.user.first_name}} {{student.user.last_name}}</h6>
+                                            <p class="card-text" style="margin: 0rem;">{{student.department}} - Promo '{{student.promo.nickname}}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                     </div>
-                </div>
-                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
-                    <div class="card bg-light mb-3">
-                        <div class="row h-100 justify-content-center align-items-center">
-                            <div class="col-4">
-                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body" style="margin-left: 1rem;">
-                                    <h6 class="card-title" style="margin: 0rem;">Maïmone David Nahmias</h6>
-                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
-                    <div class="card bg-light mb-3">
-                        <div class="row h-100 justify-content-center align-items-center">
-                            <div class="col-4">
-                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body" style="margin-left: 1rem;">
-                                    <h6 class="card-title" style="margin: 0rem;">Bastien Le Chenadec</h6>
-                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
-                    <div class="card bg-light mb-3">
-                        <div class="row h-100 justify-content-center align-items-center">
-                            <div class="col-4">
-                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body" style="margin-left: 1rem;">
-                                    <h6 class="card-title" style="margin: 0rem;">Thomas Buiron</h6>
-                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
-                    <div class="card bg-light mb-3">
-                        <div class="row h-100 justify-content-center align-items-center">
-                            <div class="col-4">
-                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body" style="margin-left: 1rem;">
-                                    <h6 class="card-title" style="margin: 0rem;">Theilo Terisse</h6>
-                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
-                    <div class="card bg-light mb-3">
-                        <div class="row h-100 justify-content-center align-items-center">
-                            <div class="col-4">
-                                <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body" style="margin-left: 1rem;">
-                                    <h6 class="card-title" style="margin: 0rem;">Louis Boilly</h6>
-                                    <p class="card-text" style="margin: 0rem;">1A - Promo '0XX</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Il n'y a pas d'élèves dans la base de donnée.</p>
+                    {% endif %}
+
             </div>
         </div>
         <!--Container Main end-->
