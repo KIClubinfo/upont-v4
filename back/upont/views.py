@@ -10,3 +10,9 @@ def index(request):
 
 def index_admin(request):
     return render(request, "index_admin.html")
+
+def index_users(request):
+    return render(request, "index_users.html")
+
+def index_profil(request):
+    return render(request, "index_profil.html")

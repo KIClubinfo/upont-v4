@@ -1,0 +1,93 @@
+{% load static %}
+<!doctype html>
+<html>
+    <!--Header-->
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <title></title>
+        <!--Boostrap Css-->
+        <link href="{% static 'css/bootstrap.css' %}" rel='stylesheet'>
+        <!--Icons Fontawesome and Boxicons-->
+        <link href='https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css' rel='stylesheet'>
+        <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
+        <!--Nav Style-->
+        <link rel="stylesheet" href="{% static 'css/nav_style.css' %}">
+    </head>
+    <body id="body-pd">
+        <!--Header Nav-->
+        <header class="header" id="header">
+            <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle" ></i> </div>
+            <div style="margin-top: 1rem;">
+                <h4 style="font-weight: 800; color: #000e5e;" >Header</h4>
+            </div>
+            <div class="header_img"> <img src="https://i.imgur.com/hczKIze.jpg" alt=""> </div>
+        </header>
+        <!--SideNav-->
+        <div class="l-sidenavbar" id="sidenav-bar">
+            <nav class="sidenav">
+                <div> 
+                    <a href="#" class="sidenav_logo"><img src="{% static 'assets/img/logo.png' %}" alt="" height="25"><span class="sidenav_logo-name" style="font-size: 1.5rem;">uPont</span></a>
+                    <div class="sidenav_list">
+                        <a href="#" class="sidenav_link"> <i class='bx bx-message-square-detail sidenav_icon'></i> <span class="sidenav_name">News</span> </a> 
+                        <a href="#" class="sidenav_link"> <i class='bx bx-user sidenav_icon'></i> <span class="sidenav_name">Élèves</span> </a>
+                        <a href="#" class="sidenav_link"> <i class='bx bx-joystick sidenav_icon'></i> <span class="sidenav_name">Clubs</span> </a> 
+                        <a href="#" class="sidenav_link"> <i class='bx bx-file sidenav_icon'></i> <span class="sidenav_name">Ressources</span> </a> 
+                        <a href="#" class="sidenav_link"> <i class='bx bx-user-circle sidenav_icon'></i> <span class="sidenav_name">Profil</span> </a> 
+                        <a href="#" class="sidenav_link active_link"> <i class='bx bx-edit sidenav_icon'></i> <span class="sidenav_name">Admin</span> </a> 
+                    </div>
+                </div> 
+                <a href="#" class="sidenav_link"> <i class='bx bx-log-out sidenav_icon'></i> <span class="sidenav_name">Se déconnecter</span> </a>
+            </nav>
+        </div>
+        <!--Container Main start-->
+        <div style="margin:5rem 1rem 0rem;">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="card text-white bg-primary mb-3" style="padding: 1rem;">
+                        <h3 class="card-header text-center">Profil</h3>
+                        <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                  <tr>
+                                    <th scope="row">Prénom :</th>
+                                    <td style="text-align: right;">David</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Nom :</th>
+                                    <td style="text-align: right;">Nahmias</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Promo :</th>
+                                    <td style="text-align: right;">023</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Départ. :</th>
+                                    <td style="text-align: right;">SEGF</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Nationalité :</th>
+                                    <td style="text-align: right;">Française</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Numéro de téléphone :</th>
+                                    <td style="text-align: right;">+33.6.49.12.40.57</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Genre :</th>
+                                    <td style="text-align: right;">M</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Container Main end-->
+        <!--Script Bootstrap and Nav-->
+        <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js'></script>
+        <script type='text/javascript' src="{% static 'js/nav_script.js' %}"></script>
+    </body>
+</html>
