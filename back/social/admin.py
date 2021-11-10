@@ -1,21 +1,14 @@
 from django.contrib import admin
 
-from .models import Promotion, Student, Nationality, Role, Membership, Category, Club
+from .models import Category, Club, Membership, Nationality, Promotion, Role, Student
 
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display = (
-        'user',
-        'promo',
-        'department'
-    )
+    list_display = ("user", "promo", "department")
 
 
 class ClubAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'category'
-    )
+    list_display = ("name",)
 
 
 admin.site.register(Promotion)
