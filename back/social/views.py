@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Student
+from .models import Student, Club
 
 
 def index_users(request):
@@ -9,3 +9,8 @@ def index_users(request):
 
 def index_profile(request):
     return render(request, 'social/index_profile.html')
+
+def index_clubs(request):
+    all_clubs_list = Club.objects.order_by('name')
+    context = {'all_clubs_list': all_clubs_list}
+    return render(request, 'social/index_clubs.html', context)
