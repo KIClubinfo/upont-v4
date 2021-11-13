@@ -140,3 +140,4 @@ FIXTURE_DIRS = ["/fixtures/"]
 
 #Default media folder
 MEDIA_ROOT = os.path.join(BASE_DIR,'../media/')
+MEDIA_URL = '/media/'
