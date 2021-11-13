@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+<p>Vue du club</p>
+{%if club.logo%}
+<p><img src={{club.logo.path}} width="400" height="400"> </p>
+{%endif%}
+<p>{{club.name}} {% if club.nickname %} ({{club.nickname}}) {% endif %}:</p>
+<p> {{club.description}}</p>
+<p> <a href="{% url 'social:club_index' %}"> Retour à l'index </a></p>
+</body>
+</html>
