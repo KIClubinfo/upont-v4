@@ -21,10 +21,13 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
+    path("login/", views.login),
+    path("", views.index),
+    path("index_admin/", views.index_admin),
     path("social/", include("social.urls")),
     path("admin/", admin.site.urls),
     path("", include('django.contrib.auth.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Only for dev, gives anyone access to any image
 if settings.DEBUG:

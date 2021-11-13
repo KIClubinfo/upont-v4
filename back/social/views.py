@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from .models import Student, Club
 from django.contrib.auth.decorators import login_required
 
@@ -10,16 +10,7 @@ def index_users(request):
     return render(request, 'social/index_users.html', context)
 
 
-@login_required
-def index_profile(request):
-    return render(request, 'social/index_profile.html')
-
 def index_clubs(request):
     all_clubs_list = Club.objects.order_by('name')
     context = {'all_clubs_list': all_clubs_list}
     return render(request, 'social/index_clubs.html', context)
-
-def view_club(request, club_id):
-    club = get_object_or_404(Club, pk=club_id)
-    context = {'club': club}
-    return render(request, 'social/view_club.html', context)
