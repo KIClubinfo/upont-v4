@@ -47,16 +47,16 @@ Mettre la branche en ligne et créer une pull request :
 $ git push --set-upstream origin feature
 ```
 
-Quand un reviewer a validé la pull request, faire un rebase de master dans la nouvelle branche pour ne pas avoir de conflits :
-```
-$ git checkout master
-$ git rebase feature
-```
-
-Faire un rebase dans master :
+Quand un reviewer a validé la pull request, faire un rebase de la nouvelle branche dans master :
 ```
 $ git checkout feature
 $ git rebase master
+```
+
+Faire un rebase de master dans la feature :
+```
+$ git checkout master
+$ git rebase feature
 ```
 
 Mettre les changements en ligne :
