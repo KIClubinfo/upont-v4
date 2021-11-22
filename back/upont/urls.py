@@ -19,49 +19,16 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path(
-        'login/',
-        auth_views.LoginView.as_view(template_name='login.html', extra_context={'next':""}),
-        name="login"
-    ),
-    path(
-        'password_change/',
-        auth_views.PasswordChangeView.as_view(template_name='password_change.html'),
-        name="password_change"
-    ),
-    path(
-        'password_change_done/',
-        auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
-        name="password_change_done"
-    ),
-    path(
-        'password_reset/',
-        auth_views.PasswordResetView.as_view(
-            template_name='password_reset.html',
-            email_template_name="password_reset_email.html",
-            subject_template_name="password_reset_subject.txt",
-            success_url="password_reset_done"
-        ),
-        name="password_reset"
-    ),
-    path(
-        'password_reset_done/',
-        auth_views.PasswordChangeDoneView.as_view(template_name='password_reset_done.html'),
-        name="password_reset_done"
-    ),
-   path(
-        'password_reset_confirm/',
-        auth_views.PasswordResetView.as_view(template_name='password_reset_confirm.html', success_url="password_reset_complete"),
-        name="password_reset_confirm"
-    ),
-    path(
-        'password_reset_complete/',
-        auth_views.PasswordResetView.as_view(template_name='password_reset_complete.html'),
-        name="password_reset_complete"
-    ),
-    path("", views.index),
-    path("index_admin/", views.index_admin),
-    path("index_users/", views.index_users),
-    path("index_profil/", views.index_profil),
+    path("", views.index, name="index"),
+    path("index_admin/", views.index_admin, name="index_admin"),
+    path("index_users/", views.index_users, name="index_users"),
+    path("index_profil/", views.index_profil, name="index_profil"),
     path("admin/", admin.site.urls),
+    path('login/', views.Login.as_view(), name="login"),
+    path('password_change/', views.PasswordChange.as_view(), name="password_change"),
+    path('password_change_done/', views.PasswordChangeDone.as_view(), name="password_change_done"),
+    path('password_reset/', views.PasswordReset.as_view(), name="password_reset"),
+    path('password_reset_done/', views.PasswordResetDone.as_view(), name="password_reset_done"),
+    path('password_reset_confirm/', views.PasswordResetConfirm.as_view(), name="password_reset_confirm"),
+    path('password_reset_complete/', views.PasswordResetComplete.as_view(), name="password_reset_complete"),
 ]
