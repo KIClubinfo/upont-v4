@@ -140,3 +140,6 @@ FIXTURE_DIRS = ["/fixtures/"]
 
 #Default media folder
 MEDIA_ROOT = os.path.join(BASE_DIR,'../media/')
+
+# Email used for automated mailing
+DEFAULT_FROM_EMAIL = 'flyfft@gmail.com'
