@@ -50,7 +50,7 @@
                             <div class="card bg-light mb-3">
                                 <div class="row h-100 justify-content-center align-items-center">
                                     <div class="col-4">
-                                        <img class="user_card_img" src="https://i.imgur.com/hczKIze.jpg" alt="">
+                                        <img class="user_card_img" src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
                                     </div>
                                     <div class="col-8">
                                         <div class="card-body" style="margin-left: 1rem;">
