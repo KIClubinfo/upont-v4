@@ -13,6 +13,7 @@
         <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
         <!--Nav Style-->
         <link rel="stylesheet" href="{% static 'css/nav_style.css' %}">
+        <link href="{% static 'tellme/vendor/feedback/feedback.css' %}" rel="stylesheet">
     </head>
     <body id="body-pd">
         <!--Header Nav-->
@@ -48,5 +49,9 @@
         <!--Script Bootstrap and Nav-->
         <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js'></script>
         <script type='text/javascript' src="{% static 'js/nav_script.js' %}"></script>
+        {%  include 'tellme/js_inc.html' %}
+        <button type="button" id="feedback-btn" class="btn btn-info vertical-right-aligned">
+            Feedback <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span>
+        </button>
     </body>
 </html>

@@ -195,3 +195,12 @@ a {
         padding-left: calc(var(--sidenav-width) + 160px)
     }
 }
+
+.vertical-right-aligned {
+    transform: rotate(-90deg);
+    transform-origin: 100% 100%;
+    position: fixed;
+    right: 0;
+    top: 50%;
+    z-index: 100;
+}
