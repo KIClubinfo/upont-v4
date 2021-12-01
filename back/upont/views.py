@@ -21,7 +21,7 @@ def index_profil(request):
 
 class Login(auth_views.LoginView):
     template_name = 'login.html'
-    extra_context = {'next': "/"}
+    extra_context = {'next': "index"}
 
 
 class PasswordChange(auth_views.PasswordChangeView):
@@ -33,10 +33,9 @@ class PasswordChangeDone(auth_views.PasswordChangeDoneView):
 
 
 class PasswordReset(auth_views.PasswordResetView):
-    template_name = 'password_reset.html'
-    email_template_name = "password_reset_email.html"
-    subject_template_name = "password_reset_subject.txt"
-    success_url = "password_reset_done"
+    template_name = 'password_reset_form.html'
+    # email_template_name = "password_reset_email.html"
+    # subject_template_name = "password_reset_subject.txt"
 
 
 class PasswordResetDone(auth_views.PasswordResetDoneView):
@@ -45,7 +44,6 @@ class PasswordResetDone(auth_views.PasswordResetDoneView):
 
 class PasswordResetConfirm(auth_views.PasswordResetConfirmView):
     template_name = 'password_reset_confirm.html'
-    success_url = "password_reset_complete"
 
 
 class PasswordResetComplete(auth_views.PasswordResetCompleteView):

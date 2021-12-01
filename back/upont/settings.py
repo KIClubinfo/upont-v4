@@ -90,6 +90,11 @@ DATABASES = {
 }
 
 
+# Login redirection
+
+LOGIN_REDIRECT_URL = "index"
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -141,5 +146,8 @@ FIXTURE_DIRS = ["/fixtures/"]
 #Default media folder
 MEDIA_ROOT = os.path.join(BASE_DIR,'../media/')
 
-# Email used for automated mailing
+# Mailing configuration
 DEFAULT_FROM_EMAIL = 'flyfft@gmail.com'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, '../emails/')
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+
