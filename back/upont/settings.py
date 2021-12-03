@@ -113,6 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = ["upont.auth.EmailBackend"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
