@@ -50,15 +50,15 @@
                                             <h3>Connecte-toi !</h3>
                                             <!--Email Adress-->
                                             <div class="form-floating mb-3 text-center">
-                                                <button type="email" class="form-control" id="floatingInput" placeholder="name@example.com">{{ form.username }}</button>
+                                                <input type="email" class="form-control" id="floatingInput" placeholder="prenom.nom@eleves.enpc.fr" name="username"></input>
                                                 <label for="floatingInput"><i class='bx bx-user'></i> Identifiant</label>
                                             </div>
                                             <!--Password-->
                                             <div class="form-floating">
-                                                <button type="password" class="form-control" id="floatingPassword" placeholder="Password">{{ form.password }}</button>
+                                                <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password"></input>
                                                 <label for="floatingPassword"><i class='bx bx-lock'></i> Mot de passe</label>
                                             </div>
-                                            <p>Connexion SSO</a> - <a href="{% url 'password_reset_form' %}">Mot de passe oublié ?</a></p>
+                                            <p>Connexion SSO</p> <a href="{% url 'password_reset_form' %}">Mot de passe oublié ?</a></p>
                                             {% if form.errors %}
                                             <p class="text-info">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
                                             {% endif %}

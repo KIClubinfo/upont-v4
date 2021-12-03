@@ -59,7 +59,7 @@ ROOT_URLCONF = "upont.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR,'upont/templates/upont')],
+        "DIRS": [os.path.join(BASE_DIR, "upont/templates/upont")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -113,6 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = ["upont.auth.EmailBackend"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -143,11 +144,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 FIXTURE_DIRS = ["/fixtures/"]
 
-#Default media folder
-MEDIA_ROOT = os.path.join(BASE_DIR,'../media/')
+# Default media folder
+MEDIA_ROOT = os.path.join(BASE_DIR, "../media/")
 
 # Mailing configuration
-DEFAULT_FROM_EMAIL = 'flyfft@gmail.com'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, '../emails/')
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-
+DEFAULT_FROM_EMAIL = "flyfft@gmail.com"
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, "../emails/")
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
