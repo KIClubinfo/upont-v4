@@ -33,9 +33,11 @@ class PasswordChangeDone(auth_views.PasswordChangeDoneView):
 
 
 class PasswordReset(auth_views.PasswordResetView):
+    # For security reasons, if the inpu email does not exist in the system, the site will fail silently,
+    # ignoring the request.
     template_name = "password_reset_form.html"
     # email_template_name = "password_reset_email.html"
-    # subject_template_name = "password_reset_subject.txt"
+    subject_template_name = "password_reset_subject.txt"
 
 
 class PasswordResetDone(auth_views.PasswordResetDoneView):
