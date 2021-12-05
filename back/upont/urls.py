@@ -29,7 +29,7 @@ urlpatterns = [
     path('password_change_done/', views.PasswordChangeDone.as_view(), name="password_change_done"),
     path('password_reset_form/', views.PasswordReset.as_view(), name="password_reset_form"),
     path('password_reset_done/', views.PasswordResetDone.as_view(), name="password_reset_done"),
-    path('password_reset_confirm/', views.PasswordResetConfirm.as_view(), name="password_reset_confirm"),
+    path('reset/<uidb64>/<token>/', views.PasswordResetConfirm.as_view(), name="password_reset_confirm"),
     path('password_reset_complete/', views.PasswordResetComplete.as_view(), name="password_reset_complete"),
 ]
 
