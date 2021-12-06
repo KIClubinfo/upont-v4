@@ -136,4 +136,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 FIXTURE_DIRS = ["/fixtures/"]
 
 #Default media folder
-MEDIA_ROOT = os.path.join(BASE_DIR,'../media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, '/media/')
+MEDIA_URL = "media/"
