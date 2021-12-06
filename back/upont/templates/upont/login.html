@@ -1,19 +1,15 @@
 {% load static %}
-<!doctype html>
-<html>
-    <!--Header-->
-    <head>
-        <meta charset='utf-8'>
-        <title>Index</title>
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-        <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
-    </head>
-    <body>
+<!--Header-->
+{% include "header.html" %}
+
+        <!--Background-->
         <div class="colored-circle"></div>
         <div class="colored-circle"></div>
         <div class="colored-circle"></div>
         <div class="colored-circle"></div>
+        <!--EndBackground-->
+
+        <!--LoginContent-->
         <div class="login-content">
             <div class="login-card">
                 <div class="row h-100">
@@ -33,6 +29,8 @@
                 </div>
             </div>
         </div>
+
+        <!--Scripts-->
         <script src="https://unpkg.com/scrollreveal"></script>
         <script>
             ScrollReveal().reveal('.login-card', {duration: 1000,distance: '150%', origin: 'right', opacity: 0});
@@ -45,5 +43,7 @@
                 window.scrollTo(0, 0);
             }
         </script>
+        <!--EndScripts-->
+
     </body>
 </html>
