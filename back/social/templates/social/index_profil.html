@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <p>{{student.user.first_name}} {{student.user.last_name}}</p>
+    <p>{{student.department}} - Promo '{{student.promo.nickname}}</p>
+    <p>{{student.phone_number}}</p>
+    <p>{{student.origin}}</p>
+    <p>{{student.email}}</p>
+    <img class="user_card_img" src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+    <p>ce sont mes clubs</p>
+    {% if membership_club_list %}
+        {% for membership in membership_club_list %}
+            <p>{{membership.role.name}}</p>
+            <p>{{membership.club.name}}</p>
+            {% if membership.club.nickname %}
+                <p>{{membership.club.nickname}}</p>
+            {% endif %}
+            <p><img src="{{membership.club.logo.url}}"> </p>
+        {% endfor %}
+    {% else %}
+    <p>je n'ai pas de club</p>
+    {% endif %}
+</body>
+</html>
