@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<p>Index de l'ensemble des posts</p>
+{% for post in all_posts_list %}
+    {%if post.illustration%}
+    <p> <img src={{post.illustration.path}} width="100" height="100"> </p>
+    {%endif%}
+    <a href="{% url 'news:event_detail' post.event.pk %}"> {{post.title}} </a> </p>
+    <p> Auteur: {%if post.published_as_student%}
+                    {{post.author.student.user.first_name}} {{post.author.student.user.last_name}}
+                {%else%} {{post.author.club.name}}
+                {%endif%}
+    </p>
+    <p> Description : {{post.content}}</p>
+{% endfor %}
+</body>
+</html>

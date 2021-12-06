@@ -24,6 +24,7 @@ urlpatterns = [
     path("login/", views.login),
     path("social/", include("social.urls")),
     path("admin/", admin.site.urls),
+    path("news/", include('news.urls')),
 ]
 
 # Only for dev, gives anyone access to any image

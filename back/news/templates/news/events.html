@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<p>Index de l'ensemble des events</p>
+{% for event in all_events_list %}
+<p> <a href="{% url 'news:event_detail' event.pk %}"> {{event.name}} </a> </p>
+<p> Organisateur : {{event.club}} </p>
+<p> Date: {{event.date}}</p>
+{% endfor %}
+</body>
+</html>
