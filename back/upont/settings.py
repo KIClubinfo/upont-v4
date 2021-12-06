@@ -114,7 +114,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = ["upont.auth.EmailBackend"]
+AUTHENTICATION_BACKENDS = [
+    "upont.auth.EmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
