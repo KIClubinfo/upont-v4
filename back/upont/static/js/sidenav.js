@@ -11,15 +11,4 @@ document.addEventListener("DOMContentLoaded", function(event) {
         signoutLink.classList.toggle('show-last-link');
     })
 
-    /*===== LINK ACTIVE =====*/
-    const linkColor = document.querySelectorAll('.sidenav-link')
-        
-    function colorLink(){
-        if(linkColor){
-            linkColor.forEach(l=> l.classList.remove('active'))
-            this.classList.add('active')
-        }
-    }
-    linkColor.forEach(l=> l.addEventListener('click', colorLink))
-
 });
