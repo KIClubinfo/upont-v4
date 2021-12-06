@@ -58,7 +58,7 @@
                                                 <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
                                                 <label for="floatingPassword"><i class='bx bx-lock'></i> Mot de passe</label>
                                             </div>
-                                            <p>Connexion SSO</p> <a href="{% url 'password_reset_form' %}">Mot de passe oublié ?</a></p>
+                                            <p>Connexion SSO</p> <a href="{% url 'password_reset' %}">Mot de passe oublié ?</a></p>
                                             {% if form.errors %}
                                             <p class="text-info">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
                                             {% endif %}
