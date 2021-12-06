@@ -1,3 +1,5 @@
+@import url("../assets/fonts/helvetica_neue/font.css");
+
 :root{
     --medium-screen:768px;
     --primary-bg-color:#1A1B20;
@@ -11,12 +13,11 @@
 
 
 body{
-    font-family: 'Montserrat', sans-serif; /* 'Poppins' ou Helvetica */
-    font-weight: 300;
+    font-family: 'Neue Helvetica Light';
     box-sizing: border-box;
     background-color: var(--primary-bg-color);
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
     padding: 0;
 }
@@ -441,6 +442,7 @@ h1,h2,h3,h4,h5,h6{
     width: 300px;
     height: 500px;
     background-color: hsla(0, 0%, 100%, 0.1);
+    border-radius: 0.5rem;
     box-shadow: 20px 20px 50px rgba(0, 0, 0, 0.5); /* rgba(255, 255, 255, 0.1) */
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-left: 1px solid rgba(255, 255, 255, 0.5);
@@ -448,4 +450,170 @@ h1,h2,h3,h4,h5,h6{
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     padding: 10px;
+    overflow: hidden;
+}
+
+
+/*-------------------------------------------------*/
+/*------------------ LOGIN STYLE ------------------*/
+/*-------------------------------------------------*/
+
+.login-content{
+    /* Positioning */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Sizing */
+    width: 100vw;
+    min-height: 100vh;
+    /* Z-Positioning */
+    z-index: 1;
+    /* Styling */
+    overflow-x: hidden;
+}
+
+.login-card{
+    /* Positioning */
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    /* Sizing */
+    width: 90%;
+    min-height: 0;
+    padding: 1.5rem;
+    /* Styling */
+    word-wrap: break-word;
+    border-radius: 1rem;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-top: solid 1px hsla(0, 0%, 100%, 0.5);
+    border-left: solid 1px hsla(0, 0%, 100%, 0.5);
+    background-color: hsla(0, 0%, 100%, 0.1);
+    overflow: hidden;
+    /* Z-Positioning */
+    z-index: 2;
+}
+
+.login-card-form{
+    /* Positioning */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Styling */
+    color: white;
+}
+
+.login-input {
+    /* Sizing */
+    width: 80%;
+    padding: 0.75rem 1.5rem;
+    margin: 1rem 0rem;
+    /* Styling */
+    font-size: 1rem;
+    color: #fff;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 0.5rem;
+}
+
+.login-input:focus{
+    outline: 0;
+}
+
+.logo-col{
+    /* Positioning */
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    /* Styling */
+    color: white;
+}
+
+.login-logo{
+    height: 200px;
+}
+
+.login-title{
+    text-align: center;
+    font-size: 2rem;
+    font-family:'Neue Helvetica Light';
+}
+
+.login-links{
+    font-family:'Neue Helvetica Thin';
+    text-align: center;
+}
+
+.link{
+    text-decoration: none;
+}
+
+.link:hover{
+    color: #39cbfb;
+}
+
+@media(max-width:870px){
+    .login-logo{
+        height: 150px;
+    }
+}
+
+@media(max-width:450px){
+    .login-logo{
+        height: 100px;
+    }
+
+    .login-title{
+        font-size: 1.3rem;
+    }
+
+    .link{
+        font-size: 0.7rem;
+    }
+
+    .login-input {
+        font-size: 0.7rem;
+    }
+}
+
+.colored-circle{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgb(0, 140, 255), rgb(255, 0, 0));
+    z-index: 0;
+}
+
+.colored-circle:nth-child(1){
+    clip-path: circle(30% at 30% 10%);
+}
+
+.colored-circle:nth-child(2){
+    clip-path: circle(25% at 100% 40%);
+}
+
+.colored-circle:nth-child(3){
+    clip-path: circle(25% at 0% 100%);
+}
+
+.colored-circle:nth-child(4){
+    clip-path: circle(10% at 50% 80%);
+}
+
+.white-border{
+    border-left: solid var(--border-color) var(--border-width);
+}
+
+@media(max-width:670px){
+    .white-border{
+        border-left: none var(--border-color) var(--border-width);
+        border-top: solid var(--border-color) var(--border-width);
+    }
 }

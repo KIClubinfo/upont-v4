@@ -3015,6 +3015,13 @@ textarea.form-control-lg {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+@media(max-width:450px){
+  .btn{
+    font-size: 0.8rem;
+    padding: 0.5rem 0.7rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn {
     transition: none;

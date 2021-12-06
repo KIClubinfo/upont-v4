@@ -81,5 +81,13 @@
             </div>
         </div>
         <script src="{% static 'js/sidenav.js' %}"></script>
+
+        <script src="https://unpkg.com/scrollreveal"></script>
+        <script>
+            ScrollReveal().reveal('.profil-image', {delay: 100, duration: 1500,distance: '300%', origin: 'right', opacity: 0});
+            window.onbeforeunload = function () {
+                window.scrollTo(0, 0);
+            }
+        </script>
     </body>
 </html>

@@ -6,3 +6,6 @@ def index_users(request):
     all_student_list = Student.objects.order_by('-promo__year', 'user__first_name')
     context = {'all_student_list': all_student_list}
     return render(request, 'social/index_users.html', context)
+
+def index_profile(request):
+    return render(request, 'social/index_profile.html')
