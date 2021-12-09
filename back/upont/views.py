@@ -20,3 +20,7 @@ def index_users(request):
 
 def index_profil(request):
     return render(request, "index_profil.html")
+
+
+def glasscard(request):
+    return render(request, "GlassCard.html")
