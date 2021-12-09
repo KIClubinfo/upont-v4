@@ -1,76 +1,50 @@
 {% load static %}
-<!doctype html>
-<html>
-    <!--Header-->
-    <head>
-        <meta charset='utf-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <title></title>
-        <!--Boostrap Css-->
-        <link href="{% static 'css/bootstrap.css' %}" rel='stylesheet'>
-        <!--Icons Fontawesome and Boxicons-->
-        <link href='https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css' rel='stylesheet'>
-        <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
-        <!--Nav Style-->
-        <link rel="stylesheet" href="{% static 'css/nav_style.css' %}">
-        <link rel="stylesheet" href="{% static 'css/users_grid.css' %}">
-    </head>
-    <body id="body-pd">
-        <!--Header Nav-->
-        <header class="header" id="header">
-            <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle" ></i> </div>
-            <div style="margin-top: 1rem;">
-                <h4 style="font-weight: 800; color: #000e5e;" >Header</h4>
-            </div>
-            <div class="header_img"> <img src="https://i.imgur.com/hczKIze.jpg" alt=""> </div>
-        </header>
-        <!--SideNav-->
-        <div class="l-sidenavbar" id="sidenav-bar">
-            <nav class="sidenav">
-                <div> 
-                    <a href="#" class="sidenav_logo"><img src="{% static 'assets/img/logo.png' %}" alt="" height="25"><span class="sidenav_logo-name" style="font-size: 1.5rem;">uPont</span></a>
-                    <div class="sidenav_list">
-                        <a href="#" class="sidenav_link"> <i class='bx bx-message-square-detail sidenav_icon'></i> <span class="sidenav_name">News</span> </a> 
-                        <a href="#" class="sidenav_link active_link"> <i class='bx bx-user sidenav_icon'></i> <span class="sidenav_name">Élèves</span> </a>
-                        <a href="#" class="sidenav_link"> <i class='bx bx-joystick sidenav_icon'></i> <span class="sidenav_name">Clubs</span> </a> 
-                        <a href="#" class="sidenav_link"> <i class='bx bx-file sidenav_icon'></i> <span class="sidenav_name">Ressources</span> </a> 
-                        <a href="#" class="sidenav_link"> <i class='bx bx-user-circle sidenav_icon'></i> <span class="sidenav_name">Profil</span> </a> 
-                        <a href="#" class="sidenav_link"> <i class='bx bx-edit sidenav_icon'></i> <span class="sidenav_name">Admin</span> </a> 
+<!--Header-->
+{% include "header.html" %}
+<!--Sidenav-->
+{% include "../social/sidenav.html" with active_link="users" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
                     </div>
-                </div> 
-                <a href="#" class="sidenav_link"> <i class='bx bx-log-out sidenav_icon'></i> <span class="sidenav_name">Se déconnecter</span> </a>
-            </nav>
-        </div>
-        <!--Container Main start-->
-        <div style="margin-top: 5rem;">
-            <div class="row">
+                    <!--<div class="col" style="text-align: end;">
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                    </div>-->
+                </div>
+            </div>
+            <div class="content-main">
+                <h3 class="page-title">Élèves</h3>
+                <div class="row">
                     {% if all_student_list %}
                         {% for student in all_student_list %}
-                <div class="col-small-6 col-mid-4 col-large-3 col-xlarge-3 col-xxlarge-2">
-                            <div class="card bg-light mb-3">
-                                <div class="row h-100 justify-content-center align-items-center">
-                                    <div class="col-4">
-                                        <img class="user_card_img" src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
-                                    </div>
-                                    <div class="col-8">
-                                        <div class="card-body" style="margin-left: 1rem;">
-                                            <h6 class="card-title" style="margin: 0rem;">{{student.user.first_name}} {{student.user.last_name}}</h6>
-                                            <p class="card-text" style="margin: 0rem;">{{student.department}} - Promo '{{student.promo.nickname}}</p>
-                                        </div>
+                            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                <div class="user-card">
+                                    <div class="user-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                    <div class="user-information">
+                                        <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
+                                        <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
                                     </div>
                                 </div>
                             </div>
-                    </div>
                         {% endfor %}
                     {% else %}
                         <p>Il n'y a pas d'élèves dans la base de donnée.</p>
                     {% endif %}
-
+                </div>
             </div>
         </div>
-        <!--Container Main end-->
-        <!--Script Bootstrap and Nav-->
-        <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js'></script>
-        <script type='text/javascript' src="{% static 'js/nav_script.js' %}"></script>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+
     </body>
 </html>
