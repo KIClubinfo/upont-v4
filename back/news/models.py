@@ -66,7 +66,8 @@ class Shotgun(models.Model):
         null=True,
     )
     content = models.TextField()
-    date = models.DateTimeField()
+    starting_date = models.DateTimeField()
+    ending_date = models.DateTimeField()
     size = models.IntegerField(default=0)
     requires_motivation = models.BooleanField(default=False)
     participations = models.ManyToManyField(
@@ -82,4 +83,7 @@ class Shotgun(models.Model):
         return self.participations.order_by("shotgun_date")[: self.size]
 
     def is_started(self):
-        return timezone.now() > self.date
+        return timezone.now() > self.starting_date
+
+    def is_ended(self):
+        return timezone.now() > self.ending_date
