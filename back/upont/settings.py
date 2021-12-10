@@ -152,6 +152,7 @@ FIXTURE_DIRS = ["/fixtures/"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "../media/")
 
-DEFAULT_FROM_EMAIL = "flyfft@gmail.com"
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "../emails/")
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+if DEBUG:
+    DEFAULT_FROM_EMAIL = "test@mail.com"
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, "../emails/")
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
