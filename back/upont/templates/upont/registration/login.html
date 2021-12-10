@@ -1,7 +1,16 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" %}
-
+<!doctype html>
+<html>
+    <!--Header-->
+    <head>
+        <meta charset='utf-8'>
+        <title>Index</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
         <!--Background-->
         <div class="colored-circle"></div>
         <div class="colored-circle"></div>
@@ -18,12 +27,17 @@
                         <h1 class="login-title">Bienvenue sur uPont</h1>
                     </div>
                     <div class="col-sm-7 white-border" style="padding: 1rem;">
-                        <form class="login-card-form" action="">
+                        <form class="login-card-form" method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
                             <h1 class="login-title">Connecte-toi !</h1>
-                            <input type="email" class="login-input" placeholder="Enter email">
-                            <input type="password" class="login-input" placeholder="Password">
-                            <p class="login-links"><a class="link" href="">Connexion SSO</a> - <a class="link" href="">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
-                            <button class="btn btn-info">Se connecter</button>
+                            <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username">
+                            <input type="password" class="login-input" placeholder="Password" name="password">
+                            <p class="login-links"><a class="link" href="">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
+                            {% if form.errors %}
+                                <p class="login-links">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
+                            {% endif %}
+                            <input type="submit" class="btn btn-info" value="Se connecter">
+                            <input type="hidden" name="next" value="{{ next }}">
                         </form>
                     </div>
                 </div>
@@ -31,7 +45,7 @@
         </div>
 
         <!--Scripts-->
-        <script src="https://unpkg.com/scrollreveal"></script>
+        <!--<script src="https://unpkg.com/scrollreveal"></script>
         <script>
             ScrollReveal().reveal('.login-card', {duration: 1000,distance: '150%', origin: 'right', opacity: 0});
             ScrollReveal().reveal('.login-logo', {duration: 1000,distance: '1000%', origin: 'top', opacity: 0});
@@ -42,7 +56,7 @@
             window.onbeforeunload = function () {
                 window.scrollTo(0, 0);
             }
-        </script>
+        </script>-->
         <!--EndScripts-->
 
     </body>
