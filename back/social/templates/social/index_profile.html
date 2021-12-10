@@ -26,7 +26,7 @@
                         <div class="col-lg-8">
                             <div class="row">
                                 <div class="col-lg-5">
-                                    <div class="profil-image"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                                    <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
                                 </div>
                                 <div class="col-lg-7" style="text-align: center;">
                                     <div class="section-title">Mes informations personnelles</div>
@@ -34,25 +34,27 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-5" style="text-align: center;">
-                                    <input class="profil-input" type="text" placeholder="Prénom">
-                                    <input class="profil-input" type="text" placeholder="Téléphone">
+                                    <input class="profil-input" type="text" placeholder={{student.user.first_name}}>
+                                    <input class="profil-input" type="text" placeholder={{student.phone_number}}>
                                 </div>
                                 <div class="col-lg-7" style="text-align: center;">
-                                    <input class="profil-input" type="text" placeholder="Nom">
-                                    <input class="profil-input" type="text" placeholder="Département">
+                                    <input class="profil-input" type="text" placeholder={{student.user.last_name}}>
+                                    <input class="profil-input" type="text" placeholder={{student.department}}>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4" style="border-left: solid hsla(0, 0%, 100%, 0.25) 0.25px;">
                             <div class="section-title">Mes activités associatives</div>
-                            <div class="user-card">
-                                <div class="user-image"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                                <div class="user-information"><span class="user-name">Maïmone David NAHMIAS</span> <span>SEGF - Promo '023</span></div>
-                            </div>
-                            <div class="user-card">
-                                <div class="user-image"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                                <div class="user-information"><span class="user-name">Maïmone David NAHMIAS</span> <span>SEGF - Promo '023</span></div>
-                            </div>
+                            {% if membership_club_list %}
+                                {% for membership in membership_club_list %}
+                                    <div class="user-card">
+                                        <div class="user-image"><img src="{{membership.club.logo.url}}" alt=""></div>
+                                        <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}{{membership.club.nickname}}{% endif %}</span> <span>{{membership.role.name}}</span></div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>Je ne suis pas membre d'un club.</p> <!--TO DO : écrire ça bien-->
+                            {% endif %}
                         </div>
                     </div>
                 </div>
