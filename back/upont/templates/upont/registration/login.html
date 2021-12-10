@@ -1,80 +1,63 @@
 {% load static %}
+<!--Header-->
 <!doctype html>
 <html>
     <!--Header-->
     <head>
         <meta charset='utf-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <title>Connexion Page</title>
-        <!--Bootstrap-->
-        <link href="{% static 'css/bootstrap.css' %}" rel='stylesheet'>
-        <!--Icons Fontawesome and Boxicons-->
-        <link href='https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css' rel='stylesheet'>
+        <title>Index</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
         <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
     </head>
-    <!--Body-->
-    <body style="background-image: url('{% static 'assets/img/back.jpg' %}'); background-position: center; background-repeat: no-repeat;">
-        <section>
-            <!--Help and Assos section-->
-            <div class="row justify-content-center">
-                <!--Help-->
-                <div class="col-6 col-lg-5 text-center">
-                    <button class="btn btn-secondary" style="min-width: 100%;"><i class="fas fa-question-circle"></i> Aide</button>
-                </div>
-                <!--Clubs and Assos-->
-                <div class="col-6 col-lg-5 text-center">
-                    <button class="btn btn-secondary" style="min-width: 100%;"><i class="fas fa-users"></i> Clubs & Assos</button>
-                </div>
-            </div>
-            <!--Form section-->
-            <div class="row justify-content-center" style="margin-top:5rem; margin-bottom: 2rem;">
-                <div class="col-12 col-lg-10">
-                    <!--Form Card-->
-                    <div class="card sign-up-card">
-                        <div class="card-body">
-                            <!--Connexion Form-->
-                            <form method="post" action="{% url 'login' %}">
-                            {% csrf_token %}
-                                <div class="row h-100 justify-content-center align-items-center">
-                                    <!--Logo Column-->
-                                    <div class="col-lg-5">
-                                        <div class="text-center">
-                                            <img class="img-logo" src="{% static 'assets/img/logo.png' %}" alt="">
-                                            <h3>Bienvenue sur uPont</h3>
-                                        </div>
-                                        
-                                    </div>
-                                    <!--Form Column-->
-                                    <div class="col-lg-7 white-divider" style="margin: 1rem 0rem; padding:1rem;">
-                                        <div class="form-group text-center">
-                                            <h3>Connecte-toi !</h3>
-                                            <!--Email Adress-->
-                                            <div class="form-floating mb-3 text-center">
-                                                <input type="email" class="form-control" id="floatingInput" placeholder="prenom.nom@eleves.enpc.fr" name="username">
-                                                <label for="floatingInput"><i class='bx bx-user'></i> Identifiant</label>
-                                            </div>
-                                            <!--Password-->
-                                            <div class="form-floating">
-                                                <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
-                                                <label for="floatingPassword"><i class='bx bx-lock'></i> Mot de passe</label>
-                                            </div>
-                                            <p>Connexion SSO</p> <a href="{% url 'password_reset' %}">Mot de passe oublié ?</a></p>
-                                            {% if form.errors %}
-                                            <p class="text-info">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
-                                            {% endif %}
-                                            <!--Validation Button-->
-                                            <input type="submit" class="btn btn-primary" value="Se connecter">
-                                            <input type="hidden" name="next" value="{{ next }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+    <body>
+        <!--Background-->
+        <div class="colored-circle"></div>
+        <div class="colored-circle"></div>
+        <div class="colored-circle"></div>
+        <div class="colored-circle"></div>
+        <!--EndBackground-->
+
+        <!--LoginContent-->
+        <div class="login-content">
+            <div class="login-card">
+                <div class="row h-100">
+                    <div class="col-sm-5 logo-col" style="padding: 1rem;">
+                        <img class="login-logo" src="{% static 'assets/img/logo.png' %}"  alt="">
+                        <h1 class="login-title">Bienvenue sur uPont</h1>
+                    </div>
+                    <div class="col-sm-7 white-border" style="padding: 1rem;">
+                        <form class="login-card-form" method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                            <h1 class="login-title">Connecte-toi !</h1>
+                            <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username">
+                            <input type="password" class="login-input" placeholder="Password" name="password">
+                            <p class="login-links"><a class="link" href="">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
+                            {% if form.errors %}
+                            <p class="login-links">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
+                            {% endif %}
+                            <input type="submit" class="btn btn-info" value="Se connecter">
+                            <input type="hidden" name="next" value="{{ next }}">
+                        </form>
                     </div>
                 </div>
             </div>
-        </section>
-        <!--Script Bootstrap-->
-        <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js'></script>
+        </div>
+
+        <!--Scripts-->
+        <!--<script src="https://unpkg.com/scrollreveal"></script>
+        <script>
+            ScrollReveal().reveal('.login-card', {duration: 1000,distance: '150%', origin: 'right', opacity: 0});
+            ScrollReveal().reveal('.login-logo', {duration: 1000,distance: '1000%', origin: 'top', opacity: 0});
+            ScrollReveal().reveal('.login-input', {duration: 1000,delay: 650, distance: '1000%', origin: 'bottom', opacity: 0});
+            ScrollReveal().reveal('.login-title', {duration: 1000,delay: 850, distance: '1000%', origin: 'left', opacity: 0});
+            ScrollReveal().reveal('.login-links', {duration: 1000,delay: 1050, distance: '1000%', origin: 'right', opacity: 0});
+            ScrollReveal().reveal('.btn', {duration: 1000,delay: 1250, distance: '1000%', origin: 'bottom', opacity: 0});
+            window.onbeforeunload = function () {
+                window.scrollTo(0, 0);
+            }
+        </script>-->
+        <!--EndScripts-->
+
     </body>
-</html> <!..><
+</html>
