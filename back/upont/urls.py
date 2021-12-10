@@ -22,8 +22,9 @@ from . import views
 
 urlpatterns = [
     path("login/", views.login),
-    path("", views.index),
+    # path("", views.index),
     path("social/", include("social.urls")),
+    path("news/", include("news.urls")),
     path("glasscard/", views.glasscard),
     path("admin/", admin.site.urls),
 ]

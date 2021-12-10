@@ -81,15 +81,13 @@ class ShotgunModelTest(TestCase):
         self.assertTrue(shotgun.is_ended())
 
     def test_shotgun_not_ended(self):
-        shotgun = Shotgun(title="Shotgun", content="Un shotgun", size=1)
-        self.assertFalse(shotgun.is_ended())
-        shotgun_2 = Shotgun(
+        shotgun = Shotgun(
             title="Shotgun",
             content="Un shotgun",
             ending_date=timezone.now() + datetime.timedelta(seconds=10),
             size=1,
         )
-        self.assertFalse(shotgun_2.is_ended())
+        self.assertFalse(shotgun.is_ended())
 
     def test_get_right_participants(self):
         shotgun, participation1, participation2 = self.shotgun_with_two_participants()

@@ -55,6 +55,7 @@ class Comment(models.Model):
 class Participation(models.Model):
     participant = models.ForeignKey("social.Student", on_delete=models.CASCADE)
     shotgun_date = models.DateTimeField()
+    motivation = models.TextField(null=True)
 
 
 class Shotgun(models.Model):
@@ -67,7 +68,7 @@ class Shotgun(models.Model):
     )
     content = models.TextField()
     starting_date = models.DateTimeField()
-    ending_date = models.DateTimeField(null=True)
+    ending_date = models.DateTimeField()
     size = models.IntegerField(default=0)
     requires_motivation = models.BooleanField(default=False)
     participations = models.ManyToManyField(
