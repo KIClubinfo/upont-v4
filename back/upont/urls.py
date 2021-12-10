@@ -21,10 +21,9 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    path("login/", views.login),
     path("social/", include("social.urls")),
     path("admin/", admin.site.urls),
-    path('', include('django.contrib.auth.urls')),
+    path("", include('django.contrib.auth.urls')),
 ]
 
 # Only for dev, gives anyone access to any image

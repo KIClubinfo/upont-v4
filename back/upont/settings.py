@@ -93,7 +93,7 @@ DATABASES = {
 # Login redirection
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "social/index_users"
+LOGIN_REDIRECT_URL = "/social/index_users"
 
 
 # Password validation
@@ -154,4 +154,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "../media/")
 
 DEFAULT_FROM_EMAIL = "flyfft@gmail.com"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "../emails/")
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
