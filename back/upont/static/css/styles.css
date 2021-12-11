@@ -503,6 +503,8 @@ h1,h2,h3,h4,h5,h6{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    height: 100%;
     /* Styling */
     color: white;
 }

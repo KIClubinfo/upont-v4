@@ -1,5 +1,4 @@
 {% load static %}
-<!--Header-->
 <!doctype html>
 <html>
     <!--Header-->
@@ -31,7 +30,7 @@
                         {% csrf_token %}
                             <h1 class="login-title">Connecte-toi !</h1>
                             <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username">
-                            <input type="password" class="login-input" placeholder="Password" name="password">
+                            <input type="password" class="login-input" placeholder="mot de passe" name="password">
                             <p class="login-links"><a class="link" href="">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
                             {% if form.errors %}
                             <p class="login-links">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
@@ -45,18 +44,8 @@
         </div>
 
         <!--Scripts-->
-        <!--<script src="https://unpkg.com/scrollreveal"></script>
-        <script>
-            ScrollReveal().reveal('.login-card', {duration: 1000,distance: '150%', origin: 'right', opacity: 0});
-            ScrollReveal().reveal('.login-logo', {duration: 1000,distance: '1000%', origin: 'top', opacity: 0});
-            ScrollReveal().reveal('.login-input', {duration: 1000,delay: 650, distance: '1000%', origin: 'bottom', opacity: 0});
-            ScrollReveal().reveal('.login-title', {duration: 1000,delay: 850, distance: '1000%', origin: 'left', opacity: 0});
-            ScrollReveal().reveal('.login-links', {duration: 1000,delay: 1050, distance: '1000%', origin: 'right', opacity: 0});
-            ScrollReveal().reveal('.btn', {duration: 1000,delay: 1250, distance: '1000%', origin: 'bottom', opacity: 0});
-            window.onbeforeunload = function () {
-                window.scrollTo(0, 0);
-            }
-        </script>-->
+        <script src="https://unpkg.com/scrollreveal"></script>
+        <script src="{% static 'js/login_appear.js' %}"></script>
         <!--EndScripts-->
 
     </body>
