@@ -29,6 +29,9 @@
                         <form class="login-card-form" method="post" action="{% url 'login' %}">
                         {% csrf_token %}
                             <h1 class="login-title">Connecte-toi !</h1>
+                            {% if next %}
+                                <p> Connecte-toi pour accéder à cette page ! </p>
+                            {% endif %}
                             <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username">
                             <input type="password" class="login-input" placeholder="mot de passe" name="password">
                             <p class="login-links"><a class="link" href="">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
