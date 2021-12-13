@@ -23,7 +23,6 @@ from . import views
 urlpatterns = [
     path("social/", include("social.urls")),
     path("news/", include("news.urls")),
-    path("glasscard/", views.glasscard),
     path("admin/", admin.site.urls),
     path("", include('django.contrib.auth.urls')),
 ]
