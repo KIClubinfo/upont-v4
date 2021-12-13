@@ -36,7 +36,7 @@
                             <input type="password" class="login-input" placeholder="mot de passe" name="password">
                             <p class="login-links"><a class="link" href="">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
                             {% if form.errors %}
-                            <p class="login-links">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
+                                <p class="login-links">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
                             {% endif %}
                             <input type="submit" class="btn btn-info" value="Se connecter">
                             <input type="hidden" name="next" value="{{ next }}">
