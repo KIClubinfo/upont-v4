@@ -9,6 +9,8 @@ def index_users(request):
     context = {'all_student_list': all_student_list}
     return render(request, 'social/index_users.html', context)
 
+def index_profile(request):
+    return render(request, 'social/index_profile.html')
 
 def index_clubs(request):
     all_clubs_list = Club.objects.order_by('name')
