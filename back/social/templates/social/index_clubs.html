@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<p>Index de l'ensemble des clubs</p>
+{% for club in all_clubs_list %}
+<p> <a href="{% url 'social:club_detail' club.id %}">
+    {%if club.logo%}<img src={{club.logo.path}} width="100" height="100"> {%endif%}
+    {{club.name}}
+    {% if club.nickname %} ({{club.nickname}}) {% endif %} </a> </p>
+{% endfor %}
+</body>
+</html>
