@@ -1,0 +1,55 @@
+{% load static %}
+<!doctype html>
+<html>
+    <!--Header-->
+    <head>
+        <meta charset='utf-8'>
+        <title>Index</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <!--Background-->
+        <div class="colored-circle"></div>
+        <div class="colored-circle"></div>
+        <div class="colored-circle"></div>
+        <div class="colored-circle"></div>
+        <!--EndBackground-->
+
+        <!--LoginContent-->
+        <div class="login-content">
+            <div class="login-card">
+                <div class="row h-100">
+                    <div class="col-sm-5 logo-col" style="padding: 1rem;">
+                        <img class="login-logo" src="{% static 'assets/img/logo.png' %}"  alt="">
+                        <h1 class="login-title">Bienvenue sur uPont</h1>
+                    </div>
+                    <div class="col-sm-7 white-border" style="padding: 1rem;">
+                        <form class="login-card-form" method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                            <h1 class="login-title">Connecte-toi !</h1>
+                            {% if next %}
+                                <p> Connecte-toi pour accéder à cette page ! </p>
+                            {% endif %}
+                            <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username">
+                            <input type="password" class="login-input" placeholder="mot de passe" name="password">
+                            <p class="login-links"><a class="link" href="">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
+                            {% if form.errors %}
+                                <p class="login-links">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
+                            {% endif %}
+                            <input type="submit" class="btn btn-info" value="Se connecter">
+                            <input type="hidden" name="next" value="{{ next }}">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Scripts-->
+        <script src="https://unpkg.com/scrollreveal"></script>
+        <script src="{% static 'js/login_appear.js' %}"></script>
+        <!--EndScripts-->
+
+    </body>
+</html>
