@@ -84,6 +84,12 @@ def partition(words):
         yield result  # cough up r
 
 
+@login_required
+def index_profile(request):
+    return render(request, "social/index_profile.html")
+
+
+@login_required
 @login_required(login_url="/login/")
 def profile_edit(request):
     student_id = request.user.id
