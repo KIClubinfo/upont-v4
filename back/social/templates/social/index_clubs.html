@@ -1,15 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
-<p>Index de l'ensemble des clubs</p>
-{% for club in all_clubs_list %}
-<p> <a href="{% url 'social:club_detail' club.id %}">
-    {%if club.logo%}<img src={{club.logo.path}} width="100" height="100"> {%endif%}
-    {{club.name}}
-    {% if club.nickname %} ({{club.nickname}}) {% endif %} </a> </p>
-{% endfor %}
-</body>
+{% load static %}
+<!--Header-->
+{% include "header.html" %}
+<!--Sidenav-->
+{% include "../social/sidenav.html" with active_link="clubs" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                    <!--<div class="col" style="text-align: end;">
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                    </div>-->
+                </div>
+            </div>
+            <div class="content-main">
+                <div class="row">
+                    <div class="col-clublg-8">
+                        <h4 class="page-subtitle">Clubs & Assos</h4>
+                        <div class="row">
+
+                            <!--Clubs cards-->
+                            {% for club in all_clubs_list %}
+                            <div class="col-clubmd-4 col-clubsm-6">
+                                <div class="club-card">
+                                    <div class="club-card-content">
+                                        {%if club.logo%}
+                                            <img class="club-card-image" src={{club.logo.path}} alt="">
+                                        {%endif%}
+
+                                    </div>
+                                    <div class="club-card-title">
+                                        <span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span>
+                                    </div>
+                                    <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <!--End of clubs cards-->
+
+                        </div>
+                    </div>
+                    <div class="col-clublg-4">
+                        <h4 class="page-subtitle-2">Mes clubs & assos</h4>
+                        <div class="row">
+
+                            <!--My Clubs cards-->
+                            <div class="col-12">
+                                <div class="vignette-club-mini">
+                                    <img class="vignette-image-mini" src="{% static 'assets/img/bde.png' %}" alt="">
+                                    <div class="vignette-mini-title">
+                                        <span>Bureau des élèves <br> Jurassic Pont</span>
+                                        <span class="vignette-mini-role"><br>Responsable voyage</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--End of My Clubs cards-->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+
+    </body>
 </html>
