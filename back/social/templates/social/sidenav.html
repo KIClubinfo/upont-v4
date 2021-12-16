@@ -9,7 +9,7 @@
         <div class="sidenav-links">
             <a href="#" class="sidenav-link {% if active_link == 'news' %} active {% endif %}"><i class="fas fa-newspaper "></i></a>
             <a href="/social/index_users" class="sidenav-link {% if active_link  == 'users' %} active {% endif %}"><i class="fas fa-user-graduate "></i></a>
-            <a href="#" class="sidenav-link {% if active_link == 'clubs' %} active {% endif %}"><i class="fas fa-gamepad "></i></a>
+            <a href="{% url 'social:club_index' %}" class="sidenav-link {% if active_link == 'clubs' %} active {% endif %}"><i class="fas fa-gamepad "></i></a>
             <a href="#" class="sidenav-link {% if active_link == 'resources' %} active {% endif %}"><i class="fas fa-file-alt "></i></a>
             <a href="{% url 'social:profile' %}" class="sidenav-link {% if active_link == 'profile' %} active {% endif %}"><i class="fas fa-address-card "></i></a>
             <a href="#" class="sidenav-link {% if active_link == 'admin' %} active {% endif %}"><i class="fas fa-user-edit "></i></a>

@@ -1,15 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-</head>
-<body>
-<p>Vue du club</p>
-{%if club.logo%}
-<p><img src={{club.logo.path}} width="400" height="400"> </p>
-{%endif%}
-<p>{{club.name}} {% if club.nickname %} ({{club.nickname}}) {% endif %}:</p>
-<p> {{club.description}}</p>
-<p> <a href="{% url 'social:club_index' %}"> Retour à l'index </a></p>
-</body>
+{% load static %}
+<!--Header-->
+{% include "header.html" %}
+<!--Sidenav-->
+{% include "../social/sidenav.html" with active_link="clubs" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                    <!--<div class="col" style="text-align: end;">
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                    </div>-->
+                </div>
+            </div>
+            <div class="content-main">
+                <div class="club-box">
+                    <div class="club-group-image-container">
+                        <img src="{% static 'assets/img/equipe.jpg' %}" class="club-group-image" alt="">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="club-image">
+                                {%if club.logo%}
+                                    <img src={{club.logo.path}} height="100%" width="100%" alt="">
+                                {%endif%}
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="club-title">{{club.name}} {% if club.nickname %}- ({{club.nickname}}) {% endif %}</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="club-description-content">
+                                <span class="club-description-title">Description du club</span>
+                                <p class="club-description">{{club.description}}</p>
+                                <p><a href="{% url 'social:club_index' %}"> Retour à l'index </a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
 </html>
