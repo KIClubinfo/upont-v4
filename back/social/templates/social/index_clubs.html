@@ -31,10 +31,11 @@
                             <div class="col-clubmd-4 col-clubsm-6">
                                 <div class="club-card">
                                     <div class="club-card-content">
-                                        {%if club.logo%}
+                                        {% if club.logo %}
                                             <img class="club-card-image" src={{club.logo.path}} alt="">
-                                        {%endif%}
-
+                                        {% else %}
+                                            <img class="club-card-image" src="{% static 'assets/img/user.jpeg' %}" alt="">
+                                        {% endif %}
                                     </div>
                                     <div class="club-card-title">
                                         <span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span>
