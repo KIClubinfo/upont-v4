@@ -8,31 +8,26 @@ from social.models import Student
 from .models import Participation, Shotgun
 
 
-@login_required(login_url="/login/")
+@login_required()
 def shotguns(request):
     next_shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by(
         "starting_date"
     )
-    if len(next_shotguns) == 0:
-        has_next_shotguns = False
-    else:
-        has_next_shotguns = True
+    has_next_shotguns = not len(next_shotguns) == 0
     old_shotguns = Shotgun.objects.filter(ending_date__lte=timezone.now()).order_by(
         "ending_date"
     )
-    if len(old_shotguns) == 0:
-        has_old_shotguns = False
-    else:
-        has_old_shotguns = True
-    user_shotguns = Shotgun.objects.filter(
-        participations__participant__id__in=[
-            Student.objects.get(user__id=request.user.id).id
-        ]
-    )
-    if len(user_shotguns) == 0:
+    has_old_shotguns = not len(old_shotguns) == 0
+    if request.user.is_superuser:
         has_user_shotguns = False
+        user_shotguns = []
     else:
-        has_user_shotguns = True
+        user_shotguns = Shotgun.objects.filter(
+            participations__participant__id__in=[
+                Student.objects.get(user__id=request.user.id).id
+            ]
+        )
+        has_user_shotguns = not len(user_shotguns) == 0
     context = {
         "next_shotguns": next_shotguns,
         "has_next_shotguns": has_next_shotguns,
@@ -44,12 +39,16 @@ def shotguns(request):
     return render(request, "news/shotguns.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def shotgun_detail(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
-    student = Student.objects.get(user__id=request.user.id)
-    already_participated = shotgun.participated(student)
-    got_accepted = shotgun.got_accepted(student)
+    if request.user.is_superuser:
+        already_participated = False
+        got_accepted = False
+    else:
+        student = Student.objects.get(user__id=request.user.id)
+        already_participated = shotgun.participated(student)
+        got_accepted = shotgun.got_accepted(student)
     context = {
         "shotgun": shotgun,
         "already_participated": already_participated,
@@ -58,9 +57,11 @@ def shotgun_detail(request, shotgun_id):
     return render(request, "news/shotgun_detail.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def shotgun_participate(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
+    if request.user.is_superuser:
+        return HttpResponseRedirect(reverse("shotgun_detail", args=(shotgun_id,)))
     student = Student.objects.get(user__id=request.user.id)
     if shotgun.participated(student):
         return HttpResponseRedirect(reverse("shotgun_detail", args=(shotgun_id,)))

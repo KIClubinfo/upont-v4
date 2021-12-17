@@ -15,7 +15,7 @@ class Event(models.Model):
         blank=True,
     )
     shotgun = models.ForeignKey(
-        "Shotgun", on_delete=models.CASCADE, null=True, blank=True
+        "Shotgun", on_delete=models.SET_NULL, null=True, blank=True
     )
 
     def __str__(self):
