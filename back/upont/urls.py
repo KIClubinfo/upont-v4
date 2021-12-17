@@ -26,7 +26,7 @@ urlpatterns = [
     path("index_admin/", views.index_admin),
     path("social/", include("social.urls")),
     path("admin/", admin.site.urls),
-    path("tellme/", include("tellme.urls")),
+    path("tellme/", include("tellme.urls"), name="tellme"),
 ]
 
 # Only for dev, gives anyone access to any image
