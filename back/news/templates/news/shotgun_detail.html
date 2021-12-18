@@ -47,6 +47,9 @@
                     <h1>{{shotgun.title}}</h1>
                     {%if already_participated%}
                         <h3 style="text-align: center">Tu as participé à ce shotgun.</h3>
+                        {%if shotgun.requires_motivation%}
+                            <h5>Ta motivation :</h5> {{motivation}}
+                        {% endif %}
                     {%else%}
                         {%if shotgun.is_started%}
                             {%if shotgun.is_ended%}

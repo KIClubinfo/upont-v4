@@ -49,10 +49,16 @@ def shotgun_detail(request, shotgun_id):
         student = Student.objects.get(user__id=request.user.id)
         already_participated = shotgun.participated(student)
         got_accepted = shotgun.got_accepted(student)
+        participation = shotgun.participations.filter(participant=student)
+        if len(participation) > 0:
+            motivation = participation[0].motivation
+        else:
+            motivation = ""
     context = {
         "shotgun": shotgun,
         "already_participated": already_participated,
         "got_accepted": got_accepted,
+        "motivation": motivation,
     }
     return render(request, "news/shotgun_detail.html", context)
 
