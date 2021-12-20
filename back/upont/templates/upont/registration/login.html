@@ -30,7 +30,11 @@
                         {% csrf_token %}
                             <h1 class="login-title">Connecte-toi !</h1>
                             {% if next %}
-                                <p> Connecte-toi pour accéder à cette page ! </p>
+                                {% if user.is_authenticated %}
+                                    <p>Ton compte n'a pas accès à cette page. Pour continuer, connecte-toi avec un compte ayant les droits suffisants.</p>
+                                {% else %}
+                                    <p>Connecte-toi pour accéder à cette page !</p>
+                                {% endif %}
                             {% endif %}
                             <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username" required>
                             <input type="password" class="login-input" placeholder="mot de passe" name="password" required>
