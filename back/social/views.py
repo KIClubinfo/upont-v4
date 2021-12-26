@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import EditProfile
 from .models import Club, Membership, Student
 
 
@@ -12,11 +13,45 @@ def index_users(request):
 
 
 @login_required(login_url="/login/")
-def index_profile(request, student_id):
+def index_profile(request, student_id=None):
+    if student_id is None:
+        student_id = request.user.id
     student = get_object_or_404(Student, pk=student_id)
     membership_club_list = Membership.objects.filter(student__pk=student_id)
     context = {"student": student, "membership_club_list": membership_club_list}
-    return render(request, "social/index_profile.html", context)
+    if student_id == request.user.id:
+        return render(request, "social/index_profile.html", context)
+    else:
+        return render(request, "social/profile.html", context)
+
+
+@login_required(login_url="/login/")
+def edit_profile(request):
+    student_id = request.user.id
+    student = get_object_or_404(Student, pk=student_id)
+    membership_club_list = Membership.objects.filter(student__pk=student_id)
+    context = {"student": student, "membership_club_list": membership_club_list}
+
+    if request.method == "POST":
+        form = EditProfile(request.POST, request.FILES)
+        if form.is_valid():
+            Student.objects.filter(pk=student_id).update(
+                phone_number=form.cleaned_data["phone_number"]
+            )
+            Student.objects.filter(pk=student_id).update(
+                department=form.cleaned_data["department"]
+            )
+            Student.objects.filter(pk=student_id).update.picture(
+                picture=request.FILES["picture"]
+            )
+            return redirect("/social/index_profile")
+
+    else:
+        form = EditProfile()
+        form.fields["phone_number"].widget.attrs["placeholder"] = student.phone_number
+        form.fields["department"].initial = student.department
+        context["EditProfile"] = form
+    return render(request, "social/edit_profile.html", context)
 
 
 @login_required
