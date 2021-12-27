@@ -33,7 +33,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <form action="" method="post">
+                                <form action="" method="post" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     {{ EditProfile.non_field_errors }}
                                     <div class="col-lg-5" style="text-align: center;">
@@ -46,6 +46,7 @@
                                         {{ EditProfile.department.errors }}
                                         {{ EditProfile.department }}
                                     </div>
+                                    {{ EditProfile.picture }}
                                     <input type="submit" value="Submit">
                                 </form>
                             </div>
