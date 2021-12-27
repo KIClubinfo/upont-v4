@@ -33,22 +33,16 @@ def edit_profile(request):
     context = {"student": student, "membership_club_list": membership_club_list}
 
     if request.method == "POST":
-        form = EditProfile(request.POST, request.FILES)
+        form = EditProfile(
+            request.POST, request.FILES, instance=Student.objects.get(user=request.user)
+        )
         if form.is_valid():
-            Student.objects.filter(pk=student_id).update(
-                phone_number=form.cleaned_data["phone_number"]
-            )
-            Student.objects.filter(pk=student_id).update(
-                department=form.cleaned_data["department"]
-            )
-            Student.objects.filter(pk=student_id).update.picture(
-                picture=request.FILES["picture"]
-            )
+            student = form.save()
             return redirect("/social/index_profile")
 
     else:
         form = EditProfile()
-        form.fields["phone_number"].widget.attrs["placeholder"] = student.phone_number
+        form.fields["phone_number"].initial = student.phone_number
         form.fields["department"].initial = student.department
         context["EditProfile"] = form
     return render(request, "social/edit_profile.html", context)
