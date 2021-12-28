@@ -21,34 +21,23 @@
                 </div>
             </div>
             <div class="content-main">
-                <div class="box profil-box">
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="row">
-                                <div class="col-lg-5">
-                                    <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
-                                </div>
-                                <div class="col-lg-7" style="text-align: center;">
-                                    <div class="section-title">Ses informations</div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-5" style="text-align: center;">
-                                    <input class="profil-input" type="text" placeholder={{student.user.first_name}}>
-                                    <input class="profil-input" type="text" placeholder={{student.phone_number}}>
-                                </div>
-                                <div class="col-lg-7" style="text-align: center;">
-                                    <input class="profil-input" type="text" placeholder={{student.user.last_name}}>
-                                    <input class="profil-input" type="text" placeholder={{student.department}}>
-                                </div>
-                            </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="box profil-box">
+                            <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                            <div class="section-title">{{student.user.first_name}} {{student.user.last_name}} </div>
+                            <div class="profil-information-box">{{student.phone_number}}</div>
+                            <div class="profil-information-box">{{student.department}}</div>
+                            <div class="profil-information-box">Information 5 : ----------</div>
                         </div>
-                        <div class="col-lg-4" style="border-left: solid hsla(0, 0%, 100%, 0.25) 0.25px;">
-                            <div class="section-title">Ses activités associatives</div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="section-title">Dernières activités</div>
+                        <div class="box mt-3">
                             {% if membership_club_list %}
                                 {% for membership in membership_club_list %}
                                     <div class="user-card">
-                                        <div class="user-image"><img src="{{membership.club.logo.url}}" alt=""></div>
+                                        <div class="user-image"><img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
                                         <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}{{membership.club.nickname}}{% endif %}</span> <span>{{membership.role.name}}</span></div>
                                     </div>
                                 {% endfor %}

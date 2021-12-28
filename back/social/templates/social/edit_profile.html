@@ -14,10 +14,6 @@
                             <button class="button search-button"><i class="fas fa-search "></i></button>
                         </div>
                     </div>
-                    <!--<div class="col" style="text-align: end;">
-                        <button class="button"><i class="fas fa-bell"></i></button>
-                        <button class="button"><i class="fas fa-bell"></i></button>
-                    </div>-->
                 </div>
             </div>
             <div class="content-main">
@@ -37,17 +33,21 @@
                                     {% csrf_token %}
                                     {{ EditProfile.non_field_errors }}
                                     <div class="col-lg-5" style="text-align: center;">
-                                        <div class="profil-input">{{student.user.first_name}}</div>
+                                        <div class="profil-information-box">{{student.user.first_name}}</div>
                                         {{ EditProfile.phone_number.errors }}
                                         {{ EditProfile.phone_number }}
                                     </div>
                                     <div class="col-lg-7" style="text-align: center;">
-                                        <div class="profil-input">{{student.user.last_name}}</div>
+                                        <div class="profil-information-box">{{student.user.last_name}}</div>
                                         {{ EditProfile.department.errors }}
                                         {{ EditProfile.department }}
+                                        {{ EditProfile.picture }}
+                                        <div style="text-align: center;">
+                                            <input class="button red-button" type="reset" value="Annuler">
+                                            <input class="button green-button" type="submit" value="Valider">
+                                        </div>
                                     </div>
-                                    {{ EditProfile.picture }}
-                                    <input type="submit" value="Submit">
+
                                 </form>
                             </div>
                         </div>
@@ -76,3 +76,4 @@
 
     </body>
 </html>
+
