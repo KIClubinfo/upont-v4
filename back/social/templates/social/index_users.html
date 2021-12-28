@@ -27,11 +27,13 @@
                         {% for student in all_student_list %}
                             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                 <div class="user-card">
-                                    <div class="user-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
-                                    <div class="user-information">
-                                        <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
-                                        <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
-                                    </div>
+                                    <a href="{% url 'social:profile'%}{{student.user.id}}" >
+                                        <div class="user-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                        <div class="user-information">
+                                            <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
+                                            <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         {% endfor %}
