@@ -4,12 +4,12 @@
             <div class="search-input-group">
                 <datalist id="search-choices">
                     {% for student in all_student_list %}
-                        <option value="{{student.user.pk}}">{{student.user.first_name}}  {{student.user.last_name}} - '{{student.promo.nickname}}</option>
+                        <option value="{{student.user.first_name}} {{student.user.last_name}}">{{student.user.first_name}} {{student.user.last_name}} - {{student.department}} - '{{student.promo.nickname}}</option>
                     {% endfor %}
                 </datalist>
                 <form>
-                    <input list="search-choices" class="search-input" placeholder="Rechercher" type="text" name="search" value="{{request.GET.title}}">
-                    <button class="button search-button" type="submit" formaction="/social/search/{{request.GET.title}}"><i class="fas fa-search "></i></button>
+                    <input name="search" type="text" list="search-choices" class="search-input" placeholder="Rechercher">
+                    <button class="button search-button" type="submit" formaction="{% url 'social:search' %}"><i class="fas fa-search "></i></button>
                 </form>
             </div>
         </div>

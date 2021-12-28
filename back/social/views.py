@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import EditProfile
@@ -32,12 +33,26 @@ def profile(request, student_id=None):
 
 @login_required(login_url="/login/")
 def search(request):
-    target_user_id = request.GET.get("search", None)
-    if target_user_id is None:
-        return redirect("/social/index_users/")
-    else:
-        get_object_or_404(Student, pk=target_user_id)
-        return redirect("social:profile_viewed", target_user_id)
+    all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
+    context = {"all_student_list": all_student_list}
+    searched_expression = "Avant de trouver quelque chose, il faut le chercher."
+    if ("search" in request.GET) and request.GET["search"].strip():
+        searched_expression = request.GET.get("search", None)
+        key_words_list = [word.strip() for word in searched_expression.split()]
+        query = Q()
+        for key_word in key_words_list:
+            query &= (
+                Q(user__first_name__icontains=key_word)
+                | Q(user__last_name__icontains=key_word)
+                | Q(promo__nickname__icontains=key_word)
+                | Q(department=key_word)
+            )
+        found_students = Student.objects.filter(query).order_by(
+            "-promo__year", "user__first_name"
+        )
+        context["found_students"] = found_students
+    context["searched_expression"] = searched_expression
+    return render(request, "social/search_result.html", context)
 
 
 @login_required(login_url="/login/")
