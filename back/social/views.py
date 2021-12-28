@@ -13,14 +13,14 @@ def index_users(request):
 
 
 @login_required(login_url="/login/")
-def index_profile(request, student_id=None):
+def profile(request, student_id=None):
     if student_id is None:
         student_id = request.user.id
     student = get_object_or_404(Student, pk=student_id)
     membership_club_list = Membership.objects.filter(student__pk=student_id)
     context = {"student": student, "membership_club_list": membership_club_list}
     if student_id == request.user.id:
-        return render(request, "social/index_profile.html", context)
+        return render(request, "social/profile.html", context)
     else:
         return render(request, "social/profile_viewed.html", context)
 
@@ -39,7 +39,7 @@ def profile_edit(request):
         if form.is_valid():
             student.picture.delete()
             form.save()
-            return redirect("/social/index_profile")
+            return redirect("/social/profile")
 
     else:
         form = EditProfile()
