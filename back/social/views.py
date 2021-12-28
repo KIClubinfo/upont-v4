@@ -18,7 +18,12 @@ def profile(request, student_id=None):
         student_id = request.user.id
     student = get_object_or_404(Student, pk=student_id)
     membership_club_list = Membership.objects.filter(student__pk=student_id)
-    context = {"student": student, "membership_club_list": membership_club_list}
+    all_student_list = Student.objects.order_by("user__first_name")
+    context = {
+        "all_student_list": all_student_list,
+        "student": student,
+        "membership_club_list": membership_club_list,
+    }
     if student_id == request.user.id:
         return render(request, "social/profile.html", context)
     else:
@@ -26,11 +31,26 @@ def profile(request, student_id=None):
 
 
 @login_required(login_url="/login/")
+def search(request):
+    target_user_id = request.GET.get("search", None)
+    if target_user_id is None:
+        return redirect("/social/index_users/")
+    else:
+        get_object_or_404(Student, pk=target_user_id)
+        return redirect("social:profile_viewed", target_user_id)
+
+
+@login_required(login_url="/login/")
 def profile_edit(request):
     student_id = request.user.id
     student = get_object_or_404(Student, pk=student_id)
     membership_club_list = Membership.objects.filter(student__pk=student_id)
-    context = {"student": student, "membership_club_list": membership_club_list}
+    all_student_list = Student.objects.order_by("user__first_name")
+    context = {
+        "all_student_list": all_student_list,
+        "student": student,
+        "membership_club_list": membership_club_list,
+    }
 
     if request.method == "POST":
         if "Annuler" in request.POST:
