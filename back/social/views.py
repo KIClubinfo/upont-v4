@@ -37,7 +37,8 @@ def edit_profile(request):
             request.POST, request.FILES, instance=Student.objects.get(user=request.user)
         )
         if form.is_valid():
-            student = form.save()
+            student.picture.delete()
+            form.save()
             return redirect("/social/index_profile")
 
     else:
