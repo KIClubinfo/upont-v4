@@ -22,11 +22,11 @@ def index_profile(request, student_id=None):
     if student_id == request.user.id:
         return render(request, "social/index_profile.html", context)
     else:
-        return render(request, "social/profile.html", context)
+        return render(request, "social/profile_viewed.html", context)
 
 
 @login_required(login_url="/login/")
-def edit_profile(request):
+def profile_edit(request):
     student_id = request.user.id
     student = get_object_or_404(Student, pk=student_id)
     membership_club_list = Membership.objects.filter(student__pk=student_id)
@@ -46,7 +46,7 @@ def edit_profile(request):
         form.fields["phone_number"].initial = student.phone_number
         form.fields["department"].initial = student.department
         context["EditProfile"] = form
-    return render(request, "social/edit_profile.html", context)
+    return render(request, "social/profile_edit.html", context)
 
 
 @login_required
