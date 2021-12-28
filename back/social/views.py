@@ -33,14 +33,19 @@ def profile_edit(request):
     context = {"student": student, "membership_club_list": membership_club_list}
 
     if request.method == "POST":
-        form = EditProfile(
-            request.POST, request.FILES, instance=Student.objects.get(user=request.user)
-        )
-        if form.is_valid():
-            if "picture" in request.FILES:
-                student.picture.delete()
-            form.save()
+        if "Annuler" in request.POST:
             return redirect("/social/profile")
+        elif "Valider" in request.POST:
+            form = EditProfile(
+                request.POST,
+                request.FILES,
+                instance=Student.objects.get(user=request.user),
+            )
+            if form.is_valid():
+                if "picture" in request.FILES:
+                    student.picture.delete()
+                form.save()
+                return redirect("/social/profile")
 
     else:
         form = EditProfile()
