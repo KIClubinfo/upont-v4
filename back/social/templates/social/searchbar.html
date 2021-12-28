@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<div class="content-header">
+    <div class="row justify-content-between w-100">
+        <div class="col">
+            <div class="search-input-group">
+                <datalist id="search-choices">
+                    {% for student in all_student_list %}
+                        <option value="{{student.user.pk}}">{{student.user.first_name}}  {{student.user.last_name}} - '{{student.promo.nickname}}</option>
+                    {% endfor %}
+                </datalist>
+                <form>
+                    <input list="search-choices" class="search-input" placeholder="Rechercher" type="text" name="search" value="{{request.GET.title}}">
+                    <button class="button search-button" type="submit" formaction="/social/search/{{request.GET.title}}"><i class="fas fa-search "></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
