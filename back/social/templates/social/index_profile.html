@@ -31,7 +31,11 @@
                             <div class="row">
                                 <div class="col-lg-5" style="text-align: center;">
                                     <div class="profil-information-box">{{student.user.first_name}}</div>
-                                    <div class="profil-information-box">{{student.phone_number}}</div>
+                                    {% if student.phone_number is not None %}
+                                        <div class="profil-information-box">{{student.phone_number}}</div>
+                                    {% else %}
+                                        <div class="profil-information-box">Tu peux entrer ton numéro de téléphone</div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-lg-7" style="text-align: center;">
                                     <div class="profil-information-box">{{student.user.last_name}}</div>
