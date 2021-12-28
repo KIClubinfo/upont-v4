@@ -14,10 +14,6 @@
                             <button class="button search-button"><i class="fas fa-search "></i></button>
                         </div>
                     </div>
-                    <!--<div class="col" style="text-align: end;">
-                        <button class="button"><i class="fas fa-bell"></i></button>
-                        <button class="button"><i class="fas fa-bell"></i></button>
-                    </div>-->
                 </div>
             </div>
             <div class="content-main">
@@ -26,7 +22,7 @@
                         <div class="col-lg-8">
                             <div class="row">
                                 <div class="col-lg-5">
-                                    <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                    <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" height="100%" width="100%" alt=""></div>
                                 </div>
                                 <div class="col-lg-7" style="text-align: center;">
                                     <div class="section-title">Mes informations personnelles</div>
@@ -34,12 +30,15 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-5" style="text-align: center;">
-                                    <input class="profil-input" type="text" placeholder={{student.user.first_name}}>
-                                    <input class="profil-input" type="text" placeholder={{student.phone_number}}>
+                                    <div class="profil-information-box">{{student.user.first_name}}</div>
+                                    <div class="profil-information-box">{{student.phone_number}}</div>
                                 </div>
                                 <div class="col-lg-7" style="text-align: center;">
-                                    <input class="profil-input" type="text" placeholder={{student.user.last_name}}>
-                                    <input class="profil-input" type="text" placeholder={{student.department}}>
+                                    <div class="profil-information-box">{{student.user.last_name}}</div>
+                                    <div class="profil-information-box">{{student.department}}</div>
+                                    <a href="/social/edit_profile"><!--REVOIR L'URL-->
+                                        <button class="button blue-button">Modifier mon profil</button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -48,7 +47,7 @@
                             {% if membership_club_list %}
                                 {% for membership in membership_club_list %}
                                     <div class="user-card">
-                                        <div class="user-image"><img src="{{membership.club.logo.url}}" alt=""></div>
+                                        <div class="user-image"><img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
                                         <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}{{membership.club.nickname}}{% endif %}</span> <span>{{membership.role.name}}</span></div>
                                     </div>
                                 {% endfor %}
