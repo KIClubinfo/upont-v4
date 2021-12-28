@@ -253,6 +253,29 @@ h1,h2,h3,h4,h5,h6{
     border-bottom: solid var(--border-color) var(--border-width);
 }
 
+.page-subtitle{
+    padding-bottom: 2rem;
+    margin: 0;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: solid var(--border-color) var(--border-width);
+}
+
+.page-subtitle-2{
+    padding-bottom: 2rem;
+    margin: 0;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: solid var(--border-color) var(--border-width);
+}
+
+@media(max-width:1319px){
+    .page-subtitle-2{
+        padding-top:2rem;
+        border-top: solid var(--border-color) var(--border-width);
+    }
+}
+
 .section-title{
     /* Sizing */
     padding: 2rem 0rem;
@@ -274,7 +297,8 @@ h1,h2,h3,h4,h5,h6{
     padding:1rem;
     /* Styling */
     color: white;
-    background: rgba(255, 255, 255, 0.09);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     border-radius: 0.5rem;
 }
 
@@ -288,6 +312,33 @@ h1,h2,h3,h4,h5,h6{
     border-radius: 0.5rem;
     background-color: rgba(255, 255, 255, 0.09);
     border-style: none;
+}
+
+.blue-button{
+    background-color: #3DC1F3;
+    margin:1rem;
+}
+
+.blue-button:hover{
+    background-color: #16a2d4;
+}
+
+.red-button{
+    background-color: #f33d3d;
+    margin:1rem;
+}
+
+.red-button:hover{
+    background-color: #c01717;
+}
+
+.green-button{
+    background-color: #00cc33;
+    margin:1rem;
+}
+
+.green-button:hover{
+    background-color: #008a22;
 }
 
 .search-button{
@@ -392,7 +443,7 @@ h1,h2,h3,h4,h5,h6{
 }
 
 /*-------------------------------------------------*/
-/*------------------- PROFIL IMG ------------------*/
+/*--------------- PROFIL COMPONENTS ---------------*/
 /*-------------------------------------------------*/
 
 .profil-image{
@@ -410,15 +461,29 @@ h1,h2,h3,h4,h5,h6{
     overflow: hidden;
 }
 
+.profil-information-box{
+    /* Sizing */
+    margin: 2rem auto;
+    padding: 0.5rem 1rem;
+    width: 80%;
+    /* Styling */
+    background-color: transparent;
+    border: solid var(--border-color) var(--border-width);
+    color: white;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0.5rem;
+}
+
 .profil-box{
-    margin-top: calc(141px);
+    margin-top: calc(125px);
 }
 
 .profil-input{
     /* Sizing */
     margin: 1rem auto;
     padding: 0.5rem 1rem;
-    width: 70%;
+    width: 80%;
     /* Styling */
     background-color: var(--primary-bg-color);
     border: solid var(--border-color) var(--border-width);
@@ -426,7 +491,6 @@ h1,h2,h3,h4,h5,h6{
     font-size: 1rem;
     font-weight: 400;
     border-radius: 0.5rem;
-    
 }
 
 .profil-input:focus{
@@ -503,6 +567,8 @@ h1,h2,h3,h4,h5,h6{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    height: 100%;
     /* Styling */
     color: white;
 }
@@ -547,6 +613,11 @@ h1,h2,h3,h4,h5,h6{
 .login-links{
     font-family:'Neue Helvetica Thin';
     text-align: center;
+}
+
+.login-errors{
+    color:#ffffff;
+    font-family: 'Neue Helvetica Medium';
 }
 
 .link{
@@ -616,4 +687,374 @@ h1,h2,h3,h4,h5,h6{
         border-left: none var(--border-color) var(--border-width);
         border-top: solid var(--border-color) var(--border-width);
     }
+}
+
+/*-------------------------------------------------*/
+/*------------ SINGLE CLUB COMPONENTS -------------*/
+/*-------------------------------------------------*/
+
+.club-box{
+    /* Styling */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 11rem;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    padding: 0rem 7rem;
+    border-radius: 0.5rem;
+    background-color: hsla(0, 0%, 100%, 0.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    max-width: 1500px;
+}
+
+@media(max-width:856px){
+    .club-box{
+        background-color: hsla(0, 0%, 100%, 0);
+        box-shadow: none;
+    }
+}
+
+.club-group-image-container{
+    margin-top: -10rem;
+    background: rgba(255, 255, 255, 0.09);
+    border-radius: 0.5rem;
+    max-height: 60vh;
+    overflow: hidden;
+}
+
+.club-group-image{
+    border-radius: 0.5rem;
+    width: 100%;
+    height: auto;
+}
+
+.club-image{
+    /* Positioning */
+    display: flex;
+    /* Sizing */
+    margin-top: -6rem;
+    margin-left: auto;
+    margin-right: auto;
+    height: 14rem;
+    width: 14rem;
+    /* Styling */
+    background-color: #26272b;
+    border: 8px solid var(--primary-bg-color);
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.club-title{
+    /* Sizing */
+    padding: 2rem 0rem;
+    margin: 0rem 3rem 0rem 0rem;
+    /* Styling */
+    text-align: left;
+    font-family:'Neue Helvetica Medium';
+    font-style: normal;
+    font-size: 1.5rem;
+
+    border-bottom: solid var(--border-color) var(--border-width);
+}
+
+.club-description-content{
+    margin: 1rem 3rem;
+}
+
+.club-description-title{
+    text-decoration: underline;
+    text-align: left;
+    font-style: normal;
+    font-size: 1rem;
+}
+
+.club-description{
+    font-family:'Neue Helvetica Ultra Light';
+    font-weight:normal;
+    margin: 1rem 0rem;
+    text-align: justify;
+    font-size: 1rem;
+}
+
+@media(max-width:440px){
+    .club-image{
+        margin-top: -4rem;
+        height: 10rem;
+        width: 10rem;
+    }
+}
+
+@media(max-width:857px){
+    .club-box{
+        padding: 0rem 0.5rem;
+        background-color: hsla(0, 0%, 100%, 0);
+    }
+
+    .club-description-content{
+        margin: 1rem 1rem;
+    }
+}
+
+@media(max-width:1168px){
+
+    .club-title{
+        margin: 0rem;
+        text-align: center;
+    }
+}
+
+/*-------------------------------------------------*/
+/*--------------- ALL CLUB COMPONENTS -------------*/
+/*-------------------------------------------------*/
+
+
+.club-card {
+    margin: 1.5rem auto;
+	position: relative;
+	height: 20rem;
+    width: 14rem;
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	backdrop-filter: blur(10px);
+}
+
+.club-card .club-card-content {
+	transition: 0.5s;
+}
+
+.club-card:hover .club-card-content {
+	transform: translateY(-50px);
+}
+
+.club-card .club-card-content .club-card-image{
+    /* Positioning */
+    display: flex;
+    /* Sizing */
+    margin: 1rem auto;
+    height: 11rem;
+    width: 11rem;
+    /* Styling */
+    border: 8px solid var(--primary-bg-color);
+    border-radius: 50%;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.club-card .club-card-title {
+    position: absolute;
+    text-align: center;
+	bottom: 50px;
+	display: flex;
+	transform: translateY(40px);
+	transition: 0.5s;
+	opacity: 0;
+}
+
+.club-card:hover .club-card-title{
+	transform: translateY(0px);
+	opacity: 1;
+}
+
+.vignette-club-mini{
+    display: flex;
+    margin-top: 2rem;
+    min-height: 6rem;
+    margin-left: auto;
+    margin-right: auto;
+    width: 20rem;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+@media(max-width:500px){
+    .vignette-club-mini{
+        width: 17rem;
+    }
+}
+
+.vignette-club-mini .vignette-image-mini{
+    /* Positioning */
+    display: flex;
+    /* Sizing */
+    height: 5rem;
+    width: 5rem;
+    margin-left: 0.7rem;
+    /* Styling */
+    border: 3px solid var(--primary-bg-color);
+    border-radius: 50%;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.vignette-club-mini .vignette-mini-title{
+    text-align: center;
+    margin: auto;
+    font-size: 1rem;
+}
+
+.vignette-club-mini .vignette-mini-role{
+    text-align: center;
+    margin: auto;
+    font-size: 0.8rem;
+}
+
+/*-------------------------------------------------*/
+/*----------------- NEWS COMPONENTS ---------------*/
+/*-------------------------------------------------*/
+
+.news-card{
+    margin: 1.5rem auto 0 auto;
+    width: 32rem;
+    min-height: 15rem;
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+	backdrop-filter: blur(10px);
+}
+
+.news-card-header{
+    height: 5rem;
+    padding: 0rem 1rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid var(--primary-bg-color);
+}
+
+.news-card-header-image{
+    /* Positioning */
+    display: flex;
+    /* Sizing */
+    height: 4rem;
+    width: 4rem;
+    /* Styling */
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.news-card-header-text{
+    margin-left: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.news-card-header-name{
+    font-family: 'Neue Helvetica Medium';
+    font-weight: normal;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+
+.news-card-header-title{
+    font-family: 'Neue Helvetica Thin';
+    font-weight: normal;
+    font-size: 0.9rem;
+}
+
+.news-card-content{
+    padding:1rem;
+    border-bottom: 2px solid var(--primary-bg-color);
+}
+
+.news-card-images{
+    height: 20rem;
+    padding:1rem;
+    border-bottom: 2px solid var(--primary-bg-color);
+}
+
+.news-card-carousel{
+    height: 90%;
+}
+
+.carousel-cell{
+    margin:0rem 0.5rem; 
+    height: 100%;
+}
+
+.news-card-actions{
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    border-bottom: 2px solid var(--primary-bg-color);
+}
+
+.news-card-buttons{
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.news-card-button{
+    font-size: 1.8rem;
+    margin: 0 0.5rem;
+}
+
+.news-card-comments{
+    padding: 0 1rem;
+}
+
+.news-card-comment-user-pic{
+    /* Positioning */
+    display: flex;
+    /* Sizing */
+    height: 3rem;
+    width: 3rem;
+    /* Styling */
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.news-card-comment{
+    display: flex;
+    justify-content: left;
+    padding: 1rem 0rem;
+}
+
+.news-card-comment-box{
+    /* Sizing */
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
+    width: 65%;
+    /* Styling */
+    background-color: transparent;
+    border: solid var(--border-color) var(--border-width);
+    color: white;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0.5rem;
+}
+
+.news-card-edit-comment{
+    display: flex;
+    justify-content: left;
+    padding: 1rem 0rem;
+}
+
+.news-card-edit-comment-input{
+    /* Sizing */
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
+    width: 85%;
+    /* Styling */
+    background-color: var(--primary-bg-color);
+    border: solid var(--border-color) var(--border-width);
+    color: white;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0.5rem;
+}
+
+.news-card-edit-comment-input:focus{
+    outline: 0;
 }
