@@ -4,7 +4,7 @@
             <div class="search-input-group">
                 <datalist id="search-choices">
                     {% for student in all_student_list %}
-                        <option value="{{student.user.first_name}} {{student.user.last_name}}">{{student.user.first_name}} {{student.user.last_name}} - {{student.department}} - '{{student.promo.nickname}}</option>
+                        <option value="{{student.user.first_name}} {{student.user.last_name}} {{student.department}} {{student.promo.nickname}}">{{student.user.first_name}} {{student.user.last_name}} - {{student.department}} - '{{student.promo.nickname}}</option>
                     {% endfor %}
                 </datalist>
                 <form>
