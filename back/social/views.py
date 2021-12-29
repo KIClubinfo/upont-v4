@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q
+from django.db.models.functions import Greatest
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import EditProfile
@@ -39,17 +41,24 @@ def search(request):
     if ("search" in request.GET) and request.GET["search"].strip():
         searched_expression = request.GET.get("search", None)
         key_words_list = [word.strip() for word in searched_expression.split()]
-        query = Q()
+        queryset = Student.objects.all()
         for key_word in key_words_list:
-            query &= (
-                Q(user__first_name__icontains=key_word)
-                | Q(user__last_name__icontains=key_word)
-                | Q(promo__nickname__icontains=key_word)
-                | Q(department=key_word)
+            queryset = queryset.annotate(
+                similarity=Greatest(
+                    TrigramSimilarity("user__first_name", key_word),
+                    TrigramSimilarity("user__last_name", key_word),
+                    TrigramSimilarity("promo__nickname", key_word),
+                    TrigramSimilarity("department", key_word),
+                )
             )
-        found_students = Student.objects.filter(query).order_by(
-            "-promo__year", "user__first_name"
-        )
+            queryset = queryset.filter(
+                Q(user__first_name__trigram_similar=key_word)
+                | Q(user__last_name__trigram_similar=key_word)
+                | Q(promo__nickname__iexact=key_word)
+                | Q(department__iexact=key_word),
+                similarity__gt=0.3,
+            )
+        found_students = queryset.order_by("-promo__year", "user__first_name")
         context["found_students"] = found_students
     context["searched_expression"] = searched_expression
     return render(request, "social/search_result.html", context)
