@@ -38,30 +38,50 @@ def search(request):
     all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
     context = {"all_student_list": all_student_list}
     searched_expression = "Avant de trouver quelque chose, il faut le chercher."
+
     if ("search" in request.GET) and request.GET["search"].strip():
         searched_expression = request.GET.get("search", None)
         key_words_list = [word.strip() for word in searched_expression.split()]
-        queryset = Student.objects.all()
-        for key_word in key_words_list:
-            queryset = queryset.annotate(
-                similarity=Greatest(
-                    TrigramSimilarity("user__first_name", key_word),
-                    TrigramSimilarity("user__last_name", key_word),
-                    TrigramSimilarity("promo__nickname", key_word),
-                    TrigramSimilarity("department", key_word),
+        queryset = Student.objects.none()
+
+        for possible_list in partition(key_words_list):
+            partial_queryset = Student.objects.all()
+
+            for key_word in possible_list:
+                partial_queryset = partial_queryset.annotate(
+                    similarity=Greatest(
+                        TrigramSimilarity("user__first_name", key_word),
+                        TrigramSimilarity("user__last_name", key_word),
+                        TrigramSimilarity("promo__nickname", key_word),
+                        TrigramSimilarity("department", key_word),
+                    )
                 )
-            )
-            queryset = queryset.filter(
-                Q(user__first_name__trigram_similar=key_word)
-                | Q(user__last_name__trigram_similar=key_word)
-                | Q(promo__nickname__iexact=key_word)
-                | Q(department__iexact=key_word),
-                similarity__gt=0.3,
-            )
+                partial_queryset = partial_queryset.filter(
+                    Q(user__first_name__trigram_similar=key_word)
+                    | Q(user__last_name__trigram_similar=key_word)
+                    | Q(promo__nickname__iexact=key_word)
+                    | Q(department__iexact=key_word),
+                    similarity__gt=0.3,
+                )
+            queryset |= partial_queryset
         found_students = queryset.order_by("-promo__year", "user__first_name")
         context["found_students"] = found_students
+
     context["searched_expression"] = searched_expression
     return render(request, "social/search_result.html", context)
+
+
+def partition(words):
+    gaps = len(words) - 1  # one gap less than words (fencepost problem)
+    for i in range(1 << gaps):  # the 2^n possible partitions
+        result = words[:1]  # The result starts with the first word
+        for word in words[1:]:
+            if i & 1:
+                result.append(word)  # If "1" split at the gap
+            else:
+                result[-1] += " " + word  # If "0", don't split at the gap
+            i >>= 1  # Next 0 or 1 indicating split or don't split
+        yield result  # cough up r
 
 
 @login_required(login_url="/login/")
