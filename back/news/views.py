@@ -45,6 +45,7 @@ def shotgun_detail(request, shotgun_id):
     if request.user.is_superuser:
         already_participated = False
         got_accepted = False
+        motivation = ""
     else:
         student = Student.objects.get(user__id=request.user.id)
         already_participated = shotgun.participated(student)
