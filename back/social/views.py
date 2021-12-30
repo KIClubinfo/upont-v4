@@ -129,5 +129,6 @@ def index_clubs(request):
 @login_required
 def view_club(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
-    context = {"club": club}
+    members = Membership.objects.filter(club__id=club_id)
+    context = {"club": club, "members": members}
     return render(request, "social/view_club.html", context)
