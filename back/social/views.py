@@ -55,8 +55,6 @@ def search(request):
                     similarity=Greatest(
                         TrigramSimilarity("user__first_name", key_word),
                         TrigramSimilarity("user__last_name", key_word),
-                        TrigramSimilarity("promo__nickname", key_word),
-                        TrigramSimilarity("department", key_word),
                     )
                 )
                 partial_queryset = partial_queryset.filter(
