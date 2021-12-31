@@ -109,6 +109,8 @@ def search_user(request):
     return found_students, searched_expression
 
 
+    context["searched_expression"] = searched_expression
+    return render(request, "social/index_users.html", context)
 def search_club(request):
     searched_expression = request.GET.get("club", None)
     key_words_list = [word.strip() for word in searched_expression.split()]
