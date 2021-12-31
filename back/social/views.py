@@ -11,7 +11,10 @@ from .models import Club, Membership, Student
 @login_required(login_url="/login/")
 def index_users(request):
     all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
-    context = {"all_student_list": all_student_list}
+    context = {
+        "all_student_list": all_student_list,
+        "student_display_list": all_student_list,
+    }
     return render(request, "social/index_users.html", context)
 
 
@@ -65,10 +68,10 @@ def search(request):
                 )
             queryset |= partial_queryset
         found_students = queryset.order_by("-promo__year", "user__first_name")
-        context["found_students"] = found_students
+        context["student_display_list"] = found_students
 
     context["searched_expression"] = searched_expression
-    return render(request, "social/search_result.html", context)
+    return render(request, "social/index_users.html", context)
 
 
 def partition(words):

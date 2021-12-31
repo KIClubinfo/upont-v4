@@ -10,8 +10,8 @@
             <div class="content-main">
                 <h3 class="page-title">Élèves</h3>
                 <div class="row">
-                    {% if all_student_list %}
-                        {% for student in all_student_list %}
+                    {% if student_display_list %}
+                        {% for student in student_display_list %}
                             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                 <div class="user-card">
                                     <a href="{% url 'social:profile'%}{{student.user.id}}" >
@@ -25,7 +25,12 @@
                             </div>
                         {% endfor %}
                     {% else %}
+                        {% if searched_expression %}
+                        <p>Aucun élève n'a été trouvé</p>
+                        <p>{{searched_expression}}</p>
+                        {% else %}
                         <p>Il n'y a pas d'élèves dans la base de donnée.</p>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
