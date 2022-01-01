@@ -52,9 +52,11 @@ def search(request):
     if ("club" in request.GET) and request.GET["club"].strip():
         all_clubs_list = Club.objects.order_by("name")
         all_categories_list = Category.objects.order_by("name")
+        my_memberships_list = Membership.objects.filter(student__user__id=request.user.id)
         context = {
             "all_clubs_list": all_clubs_list,
-            "all_categories_list": all_categories_list
+            "all_categories_list": all_categories_list,
+            "my_memberships_list": my_memberships_list
             }
         found_clubs, searched_expression = search_club(request)
         context["club_displayed_list"] = found_clubs
@@ -183,6 +185,9 @@ def index_clubs(request):
     }
     all_categories_list = Category.objects.order_by("name")
     context["all_categories_list"] = all_categories_list
+
+    my_memberships_list = Membership.objects.filter(student__user__id=request.user.id)
+    context["my_memberships_list"] = my_memberships_list
     return render(request, "social/index_clubs.html", context)
 
 
