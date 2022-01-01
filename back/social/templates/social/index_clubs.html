@@ -6,33 +6,45 @@
 
         <!--Content-->
         <div class="content">
-            {% include "../social/searchbar.html" with all_clubs_list=all_clubs_list search_type="club" %}
+            {% include "../social/searchbar.html" with all_clubs_list=all_clubs_list %}
             <div class="content-main">
                 <div class="row">
                     <div class="col-clublg-8">
-                        <h4 class="page-subtitle">Clubs & Assos</h4>
+                        <h4 class="page-subtitle">
+                            {% if searched_expression %}
+                                Résultats de la recherche "{{searched_expression}}"
+                            {% else %}
+                                Clubs & Assos
+                            {% endif %}
+                        </h4>
                         <div class="row">
-
-                            <!--Clubs cards-->
-                            {% for club in all_clubs_list %}
-                            <div class="col-clubmd-4 col-clubsm-6">
-                                <div class="club-card">
-                                    <div class="club-card-content">
-                                        {% if club.logo %}
-                                            <img class="club-card-image" src={{club.logo.path}} alt="">
-                                        {% else %}
-                                            <img class="club-card-image" src="{% static 'assets/img/user.jpeg' %}" alt="">
-                                        {% endif %}
+                            {% if club_displayed_list %}
+                                <!--Clubs cards-->
+                                {% for club in club_displayed_list %}
+                                <div class="col-clubmd-4 col-clubsm-6">
+                                    <div class="club-card">
+                                        <div class="club-card-content">
+                                            {% if club.logo %}
+                                                <img class="club-card-image" src={{club.logo.path}} alt="">
+                                            {% else %}
+                                                <img class="club-card-image" src="{% static 'assets/img/user.jpeg' %}" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="club-card-title">
+                                            <span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span>
+                                        </div>
+                                        <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
                                     </div>
-                                    <div class="club-card-title">
-                                        <span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span>
-                                    </div>
-                                    <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
                                 </div>
-                            </div>
-                            {% endfor %}
-                            <!--End of clubs cards-->
-
+                                {% endfor %}
+                                <!--End of clubs cards-->
+                            {% else %}
+                                {% if searched_expression %}
+                                    <p>Aucun club n'a été trouvé</p>
+                                {% else %}
+                                    <p>Il n'y a pas de clubs dans la base de données.</p>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="col-clublg-4">

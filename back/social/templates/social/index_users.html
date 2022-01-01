@@ -6,12 +6,18 @@
 
         <!--Content-->
         <div class="content">
-            {% include "../social/searchbar.html" with all_student_list=all_student_list search_type="user" %}
+            {% include "../social/searchbar.html" with all_student_list=all_student_list %}
             <div class="content-main">
-                <h3 class="page-title">Élèves</h3>
+                <h3 class="page-title">
+                    {% if searched_expression %}
+                        Résultats de la recherche "{{searched_expression}}"
+                    {% else %}
+                        Élèves
+                    {% endif %}
+                </h3>
                 <div class="row">
-                    {% if all_student_list %}
-                        {% for student in all_student_list %}
+                    {% if student_displayed_list %}
+                        {% for student in student_displayed_list %}
                             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                 <div class="user-card">
                                     <a href="{% url 'social:profile'%}{{student.user.id}}" >
@@ -25,7 +31,11 @@
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p>Il n'y a pas d'élèves dans la base de donnée.</p>
+                        {% if searched_expression %}
+                            <p>Aucun élève n'a été trouvé</p>
+                        {% else %}
+                            <p>Il n'y a pas d'élèves dans la base de données.</p>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
