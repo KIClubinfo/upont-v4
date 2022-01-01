@@ -6,20 +6,7 @@
 
         <!--Content-->
         <div class="content">
-            <div class="content-header">
-                <div class="row justify-content-between w-100">
-                    <div class="col">
-                        <div class="search-input-group">
-                            <input type="text" class="search-input" placeholder="Rechercher">
-                            <button class="button search-button"><i class="fas fa-search "></i></button>
-                        </div>
-                    </div>
-                    <!--<div class="col" style="text-align: end;">
-                        <button class="button"><i class="fas fa-bell"></i></button>
-                        <button class="button"><i class="fas fa-bell"></i></button>
-                    </div>-->
-                </div>
-            </div>
+            {% include "../social/searchbar.html" with all_student_list=all_student_list %}
             <div class="content-main">
                 <div class="club-box">
                     <div class="club-group-image-container">

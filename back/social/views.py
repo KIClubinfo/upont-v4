@@ -3,6 +3,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q
 from django.db.models.functions import Greatest
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
 
 from .forms import EditProfile
 from .models import Club, Membership, Student, Category
@@ -11,7 +12,10 @@ from .models import Club, Membership, Student, Category
 @login_required(login_url="/login/")
 def index_users(request):
     all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
-    context = {"all_student_list": all_student_list}
+    context = {
+        "all_student_list": all_student_list,
+        "student_displayed_list": all_student_list
+        }
     return render(request, "social/index_users.html", context)
 
 
@@ -35,28 +39,29 @@ def profile(request, student_id=None):
 
 @login_required(login_url="/login/")
 def search(request):
-    all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
-    context = {"all_student_list": all_student_list}
-    all_clubs_list = Club.objects.order_by("name")
-    context["all_clubs_list"] = all_clubs_list
-    all_categories_list = Category.objects.order_by("name")
-    context["all_categories_list"] = all_categories_list
     searched_expression = "Avant de trouver quelque chose, il faut le chercher."
 
     if ("user" in request.GET) and request.GET["user"].strip():
+        all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
+        context = {"all_student_list": all_student_list}
         found_students, searched_expression = search_user(request)
-        context["found_students"] = found_students
+        context["student_displayed_list"] = found_students
         context["searched_expression"] = searched_expression
-        return render(request, "social/search_result.html", context)
+        return render(request, "social/index_users.html", context)
 
     if ("club" in request.GET) and request.GET["club"].strip():
+        all_clubs_list = Club.objects.order_by("name")
+        all_categories_list = Category.objects.order_by("name")
+        context = {
+            "all_clubs_list": all_clubs_list,
+            "all_categories_list": all_categories_list
+            }
         found_clubs, searched_expression = search_club(request)
-        context["found_clubs"] = found_clubs
+        context["club_displayed_list"] = found_clubs
         context["searched_expression"] = searched_expression
-        return render(request, "social/search_result.html", context)
+        return render(request, "social/index_clubs.html", context)
 
-    context["searched_expression"] = searched_expression
-    return render(request, "social/search_result.html", context)
+    raise Http404
 
 
 def partition(words):
@@ -166,7 +171,10 @@ def profile_edit(request):
 @login_required
 def index_clubs(request):
     all_clubs_list = Club.objects.order_by("name")
-    context = {"all_clubs_list": all_clubs_list}
+    context = {
+        "all_clubs_list": all_clubs_list,
+        "club_displayed_list": all_clubs_list,
+    }
     all_categories_list = Category.objects.order_by("name")
     context["all_categories_list"] = all_categories_list
     return render(request, "social/index_clubs.html", context)
@@ -186,7 +194,6 @@ def club_edit(request, club_id):
     student = get_object_or_404(Student, pk=student_id)
     club = get_object_or_404(Club, pk=club_id)
     membership_club_list = Membership.objects.filter(student__pk=student_id, club__pk=club_id)
-    all_student_list = Student.objects.order_by("user__first_name")
     context = {
         "all_student_list": all_student_list,
         "student": student,
