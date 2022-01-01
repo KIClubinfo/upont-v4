@@ -8,7 +8,10 @@
         <div class="content">
             {% include "../social/searchbar.html" with all_student_list=all_student_list %}
             <div class="content-main">
-                <h3 class="page-title">Élèves</h3>
+                <h3 class="page-title">Résultats de la recherche "{{searched_expression}}"
+                    {% if found_students %} parmi les élèves {% endif %}
+                    {% if found_clubs %} parmi les clubs {% endif %}
+                </h3>
                 <div class="row">
                     {% if found_students %}
                         {% for student in found_students %}
@@ -24,10 +27,26 @@
                                 </div>
                             </div>
                         {% endfor %}
+                    {% elif found_clubs %}
+                        {% for club in found_clubs %}
+                            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                <div class="club-card">
+                                    <div class="club-card-content">
+                                        {% if club.logo %}
+                                            <img class="club-card-image" src={{club.logo.path}} alt="">
+                                        {% else %}
+                                            <img class="club-card-image" src="{% static 'assets/img/user.jpeg' %}" alt="">
+                                        {% endif %}
+                                    </div>
+                                    <div class="club-card-title">
+                                        <span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span>
+                                    </div>
+                                    <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                </div>
+                            </div>
+                        {% endfor %}
                     {% else %}
-                        <p>Aucun élève n'a été trouvé</p>
-                        <p>{{searched_expression}}</p>
-                        <p>{{sim_list}}</p>
+                        <h3>Aucun résultat</h3>
                     {% endif %}
                 </div>
             </div>
