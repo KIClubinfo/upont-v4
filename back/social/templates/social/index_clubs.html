@@ -27,7 +27,7 @@
                                             {% if club.logo %}
                                                 <img class="club-card-image" src={{club.logo.path}} alt="">
                                             {% else %}
-                                                <img class="club-card-image" src="{% static 'assets/img/user.jpeg' %}" alt="">
+                                                <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
                                             {% endif %}
                                         </div>
                                         <div class="club-card-title">
@@ -50,18 +50,29 @@
                     <div class="col-clublg-4">
                         <h4 class="page-subtitle-2">Mes clubs & assos</h4>
                         <div class="row">
-
-                            <!--My Clubs cards-->
-                            <div class="col-12">
-                                <div class="vignette-club-mini">
-                                    <img class="vignette-image-mini" src="{% static 'assets/img/bde.png' %}" alt="">
-                                    <div class="vignette-mini-title">
-                                        <span>Bureau des élèves <br> Jurassic Pont</span>
-                                        <span class="vignette-mini-role"><br>Responsable voyage</span>
+                            {% if my_memberships_list %}
+                                {% for membership in my_memberships_list %}
+                                    <!--My Clubs cards-->
+                                    <div class="col-12">
+                                        <a href="{% url 'social:club_detail' membership.club.id %}">
+                                            <div class="vignette-club-mini">
+                                                {% if membership.club.logo %}
+                                                    <img class="vignette-image-mini" src={{membership.club.logo.path}} alt="">
+                                                {% else %}
+                                                    <img class="vignette-image-mini" src="{% static 'assets/img/bde.png' %}" alt="">
+                                                {% endif %}
+                                                <div class="vignette-mini-title">
+                                                    <span>{{membership.club.name}}</span>
+                                                    <span class="vignette-mini-role"><br>{{membership.role}}</span>
+                                                </div>
+                                            </div>
+                                        </a>
                                     </div>
-                                </div>
-                            </div>
-                            <!--End of My Clubs cards-->
+                                    <!--End of My Clubs cards-->
+                                {% endfor %}
+                            {% else %}
+                                <p> Tu n'es membre d'aucun club pour l'instant</p>
+                            {% endif %}
 
                         </div>
                     </div>
