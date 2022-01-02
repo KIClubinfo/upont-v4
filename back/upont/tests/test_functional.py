@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase
-from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium import webdriver
 
 
 class LoginTest(TestCase):
@@ -32,3 +32,40 @@ class LoginTest(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTrue(response.context[1].get("form").errors)
         self.assertTrue(not response.wsgi_request.user.is_authenticated)
+
+
+# class MySeleniumTests(StaticLiveServerTestCase):
+#     @classmethod
+#     def setUpClass(cls):
+#         # super().setUpClass()
+#         # cls.selenium = webdriver.Chrome
+#         cls.driver = webdriver.Chrome()
+#
+#     @classmethod
+#     def tearDownClass(cls):
+#         # cls.selenium.quit()
+#         # super().tearDownClass()
+#         cls.driver.quit
+#
+#     def test_login(self):
+#         # self.selenium.get('%s%s' % (self.live_server_url, '/login/'))
+#         # username_input = self.selenium.find_element_by_name("username")
+#         # username_input.send_keys('test@mail.com')
+#         # password_input = self.selenium.find_element_by_name("password")
+#         # password_input.send_keys('NotSecret')
+#         # self.selenium.find_element_by_xpath('//input[@value="Log in"]').click()
+#          cls.driver
+
+
+class MySeleniumTests(StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+
+        cls.driver = webdriver.Chrome()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+
+    def test_login(self):
+        self.driver.get("http://selenium.dev")
