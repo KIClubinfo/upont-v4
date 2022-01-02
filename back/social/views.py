@@ -4,8 +4,9 @@ from django.db.models import Q
 from django.db.models.functions import Greatest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
 
-from .forms import EditProfile
+from .forms import EditProfile, EditClub
 from .models import Club, Membership, Student, Category
 
 
@@ -146,9 +147,7 @@ def profile_edit(request):
     student_id = request.user.id
     student = get_object_or_404(Student, pk=student_id)
     membership_club_list = Membership.objects.filter(student__pk=student_id)
-    all_student_list = Student.objects.order_by("user__first_name")
     context = {
-        "all_student_list": all_student_list,
         "student": student,
         "membership_club_list": membership_club_list,
     }
@@ -195,40 +194,58 @@ def index_clubs(request):
 def view_club(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     members = Membership.objects.filter(club__id=club_id)
-    context = {"club": club, "members": members}
+    membership_club_list = Membership.objects.filter(student__user__id=request.user.id, club__pk=club_id)
+
+    if not membership_club_list:                # If no match is found
+        is_admin = False
+    elif not membership_club_list[0].is_admin:    # If the user does not have the rights
+        is_admin = False
+    else:
+        is_admin = True
+    context = {"club": club, "members": members, "is_admin": is_admin}
     return render(request, "social/view_club.html", context)
 
 
 @login_required(login_url="/login/")
 def club_edit(request, club_id):
-    student_id = request.user.id
-    student = get_object_or_404(Student, pk=student_id)
+    student = get_object_or_404(Student, user__id=request.user.id)
     club = get_object_or_404(Club, pk=club_id)
-    membership_club_list = Membership.objects.filter(student__pk=student_id, club__pk=club_id)
+    membership_club_list = Membership.objects.filter(student__pk=student.id, club__pk=club_id)
+
+    if not membership_club_list:                # If no match is found
+        raise PermissionDenied
+    if not membership_club_list[0].is_admin:    # If the user does not have the rights
+        raise PermissionDenied
+
     context = {
-        "all_student_list": all_student_list,
         "student": student,
         "membership_club_list": membership_club_list,
+        "club": club
     }
 
     if request.method == "POST":
         if "Annuler" in request.POST:
-            return redirect("/social/profile")
+            return redirect("/social/view_club/"+str(club.id))
         elif "Valider" in request.POST:
-            form = EditProfile(
+            form = EditClub(
                 request.POST,
                 request.FILES,
-                instance=Club.objects.get(user=request.user),
+                instance=Club.objects.get(id=club.id),
             )
             if form.is_valid():
-                if "picture" in request.FILES:
-                    student.picture.delete()
+                if "logo" in request.FILES:
+                    club.logo.delete()
                 form.save()
-                return redirect("/social/profile")
+                return redirect("/social/view_club/"+str(club.id))
 
     else:
-        form = EditProfile()
-        form.fields["phone_number"].initial = student.phone_number
-        form.fields["department"].initial = student.department
-        context["EditProfile"] = form
-    return render(request, "social/profile_edit.html", context)
+        form = EditClub()
+
+        form.fields["name"].initial = club.name
+        form.fields["nickname"].initial = club.nickname
+        form.fields["logo"].initial = club.logo
+        form.fields["description"].initial = club.description
+
+        context["EditClub"] = form
+    return render(request, "social/club_edit.html", context)
+

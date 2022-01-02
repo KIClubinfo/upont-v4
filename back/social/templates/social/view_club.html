@@ -18,7 +18,7 @@
                                 {% if club.logo %}
                                     <img class="club-card-image" src={{club.logo.path}} height="100%" width="100%" alt="">
                                 {% else %}
-                                    <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
+                                        <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
                                 {% endif %}
                             </div>
                         </div>
@@ -47,6 +47,11 @@
                                 {% endif %}
                                 <p><a href="{% url 'social:club_index' %}"> Retour à l'index </a></p>
                             </div>
+                            {% if is_admin %}
+                                <a href="{% url 'social:club_edit' club.id %}">
+                                    <button class="button blue-button">Modifier les informations du club</button>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
