@@ -1,0 +1,54 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" %}
+<!--Sidenav-->
+{% include "../social/sidenav.html" with active_link="clubs" %}
+
+        <!--Content-->
+        <div class="content">
+            {% include "../social/searchbar.html" with all_student_list=all_student_list %}
+            <div class="content-main">
+                <div class="club-box">
+                    <div class="club-group-image-container">
+                        <img src="{% static 'assets/img/equipe.jpg' %}" class="club-group-image" alt="">
+                    </div>
+                    <div class="row">
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ EditClub.non_field_errors }}
+                            <div class="col-lg-4">
+                                Modifier le logo du club :
+                                {{ EditClub.logo }}
+                            </div>
+                            <div class="col-lg-8">
+                                Nom du club:
+                                {{ EditClub.name.errors }}
+                                {{ EditClub.name }}
+                                 Surnom du club :
+                                {{ EditClub.nickname.errors }}
+                                {{ EditClub.nickname }}
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="club-description-content">
+                                    Description du club :
+                                    {{ EditClub.description.errors }}
+                                    {{ EditClub.description }}
+                                </div>
+                            </div>
+                                    <div style="text-align: center;">
+                                        <input class="button red-button" type="submit" name="Annuler" value="Annuler">
+                                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>
