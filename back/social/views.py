@@ -1,13 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.db.models.functions import Greatest
-from django.shortcuts import get_object_or_404, redirect, render
 from django.http import Http404
-from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EditProfile, EditClub
-from .models import Club, Membership, Student, Category
+from .forms import EditClub, EditProfile
+from .models import Category, Club, Membership, Student
 
 
 @login_required(login_url="/login/")
@@ -15,8 +15,8 @@ def index_users(request):
     all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
     context = {
         "all_student_list": all_student_list,
-        "student_displayed_list": all_student_list
-        }
+        "student_displayed_list": all_student_list,
+    }
     return render(request, "social/index_users.html", context)
 
 
@@ -53,12 +53,14 @@ def search(request):
     if ("club" in request.GET) and request.GET["club"].strip():
         all_clubs_list = Club.objects.order_by("name")
         all_categories_list = Category.objects.order_by("name")
-        my_memberships_list = Membership.objects.filter(student__user__id=request.user.id)
+        my_memberships_list = Membership.objects.filter(
+            student__user__id=request.user.id
+        )
         context = {
             "all_clubs_list": all_clubs_list,
             "all_categories_list": all_categories_list,
-            "my_memberships_list": my_memberships_list
-            }
+            "my_memberships_list": my_memberships_list,
+        }
         found_clubs, searched_expression = search_club(request)
         context["club_displayed_list"] = found_clubs
         context["searched_expression"] = searched_expression
@@ -188,11 +190,13 @@ def index_clubs(request):
 def view_club(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     members = Membership.objects.filter(club__id=club_id)
-    membership_club_list = Membership.objects.filter(student__user__id=request.user.id, club__pk=club_id)
+    membership_club_list = Membership.objects.filter(
+        student__user__id=request.user.id, club__pk=club_id
+    )
 
-    if not membership_club_list:                # If no match is found
+    if not membership_club_list:  # If no match is found
         is_admin = False
-    elif not membership_club_list[0].is_admin:    # If the user does not have the rights
+    elif not membership_club_list[0].is_admin:  # If the user does not have the rights
         is_admin = False
     else:
         is_admin = True
@@ -204,22 +208,24 @@ def view_club(request, club_id):
 def club_edit(request, club_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     club = get_object_or_404(Club, pk=club_id)
-    membership_club_list = Membership.objects.filter(student__pk=student.id, club__pk=club_id)
+    membership_club_list = Membership.objects.filter(
+        student__pk=student.id, club__pk=club_id
+    )
 
-    if not membership_club_list:                # If no match is found
+    if not membership_club_list:  # If no match is found
         raise PermissionDenied
-    if not membership_club_list[0].is_admin:    # If the user does not have the rights
+    if not membership_club_list[0].is_admin:  # If the user does not have the rights
         raise PermissionDenied
 
     context = {
         "student": student,
         "membership_club_list": membership_club_list,
-        "club": club
+        "club": club,
     }
 
     if request.method == "POST":
         if "Annuler" in request.POST:
-            return redirect("/social/view_club/"+str(club.id))
+            return redirect("/social/view_club/" + str(club.id))
         elif "Valider" in request.POST:
             form = EditClub(
                 request.POST,
@@ -230,7 +236,7 @@ def club_edit(request, club_id):
                 if "logo" in request.FILES:
                     club.logo.delete()
                 form.save()
-                return redirect("/social/view_club/"+str(club.id))
+                return redirect("/social/view_club/" + str(club.id))
 
     else:
         form = EditClub()
@@ -242,4 +248,3 @@ def club_edit(request, club_id):
 
         context["EditClub"] = form
     return render(request, "social/club_edit.html", context)
-
