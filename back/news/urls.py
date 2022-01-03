@@ -13,18 +13,18 @@ urlpatterns = [
     path("shotguns/new/", views.new_shotgun, name="new_shotgun"),
     path("shotguns/delete/", views.delete_shotgun, name="delete_shotgun"),
     path(
-        "shotguns/delete/<int:shotgun_id>/",
+        "shotguns/<int:shotgun_id>/delete/",
         views.delete_shotgun_detail,
         name="delete_shotgun_detail",
     ),
     path("shotguns/admin/", views.shotguns_admin, name="shotguns_admin"),
     path(
-        "shotguns/admin/<int:shotgun_id>/",
+        "shotguns/<int:shotgun_id>/admin/",
         views.shotguns_admin_detail,
         name="shotguns_admin_detail",
     ),
     path(
-        "shotguns/admin/fail/<int:participation_id>/",
+        "shotguns/<int:participation_id>/admin/fail/",
         views.fail_participation,
         name="fail_participation",
     ),

@@ -130,6 +130,9 @@ def shotguns_admin(request):
 @login_required()
 def shotguns_admin_detail(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
+    student = Student.objects.get(user__id=request.user.id)
+    if not shotgun.club.is_member(student.id):
+        return HttpResponseRedirect(reverse("shotguns"))
     context = {
         "shotgun": shotgun,
     }
