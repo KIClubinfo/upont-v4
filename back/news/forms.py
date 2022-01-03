@@ -1,7 +1,7 @@
 from django import forms
 from social.models import Membership
 
-from .models import Event, Post
+from .models import Event, Post, Comment
 
 
 class EditEvent(forms.ModelForm):
@@ -49,3 +49,9 @@ class EditPost(forms.ModelForm):
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["content", "published_as_student"]

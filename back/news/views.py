@@ -5,8 +5,8 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from social.models import Membership, Student
 
-from .forms import EditEvent, EditPost
-from .models import Event, Post
+from .forms import EditEvent, EditPost, CommentForm
+from .models import Event, Post, Comment
 
 
 def posts(request):
@@ -24,6 +24,20 @@ def posts(request):
         "my_posts": my_posts
     }
     return render(request, "news/posts.html", context)
+#
+# def posts(request):
+#     all_posts_list = Post.objects.order_by('-date')
+#
+#     if request.method == "POST":
+#         comment_form = CommentForm(request.POST)
+#         if comment_form.is_valid():
+#             new_comment = Comment.objects.create(
+#                 post=request.POST.get("post"),
+#                 author=request.POST.get("author"),
+#                 published_as_student
+#             )
+#     context = {'all_posts_list': all_posts_list}
+#     return render(request, 'news/posts.html', context)
 
 
 def events(request):
