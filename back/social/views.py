@@ -21,18 +21,18 @@ def index_users(request):
 
 
 @login_required(login_url="/login/")
-def profile(request, student_id=None):
-    if student_id is None:
-        student_id = request.user.id
-    student = get_object_or_404(Student, pk=student_id)
-    membership_club_list = Membership.objects.filter(student__pk=student_id)
+def profile(request, user_id=None):
+    if user_id is None:
+        user_id = request.user.id
+    student = get_object_or_404(Student, user__pk=user_id)
+    membership_club_list = Membership.objects.filter(student__user__pk=user_id)
     all_student_list = Student.objects.order_by("user__first_name")
     context = {
         "all_student_list": all_student_list,
         "student": student,
         "membership_club_list": membership_club_list,
     }
-    if student_id == request.user.id:
+    if user_id == request.user.id:
         return render(request, "social/profile.html", context)
     else:
         return render(request, "social/profile_viewed.html", context)
@@ -40,17 +40,18 @@ def profile(request, student_id=None):
 
 @login_required(login_url="/login/")
 def search(request):
-    searched_expression = "Avant de trouver quelque chose, il faut le chercher."
+    searched_expression = "Si trouver quelque chose tu veux, le chercher il te faut."
 
-    if ("user" in request.GET) and request.GET["user"].strip():
+    if "user" in request.GET:
         all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
         context = {"all_student_list": all_student_list}
-        found_students, searched_expression = search_user(request)
-        context["student_displayed_list"] = found_students
+        if request.GET["user"].strip():
+            found_students, searched_expression = search_user(request)
+            context["student_displayed_list"] = found_students
         context["searched_expression"] = searched_expression
         return render(request, "social/index_users.html", context)
 
-    if ("club" in request.GET) and request.GET["club"].strip():
+    if "club" in request.GET:
         all_clubs_list = Club.objects.order_by("name")
         all_categories_list = Category.objects.order_by("name")
         my_memberships_list = Membership.objects.filter(
@@ -61,8 +62,9 @@ def search(request):
             "all_categories_list": all_categories_list,
             "my_memberships_list": my_memberships_list,
         }
-        found_clubs, searched_expression = search_club(request)
-        context["club_displayed_list"] = found_clubs
+        if request.GET["club"].strip():
+            found_clubs, searched_expression = search_club(request)
+            context["club_displayed_list"] = found_clubs
         context["searched_expression"] = searched_expression
         return render(request, "social/index_clubs.html", context)
 
@@ -95,8 +97,6 @@ def search_user(request):
                 similarity=Greatest(
                     TrigramSimilarity("user__first_name", key_word),
                     TrigramSimilarity("user__last_name", key_word),
-                    TrigramSimilarity("promo__nickname", key_word),
-                    TrigramSimilarity("department", key_word),
                 )
             )
             partial_queryset = partial_queryset.filter(
@@ -121,11 +121,7 @@ def search_club(request):
 
         for key_word in possible_list:
             partial_queryset = partial_queryset.annotate(
-                similarity=Greatest(
-                    TrigramSimilarity("name", key_word),
-                    TrigramSimilarity("nickname", key_word),
-                    TrigramSimilarity("category__name", key_word),
-                )
+                similarity=TrigramSimilarity("name", key_word)
             )
             partial_queryset = partial_queryset.filter(
                 Q(name__trigram_similar=key_word)
