@@ -97,6 +97,8 @@ def search_user(request):
                 similarity=Greatest(
                     TrigramSimilarity("user__first_name", key_word),
                     TrigramSimilarity("user__last_name", key_word),
+                    TrigramSimilarity("promo__nickname", key_word),
+                    TrigramSimilarity("department", key_word),
                 )
             )
             partial_queryset = partial_queryset.filter(
@@ -121,7 +123,10 @@ def search_club(request):
 
         for key_word in possible_list:
             partial_queryset = partial_queryset.annotate(
-                similarity=TrigramSimilarity("name", key_word)
+                similarity=Greatest(
+                    TrigramSimilarity("name", key_word),
+                    TrigramSimilarity("category__name", key_word),
+                )
             )
             partial_queryset = partial_queryset.filter(
                 Q(name__trigram_similar=key_word)
