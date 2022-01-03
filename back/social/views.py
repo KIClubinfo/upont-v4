@@ -142,9 +142,9 @@ def index_profile(request):
 
 @login_required(login_url="/login/")
 def profile_edit(request):
-    student_id = request.user.id
-    student = get_object_or_404(Student, pk=student_id)
-    membership_club_list = Membership.objects.filter(student__pk=student_id)
+    user_id = request.user.id
+    student = get_object_or_404(Student, user__pk=user_id)
+    membership_club_list = Membership.objects.filter(student__user__pk=user_id)
     context = {
         "student": student,
         "membership_club_list": membership_club_list,
