@@ -54,8 +54,10 @@ class Comment(models.Model):
 
 class Participation(models.Model):
     participant = models.ForeignKey("social.Student", on_delete=models.CASCADE)
+    shotgun = models.ForeignKey("Shotgun", on_delete=models.CASCADE, null=True)
     shotgun_date = models.DateTimeField()
     motivation = models.TextField(null=True)
+    failed_motivation = models.BooleanField(default=False)
 
 
 class Shotgun(models.Model):
@@ -71,17 +73,13 @@ class Shotgun(models.Model):
     ending_date = models.DateTimeField()
     size = models.IntegerField(default=0)
     requires_motivation = models.BooleanField(default=False)
-    participations = models.ManyToManyField(
-        Participation,
-        related_name="shotgun",
-        blank=True,
-    )
 
     def __str__(self):
         return self.title
 
     def accepted_participations(self):
-        return self.participations.order_by("shotgun_date")[: self.size]
+        participations = Participation.objects.filter(shotgun=self)
+        return participations.order_by("shotgun_date")[: self.size]
 
     def is_started(self):
         return timezone.now() > self.starting_date
@@ -92,7 +90,8 @@ class Shotgun(models.Model):
         return timezone.now() > self.ending_date
 
     def participated(self, student: Student):
-        for participation in self.participations.all():
+        participations = Participation.objects.filter(shotgun=self)
+        for participation in participations.all():
             if participation.participant == student:
                 return True
         return False

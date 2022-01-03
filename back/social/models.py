@@ -106,6 +106,12 @@ class Club(models.Model):
     def __str__(self):
         return self.name
 
+    def is_member(self, student_id):
+        for student in self.members.all():
+            if student.id == student_id:
+                return True
+        return False
+
 
 class Membership(models.Model):
     is_admin = models.BooleanField()

@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from social.models import Student
+from social.models import Membership, Student
 
 from .models import Participation, Shotgun
 
@@ -22,12 +22,13 @@ def shotguns(request):
         has_user_shotguns = False
         user_shotguns = []
     else:
-        user_shotguns = Shotgun.objects.filter(
-            participations__participant__id__in=[
-                Student.objects.get(user__id=request.user.id).id
-            ]
-        )
-        has_user_shotguns = not len(user_shotguns) == 0
+        student = Student.objects.get(user__id=request.user.id)
+        user_participations = Participation.objects.filter(participant=student)
+        user_shotguns = []
+        for participation in user_participations:
+            user_shotguns.append(participation.shotgun)
+            print(participation.shotgun)
+        has_user_shotguns = not len(user_participations) == 0
     context = {
         "next_shotguns": next_shotguns,
         "has_next_shotguns": has_next_shotguns,
@@ -50,7 +51,9 @@ def shotgun_detail(request, shotgun_id):
         student = Student.objects.get(user__id=request.user.id)
         already_participated = shotgun.participated(student)
         got_accepted = shotgun.got_accepted(student)
-        participation = shotgun.participations.filter(participant=student)
+        participation = Participation.objects.filter(
+            participant=student, shotgun=shotgun
+        )
         if len(participation) > 0:
             motivation = participation[0].motivation
         else:
@@ -87,20 +90,63 @@ def shotgun_participate(request, shotgun_id):
                 )
             )
         participation = Participation(
+            shotgun=shotgun,
             shotgun_date=timezone.now(),
             participant=Student.objects.get(user__id=request.user.id),
             motivation=motivation,
         )
         participation.save()
-        shotgun.participations.add(participation)
     else:
         participation = Participation(
+            shotgun=shotgun,
             shotgun_date=timezone.now(),
             participant=Student.objects.get(user__id=request.user.id),
         )
         participation.save()
-        shotgun.participations.add(participation)
     return HttpResponseRedirect(reverse("shotgun_detail", args=(shotgun_id,)))
+
+
+@login_required()
+def shotguns_admin(request):
+    student = Student.objects.get(user__id=request.user.id)
+    clubs_memberships = Membership.objects.filter(student__pk=student.id)
+    clubs_and_shotguns = []
+    for club_membership in clubs_memberships:
+        club_shotguns = Shotgun.objects.filter(
+            club=club_membership.club, requires_motivation=True
+        )
+        if len(club_shotguns) > 0:
+            clubs_and_shotguns.append(
+                {"club": club_membership.club, "shotguns": club_shotguns}
+            )
+    not_empty = len(clubs_and_shotguns) > 0
+    context = {
+        "clubs_and_shotguns": clubs_and_shotguns,
+        "not_empty": not_empty,
+    }
+    return render(request, "news/shotguns_admin.html", context)
+
+
+@login_required()
+def shotguns_admin_detail(request, shotgun_id):
+    shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
+    context = {
+        "shotgun": shotgun,
+    }
+    return render(request, "news/shotguns_admin_detail.html", context)
+
+
+@login_required()
+def fail_participation(request, participation_id):
+    participation = get_object_or_404(Participation, pk=participation_id)
+    student = Student.objects.get(user__id=request.user.id)
+    if not participation.shotgun.club.is_member(student.id):
+        return HttpResponseRedirect(reverse("shotguns"))
+    participation.failed_motivation = True
+    participation.save()
+    return HttpResponseRedirect(
+        reverse("shotguns_admin_detail", args=(participation.shotgun.id,))
+    )
 
 
 def new_shotgun(request):

@@ -17,4 +17,15 @@ urlpatterns = [
         views.delete_shotgun_detail,
         name="delete_shotgun_detail",
     ),
+    path("shotguns/admin/", views.shotguns_admin, name="shotguns_admin"),
+    path(
+        "shotguns/admin/<int:shotgun_id>/",
+        views.shotguns_admin_detail,
+        name="shotguns_admin_detail",
+    ),
+    path(
+        "shotguns/admin/fail/<int:participation_id>/",
+        views.fail_participation,
+        name="fail_participation",
+    ),
 ]
