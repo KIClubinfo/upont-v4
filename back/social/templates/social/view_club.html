@@ -10,7 +10,11 @@
             <div class="content-main">
                 <div class="club-box">
                     <div class="club-group-image-container">
-                        <img src="{% static 'assets/img/equipe.jpg' %}" class="club-group-image" alt="">
+                                {% if club.background_picture %}
+                                    <img class="club-card-image" src={{club.background_picture.path}} height="100%" width="100%" alt="">
+                                {% else %}
+                                        <img class="club-card-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
+                                {% endif %}
                     </div>
                     <div class="row">
                         <div class="col-lg-4">

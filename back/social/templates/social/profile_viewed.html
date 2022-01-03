@@ -26,7 +26,7 @@
                             {% if membership_club_list %}
                                 {% for membership in membership_club_list %}
                                     <div class="user-card">
-                                        <div class="user-image"><img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                        <div class="user-image"><img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/bde.png' %}{% endif %}" alt=""></div>
                                         <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span> <span>{{membership.role.name}}</span></div>
                                     </div>
                                 {% endfor %}
