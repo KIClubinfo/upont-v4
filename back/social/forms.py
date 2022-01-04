@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator
 
-from .models import Club, Student, Membership
+from .models import Club, Student, Membership, Role
 
 
 class EditProfile(forms.ModelForm):
@@ -44,3 +44,12 @@ class AddMember(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AddMember, self).__init__(*args, **kwargs)
+
+
+class AddRole(forms.ModelForm):
+    class Meta:
+        model = Role
+        fields = ("name",)
+
+    def __init__(self, *args, **kwargs):
+        super(AddRole, self).__init__(*args, **kwargs)

@@ -6,8 +6,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
 
-from .forms import EditClub, EditProfile, AddMember
-from .models import Category, Club, Membership, Student
+from .forms import EditClub, EditProfile, AddMember, AddRole
+from .models import Category, Club, Membership, Student, Role
 
 
 @login_required(login_url="/login/")
@@ -111,8 +111,6 @@ def search_user(request):
     return found_students, searched_expression
 
 
-    context["searched_expression"] = searched_expression
-    return render(request, "social/index_users.html", context)
 def search_club(request):
     searched_expression = request.GET.get("club", None)
     key_words_list = [word.strip() for word in searched_expression.split()]
@@ -231,7 +229,8 @@ def club_edit(request, club_id):
 
     if request.method == "POST":
         if "Annuler" in request.POST:
-            return redirect("/social/view_club/"+str(club.id))
+            return redirect("/social/view_club/" + str(club.id))
+
         elif "Valider" in request.POST:
             form_club = EditClub(
                 request.POST,
@@ -245,24 +244,47 @@ def club_edit(request, club_id):
                     club.logo.delete()
                 form_club.save()
                 return redirect("/social/view_club/" + str(club.id))
-        elif "Ajouter" in request.POST:
-            form_membership = AddMember(
-                request.POST,
-                instance=Membership.objects.get_or_create(
-                    student=request.POST["student"],
+
+        elif "Ajouter-Membre" in request.POST:
+            try:
+                membership_added = Membership.objects.filter(
+                    student__id=request.POST["student"],
                     club=club
                 )
-            )
-            if form_membership.is_valid():
-                form_membership.save()
-            return redirect("/social/club_edit" + str(club.id))
+                if membership_added:
+                    membership_added = membership_added[0]
+                else:
+                    membership_added = Membership.objects.create(
+                        student=get_object_or_404(Student, pk=request.POST["student"]),
+                        club=club,
+                        role=None,
+                        is_admin=False
+                    )
+                form_membership = AddMember(
+                    request.POST,
+                    instance=membership_added
+                )
+                if form_membership.is_valid():
+                    form_membership.save()
+                return redirect("/social/club_edit/" + str(club.id))
+            except Student.DoesNotExist:
+                return redirect("/social/club_edit/" + str(club.id))
+
         elif "Supprimer" in request.POST:
-            deleted_member = Membership.objects.get(club=club, student=request.POST["student"])
+            deleted_member = Membership.objects.get(club=club, student__id=request.POST["student_id"])
             deleted_member.delete()
-            return redirect("/social/club_edit" + str(club.id))
+            return redirect("/social/club_edit/" + str(club.id))
+
+        elif "Ajouter-Role" in request.POST:
+            form_role = AddRole(request.POST)
+            if form_role.is_valid():
+                form_role.save()
+            return redirect("/social/club_edit/" + str(club.id))
 
     else:
         form_club = EditClub()
+        form_membership = AddMember()
+        form_role = AddRole()
 
         form_club.fields["name"].initial = club.name
         form_club.fields["nickname"].initial = club.nickname
@@ -274,5 +296,7 @@ def club_edit(request, club_id):
         form_club.fields["category"].initial = [category.pk for category in club.category.all()]
 
         context["EditClub"] = form_club
+        context["AddMember"] = form_membership
+        context["AddRole"] = form_role
     return render(request, "social/club_edit.html", context)
 
