@@ -6,8 +6,8 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EditClub, EditProfile, AddMember, AddRole
-from .models import Category, Club, Membership, Student, Role
+from .forms import AddMember, AddRole, EditClub, EditProfile
+from .models import Category, Club, Membership, Role, Student
 
 
 @login_required(login_url="/login/")
@@ -169,7 +169,7 @@ def profile_edit(request):
         form.fields["phone_number"].initial = student.phone_number
         form.fields["department"].initial = student.department
         form.fields["picture"].initial = student.picture
-        context["EditProfile"] = form
+    context["EditProfile"] = form
     return render(request, "social/profile_edit.html", context)
 
 
@@ -248,8 +248,7 @@ def club_edit(request, club_id):
         elif "Ajouter-Membre" in request.POST:
             try:
                 membership_added = Membership.objects.filter(
-                    student__id=request.POST["student"],
-                    club=club
+                    student__id=request.POST["student"], club=club
                 )
                 if membership_added:
                     membership_added = membership_added[0]
@@ -258,12 +257,9 @@ def club_edit(request, club_id):
                         student=get_object_or_404(Student, pk=request.POST["student"]),
                         club=club,
                         role=None,
-                        is_admin=False
+                        is_admin=False,
                     )
-                form_membership = AddMember(
-                    request.POST,
-                    instance=membership_added
-                )
+                form_membership = AddMember(request.POST, instance=membership_added)
                 if form_membership.is_valid():
                     form_membership.save()
                 return redirect("/social/club_edit/" + str(club.id))
@@ -271,7 +267,9 @@ def club_edit(request, club_id):
                 return redirect("/social/club_edit/" + str(club.id))
 
         elif "Supprimer" in request.POST:
-            deleted_member = Membership.objects.get(club=club, student__id=request.POST["student_id"])
+            deleted_member = Membership.objects.get(
+                club=club, student__id=request.POST["student_id"]
+            )
             deleted_member.delete()
             return redirect("/social/club_edit/" + str(club.id))
 
@@ -293,9 +291,11 @@ def club_edit(request, club_id):
         form_club.fields["description"].initial = club.description
         form_club.fields["active"].initial = club.active
         form_club.fields["has_fee"].initial = club.has_fee
-        form_club.fields["category"].initial = [category.pk for category in club.category.all()]
+        form_club.fields["category"].initial = [
+            category.pk for category in club.category.all()
+        ]
 
-        context["EditClub"] = form_club
-        context["AddMember"] = form_membership
-        context["AddRole"] = form_role
+    context["EditClub"] = form_club
+    context["AddMember"] = form_membership
+    context["AddRole"] = form_role
     return render(request, "social/club_edit.html", context)
