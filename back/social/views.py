@@ -123,6 +123,7 @@ def search_club(request):
             partial_queryset = partial_queryset.annotate(
                 similarity=Greatest(
                     TrigramSimilarity("name", key_word),
+                    TrigramSimilarity("nickname", key_word),
                     TrigramSimilarity("category__name", key_word),
                 )
             )
