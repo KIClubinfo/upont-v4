@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator
 
-from .models import Club, Student
+from .models import Club, Student, Membership
 
 
 class EditProfile(forms.ModelForm):
@@ -21,19 +21,26 @@ class EditProfile(forms.ModelForm):
 class EditClub(forms.ModelForm):
     class Meta:
         model = Club
-        fields = ("name", "nickname", "logo", "description")   # , "active", "has_fee", "category", "members"
-        #widgets = {
-        #    "phone_number": forms.TextInput(attrs={"class": "profil-input"}),
-        #}
+        fields = ("name", "nickname", "logo", "background_picture", "description", "active", "has_fee", "category")
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "profil-input"}),
+            "nickname": forms.TextInput(attrs={"class": "profil-input"}),
+            "description": forms.Textarea(attrs={"class": "profil-input"}),
+            "category": forms.CheckboxSelectMultiple,
+        }
 
     def __init__(self, *args, **kwargs):
         super(EditClub, self).__init__(*args, **kwargs)
-        self.fields["name"].required = False
         self.fields["nickname"].required = False
         self.fields["logo"].required = False
-        self.fields["description"].required = False
-        # self.fields["active"].required = False
-        # self.fields["has_fee"].required = False
-        # self.fields["category"].required = False
-        # self.fields["members"].required = False
+        self.fields["background_picture"].required = False
+        self.fields["category"].required = False
 
+
+class AddMember(forms.ModelForm):
+    class Meta:
+        model = Membership
+        fields = ("student", "role", "is_admin")
+
+    def __init__(self, *args, **kwargs):
+        super(AddMember, self).__init__(*args, **kwargs)

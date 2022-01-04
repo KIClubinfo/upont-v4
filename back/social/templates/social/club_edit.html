@@ -6,17 +6,30 @@
 
         <!--Content-->
         <div class="content">
-            {% include "../social/searchbar.html" with all_student_list=all_student_list %}
             <div class="content-main">
                 <div class="club-box">
-                    <div class="club-group-image-container">
-                        <img src="{% static 'assets/img/equipe.jpg' %}" class="club-group-image" alt="">
-                    </div>
-                    <div class="row">
-                        <form action="" method="post" enctype="multipart/form-data">
+                    <form action="" method="post" enctype="multipart/form-data">
+                        <div class="club-group-image-container">
+                            {% if club.background_picture %}
+                                <img class="club-card-image" src={{club.background_picture.path}} height="100%" width="100%" alt="">
+                            {% else %}
+                                <img class="club-card-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
+                            {% endif %}</div>
+                        <div class="row">
                             {% csrf_token %}
                             {{ EditClub.non_field_errors }}
                             <div class="col-lg-4">
+                                <div class="club-image">
+                                    {% if club.logo %}
+                                        <img class="club-card-image" src={{club.logo.path}} height="100%" width="100%" alt="">
+                                    {% else %}
+                                            <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                Modifier la photo d'arrière plan du club :
+                                {{ EditClub.background_picture }}
                                 Modifier le logo du club :
                                 {{ EditClub.logo }}
                             </div>
@@ -24,25 +37,51 @@
                                 Nom du club:
                                 {{ EditClub.name.errors }}
                                 {{ EditClub.name }}
-                                 Surnom du club :
+                                <br>
+                                Surnom du club :
                                 {{ EditClub.nickname.errors }}
                                 {{ EditClub.nickname }}
+                                <br>
+                                Description du club :
+                                {{ EditClub.description.errors }}
+                                {{ EditClub.description }}
+                                <br>
+                                Le club est actif :
+                                {{ EditClub.active.errors }}
+                                {{ EditClub.active }}
+                                <br>
+                                Le club a une cotisation :
+                                {{ EditClub.has_fee.errors }}
+                                {{ EditClub.has_fee }}
+                                <br>
+                                Modifier les catégories du club :
+                                {{ EditClub.category.errors }}
+                                {{ EditClub.category }}
                             </div>
-                            <div class="col-lg-8">
-                                <div class="club-description-content">
-                                    Description du club :
-                                    {{ EditClub.description.errors }}
-                                    {{ EditClub.description }}
-                                </div>
+                            <div style="text-align: center;">
+                                <input class="button red-button" type="submit" name="Annuler" value="Annuler">
+                                <input class="button green-button" type="submit" name= "Valider" value="Valider">
                             </div>
-                                    <div style="text-align: center;">
-                                        <input class="button red-button" type="submit" name="Annuler" value="Annuler">
-                                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                        </div>
+                    </form>
+                    <br>
+                    {% if all_club_memberships %}
+                        {% for membership in all_club_memberships %}
+                            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                <div class="user-card">
+                                    <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                    <div class="user-information">
+                                        <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
+                                        <span>{{membership.role}}</span>
+                                        <form action="" method="post" enctype="multipart/form-data">
+                                            <input class="button red-button" type="submit" name="Supprimer" value="Supprimer">
+                                            <input type="hidden" value="{{membership.student}}" name="student">
+                                        </form>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
