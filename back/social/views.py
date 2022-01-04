@@ -6,8 +6,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
 
-from .forms import EditProfile, EditClub
-from .models import Club, Membership, Student, Category
+from .forms import EditClub, EditProfile, AddMember
+from .models import Category, Club, Membership, Student
 
 
 @login_required(login_url="/login/")
@@ -172,6 +172,7 @@ def profile_edit(request):
         form = EditProfile()
         form.fields["phone_number"].initial = student.phone_number
         form.fields["department"].initial = student.department
+        form.fields["picture"].initial = student.picture
         context["EditProfile"] = form
     return render(request, "social/profile_edit.html", context)
 
@@ -211,7 +212,10 @@ def view_club(request, club_id):
 def club_edit(request, club_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     club = get_object_or_404(Club, pk=club_id)
-    membership_club_list = Membership.objects.filter(student__pk=student.id, club__pk=club_id)
+    membership_club_list = Membership.objects.filter(
+        student__pk=student.id, club__pk=club_id
+    )
+    all_club_memberships = Membership.objects.filter(club__pk=club_id)
 
     if not membership_club_list:                # If no match is found
         raise PermissionDenied
@@ -221,32 +225,54 @@ def club_edit(request, club_id):
     context = {
         "student": student,
         "membership_club_list": membership_club_list,
-        "club": club
+        "club": club,
+        "all_club_memberships": all_club_memberships,
     }
 
     if request.method == "POST":
         if "Annuler" in request.POST:
             return redirect("/social/view_club/"+str(club.id))
         elif "Valider" in request.POST:
-            form = EditClub(
+            form_club = EditClub(
                 request.POST,
                 request.FILES,
                 instance=Club.objects.get(id=club.id),
             )
-            if form.is_valid():
+            if form_club.is_valid():
                 if "logo" in request.FILES:
                     club.logo.delete()
-                form.save()
-                return redirect("/social/view_club/"+str(club.id))
+                if "background_picture" in request.FILES:
+                    club.logo.delete()
+                form_club.save()
+                return redirect("/social/view_club/" + str(club.id))
+        elif "Ajouter" in request.POST:
+            form_membership = AddMember(
+                request.POST,
+                instance=Membership.objects.get_or_create(
+                    student=request.POST["student"],
+                    club=club
+                )
+            )
+            if form_membership.is_valid():
+                form_membership.save()
+            return redirect("/social/club_edit" + str(club.id))
+        elif "Supprimer" in request.POST:
+            deleted_member = Membership.objects.get(club=club, student=request.POST["student"])
+            deleted_member.delete()
+            return redirect("/social/club_edit" + str(club.id))
 
     else:
-        form = EditClub()
+        form_club = EditClub()
 
-        form.fields["name"].initial = club.name
-        form.fields["nickname"].initial = club.nickname
-        form.fields["logo"].initial = club.logo
-        form.fields["description"].initial = club.description
+        form_club.fields["name"].initial = club.name
+        form_club.fields["nickname"].initial = club.nickname
+        form_club.fields["logo"].initial = club.logo
+        form_club.fields["background_picture"].initial = club.background_picture
+        form_club.fields["description"].initial = club.description
+        form_club.fields["active"].initial = club.active
+        form_club.fields["has_fee"].initial = club.has_fee
+        form_club.fields["category"].initial = [category.pk for category in club.category.all()]
 
-        context["EditClub"] = form
+        context["EditClub"] = form_club
     return render(request, "social/club_edit.html", context)
 
