@@ -151,7 +151,7 @@ def profile_edit(request):
 
     if request.method == "POST":
         if "Annuler" in request.POST:
-            return redirect("/social/profile")
+            return redirect("social:profile")
         elif "Valider" in request.POST:
             form = EditProfile(
                 request.POST,
@@ -162,7 +162,7 @@ def profile_edit(request):
                 if "picture" in request.FILES:
                     student.picture.delete()
                 form.save()
-                return redirect("/social/profile")
+                return redirect("social:profile")
 
     else:
         form = EditProfile()
@@ -229,7 +229,7 @@ def club_edit(request, club_id):
 
     if request.method == "POST":
         if "Annuler" in request.POST:
-            return redirect("/social/view_club/" + str(club.id))
+            return redirect("social:club_detail", club_id=club.id)
 
         elif "Valider" in request.POST:
             form_club = EditClub(
@@ -243,7 +243,7 @@ def club_edit(request, club_id):
                 if "background_picture" in request.FILES:
                     club.logo.delete()
                 form_club.save()
-                return redirect("/social/view_club/" + str(club.id))
+                return redirect("social:club_detail", club_id=club.id)
 
         elif "Ajouter-Membre" in request.POST:
             try:
@@ -262,22 +262,22 @@ def club_edit(request, club_id):
                 form_membership = AddMember(request.POST, instance=membership_added)
                 if form_membership.is_valid():
                     form_membership.save()
-                return redirect("/social/club_edit/" + str(club.id))
+                return redirect("social:club_edit", club_id=club.id)
             except Student.DoesNotExist:
-                return redirect("/social/club_edit/" + str(club.id))
+                return redirect("social:club_edit", club_id=club.id)
 
         elif "Supprimer" in request.POST:
             deleted_member = Membership.objects.get(
                 club=club, student__id=request.POST["student_id"]
             )
             deleted_member.delete()
-            return redirect("/social/club_edit/" + str(club.id))
+            return redirect("social:club_edit", club_id=club.id)
 
         elif "Ajouter-Role" in request.POST:
             form_role = AddRole(request.POST)
             if form_role.is_valid():
                 form_role.save()
-            return redirect("/social/club_edit/" + str(club.id))
+            return redirect("social:club_edit", club_id=club.id)
 
     else:
         form_club = EditClub()

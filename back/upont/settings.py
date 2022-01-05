@@ -95,7 +95,7 @@ DATABASES = {
 # Login redirection
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "/social/index_users"
+LOGIN_REDIRECT_URL = "social:index_users"
 
 
 # Password validation
