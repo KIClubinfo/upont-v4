@@ -23,9 +23,9 @@ from . import views
 urlpatterns = [
     path("social/", include("social.urls")),
     path("admin/", admin.site.urls),
-    path("", include("django.contrib.auth.urls")),
     path("tellme/", include("tellme.urls"), name="tellme"),
-]
+    path("", include('django.contrib.auth.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Only for dev, gives anyone access to any image
 if settings.DEBUG:
