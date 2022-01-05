@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.db.models.functions import Greatest
-from django.shortcuts import get_object_or_404, redirect, render
 from django.http import Http404
-from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import AddMember, AddRole, EditClub, EditProfile
 from .models import Category, Club, Membership, Role, Student
@@ -15,8 +15,8 @@ def index_users(request):
     all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
     context = {
         "all_student_list": all_student_list,
-        "student_displayed_list": all_student_list
-        }
+        "student_displayed_list": all_student_list,
+    }
     return render(request, "social/index_users.html", context)
 
 
@@ -54,7 +54,9 @@ def search(request):
     if "club" in request.GET:
         all_clubs_list = Club.objects.order_by("name")
         all_categories_list = Category.objects.order_by("name")
-        my_memberships_list = Membership.objects.filter(student__user__id=request.user.id)
+        my_memberships_list = Membership.objects.filter(
+            student__user__id=request.user.id
+        )
         context = {
             "all_clubs_list": all_clubs_list,
             "all_categories_list": all_categories_list,
@@ -142,6 +144,7 @@ def search_club(request):
 def index_profile(request):
     return render(request, "social/index_profile.html")
 
+
 @login_required(login_url="/login/")
 def profile_edit(request):
     user_id = request.user.id
@@ -172,6 +175,7 @@ def profile_edit(request):
         form.fields["phone_number"].initial = student.phone_number
         form.fields["department"].initial = student.department
         form.fields["picture"].initial = student.picture
+        form.fields["gender"].initial = student.gender
     context["EditProfile"] = form
     return render(request, "social/profile_edit.html", context)
 
@@ -195,11 +199,13 @@ def index_clubs(request):
 def view_club(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     members = Membership.objects.filter(club__id=club_id)
-    membership_club_list = Membership.objects.filter(student__user__id=request.user.id, club__pk=club_id)
+    membership_club_list = Membership.objects.filter(
+        student__user__id=request.user.id, club__pk=club_id
+    )
 
-    if not membership_club_list:                # If no match is found
+    if not membership_club_list:  # If no match is found
         is_admin = False
-    elif not membership_club_list[0].is_admin:    # If the user does not have the rights
+    elif not membership_club_list[0].is_admin:  # If the user does not have the rights
         is_admin = False
     else:
         is_admin = True
@@ -216,9 +222,9 @@ def club_edit(request, club_id):
     )
     all_club_memberships = Membership.objects.filter(club__pk=club_id)
 
-    if not membership_club_list:                # If no match is found
+    if not membership_club_list:  # If no match is found
         raise PermissionDenied
-    if not membership_club_list[0].is_admin:    # If the user does not have the rights
+    if not membership_club_list[0].is_admin:  # If the user does not have the rights
         raise PermissionDenied
 
     context = {
@@ -300,4 +306,3 @@ def club_edit(request, club_id):
     context["AddMember"] = form_membership
     context["AddRole"] = form_role
     return render(request, "social/club_edit.html", context)
-

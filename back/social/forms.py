@@ -7,14 +7,25 @@ from .models import Club, Membership, Role, Student
 class EditProfile(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ("phone_number", "department", "picture")
+        fields = ("phone_number", "department", "picture", "gender")
         widgets = {
-            "phone_number": forms.TextInput(attrs={"class": "profil-input"}),
+            "phone_number": forms.TextInput(
+                attrs={
+                    "class": "profil-input",
+                    "placeholder": "Visible par tous les membres",
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         super(EditProfile, self).__init__(*args, **kwargs)
         self.fields["phone_number"].required = False
+        self.fields["gender"].choices = [
+            ("Homme", "Homme"),
+            ("Femme", "Femme"),
+            ("Autre", "Autre"),
+        ]
+        self.fields["phone_number"].placeholder = "False"
 
 
 class EditClub(forms.ModelForm):

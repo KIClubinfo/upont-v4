@@ -24,8 +24,13 @@
                                     {{ EditProfile.non_field_errors }}
                                     <div class="col-lg-5" style="text-align: center;">
                                         <div class="profil-information-box">{{student.user.first_name}}</div>
+                                        <p>Numéro de téléphone:</p>
                                         {{ EditProfile.phone_number.errors }}
                                         {{ EditProfile.phone_number }}
+                                    </div>
+                                    <div class="col-lg-5" style="text-align: center;">
+                                        {{ EditProfile.gender.errors }}
+                                        {{ EditProfile.gender }}
                                     </div>
                                     <div class="col-lg-7" style="text-align: center;">
                                         <div class="profil-information-box">{{student.user.last_name}}</div>

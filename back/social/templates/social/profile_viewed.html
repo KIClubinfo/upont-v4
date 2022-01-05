@@ -15,9 +15,10 @@
                             {% if student.phone_number is not None %}
                                 <div class="profil-information-box">{{student.phone_number}}</div>
                             {% else %}
-                                <div class="profil-information-box">Tu peux entrer ton numéro de téléphone</div>
+                                <div class="profil-information-box">{{student.user.first_name}} n'a pas renseigné son numéro</div>
                             {% endif %}
                             <div class="profil-information-box">{{student.department}}</div>
+                            <div class="profil-information-box">{{student.origin}}</div>
                         </div>
                     </div>
                     <div class="col-lg-8">

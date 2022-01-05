@@ -27,10 +27,12 @@
                                     {% else %}
                                         <div class="profil-information-box">Tu peux entrer ton numéro de téléphone</div>
                                     {% endif %}
+                                    <div class="profil-information-box">{{student.gender}}</div>
                                 </div>
                                 <div class="col-lg-7" style="text-align: center;">
                                     <div class="profil-information-box">{{student.user.last_name}}</div>
                                     <div class="profil-information-box">{{student.department}}</div>
+                                    <div class="profil-information-box">{{student.origin}}</div>
                                     <a href="{% url 'social:profile_edit' %}">
                                         <button class="button blue-button">Modifier mon profil</button>
                                     </a>
