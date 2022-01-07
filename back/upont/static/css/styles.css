@@ -874,6 +874,7 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .vignette-club-mini{
+    position:relative;
     display: flex;
     margin-top: 2rem;
     min-height: 6rem;
