@@ -37,6 +37,7 @@
                                 <p class="club-description">{{club.description}}</p>
                                 <span class="club-description-title">Membres du club</span>
                                 {% if members %}
+                                <div class="row">
                                     {% for membership in members %}
                                         <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                             <div class="user-card">
@@ -48,16 +49,17 @@
                                             </div>
                                         </div>
                                     {% endfor %}
+                                </div>
                                 {% else %}
                                 <p class="club-description">Ce club n'a pas de membres.. à toi de devenir le premier membre du club !</p>
                                 {% endif %}
-                                <p><a href="{% url 'social:club_index' %}"> Retour à l'index </a></p>
+                                <div style="display:flex; justify-content:center;">
+                                    <a href="{% url 'social:club_index' %}" class="button green-button">Retour à l'index</a>
+                                    {% if is_admin %}
+                                    <a href="{% url 'social:club_edit' club.id %}" class="button blue-button">Modifier les informations du club</a>
+                                    {% endif %}
+                                </div>
                             </div>
-                            {% if is_admin %}
-                                <a href="{% url 'social:club_edit' club.id %}">
-                                    <button class="button blue-button">Modifier les informations du club</button>
-                                </a>
-                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -57,19 +57,18 @@
                                 {% for membership in my_memberships_list %}
                                     <!--My Clubs cards-->
                                     <div class="col-12">
-                                        <a href="{% url 'social:club_detail' membership.club.id %}">
-                                            <div class="vignette-club-mini">
-                                                {% if membership.club.logo %}
-                                                    <img class="vignette-image-mini" src={{membership.club.logo.path}} alt="">
-                                                {% else %}
-                                                    <img class="vignette-image-mini" src="{% static 'assets/img/bde.png' %}" alt="">
-                                                {% endif %}
-                                                <div class="vignette-mini-title">
-                                                    <span>{{membership.club.name}}</span>
-                                                    <span class="vignette-mini-role"><br>{{membership.role}}</span>
-                                                </div>
+                                        <div class="vignette-club-mini">
+                                            {% if membership.club.logo %}
+                                                <img class="vignette-image-mini" src={{membership.club.logo.path}} alt="">
+                                            {% else %}
+                                                <img class="vignette-image-mini" src="{% static 'assets/img/bde.png' %}" alt="">
+                                            {% endif %}
+                                            <div class="vignette-mini-title">
+                                                <span>{{membership.club.name}}</span>
+                                                <span class="vignette-mini-role"><br>{{membership.role}}</span>
                                             </div>
-                                        </a>
+                                            <a href="{% url 'social:club_detail' membership.club.id %}" class="stretched-link"></a>
+                                        </div>
                                     </div>
                                     <!--End of My Clubs cards-->
                                 {% endfor %}
