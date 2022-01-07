@@ -495,6 +495,7 @@ h1,h2,h3,h4,h5,h6{
     /* Sizing */
     margin: 1rem auto;
     padding: 0.5rem 1rem;
+    height: 2.5rem;
     width: 80%;
     /* Styling */
     background-color: var(--primary-bg-color);
@@ -506,10 +507,51 @@ h1,h2,h3,h4,h5,h6{
     border-radius: 0.5rem;
 }
 
+.profil-input[type="file"]{
+    color: rgb(156, 156, 156);
+}
+
 .profil-input:focus{
     outline: 0;
 }
 
+.profil-input::file-selector-button {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 400;
+    background-color: transparent;
+    overflow: hidden;
+    pointer-events: none;
+    border-color: inherit;
+    border-style: solid;
+    border-width: 0;
+    border-inline-end-width: 1px;
+    border-radius: 15;
+}
+
+.profil-select{
+    width: 80%;
+    height: 2.5rem;
+    margin: 1rem auto;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #fff;
+    background-color: var(--primary-bg-color);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1.5rem center;
+    background-size: 16px 12px;
+    border: solid var(--border-color) var(--border-width);
+    border-radius: 0.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.profil-select:focus{
+    outline: 0;
+}
 /*-------------------------------------------------*/
 /*------------------- GLASS CARD ------------------*/
 /*-------------------------------------------------*/
