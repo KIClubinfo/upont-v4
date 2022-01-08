@@ -1,14 +1,11 @@
 {% load static %}
-{% include "header.html" with title="Club"%}
-
-<body>
-    {% include "feedback.html" %}
-    <!--Sidenav-->
-    {% include "../social/sidenav.html" with active_link="clubs" %}
+<!--Header-->
+{% include "../social/header.html" with title="Nom du club" %}
+<!--Sidenav-->
+{% include "../social/sidenav.html" with active_link="clubs" %}
 
         <!--Content-->
         <div class="content">
-            {% include "../social/searchbar.html" with all_student_list=all_student_list %}
             <div class="content-main">
                 <div class="club-box">
                     <div class="club-group-image-container">

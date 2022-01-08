@@ -1,11 +1,8 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Clubs"%}
-
-<body>
-    {% include "feedback.html" %}
-    <!--Sidenav-->
-    {% include "../social/sidenav.html" with active_link="clubs" %}
+{% include "../social/header.html" with title="Clubs" %}
+<!--Sidenav-->
+{% include "../social/sidenav.html" with active_link="clubs" %}
 
         <!--Content-->
         <div class="content">
