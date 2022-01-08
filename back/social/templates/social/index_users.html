@@ -1,6 +1,6 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" %}
+{% include "../social/header.html" with title="Élèves" %}
 <!--Sidenav-->
 {% include "../social/sidenav.html" with active_link="users" %}
 
@@ -20,13 +20,14 @@
                         {% for student in student_displayed_list %}
                             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                 <div class="user-card">
-                                    <div class="user-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
-                                    <a href="{% url 'social:profile_viewed' student.user.id %}" >
-                                        <div class="user-information">
-                                            <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
-                                            <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
-                                        </div>
-                                    </a>
+                                    <div class="user-image">
+                                        <img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+                                    </div>
+                                    <div class="user-information">
+                                        <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
+                                        <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
+                                    </div>
+                                    <a href="{% url 'social:profile_viewed' student.user.id %}" class="stretched-link"></a>
                                 </div>
                             </div>
                         {% endfor %}

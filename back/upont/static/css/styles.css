@@ -398,6 +398,7 @@ h1,h2,h3,h4,h5,h6{
 
 .user-card{
     /* Positioning */
+    position: relative;
     display: flex;
     flex-direction: row;
     /* Sizing */
@@ -735,6 +736,10 @@ h1,h2,h3,h4,h5,h6{
 
 .white-border{
     border-left: solid var(--border-color) var(--border-width);
+}
+
+.bottom-border{
+    border-bottom: solid var(--border-color) var(--border-width);
 }
 
 @media(max-width:670px){

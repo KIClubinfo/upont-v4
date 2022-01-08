@@ -1,6 +1,6 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" %}
+{% include "../social/header.html" with title="Édition du profil" %}
 <!--Sidenav-->
 {% include "../social/sidenav.html" with active_link="profile" %}
 
@@ -18,33 +18,31 @@
                                     <div class="section-title">Mes informations personnelles</div>
                                 </div>
                             </div>
-                            <div class="row">
+
                                 <form action="" method="post" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     {{ EditProfile.non_field_errors }}
-                                    <div class="col-lg-5" style="text-align: center;">
-                                        <div class="profil-information-box">{{student.user.first_name}}</div>
-                                        <p>Numéro de téléphone:</p>
-                                        {{ EditProfile.phone_number.errors }}
-                                        {{ EditProfile.phone_number }}
-                                    </div>
-                                    <div class="col-lg-5" style="text-align: center;">
-                                        {{ EditProfile.gender.errors }}
-                                        {{ EditProfile.gender }}
-                                    </div>
-                                    <div class="col-lg-7" style="text-align: center;">
-                                        <div class="profil-information-box">{{student.user.last_name}}</div>
-                                        {{ EditProfile.department.errors }}
-                                        {{ EditProfile.department }}
-                                        {{ EditProfile.picture }}
-                                        <div style="text-align: center;">
-                                            <input class="button red-button" type="submit" name="Annuler" value="Annuler">
-                                            <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                    <div class="row">
+                                        <div class="col-lg-5" style="text-align: center;">
+                                            <div class="profil-information-box">{% if student.user.first_name %}{{student.user.first_name}}{% else %}---Prénom---{% endif %}</div>
+                                            {{ EditProfile.phone_number.errors }}
+                                            {{ EditProfile.phone_number }}
+                                            {{ EditProfile.gender.errors }}
+                                            {{ EditProfile.gender }}
+                                        </div>
+                                        <div class="col-lg-7" style="text-align: center;">
+                                            <div class="profil-information-box">{% if student.user.last_name %}{{student.user.last_name}}{% else %}---Nom---{% endif %}</div>
+                                            {{ EditProfile.department.errors }}
+                                            {{ EditProfile.department }}
+                                            {{ EditProfile.picture }}
+                                            <div style="text-align: center;">
+                                                <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                                <input class="button red-button" type="submit" name="Annuler" value="Annuler">
+                                            </div>
                                         </div>
                                     </div>
-
                                 </form>
-                            </div>
+
                         </div>
                         <div class="col-lg-4" style="border-left: solid hsla(0, 0%, 100%, 0.25) 0.25px;">
                             <div class="section-title">Mes activités associatives</div>
