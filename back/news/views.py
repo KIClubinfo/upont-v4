@@ -43,6 +43,9 @@ def event_edit(request, event_id):
     if request.method == "POST":
         if "Annuler" in request.POST:
             return redirect("news:event_detail", event_id=event.id)
+        elif "Supprimer" in request.POST:
+            event.delete()
+            return redirect("news:events")
         elif "Valider" in request.POST:
             form = EditEvent(
                 request.user.id,
@@ -85,11 +88,27 @@ def event_create(request):
 
 @login_required(login_url="/login/")
 def post_edit(request, post_id):
+    student = get_object_or_404(Student, user__id=request.user.id)
+    post = get_object_or_404(Post, pk=post_id)
+
+    if post.club:
+        membership_club_list = Membership.objects.filter(
+            student__pk=student.id, club__pk=post.club.id
+        )
+        if not membership_club_list:  # If no match is found
+            raise PermissionDenied
+    else:
+        if post.author.user.id != request.user.id:
+            raise PermissionDenied
+
     post = get_object_or_404(Post, id=post_id)
     context = {}
     if request.method == "POST":
         if "Annuler" in request.POST:
             return redirect("news:post_detail", post_id=post.id)
+        elif "Supprimer" in request.POST:
+            post.delete()
+            return redirect("news:posts")
         elif "Valider" in request.POST:
             form = EditPost(
                 request.user.id,
@@ -123,7 +142,7 @@ def post_create(request):
             )
             if form.is_valid():
                 post = form.save(commit=False)
-                post.published_as_student = False
+                post.author = Student.objects.get(user__id=request.user.id)
                 post.date = datetime.now()
                 post.save()
                 return redirect("news:posts")
