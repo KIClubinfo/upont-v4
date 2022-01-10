@@ -17,6 +17,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from upont.add_promo import add
 
 from . import views
 
@@ -24,8 +25,9 @@ urlpatterns = [
     path("social/", include("social.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
+    path("add_promo", add),
     path("", include('django.contrib.auth.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
 
 # Only for dev, gives anyone access to any image
 if settings.DEBUG:
