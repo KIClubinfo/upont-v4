@@ -7,4 +7,5 @@ urlpatterns = [
     path("posts/", views.posts, name="posts"),
     path("events/index", views.events, name="events"),
     path("event/<int:event_id>/detail", views.event_detail, name="event_detail"),
+    path("event/<int:event_id>/edit", views.event_edit, name="event_edit"),
 ]
