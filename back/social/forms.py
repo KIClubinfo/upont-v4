@@ -12,9 +12,12 @@ class EditProfile(forms.ModelForm):
             "phone_number": forms.TextInput(
                 attrs={
                     "class": "profil-input",
-                    "placeholder": "Visible par tous les membres",
+                    "placeholder": "Numéro de téléphone",
                 }
             ),
+            "department": forms.Select(attrs={"class": "profil-select"}),
+            "picture": forms.FileInput(attrs={"class": "profil-input"}),
+            "gender": forms.Select(attrs={"class": "profil-select"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -43,6 +46,8 @@ class EditClub(forms.ModelForm):
         )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
+            "logo": forms.FileInput(attrs={"class": "profil-input"}),
+            "background_picture": forms.FileInput(attrs={"class": "profil-input"}),
             "nickname": forms.TextInput(attrs={"class": "profil-input"}),
             "description": forms.Textarea(attrs={"class": "profil-input"}),
             "category": forms.CheckboxSelectMultiple,
@@ -60,6 +65,10 @@ class AddMember(forms.ModelForm):
     class Meta:
         model = Membership
         fields = ("student", "role", "is_admin")
+        widgets = {
+            "student": forms.Select(attrs={"class": "profil-select"}),
+            "role": forms.Select(attrs={"class": "profil-select"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(AddMember, self).__init__(*args, **kwargs)
@@ -69,6 +78,9 @@ class AddRole(forms.ModelForm):
     class Meta:
         model = Role
         fields = ("name",)
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "profil-input"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(AddRole, self).__init__(*args, **kwargs)
