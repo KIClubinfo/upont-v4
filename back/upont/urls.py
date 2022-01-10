@@ -26,7 +26,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo", add),
-    path("", include('django.contrib.auth.urls')),
+    path("", include("django.contrib.auth.urls")),
+    path("", views.root_redirect),
 ]
 
 # Only for dev, gives anyone access to any image
