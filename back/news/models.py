@@ -22,9 +22,11 @@ class Event(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=50)
     author = models.ForeignKey(
-        "social.Membership", verbose_name="author", on_delete=models.SET_NULL, null=True
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
     )
-    published_as_student = models.BooleanField()
+    club = models.ForeignKey(
+        "social.Club", on_delete=models.SET_NULL, null=True, blank=True
+    )
     date = models.DateTimeField()
     illustration = models.ImageField(
         upload_to="post_illustrations", null=True, blank=True

@@ -25,13 +25,20 @@ class EditPost(forms.ModelForm):
             "illustration",
             "content",
             "event",
-            "published_as_student",
-            "author",
+            "club",
         )
 
     def __init__(self, user_id, *args, **kwargs):
         super(EditPost, self).__init__(*args, **kwargs)
-        self.fields["author"].choices = [
-            (membership.id, membership.club)
+        self.fields["event"].choices = [("", "Aucun")] + [
+            (event.id, event)
+            for event in Event.objects.filter(
+                club__in=Membership.objects.filter(student__user__pk=user_id).values(
+                    "club"
+                )
+            )
+        ]
+        self.fields["club"].choices = [("", "Aucun")] + [
+            (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
