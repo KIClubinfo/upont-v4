@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+        {{EditPost}}
+        <div>
+            <input  type="submit" name="Annuler" value="Annuler">
+            <input  type="submit" name= "Valider" value="Valider">
+        </div>
+        </form>
+</body>
+</html>
