@@ -13,6 +13,12 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+import environ
+
+# getting environmnent variables
+env = environ.Env()
+environ.Env.read_env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,13 +26,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-2-e3q#*pqsgm+lhrgrkc=ex%!^8(3^*6@q^367*ma4j1$=54$f"
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "upont.enpc.org",
+    "upont-dev.enpc.org",
+    "localhost",
+    "127.0.0.1",
+    "back",
+]
+
+if DEBUG:
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY = "django-insecure-2-e3q#*pqsgm+lhrgrkc=ex%!^8(3^*6@q^367*ma4j1$=54$f"
+else:
+    SECRET_KEY = env("SECRET_KEY", default=None)
 
 
 # Application definition
@@ -154,7 +169,14 @@ FIXTURE_DIRS = ["/fixtures/"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "../media/")
 
+# Email backend
 if DEBUG:
     DEFAULT_FROM_EMAIL = "test@mail.com"
     EMAIL_FILE_PATH = os.path.join(BASE_DIR, "../emails/")
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = True
+else:
+    EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+    SENDGRID_API_KEY = env("SENDGRID_API_KEY", default=None)
+    ADMIN_EMAIL = env("ADMIN_EMAIL", default=None)
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = False
