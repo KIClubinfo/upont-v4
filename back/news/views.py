@@ -21,6 +21,9 @@ def events(request):
 
 def event_detail(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
+    event_posts = Post.objects.filter(event__pk=event_id).order_by("-date")
+    context = {"event": event, "event_posts": event_posts}
+    return render(request, "news/event_detail.html", context)
     context = {"event": event}
     return render(request, "news/event_detail.html", context)
 
