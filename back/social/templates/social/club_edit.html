@@ -1,11 +1,8 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Paramètres du club"%}
-
-<body>
-    {% include "feedback.html" %}
-    <!--Sidenav-->
-    {% include "../social/sidenav.html" with active_link="clubs" %}
+{% include "../social/header.html" with title="Édition du club" %}
+<!--Sidenav-->
+{% include "../social/sidenav.html" with active_link="clubs" %}
 
         <!--Content-->
         <div class="content">
@@ -31,25 +28,28 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                Modifier la photo d'arrière plan du club :
-                                {{ EditClub.background_picture }}
-                                Modifier le logo du club :
-                                {{ EditClub.logo }}
-                            </div>
-                            <div class="col-lg-8">
-                                Nom du club:
+                        </div>
+                        <div class="row border-bottom">
+                            <div class="col-lg-6">
+                                Nom du club:<br>
                                 {{ EditClub.name.errors }}
                                 {{ EditClub.name }}
                                 <br>
-                                Surnom du club :
+                                Surnom du club : <br>
                                 {{ EditClub.nickname.errors }}
                                 {{ EditClub.nickname }}
                                 <br>
-                                Description du club :
+                                Description du club : <br>
                                 {{ EditClub.description.errors }}
                                 {{ EditClub.description }}
                                 <br>
+                                Modifier la photo d'arrière plan du club :<br>
+                                {{ EditClub.background_picture }}
+                                <br>
+                                Modifier le logo du club :<br>
+                                {{ EditClub.logo }}
+                            </div>
+                            <div class="col-lg-6">
                                 Le club est actif :
                                 {{ EditClub.active.errors }}
                                 {{ EditClub.active }}
@@ -61,15 +61,17 @@
                                 Modifier les catégories du club :
                                 {{ EditClub.category.errors }}
                                 {{ EditClub.category }}
-                            </div>
-                            <div style="text-align: center;">
-                                <input class="button red-button" type="submit" name="Annuler" value="Annuler">
-                                <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                <div style="text-align: center;">
+                                    <input class="button red-button" type="submit" name="Annuler" value="Annuler">
+                                    <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                </div>
                             </div>
                         </div>
                     </form>
                     <br>
                     {% if all_club_memberships %}
+                        Supprimer des membres du club : <br>
+                        <div class="row">
                         {% for membership in all_club_memberships %}
                             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                 <div class="user-card">
@@ -89,33 +91,40 @@
                                 </div>
                             </div>
                         {% endfor %}
+                        </div>
                     {% endif %}
                     <br>
-                    <form action="" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{AddMember.non_field_errors}}
-                        Ajouter un membre au club:
-                        <br>
-                        Elève:
-                        {{AddMember.student.errors}}
-                        {{AddMember.student}}
-                        <br>
-                        Rôle :
-                        {{AddMember.role.errors}}
-                        {{AddMember.role}}
-                        <br>
-                        Administrateur du club sur Upont
-                        {{AddMember.is_admin.errors}}
-                        {{AddMember.is_admin}}
-                        <input class="button green-button" type="submit" name="Ajouter-Membre" value="Ajouter un membre au club">
-                    </form>
-                    <form action="" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        Créez un rôle si aucun ne vous convient:
-                        {{AddRole.name.errors}}
-                        {{AddRole.name}}
-                        <input class="button green-button" type="submit" name="Ajouter-Role" value="Créer">
-                    </form>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <form action="" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {{AddMember.non_field_errors}}
+                                Ajouter un membre au club:
+                                <br><br>
+                                Elève: <br>
+                                {{AddMember.student.errors}}
+                                {{AddMember.student}}
+                                <br>
+                                Rôle : <br>
+                                {{AddMember.role.errors}}
+                                {{AddMember.role}}
+                                <br>
+                                Administrateur du club sur Upont
+                                {{AddMember.is_admin.errors}}
+                                {{AddMember.is_admin}} <br>
+                                <input class="button green-button" type="submit" name="Ajouter-Membre" value="Ajouter un membre au club">
+                            </form>
+                        </div>
+                        <div class="col-lg-6">
+                            <form action="" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                Créez un rôle si aucun ne vous convient: <br>
+                                {{AddRole.name.errors}}
+                                {{AddRole.name}}<br>
+                                <input class="button green-button" type="submit" name="Ajouter-Role" value="Créer">
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
