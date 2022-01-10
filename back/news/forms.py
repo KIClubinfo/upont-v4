@@ -12,7 +12,7 @@ class EditEvent(forms.ModelForm):
     def __init__(self, user_id, *args, **kwargs):
         super(EditEvent, self).__init__(*args, **kwargs)
         self.fields["club"].choices = [
-            (membership.club, membership.club.name)
+            (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
 

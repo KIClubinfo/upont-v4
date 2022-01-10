@@ -37,6 +37,7 @@ def event_edit(request, event_id):
             return redirect("news:event_detail", event_id=event.id)
         elif "Valider" in request.POST:
             form = EditEvent(
+                request.user.id,
                 request.POST,
                 request.FILES,
                 instance=Event.objects.get(id=event_id),
@@ -48,7 +49,7 @@ def event_edit(request, event_id):
                 return redirect("news:events")
 
     else:
-        form = EditEvent(instance=event)
+        form = EditEvent(request.user.id, instance=event)
     context["EditEvent"] = form
     return render(request, "news/event_edit.html", context)
 
@@ -61,12 +62,13 @@ def event_create(request):
             return redirect("news:events")
         elif "Valider" in request.POST:
             form = EditEvent(
+                request.user.id,
                 request.POST,
                 request.FILES,
             )
             if form.is_valid():
                 form.save()
-            return redirect("news:events")
+                return redirect("news:events")
     else:
         form = EditEvent(request.user.id)
     context["EditEvent"] = form
