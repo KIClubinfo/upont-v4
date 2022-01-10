@@ -1,0 +1,52 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Profil"%}
+
+<body>
+    {% include "feedback.html" %}
+    <!--Sidenav-->
+    {% include "../social/sidenav.html" with active_link="profile" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-main">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="box profil-box">
+                            <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                            <div class="section-title">{{student.user.first_name}} {{student.user.last_name}} </div>
+                            {% if student.phone_number is not None %}
+                                <div class="profil-information-box">{{student.phone_number}}</div>
+                            {% else %}
+                                <div class="profil-information-box">{{student.user.first_name}} n'a pas renseigné son numéro</div>
+                            {% endif %}
+                            <div class="profil-information-box">{{student.department}}</div>
+                            <div class="profil-information-box">{{student.origin}}</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="section-title">Dernières activités</div>
+                        <div class="box mt-3">
+                            {% if membership_club_list %}
+                                {% for membership in membership_club_list %}
+                                    <div class="user-card">
+                                        <div class="user-image"><img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/bde.png' %}{% endif %}" alt=""></div>
+                                        <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span> <span>{{membership.role.name}}</span></div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>{{student.user.first_name}} n'est membre d'aucun club</p> <!--TO DO : écrire ça bien-->
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+        <!--EndScripts-->
+
+    </body>
+</html>

@@ -24,9 +24,9 @@ from . import views
 urlpatterns = [
     path("social/", include("social.urls")),
     path("admin/", admin.site.urls),
-    path("", include("django.contrib.auth.urls")),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo", add),
+    path("", include('django.contrib.auth.urls')),
 ]
 
 # Only for dev, gives anyone access to any image

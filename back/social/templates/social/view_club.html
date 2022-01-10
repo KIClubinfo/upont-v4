@@ -1,15 +1,71 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-</head>
+{% load static %}
+{% include "header.html" with title="Club"%}
+
 <body>
-<p>Vue du club</p>
-{%if club.logo%}
-<p><img src={{club.logo.path}} width="400" height="400"> </p>
-{%endif%}
-<p>{{club.name}} {% if club.nickname %} ({{club.nickname}}) {% endif %}:</p>
-<p> {{club.description}}</p>
-<p> <a href="{% url 'social:club_index' %}"> Retour à l'index </a></p>
-</body>
+    {% include "feedback.html" %}
+    <!--Sidenav-->
+    {% include "../social/sidenav.html" with active_link="clubs" %}
+
+        <!--Content-->
+        <div class="content">
+            {% include "../social/searchbar.html" with all_student_list=all_student_list %}
+            <div class="content-main">
+                <div class="club-box">
+                    <div class="club-group-image-container">
+                                {% if club.background_picture %}
+                                    <img class="club-card-image" src={{club.background_picture.path}} height="100%" width="100%" alt="">
+                                {% else %}
+                                        <img class="club-card-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
+                                {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="club-image">
+                                {% if club.logo %}
+                                    <img class="club-card-image" src={{club.logo.path}} height="100%" width="100%" alt="">
+                                {% else %}
+                                        <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="club-title">{{club.name}} {% if club.nickname %}- ({{club.nickname}}) {% endif %}</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="club-description-content">
+                                <span class="club-description-title">Description du club</span>
+                                <p class="club-description">{{club.description}}</p>
+                                <span class="club-description-title">Membres du club</span>
+                                {% if members %}
+                                    {% for membership in members %}
+                                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                            <div class="user-card">
+                                                <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                                <div class="user-information">
+                                                    <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
+                                                    <span>{{membership.role}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                <p class="club-description">Ce club n'a pas de membres.. à toi de devenir le premier membre du club !</p>
+                                {% endif %}
+                                <p><a href="{% url 'social:club_index' %}"> Retour à l'index </a></p>
+                            </div>
+                            {% if is_admin %}
+                                <a href="{% url 'social:club_edit' club.id %}">
+                                    <button class="button blue-button">Modifier les informations du club</button>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
 </html>

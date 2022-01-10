@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "tellme",
+    "django.contrib.postgres",
 ]
 
 MIDDLEWARE = [
@@ -94,7 +95,7 @@ DATABASES = {
 # Login redirection
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "/social/index_users"
+LOGIN_REDIRECT_URL = "social:index_users"
 
 
 # Password validation
