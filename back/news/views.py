@@ -68,7 +68,7 @@ def event_create(request):
                 form.save()
             return redirect("news:events")
     else:
-        form = EditEvent()
+        form = EditEvent(request.user.id)
     context["EditEvent"] = form
     return render(request, "news/event_edit.html", context)
 
