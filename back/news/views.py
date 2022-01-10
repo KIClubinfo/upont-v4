@@ -43,7 +43,7 @@ def event_edit(request, event_id):
                 instance=Event.objects.get(id=event_id),
             )
             if form.is_valid():
-                if "picture" in request.FILES:
+                if "poster" in request.FILES:
                     event.poster.delete()
                 form.save()
                 return redirect("news:events")
@@ -84,18 +84,19 @@ def post_edit(request, post_id):
             return redirect("news:post_detail", post_id=post.id)
         elif "Valider" in request.POST:
             form = EditPost(
+                request.user.id,
                 request.POST,
                 request.FILES,
                 instance=Post.objects.get(id=post_id),
             )
             if form.is_valid():
-                if "picture" in request.FILES:
+                if "illustration" in request.FILES:
                     post.poster.delete()
                 form.save()
                 return redirect("news:posts")
 
     else:
-        form = EditPost(instance=post)
+        form = EditPost(request.user.id, instance=post)
     context["EditPost"] = form
     return render(request, "news/post_edit.html", context)
 
@@ -108,16 +109,17 @@ def post_create(request):
             return redirect("news:posts")
         elif "Valider" in request.POST:
             form = EditPost(
+                request.user.id,
                 request.POST,
                 request.FILES,
             )
             if form.is_valid():
                 post = form.save(commit=False)
-                post.published_as_student = True
+                post.published_as_student = False
                 post.date = datetime.now()
                 post.save()
-            return redirect("news:posts")
+                return redirect("news:posts")
     else:
-        form = EditPost()
+        form = EditPost(request.user.id)
     context["EditPost"] = form
     return render(request, "news/post_edit.html", context)
