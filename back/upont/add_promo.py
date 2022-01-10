@@ -46,7 +46,7 @@ def add(request):
         user, created = models.User.objects.update_or_create(
             last_name=column[1],
             first_name=column[2],
-            username=column[1] + "." + column[2],
+            username=(column[1] + "." + column[2]).replace(" ", "-"),
             email=column[3],
         )
         if created:

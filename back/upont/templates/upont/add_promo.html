@@ -36,7 +36,7 @@
             </div>
             <div class="content-main">
                 <p> Les informations doivent être dans l'ordre suivant : {{order}}.</p>
-                <p>Utiliser le format CSV uniquement.</p>
+                <p>Utiliser le format CSV uniquement, avec encodage UTF-8, délimité avec ";".</p>
                 <form action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="file" id="file1" name="file">
