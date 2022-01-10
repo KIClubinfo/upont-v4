@@ -1,14 +1,68 @@
+{% load static %}
 <!DOCTYPE html>
-<head>
-  <meta charset="UTF-8">
-</head>
-<body>
-<p>Vue de l'event</p>
-<p> {{event.name}} </p>
-<p> Organisateur : {{event.club}} </p>
-<p> Quand ? {{event.date}} </p>
-<p> Où ? {{event.location}} </p>
-<p> Quoi ? {{event.description}} </p>
-<p> <a href="{% url 'news:events' %}"> Retour à l'index </a></p>
-</body>
+<html>
+    <head>
+      <meta charset="UTF-8">
+    </head>
+    <body>
+    <p>Vue de l'event</p>
+    <p> {{event.name}} </p>
+    <p> Organisateur : {{event.club}} </p>
+    <p> Quand ? {{event.date}} </p>
+    <p> Où ? {{event.location}} </p>
+    <p> Quoi ? {{event.description}} </p>
+    {% for post in event_posts %}
+        <div class="news-card">
+            <div class="news-card-header">
+                <!--Poster-Image-Name-and-Title-of-the-post-->
+                <div class="news-card-header-image"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                <div class="news-card-header-text">
+                    <span class="news-card-header-name">
+                        {%if post.published_as_student%}
+                            {{post.author.student.user.first_name}} {{post.author.student.user.last_name}}
+                        {%else%}
+                            {{post.author.club.name}}
+                        {%endif%}
+                    </span>
+                    <a href="{% url 'news:event_detail' post.event.pk %}" class="news-card-header-title">{{post.title}}</a>
+                </div>
+            </div>
+            <div class="news-card-content">
+                <p>{{post.content}}</p>
+            </div>
+            {%if post.illustration%}
+                <div class="news-card-images">
+                    <!--All-Images-Linked-With-The-Post-->
+                    <div class="news-card-carousel" data-flickity='{}'>
+                        <div class="carousel-cell"><img src="{{post.illustration.path}}" style="height: 100%;" alt=""></div>
+                        <div class="carousel-cell"><img src="{% static 'assets/img/user.jpeg' %}" style="height: 100%;" alt=""></div>
+                        <div class="carousel-cell"><img src="{% static 'assets/img/user.jpeg' %}" style="height: 100%;" alt=""></div>
+                    </div>
+                </div>
+            {%endif%}
+            <div class="news-card-actions">
+                <!--Likes-Comments-Favorite-->
+                <div class="news-card-buttons">
+                    <a href="#" class="news-card-button"><i class="far fa-heart"></i></a>
+                    <a href="#" onClick="input()" class="news-card-button"><i class="far fa-comment"></i></a>
+                </div>
+                <div class="news-card-popularity">
+                    <span><i class="fas fa-heart" style="color: red;"></i> 45</span>
+                    <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i> 45</span>
+                </div>
+            </div>
+            <div class="news-card-comments">
+                <div class="news-card-comment">
+                    <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                    <div class="news-card-comment-box">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro itaque veritatis error voluptatum aperiam est enim praesentium. Quae atque fuga, dolore officiis iure laboriosam sunt consequatur laudantium minima magni porro voluptatibus quod sint quidem assumenda dicta natus! Assumenda quidem molestias explicabo provident. Necessitatibus maiores expedita, laboriosam optio suscipit libero quidem.</div>
+                </div>
+                <div class="news-card-edit-comment">
+                    <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                    <textarea class="news-card-edit-comment-input" type="text" name="" id=""></textarea>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <p> <a href="{% url 'news:events' %}"> Retour à l'index </a></p>
+    </body>
 </html>
