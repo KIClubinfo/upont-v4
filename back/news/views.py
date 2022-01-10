@@ -1,7 +1,9 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
+from social.models import Membership, Student
 
 from .forms import EditEvent, EditPost
 from .models import Event, Post
@@ -24,12 +26,18 @@ def event_detail(request, event_id):
     event_posts = Post.objects.filter(event__pk=event_id).order_by("-date")
     context = {"event": event, "event_posts": event_posts}
     return render(request, "news/event_detail.html", context)
-    context = {"event": event}
-    return render(request, "news/event_detail.html", context)
 
 
 @login_required(login_url="/login/")
 def event_edit(request, event_id):
+    student = get_object_or_404(Student, user__id=request.user.id)
+    event = get_object_or_404(Event, pk=event_id)
+    membership_club_list = Membership.objects.filter(
+        student__pk=student.id, club__pk=event.club.id
+    )
+    if not membership_club_list:  # If no match is found
+        raise PermissionDenied
+
     event = get_object_or_404(Event, id=event_id)
     context = {}
     if request.method == "POST":
