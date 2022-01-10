@@ -13,6 +13,7 @@ class Event(models.Model):
         related_name="events",
         blank=True,
     )
+    poster = models.ImageField(upload_to="poster", null=True, blank=True)
 
     def __str__(self):
         return self.name
