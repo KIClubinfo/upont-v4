@@ -51,13 +51,15 @@ def add(request):
         )
         if created:
             user.set_password(password)
+            user.save()
+        promo, created3 = Promotion.objects.get_or_create(year=column[0])
         student, created2 = Student.objects.update_or_create(
             user=user,
-            promo=Promotion.objects.get(year=column[0]),
+            promo=promo,
             department=Student.Department.A1,
         )
         if not created or not created2:
-            students_not_added.append(column[1] + "." + column[2])
+            students_not_added.append((column[1] + "." + column[2]).replace(" ", "-"))
     context = {
         "order": order,
         "promo_added": True,
