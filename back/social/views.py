@@ -221,7 +221,6 @@ def club_edit(request, club_id):
         student__pk=student.id, club__pk=club_id
     )
     all_club_memberships = Membership.objects.filter(club__pk=club_id)
-
     if not membership_club_list:  # If no match is found
         raise PermissionDenied
     if not membership_club_list[0].is_admin:  # If the user does not have the rights
@@ -278,7 +277,10 @@ def club_edit(request, club_id):
                 club=club, student__id=request.POST["student_id"]
             )
             deleted_member.delete()
-            return redirect("social:club_edit", club_id=club.id)
+            if student.id == int(request.POST["student_id"]):    # If the user commits sudoku
+                return redirect("social:club_detail", club_id=club.id)
+            else:
+                return redirect("social:club_edit", club_id=club.id)
 
         elif "Ajouter-Role" in request.POST:
             form_role = AddRole(request.POST)
