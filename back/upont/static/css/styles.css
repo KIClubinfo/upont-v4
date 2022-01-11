@@ -1086,16 +1086,3 @@ h1,h2,h3,h4,h5,h6{
 .news-card-comments-input{
     height: 0;
 }
-
-/*-------------------------------------------------*/
-/*----------------- FEEDBACK BUTTON ---------------*/
-/*-------------------------------------------------*/
-
-.vertical-right-aligned {
-    transform: rotate(-90deg);
-    transform-origin: 100% 100%;
-    position: fixed;
-    right: 0;
-    top: 50%;
-    z-index: 100;
-} 
