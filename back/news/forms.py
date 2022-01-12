@@ -54,4 +54,4 @@ class EditPost(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ["content", "published_as_student"]
+        fields = ["post", "author", "published_as_student", "content"]

@@ -1,5 +1,8 @@
 from datetime import datetime
 
+# from django.utils import timezone
+# from django.urls import reverse
+# from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
@@ -24,20 +27,34 @@ def posts(request):
         "my_posts": my_posts
     }
     return render(request, "news/posts.html", context)
+
+# class Posts(View):
+#     def get(self, request):
+#         all_posts_list = Post.objects.order_by("-date")
+#         all_posts_and_forms = [(post, CommentForm()) for post in all_posts_list]
+#         context = {"all_posts_and_forms": all_posts_and_forms}
+#         return render(request, "news/posts.html", context)
 #
-# def posts(request):
-#     all_posts_list = Post.objects.order_by('-date')
-#
-#     if request.method == "POST":
-#         comment_form = CommentForm(request.POST)
+#     def post(self, request):
+#         comment_form = CommentForm(data=request.POST)
 #         if comment_form.is_valid():
-#             new_comment = Comment.objects.create(
-#                 post=request.POST.get("post"),
-#                 author=request.POST.get("author"),
-#                 published_as_student
-#             )
-#     context = {'all_posts_list': all_posts_list}
-#     return render(request, 'news/posts.html', context)
+#             new_comment = comment_form.save(commit=False)
+#             new_comment.date = timezone.now()
+#             new_comment.save()
+#             return redirect(reverse("news:posts"))
+#         else:
+#             all_posts_list = Post.objects.order_by("-date")
+#             all_posts_and_forms = [(post, CommentForm()) for post in all_posts_list]
+#             commented_post = request.POST.get("post")
+#             print(type(commented_post))
+#             print(commented_post)
+#             commented_post_index = 0
+#             for index, post in enumerate(all_posts_list):
+#                 if post == commented_post:
+#                     commented_post_index = index
+#             all_posts_and_forms[commented_post_index] = (commented_post, comment_form)
+#             context = {"all_posts_and_forms": all_posts_and_forms}
+#             return render(request, "news/posts.html", context)
 
 
 def events(request):
