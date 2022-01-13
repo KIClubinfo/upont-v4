@@ -33,6 +33,7 @@ services:
       SECRET_KEY: $SECRET_KEY
       DEBUG: $DEBUG
       GUNICORN_NB_WORKERS: $GUNICORN_NB_WORKERS
+      SECURE_SSL_REDIRECT: $SECURE_SSL_REDIRECT
   nginx:
     build: ./nginx
     ports:

@@ -10,5 +10,6 @@ echo "PostgreSQL started"
 
 python3 manage.py migrate --noinput
 python3 manage.py collectstatic --noinput
+python manage.py check --deploy
 
 exec "$@"
