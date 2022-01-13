@@ -11,9 +11,7 @@ services:
     build:
       context: back
       dockerfile: Dockerfile_prod
-    volumes:
-      - ./back:/src
-      - ./media:/media
+    command: gunicorn upont.wsgi:application --bind 0.0.0.0:8000
     ports:
       - "$BACK_PORT:8000"
     depends_on:
@@ -31,3 +29,4 @@ services:
       DEFAULT_FROM_EMAIL: $DEFAULT_FROM_EMAIL
       SECRET_KEY: $SECRET_KEY
       DEBUG: $DEBUG
+      GUNICORN_NB_WORKERS: $GUNICORN_NB_WORKERS

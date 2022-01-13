@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "tellme",
     "django.contrib.postgres",
-    "mod_wsgi.server",
 ]
 
 MIDDLEWARE = [
