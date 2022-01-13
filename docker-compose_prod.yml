@@ -1,0 +1,33 @@
+version: "3.6"
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+  back:
+    build:
+      context: back
+      dockerfile: Dockerfile_prod
+    volumes:
+      - ./back:/src
+      - ./media:/media
+    ports:
+      - "$BACK_PORT:8000"
+    depends_on:
+      - db
+    links:
+      - db
+    environment:
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_NAME: $DB_NAME
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      SENDGRID_API_KEY: $SENDGRID_API_KEY
+      ADMIN_EMAIL: $ADMIN_EMAIL
+      DEFAULT_FROM_EMAIL: $DEFAULT_FROM_EMAIL
+      SECRET_KEY: $SECRET_KEY
+      DEBUG: $DEBUG
