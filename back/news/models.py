@@ -33,9 +33,17 @@ class Post(models.Model):
     )
     content = models.TextField()
     event = models.ForeignKey("Event", on_delete=models.SET_NULL, null=True, blank=True)
+    likes = models.ManyToManyField(
+        Student,
+        related_name="posts",
+        blank=True,
+    )
 
     def __str__(self):
         return self.title
+
+    def total_likes(self):
+        return self.likes.count()
 
 
 class Comment(models.Model):

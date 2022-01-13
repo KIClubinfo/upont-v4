@@ -75,11 +75,15 @@
                     <div class="news-card-actions">
                         <!--Likes-Comments-Favorite-->
                         <div class="news-card-buttons">
-                            <a href="#" class="news-card-button"><i class="far fa-heart"></i></a>
+                            {% if user.student in post.likes.all  %}
+                                <a href="{% url 'news:post_like' post_id=post.id action='Dislike'%}" class="news-card-button"><i class="far fa-heart"></i></a>
+                            {% else %}
+                                <a href="{% url 'news:post_like' post_id=post.id action='Like'%}" class="news-card-button"><i class="far fa-heart"></i></a>
+                            {% endif %}
                             <a href="#" onClick="input()" class="news-card-button"><i class="far fa-comment"></i></a>
                         </div>
                         <div class="news-card-popularity">
-                            <span><i class="fas fa-heart" style="color: red;"></i> 45</span>
+                            <span><i class="fas fa-heart" style="color: red;"></i>{{post.total_likes}}</span>
                             <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i> 45</span>
                         </div>
                     </div>

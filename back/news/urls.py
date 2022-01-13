@@ -11,4 +11,5 @@ urlpatterns = [
     path("event/create", views.event_create, name="event_create"),
     path("post/<int:post_id>/edit", views.post_edit, name="post_edit"),
     path("post/create", views.post_create, name="post_create"),
+    path("post/<int:post_id>/<str:action>", views.post_like, name="post_like"),
 ]

@@ -150,3 +150,14 @@ def post_create(request):
         form = EditPost(request.user.id)
     context["EditPost"] = form
     return render(request, "news/post_edit.html", context)
+
+
+@login_required(login_url="/login/")
+def post_like(request, post_id, action):
+    post = get_object_or_404(Post, id=post_id)
+    student = get_object_or_404(Student, user__id=request.user.id)
+    if action == "Dislike":
+        post.likes.remove(student)
+    elif action == "Like":
+        post.likes.add(student)
+    return redirect("news:posts")
