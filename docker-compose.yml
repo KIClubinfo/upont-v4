@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.6"
 
 services:
   db:
@@ -25,3 +25,8 @@ services:
       DB_NAME: $DB_NAME
       DB_USER: $DB_USER
       DB_PASSWORD: $DB_PASSWORD
+      SENDGRID_API_KEY: $SENDGRID_API_KEY
+      ADMIN_EMAIL: $ADMIN_EMAIL
+      DEFAULT_FROM_EMAIL: $DEFAULT_FROM_EMAIL
+      SECRET_KEY: $SECRET_KEY
+      DEBUG: $DEBUG

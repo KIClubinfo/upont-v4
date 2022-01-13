@@ -1,0 +1,87 @@
+{% load static %}
+<!--Header-->
+{% include "../social/header.html" with title="Clubs" %}
+<!--Sidenav-->
+{% include "../social/sidenav.html" with active_link="clubs" %}
+
+        <!--Content-->
+        <div class="content">
+            {% include "../social/searchbar.html" with all_clubs_list=all_clubs_list %}
+            <div class="content-main">
+                <div class="row">
+                    <div class="col-clublg-8">
+                        <h4 class="page-subtitle">
+                            {% if searched_expression %}
+                                Résultats de la recherche "{{searched_expression}}"
+                            {% else %}
+                                Clubs & Assos
+                            {% endif %}
+                        </h4>
+                        <div class="row">
+                            {% if club_displayed_list %}
+                                <!--Clubs cards-->
+                                {% for club in club_displayed_list %}
+                                <div class="col-clubmd-4 col-clubsm-6">
+                                    <div class="club-card">
+                                        <div class="club-card-content">
+                                            {% if club.logo %}
+                                                <img class="club-card-image" src={{club.logo.path}} alt="">
+                                            {% else %}
+                                                <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="club-card-title">
+                                            <span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span>
+                                        </div>
+                                        <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                <!--End of clubs cards-->
+                            {% else %}
+                                {% if searched_expression %}
+                                    <p>Aucun club n'a été trouvé</p>
+                                {% else %}
+                                    <p>Il n'y a pas de clubs dans la base de données.</p>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-clublg-4">
+                        <h4 class="page-subtitle-2">Mes clubs & assos</h4>
+                        <div class="row">
+                            {% if my_memberships_list %}
+                                {% for membership in my_memberships_list %}
+                                    <!--My Clubs cards-->
+                                    <div class="col-12">
+                                        <div class="vignette-club-mini">
+                                            {% if membership.club.logo %}
+                                                <img class="vignette-image-mini" src={{membership.club.logo.path}} alt="">
+                                            {% else %}
+                                                <img class="vignette-image-mini" src="{% static 'assets/img/bde.png' %}" alt="">
+                                            {% endif %}
+                                            <div class="vignette-mini-title">
+                                                <span>{{membership.club.name}}</span>
+                                                <span class="vignette-mini-role"><br>{{membership.role}}</span>
+                                            </div>
+                                            <a href="{% url 'social:club_detail' membership.club.id %}" class="stretched-link"></a>
+                                        </div>
+                                    </div>
+                                    <!--End of My Clubs cards-->
+                                {% endfor %}
+                            {% else %}
+                                <p> Tu n'es membre d'aucun club pour l'instant</p>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+
+    </body>
+</html>

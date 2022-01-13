@@ -1,0 +1,66 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" %}
+
+        <div class="sidenav-container">
+            <nav class="sidenav">
+                <div class="sidenav-first-link">
+                    <a href=""><img src="{% static 'assets/img/logo.png' %}" class="logo" alt=""></a>
+                    <div class="toggle "><i class="fas fa-bars "></i></div>
+                </div>
+                <div class="sidenav-links">
+                    <a href="#" class="sidenav-link"><i class="fas fa-newspaper "></i></a>
+                    <a href="#" class="sidenav-link active"><i class="fas fa-user-graduate "></i></a>
+                    <a href="#" class="sidenav-link"><i class="fas fa-gamepad "></i></a>
+                    <a href="#" class="sidenav-link"><i class="fas fa-file-alt "></i></a>
+                    <a href="#" class="sidenav-link"><i class="fas fa-address-card "></i></a>
+                    <a href="#" class="sidenav-link"><i class="fas fa-user-edit "></i></a>
+                </div>
+                <a href="#" class="sidenav-last-link sidenav-link"><i class="fas fa-sign-out-alt "></i></a>
+            </nav>
+        </div>
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                    <!--<div class="col" style="text-align: end;">
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                    </div>-->
+                </div>
+            </div>
+            <div class="content-main">
+                <p> Les informations doivent être dans l'ordre suivant : {{order}}.</p>
+                <p>Utiliser le format CSV uniquement, avec encodage UTF-8, délimité avec ";".</p>
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" id="file1" name="file">
+                    <button type="submit">Uploader</button>
+                </form><br>
+                {% if type_error %}
+                    <strong>Erreur: le fichier doit être au format .csv .</strong><br><br>
+                {% endif %}
+                {% if no_file %}
+                    <strong>Erreur: Aucun fichier n'a été uploadé.</strong><br><br>
+                {% endif %}
+                {% if promo_not_added %}
+                    <strong>La promotion n'a pas été ajoutée.</strong><br><br>
+                {% endif %}
+                {% if promo_added %}
+                    <strong>La promotion a été ajoutée.</strong><br><br>
+                {% endif %}
+                {% if students_not_added %}
+                    <p>Les étudiants suivants n'ont pas pu être ajoutés :</p>
+                    {% for student in students_not_added %}
+                        <li>{{student}}</li>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </body>
+</html>
