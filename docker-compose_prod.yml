@@ -3,6 +3,9 @@ version: "3.6"
 services:
   db:
     image: postgres
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    restart: always
     environment:
       POSTGRES_DB: $DB_NAME
       POSTGRES_USER: $DB_USER
@@ -21,6 +24,7 @@ services:
     volumes:
       - static_volume:/src/static
       - media_volume:/src/media
+    restart: always
     environment:
       DB_HOST: $DB_HOST
       DB_PORT: $DB_PORT
@@ -43,7 +47,9 @@ services:
     volumes:
       - static_volume:/src/static
       - media_volume:/src/media
+    restart: always
 
 volumes:
   static_volume:
   media_volume:
+  database:
