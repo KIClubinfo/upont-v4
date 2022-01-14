@@ -5,6 +5,8 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from ..settings import LOGIN_REDIRECT_URL, LOGIN_URL
+
 
 class TestAuthenticate(TestCase):
     def check_wrong_form_triggers_errors(self, named_url, context):
@@ -38,7 +40,7 @@ class TestAuthenticate(TestCase):
             {"username": self.user.username, "password": self.password},
         )
         self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, "/social/index_users")
+        self.assertEquals(response.url, reverse(LOGIN_REDIRECT_URL))
         self.assertTrue(response.wsgi_request.user.is_authenticated)
 
     def test_login_with_correct_email_and_password_authenticates_and_redirects(self):
@@ -46,7 +48,7 @@ class TestAuthenticate(TestCase):
             reverse("login"), {"username": self.user.email, "password": self.password}
         )
         self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, "/social/index_users")
+        self.assertEquals(response.url, reverse(LOGIN_REDIRECT_URL))
         self.assertTrue(response.wsgi_request.user.is_authenticated)
 
     def test_login_with_wrong_password_fails(self):
@@ -62,12 +64,11 @@ class TestAuthenticate(TestCase):
         self.assertFalse(response.wsgi_request.user.is_authenticated)
 
     def test_redirects_to_login_page_when_acessing_a_page_without_login(self):
-        response = self.client.get("/social/index_users", follow=True)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.redirect_chain), 2)
+        requested_url = reverse("social:index_users")
+        response = self.client.get(requested_url)
+        self.assertEquals(response.status_code, 302)
         self.assertEquals(
-            response.redirect_chain[1][0],
-            reverse("login") + "?next=/social/index_users/",
+            response.url, reverse("login") + "?next=" + reverse("social:index_users")
         )
 
     def test_getting_logout_page_logs_out(self):
