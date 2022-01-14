@@ -1,0 +1,21 @@
+# syntax=docker/dockerfile:1
+FROM python:3.9.6-bullseye
+ENV PYTHONUNBUFFERED=1
+ENV VENV=/opt/venv
+RUN python3 -m venv $VENV
+ENV PATH="$VENV/bin:$PATH"
+
+RUN apt update \
+    && apt install -y netcat
+
+WORKDIR /src
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+COPY . .
+
+COPY ./entrypoint.prod.sh .
+RUN sed -i 's/\r$//g' /src/entrypoint.prod.sh
+RUN chmod +x /src/entrypoint.prod.sh
+
+ENTRYPOINT ["/src/entrypoint.prod.sh"]

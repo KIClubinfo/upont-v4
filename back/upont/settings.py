@@ -42,6 +42,9 @@ if DEBUG:
     SECRET_KEY = "django-insecure-2-e3q#*pqsgm+lhrgrkc=ex%!^8(3^*6@q^367*ma4j1$=54$f"
 else:
     SECRET_KEY = env("SECRET_KEY", default=None)
+    SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT", default=False)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # Application definition
@@ -154,6 +157,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "upont/static"),
 ]
@@ -167,7 +171,7 @@ FIXTURE_DIRS = ["/fixtures/"]
 
 # Default media folder
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "../media/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 # Email backend
 if DEBUG:
@@ -181,3 +185,31 @@ else:
     SENDGRID_API_KEY = env("SENDGRID_API_KEY", default=None)
     ADMIN_EMAIL = env("ADMIN_EMAIL", default=None)
     SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+# Logs
+if DEBUG:
+    DJANGO_LOG_LEVEL = "DEBUG"
+else:
+    DJANGO_LOG_LEVEL = "INFO"
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "myapp": {
+            "handlers": ["console"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": True,
+        },
+    },
+}
