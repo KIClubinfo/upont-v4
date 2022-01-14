@@ -28,9 +28,9 @@ urlpatterns = [
     path("add_promo/", add),
     path("", include("django.contrib.auth.urls")),
     path("", views.root_redirect),
-    path("media/<path:path>", views.media),
 ]
 
-# Only for dev, gives anyone access to any image
-if settings.DEBUG:
+if settings.DEBUG:  # in debug anyone can access any image
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    urlpatterns.append(path("media/<path:path>", views.media))
