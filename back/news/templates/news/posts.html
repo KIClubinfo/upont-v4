@@ -43,61 +43,80 @@
             </div>
             <div class="content-main">
                 <h3 class="page-title">News</h3>
+                <br>
+                <div style="text-align:center">
+                    <a href="{% url 'news:post_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
+                </div>
                 {% for post in all_posts_list %}
-                <div class="news-card">
-                    <div class="news-card-header">
-                        <!--Poster-Image-Name-and-Title-of-the-post-->
-                        <div class="news-card-header-image"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                        <div class="news-card-header-text">
-                            <span class="news-card-header-name">
-                                {%if post.published_as_student%}
-                                    {{post.author.student.user.first_name}} {{post.author.student.user.last_name}}
-                                {%else%}
-                                    {{post.author.club.name}}
-                                {%endif%}
-                            </span>
-                            <a href="{% url 'news:event_detail' post.event.pk %}" class="news-card-header-title">{{post.title}}</a>
+                    <div class="news-card" id="{{post.id}}">
+                        <div class="news-card-header">
+                            <!--Poster-Image-Name-and-Title-of-the-post-->
+                            {% if post.club %}
+                                {% if post.club.logo %}
+                                    <div class="news-card-header-image"><img src="{{post.club.logo.path}}"></div>
+                                {% endif %}
+                            {% else %}
+                                {% if post.author.picture %}
+                                    <div class="news-card-header-image"><img src="{{post.author.picture.path}}"></div>
+                                {% endif %}
+                            {% endif %}
+                            <div class="news-card-header-text">
+                                <span class="news-card-header-name">
+                                    {%if post.club%}
+                                        {{post.club.name}}
+                                    {%else%}
+                                        {{post.author.user.first_name}} {{post.author.user.last_name}}
+                                    {%endif%}
+                                </span>
+                                {% if post.event %}
+                                    <a href="{% url 'news:event_detail' post.event.pk %}" class="news-card-header-title">{{post.title}}</a>
+                                {% else %}
+                                    <span class="news-card-header-title">{{post.title}}</span>
+                                {% endif %}
+                            </div>
+                            {% if post in my_posts %}
+                                <a href="{% url 'news:post_edit' post.id %}" class="button blue-button">Éditer</a>
+                            {% endif %}
                         </div>
-                    </div>
-                    <div class="news-card-content">
-                        <p>{{post.content}}</p>
-                    </div>
-                    {%if post.illustration%}
-                        <div class="news-card-images">
-                            <!--All-Images-Linked-With-The-Post-->
-                            <div class="news-card-carousel" data-flickity='{}'>
-                                <div class="carousel-cell"><img src="{{post.illustration.path}}" style="height: 100%;" alt=""></div>
-                                <div class="carousel-cell"><img src="{% static 'assets/img/user.jpeg' %}" style="height: 100%;" alt=""></div>
-                                <div class="carousel-cell"><img src="{% static 'assets/img/user.jpeg' %}" style="height: 100%;" alt=""></div>
+                        <div class="news-card-content">
+                            <p>{{post.content}}</p>
+                        </div>
+                        {%if post.illustration%}
+                            <div class="news-card-images">
+                                <!--All-Images-Linked-With-The-Post-->
+                                <div class="news-card-carousel" data-flickity='{}'>
+                                    <div class="carousel-cell"><img src="{{post.illustration.path}}" style="height: 100%;" alt=""></div>
+                                    <div class="carousel-cell"><img src="{% static 'assets/img/user.jpeg' %}" style="height: 100%;" alt=""></div>
+                                    <div class="carousel-cell"><img src="{% static 'assets/img/user.jpeg' %}" style="height: 100%;" alt=""></div>
+                                </div>
+                            </div>
+                        {%endif%}
+                        <div class="news-card-actions">
+                            <!--Likes-Comments-Favorite-->
+                            <div class="news-card-buttons">
+                                {% if user.student in post.likes.all  %}
+                                    <a href="{% url 'news:post_like' post_id=post.id action='Dislike'%}" class="news-card-button"><i class="fas fa-heart"></i></a>
+                                {% else %}
+                                    <a href="{% url 'news:post_like' post_id=post.id action='Like'%}" class="news-card-button"><i class="far fa-heart"></i></a>
+                                {% endif %}
+                                <a href="#" onClick="input()" class="news-card-button"><i class="far fa-comment"></i></a>
+                            </div>
+                            <div class="news-card-popularity">
+                                <span><i class="fas fa-heart" style="color: red;"></i>{{post.total_likes}}</span>
+                                <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i> 45</span>
                             </div>
                         </div>
-                    {%endif%}
-                    <div class="news-card-actions">
-                        <!--Likes-Comments-Favorite-->
-                        <div class="news-card-buttons">
-                            {% if user.student in post.likes.all  %}
-                                <a href="{% url 'news:post_like' post_id=post.id action='Dislike'%}" class="news-card-button"><i class="far fa-heart"></i></a>
-                            {% else %}
-                                <a href="{% url 'news:post_like' post_id=post.id action='Like'%}" class="news-card-button"><i class="far fa-heart"></i></a>
-                            {% endif %}
-                            <a href="#" onClick="input()" class="news-card-button"><i class="far fa-comment"></i></a>
-                        </div>
-                        <div class="news-card-popularity">
-                            <span><i class="fas fa-heart" style="color: red;"></i>{{post.total_likes}}</span>
-                            <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i> 45</span>
+                        <div class="news-card-comments">
+                            <div class="news-card-comment">
+                                <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                                <div class="news-card-comment-box">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro itaque veritatis error voluptatum aperiam est enim praesentium. Quae atque fuga, dolore officiis iure laboriosam sunt consequatur laudantium minima magni porro voluptatibus quod sint quidem assumenda dicta natus! Assumenda quidem molestias explicabo provident. Necessitatibus maiores expedita, laboriosam optio suscipit libero quidem.</div>
+                            </div>
+                            <div class="news-card-edit-comment">
+                                <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                                <textarea class="news-card-edit-comment-input" type="text" name="" id=""></textarea>
+                            </div>
                         </div>
                     </div>
-                    <div class="news-card-comments">
-                        <div class="news-card-comment">
-                            <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                            <div class="news-card-comment-box">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro itaque veritatis error voluptatum aperiam est enim praesentium. Quae atque fuga, dolore officiis iure laboriosam sunt consequatur laudantium minima magni porro voluptatibus quod sint quidem assumenda dicta natus! Assumenda quidem molestias explicabo provident. Necessitatibus maiores expedita, laboriosam optio suscipit libero quidem.</div>
-                        </div>
-                        <div class="news-card-edit-comment">
-                            <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                            <textarea class="news-card-edit-comment-input" type="text" name="" id=""></textarea>
-                        </div>
-                    </div>
-                </div>
                 {% endfor %}
             </div>
         </div>

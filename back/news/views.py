@@ -10,8 +10,19 @@ from .models import Event, Post
 
 
 def posts(request):
+    student = get_object_or_404(Student, user__id=request.user.id)
     all_posts_list = Post.objects.order_by("-date")
-    context = {"all_posts_list": all_posts_list}
+    membership_club_list = Membership.objects.filter(student__pk=student.id)
+
+    my_posts = Post.objects.filter(author__pk=student.id, club=None)
+
+    for membership in membership_club_list:
+        my_posts |= Post.objects.filter(club=membership.club)
+
+    context = {
+        "all_posts_list": all_posts_list,
+        "my_posts": my_posts
+    }
     return render(request, "news/posts.html", context)
 
 
@@ -105,7 +116,7 @@ def post_edit(request, post_id):
     context = {}
     if request.method == "POST":
         if "Annuler" in request.POST:
-            return redirect("news:post_detail", post_id=post.id)
+            return redirect("news:posts")
         elif "Supprimer" in request.POST:
             post.delete()
             return redirect("news:posts")
@@ -125,6 +136,7 @@ def post_edit(request, post_id):
     else:
         form = EditPost(request.user.id, instance=post)
     context["EditPost"] = form
+    context["Edit"] = True
     return render(request, "news/post_edit.html", context)
 
 
@@ -149,6 +161,7 @@ def post_create(request):
     else:
         form = EditPost(request.user.id)
     context["EditPost"] = form
+    context["Edit"] = False
     return render(request, "news/post_edit.html", context)
 
 
