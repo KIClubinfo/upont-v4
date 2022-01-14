@@ -181,9 +181,19 @@ def new_shotgun(request):
             return HttpResponseRedirect(reverse("shotguns"))
 
 
-def delete_shotgun(request):
-    return render(request, "news/shotguns.html")
+@login_required()
+def delete_shotgun_detail(request, shotgun_id):
+    student = Student.objects.get(user__id=request.user.id)
+    shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
+    if not shotgun.club.is_admin(student.id):
+        return render(request, "news/shotguns_admin.html")
 
+    if request.method == "GET":
+        context = {
+            "shotgun": shotgun,
+        }
+        return render(request, "news/shotgun_delete.html", context)
 
-def delete_shotgun_detail(request):
-    return render(request, "news/shotguns.html")
+    if request.method == "POST":
+        shotgun.delete()
+        return HttpResponseRedirect(reverse("shotguns_admin"))

@@ -112,6 +112,12 @@ class Club(models.Model):
                 return True
         return False
 
+    def is_admin(self, student_id):
+        membership = Membership.objects.get(student__id=student_id, club=self)
+        if membership.is_admin:
+            return True
+        return False
+
 
 class Membership(models.Model):
     is_admin = models.BooleanField()
