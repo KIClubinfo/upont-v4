@@ -1,6 +1,11 @@
 {% load static %}
-<!--Header And Background-->
-{% include "registration/header_login.html" with title="Logout" %}
+<!--Header-->
+{% include "header.html" with title="Logout" %}
+    <!--Body-->
+    <body>
+        <!--Background-->
+        {% include "registration/background.html" %}
+
         <!--Logged Out Card-->
         <div class="login-content">
             <div class="login-card">

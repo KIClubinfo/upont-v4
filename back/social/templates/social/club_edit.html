@@ -1,8 +1,14 @@
 {% load static %}
 <!--Header-->
-{% include "../social/header.html" with title="Édition du club" %}
-<!--Sidenav-->
-{% include "../social/sidenav.html" with active_link="clubs" %}
+{% include "header.html" with title="Édition du club" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="clubs" %}
 
         <!--Content-->
         <div class="content">
