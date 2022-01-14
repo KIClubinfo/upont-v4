@@ -1,8 +1,14 @@
 {% load static %}
 <!--Header-->
-{% include "../social/header.html" with title="Clubs" %}
-<!--Sidenav-->
-{% include "../social/sidenav.html" with active_link="clubs" %}
+{% include "header.html" with title="Clubs" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="clubs" %}
 
         <!--Content-->
         <div class="content">
@@ -82,6 +88,5 @@
 
         <!--Scripts-->
         <script src="{% static 'js/sidenav.js' %}"></script>
-
     </body>
 </html>

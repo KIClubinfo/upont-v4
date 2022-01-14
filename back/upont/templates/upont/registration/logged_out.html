@@ -1,8 +1,10 @@
 {% load static %}
 <!--Header-->
-{% include "registration/header_login.html" with title="Logout" %}
+{% include "header.html" with title="Logout" %}
     <!--Body-->
     <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
         <!--Background-->
         {% include "registration/background.html" %}
         <!--Logged Out Card-->

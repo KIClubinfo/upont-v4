@@ -1,8 +1,14 @@
 {% load static %}
 <!--Header-->
-{% include "../social/header.html" with title="Élèves" %}
-<!--Sidenav-->
-{% include "../social/sidenav.html" with active_link="users" %}
+{% include "header.html" with title="Élèves" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="users" %}
 
         <!--Content-->
         <div class="content">
@@ -45,6 +51,5 @@
 
         <!--Scripts-->
         <script src="{% static 'js/sidenav.js' %}"></script>
-
     </body>
 </html>

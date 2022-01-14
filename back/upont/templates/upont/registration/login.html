@@ -1,8 +1,10 @@
 {% load static %}
 <!--Header-->
-{% include "registration/header_login.html" with title="Login" %}
+{% include "header.html" with title="Login" %}
     <!--Body-->
     <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
         <!--Background-->
         {% include "registration/background.html" %}
         <!--Login Card-->
