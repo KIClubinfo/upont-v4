@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "tellme",
     "django.contrib.postgres",
+    "django_cas_ng",
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_cas_ng.middleware.CASMiddleware",
 ]
 
 ROOT_URLCONF = "upont.urls"
@@ -137,6 +139,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "upont.auth.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
+    "django_cas_ng.backends.CASBackend",
 ]
 
 # Internationalization
@@ -213,3 +216,7 @@ LOGGING = {
         },
     },
 }
+
+# SSO CONNECT
+CAS_SERVER_URL = "http://cas.enpc.fr/cas/"
+CAS_CREATE_USER = False

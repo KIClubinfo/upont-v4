@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import django_cas_ng.views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -28,6 +29,8 @@ urlpatterns = [
     path("add_promo/", add),
     path("", include("django.contrib.auth.urls")),
     path("", views.root_redirect),
+    path("cas/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
+    path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
 ]
 
 if settings.DEBUG:  # in debug anyone can access any image
