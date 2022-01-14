@@ -185,3 +185,31 @@ else:
     SENDGRID_API_KEY = env("SENDGRID_API_KEY", default=None)
     ADMIN_EMAIL = env("ADMIN_EMAIL", default=None)
     SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+# Logs
+if DEBUG:
+    DJANGO_LOG_LEVEL = "DEBUG"
+else:
+    DJANGO_LOG_LEVEL = "INFO"
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "myapp": {
+            "handlers": ["console"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": True,
+        },
+    },
+}
