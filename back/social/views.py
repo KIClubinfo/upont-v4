@@ -10,7 +10,7 @@ from .forms import AddMember, AddRole, EditClub, EditProfile
 from .models import Category, Club, Membership, Role, Student
 
 
-@login_required(login_url="/login/")
+@login_required()
 def index_users(request):
     all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
     context = {
@@ -20,7 +20,7 @@ def index_users(request):
     return render(request, "social/index_users.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def profile(request, user_id=None):
     if user_id is None:
         user_id = request.user.id
@@ -38,7 +38,7 @@ def profile(request, user_id=None):
         return render(request, "social/profile_viewed.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def search(request):
     searched_expression = "Si trouver quelque chose tu veux, le chercher il te faut."
 
@@ -145,7 +145,7 @@ def index_profile(request):
     return render(request, "social/index_profile.html")
 
 
-@login_required(login_url="/login/")
+@login_required()
 def profile_edit(request):
     user_id = request.user.id
     student = get_object_or_404(Student, user__pk=user_id)
@@ -213,7 +213,7 @@ def view_club(request, club_id):
     return render(request, "social/view_club.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def club_edit(request, club_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     club = get_object_or_404(Club, pk=club_id)
@@ -277,7 +277,9 @@ def club_edit(request, club_id):
                 club=club, student__id=request.POST["student_id"]
             )
             deleted_member.delete()
-            if student.id == int(request.POST["student_id"]):    # If the user commits sudoku
+            if student.id == int(
+                request.POST["student_id"]
+            ):  # If the user commits sudoku
                 return redirect("social:club_detail", club_id=club.id)
             else:
                 return redirect("social:club_edit", club_id=club.id)
