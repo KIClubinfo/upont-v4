@@ -1,24 +1,16 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" %}
+{% include "header.html" with title="Ajout d'une promotion" %}
 
-        <div class="sidenav-container">
-            <nav class="sidenav">
-                <div class="sidenav-first-link">
-                    <a href=""><img src="{% static 'assets/img/logo.png' %}" class="logo" alt=""></a>
-                    <div class="toggle "><i class="fas fa-bars "></i></div>
-                </div>
-                <div class="sidenav-links">
-                    <a href="#" class="sidenav-link"><i class="fas fa-newspaper "></i></a>
-                    <a href="#" class="sidenav-link active"><i class="fas fa-user-graduate "></i></a>
-                    <a href="#" class="sidenav-link"><i class="fas fa-gamepad "></i></a>
-                    <a href="#" class="sidenav-link"><i class="fas fa-file-alt "></i></a>
-                    <a href="#" class="sidenav-link"><i class="fas fa-address-card "></i></a>
-                    <a href="#" class="sidenav-link"><i class="fas fa-user-edit "></i></a>
-                </div>
-                <a href="#" class="sidenav-last-link sidenav-link"><i class="fas fa-sign-out-alt "></i></a>
-            </nav>
-        </div>
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="admin" %}
+
+        <!--Content-->
         <div class="content">
             <div class="content-header">
                 <div class="row justify-content-between w-100">
@@ -62,5 +54,9 @@
                 {% endif %}
             </div>
         </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
     </body>
 </html>
