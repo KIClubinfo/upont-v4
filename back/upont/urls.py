@@ -21,11 +21,10 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    path("login/", views.login),
-    path("", views.index),
-    path("index_admin/", views.index_admin),
     path("social/", include("social.urls")),
+    path("news/", include("news.urls")),
     path("admin/", admin.site.urls),
+    path("", include('django.contrib.auth.urls')),
 ]
 
 # Only for dev, gives anyone access to any image

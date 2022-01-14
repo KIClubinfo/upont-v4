@@ -90,6 +90,12 @@ DATABASES = {
 }
 
 
+# Login redirection
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "/social/index_users"
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -108,6 +114,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "upont.auth.EmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -141,3 +151,8 @@ FIXTURE_DIRS = ["/fixtures/"]
 # Default media folder
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "../media/")
+
+if DEBUG:
+    DEFAULT_FROM_EMAIL = "test@mail.com"
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, "../emails/")
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

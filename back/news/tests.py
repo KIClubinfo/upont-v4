@@ -14,6 +14,7 @@ class ShotgunModelTest(TestCase):
             title="Shotgun",
             content="Un shotgun",
             starting_date=timezone.now(),
+            ending_date=timezone.now() + datetime.timedelta(days=1),
             size=1,
             id=1,
         )
@@ -39,21 +40,24 @@ class ShotgunModelTest(TestCase):
         )
         student2.save()
         participation1 = Participation(
-            participant=student1, shotgun_date=timezone.now()
+            shotgun=shotgun, participant=student1, shotgun_date=timezone.now()
         )
         participation2 = Participation(
+            shotgun=shotgun,
             participant=student2,
             shotgun_date=timezone.now() + datetime.timedelta(seconds=1),
         )
         participation1.save()
         participation2.save()
-        shotgun.participations.add(participation1)
-        shotgun.participations.add(participation2)
         return shotgun, participation1, participation2
 
     def test_shotgun_saves_in_database(self):
         shotgun = Shotgun(
-            title="Shotgun", content="Un shotgun", starting_date=timezone.now(), size=1
+            title="Shotgun",
+            content="Un shotgun",
+            starting_date=timezone.now(),
+            ending_date=timezone.now() + datetime.timedelta(days=1),
+            size=1,
         )
         shotgun.save()
         retrieved_shotgun = Shotgun.objects.get(pk=shotgun.pk)
@@ -61,7 +65,11 @@ class ShotgunModelTest(TestCase):
 
     def test_shotgun_started(self):
         shotgun = Shotgun(
-            title="Shotgun", content="Un shotgun", starting_date=timezone.now(), size=1
+            title="Shotgun",
+            content="Un shotgun",
+            starting_date=timezone.now(),
+            ending_date=timezone.now() + datetime.timedelta(days=1),
+            size=1,
         )
         self.assertTrue(shotgun.is_started())
 
@@ -70,26 +78,30 @@ class ShotgunModelTest(TestCase):
             title="Shotgun",
             content="Un shotgun",
             starting_date=timezone.now() + datetime.timedelta(seconds=1),
+            ending_date=timezone.now() + datetime.timedelta(days=1),
             size=1,
         )
         self.assertFalse(shotgun.is_started())
 
     def test_shotgun_ended(self):
         shotgun = Shotgun(
-            title="Shotgun", content="Un shotgun", ending_date=timezone.now(), size=1
+            title="Shotgun",
+            content="Un shotgun",
+            starting_date=timezone.now(),
+            ending_date=timezone.now(),
+            size=1,
         )
         self.assertTrue(shotgun.is_ended())
 
     def test_shotgun_not_ended(self):
-        shotgun = Shotgun(title="Shotgun", content="Un shotgun", size=1)
-        self.assertFalse(shotgun.is_ended())
-        shotgun_2 = Shotgun(
+        shotgun = Shotgun(
             title="Shotgun",
             content="Un shotgun",
+            starting_date=timezone.now(),
             ending_date=timezone.now() + datetime.timedelta(seconds=10),
             size=1,
         )
-        self.assertFalse(shotgun_2.is_ended())
+        self.assertFalse(shotgun.is_ended())
 
     def test_get_right_participants(self):
         shotgun, participation1, participation2 = self.shotgun_with_two_participants()
