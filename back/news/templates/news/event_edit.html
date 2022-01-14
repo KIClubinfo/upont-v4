@@ -9,7 +9,7 @@
     {% csrf_token %}
         {{EditEvent}}
         <div>
-            <input  type="submit" name="Annuler" value="Annuler">
+            <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
             <input  type="submit" name="Supprimer" value="Supprimer">
             <input  type="submit" name= "Valider" value="Valider">
         </div>

@@ -72,7 +72,7 @@
                             <div class="news-card-popularity">
                                     {% csrf_token %}
                                     <div>
-                                        <input class="button red-button" type="submit" name="Annuler" value="Annuler">
+                                        <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
                                         <input class="button green-button" type="submit" name= "Valider" value="Valider">
                                         {% if Edit %}
                                             <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
