@@ -1,10 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from social.models import Membership, Student
 
+from .forms import AddShotgun
 from .models import Participation, Shotgun
 
 
@@ -78,7 +79,7 @@ def shotgun_participate(request, shotgun_id):
     if shotgun.requires_motivation:
         try:
             motivation = request.POST["motivation"]
-        except (KeyError, Motivation.DoesNotExist):
+        except (KeyError):
             error_message = "Tu n'as pas fourni de motivation !"
             return HttpResponseRedirect(
                 reverse(
@@ -152,8 +153,32 @@ def fail_participation(request, participation_id):
     )
 
 
+@login_required()
 def new_shotgun(request):
-    return render(request, "news/shotguns.html")
+    student = Student.objects.get(user__id=request.user.id)
+    clubs_memberships = Membership.objects.filter(student__pk=student.id, is_admin=True)
+    clubs = []
+    for membership in clubs_memberships:
+        clubs.append(membership.club)
+
+    if request.method == "GET":
+        form = AddShotgun(clubs)
+        context = {
+            "clubs": clubs,
+            "has_clubs_admins": len(clubs) > 0,
+            "form": form,
+        }
+        return render(request, "news/shotgun_new.html", context)
+
+    if request.method == "POST":
+        form = AddShotgun(
+            clubs,
+            request.POST,
+            request.FILES,
+        )
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("shotguns"))
 
 
 def delete_shotgun(request):

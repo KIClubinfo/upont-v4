@@ -11,7 +11,6 @@ urlpatterns = [
         name="shotgun_participate",
     ),
     path("shotguns/new/", views.new_shotgun, name="new_shotgun"),
-    path("shotguns/delete/", views.delete_shotgun, name="delete_shotgun"),
     path(
         "shotguns/<int:shotgun_id>/delete/",
         views.delete_shotgun_detail,

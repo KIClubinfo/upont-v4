@@ -1,0 +1,104 @@
+{% load static %}
+<!doctype html>
+<html>
+    <!--Header-->
+    <head>
+        <meta charset='utf-8'>
+        <title>Shotguns</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+        <!-- XDSoft DateTimePicker -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="sidenav-container">
+            <nav class="sidenav">
+                <div class="sidenav-first-link">
+                    <a href=""><img src="{% static 'assets/img/logo.png' %}" class="logo" alt=""></a>
+                    <div class="toggle "><i class="fas fa-bars "></i></div>
+                </div>
+                <div class="sidenav-links">
+                    <a href="#" class="sidenav-link"><i class="fas fa-newspaper "></i></a>
+                    <a href="#" class="sidenav-link active"><i class="fas fa-user-graduate "></i></a>
+                    <a href="#" class="sidenav-link"><i class="fas fa-gamepad "></i></a>
+                    <a href="#" class="sidenav-link"><i class="fas fa-file-alt "></i></a>
+                    <a href="#" class="sidenav-link"><i class="fas fa-address-card "></i></a>
+                    <a href="#" class="sidenav-link"><i class="fas fa-user-edit "></i></a>
+                </div>
+                <a href="#" class="sidenav-last-link sidenav-link"><i class="fas fa-sign-out-alt "></i></a>
+            </nav>
+        </div>
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-main">
+                <h1>Nouveau shotgun :</h1>
+                {% if has_clubs_admins %}
+                    <form action="{% url 'new_shotgun' %}" method="post" class="form-control" id="1"><br>
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    Club :
+                    {{form.club.errors}}
+                    {{form.club}}
+                    <br>
+                    Titre :
+                    {{form.title.errors}}
+                    {{form.title}}
+                    <br>
+                    Description :
+                    {{form.content.errors}}
+                    {{form.content}}
+                    <br>
+                    Date de début :
+                    {{form.starting_date.errors}}
+                    {{form.starting_date}}
+                    <script>
+                        $(function () {
+                          $("#id_starting_date").datetimepicker({
+                            format: 'd/m/Y H:i',
+                          });
+                        });
+                      </script>
+                    <br>
+                    Date de fin :
+                    {{form.ending_date.errors}}
+                    {{form.ending_date}}
+                    <script>
+                        $(function () {
+                          $("#id_ending_date").datetimepicker({
+                            format: 'd/m/Y H:i',
+                          });
+                        });
+                      </script>
+                    <br>
+                    Nombre de places :
+                    {{form.size.errors}}
+                    {{form.size}}
+                    <br>
+                    Requiert une motivation :
+                    {{form.requires_motivation.errors}}
+                    {{form.requires_motivation}}
+                    <button form=1 type="submit" value="Créer" class="form-control">Créer</button><br>
+                    </form>
+                {% else %}
+                    <h4>Tu ne peux pas créer de nouveaux shotguns, essaye de devenir administrateur d'un club !</h4>
+                {% endif %}
+            </div>
+        </div>
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>
