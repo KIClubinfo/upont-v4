@@ -5,4 +5,5 @@ django-tellme==0.7.2
 six==1.16.0
 django-sendgrid-v5==1.2.0
 django-environ==0.8.1
-gunicorn
+gunicorn==20.1.0
+django-cas-ng==4.3.0

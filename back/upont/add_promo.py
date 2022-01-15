@@ -46,7 +46,7 @@ def add(request):
         user, created = models.User.objects.update_or_create(
             last_name=column[1],
             first_name=column[2],
-            username=(column[1] + "." + column[2]).replace(" ", "-"),
+            username=(column[2] + "." + column[1]).replace(" ", "-").lower(),
             email=column[3],
         )
         if created:
@@ -59,7 +59,9 @@ def add(request):
             department=Student.Department.A1,
         )
         if not created or not created2:
-            students_not_added.append((column[1] + "." + column[2]).replace(" ", "-"))
+            students_not_added.append(
+                (column[2] + "." + column[1]).replace(" ", "-").lower()
+            )
     context = {
         "order": order,
         "promo_added": True,
