@@ -1,0 +1,99 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Gestion du shotgun" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="users" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-main">
+                <h1>Administration des shotguns :</h1>
+                <div class="box", style="margin-bottom: 1rem">
+                    <h3>{{shotgun.title}}</a>:</h3>
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <p style="font-size: 1.5rem">
+                                {%if shotgun.is_started%}
+                                    <b>Ce shotgun a commencé</a></b> !
+                                {%elif not shotgun.is_ended%}
+                                    <b>Début du shotgun :</b> {{shotgun.starting_date}}
+                                {%endif%}<br><br>
+                                <b>Fin du shotgun :</b> {{shotgun.ending_date}}<br><br>
+                                    <b>Motivation :</b>
+                                {%if shotgun.requires_motivation%}
+                                    Requise.
+                                {%else%}
+                                    Non.
+                                {%endif%}<br><br>
+                                <b>Nombre de places :</b> {{shotgun.size}}
+                            </p>
+                        </div>
+                        <div class="col-lg-5">
+                            <p style="font-size: 1.5rem">
+                                <b> Description :</b> {{shotgun.content}}
+                            </p>
+                            <br><br>
+                            <a href="{% url 'delete_shotgun' shotgun.id %}" style="text-decoration: none"><button class="form-control">Supprimer</button></a>
+                            <br>
+                            <a href="{% url 'edit_shotgun' shotgun.id %}" style="text-decoration: none"><button class="form-control">Éditer</button></a>
+                        </div>
+                    </div> 
+                    <hr>
+                    <h3>Participations :</h3>
+                    <p>Les participations s'affichent par ordre de shotgun. Les {{shotgun.size}} premières participations non recallées seront acceptées.</p>
+                    {% if shotgun.is_ended %}
+                        {% if shotgun.motivations_review_finished %}
+                            <h5>Les résultats ont été publiés !</h5>
+                        {% else %}
+                            <a href="{% url 'publish_shotgun_results' shotgun.id %}" style="text-decoration: none"><button class="form-control">Publier les résultats</button></a>
+                        {% endif %}
+                        <br>
+                    {% endif %}
+                    {% if not shotgun.motivations_review_finished %}
+                        {% for participation in shotgun.participations %}
+                        <div class="box", style="margin-bottom: 1rem">
+                            <h5>Motivation :</h5> {{participation.motivation}}
+                            <br><br>
+                            {% if participation.failed_motivation %}
+                                <p style="text-align: center"><strong>Participation recallée !</strong></p>
+                                <a href="{% url 'unfail_participation' participation.id %}" style="text-decoration: none"><button class="form-control">Annuler</button></a>
+                            {% else %}
+                            <a href="{% url 'fail_participation' participation.id %}" style="text-decoration: none"><button class="form-control">Recaller</button></a>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                            <h5>Aucune participation pour le moment.</h5>
+                        {% endfor %}
+                    {% else %}
+                        <h5>Participations acceptées :</h5>
+                        {% for participation in shotgun.accepted_participations %}
+                        <div class="box", style="margin-bottom: 1rem">
+                            <h5>{{participation.participant.user.first_name}} {{participation.participant.user.last_name}}</h5>
+                            <p><b>Motivation :</b> {{participation.motivation}}</p>
+                        </div>
+                        {% empty %}
+                            <h5>Personne n'a été accepté.</h5>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>

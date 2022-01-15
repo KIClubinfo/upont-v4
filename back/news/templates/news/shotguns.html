@@ -1,0 +1,140 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Élèves" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="users" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-main">
+                <div class="box", style="margin-bottom: 1rem">
+                    <h1>Prochains shotguns :</h1>
+                    {%if has_next_shotguns%}
+                        {%for shotgun in next_shotguns%}
+                            <div class="box", style="margin-bottom: 1rem">
+                                <h3><a href="{% url 'shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
+                                <div class="row">
+                                    <div class="col-lg-5">
+                                        <p style="font-size: 1.5rem">
+                                            <b>Organisateur :</b> {{shotgun.club.name}}<br><br>
+                                            {%if shotgun.is_started%}
+                                                <b>Ce shotgun a <a href="{% url 'shotgun_detail' shotgun.id %}">commencé</a></b> !
+                                            {%elif not shotgun.is_ended%}
+                                                <b>Début du shotgun :</b> {{shotgun.starting_date}}
+                                            {%endif%}<br><br>
+                                            <b>Fin du shotgun :</b> {{shotgun.ending_date}}<br><br>
+                                                <b>Motivation :</b>
+                                            {%if shotgun.requires_motivation%}
+                                                Requise.
+                                            {%else%}
+                                                Non.
+                                            {%endif%}<br><br>
+                                            <b>Nombre de places :</b> {{shotgun.size}}
+                                        </p>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <p style="font-size: 1.5rem">
+                                            <b> Description :</b> {{shotgun.content}}
+                                        </p>
+                                    </div>
+                                </div>          
+                            </div>
+                        {%endfor%}
+                    {%else%}
+                        <div class="box">
+                            <h3>Aucun shotgun à venir.</h3>
+                        </div>
+                    {%endif%}
+                </div>
+                <br>
+                <div class="box", style="margin-bottom: 1rem">
+                    <h1>Mes shotguns :</h1>
+                    {%if has_user_shotguns%}
+                        {%for shotgun in user_shotguns%}
+                        <div class="box", style="margin-bottom: 1rem">
+                            <h3><a href="{% url 'shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <p style="font-size: 1.5rem">
+                                        <b>Organisateur :</b> {{shotgun.club.name}}<br><br>
+                                        <b>Date de début :</b> {{shotgun.starting_date}}.<br><br>
+                                        <b>Date de fin :</b> {{shotgun.ending_date}}.<br><br>
+                                        <b>Motivation :</b>
+                                        {%if shotgun.requires_motivation%}
+                                            Requise.
+                                        {%else%}
+                                            Non.
+                                        {%endif%}<br><br>
+                                        <b>Nombre de places :</b> {{shotgun.size}}
+                                    </p>
+                                </div>
+                                <div class="col-lg-5">
+                                    <p style="font-size: 1.5rem">
+                                        <b> Description :</b> {{shotgun.content}}
+                                    </p>
+                                </div>
+                            </div>          
+                        </div>
+                        {%endfor%}
+                    {%else%}
+                        <div class="box">
+                            <h3>Aucun shotgun !</h3>
+                        </div>
+                    {%endif%}
+                </div>
+                <br>
+                <div class="box", style="margin-bottom: 1rem">
+                    <h1>Shotguns terminés :</h1>
+                    {%if has_old_shotguns%}
+                        {%for shotgun in old_shotguns%}
+                        <div class="box", style="margin-bottom: 1rem">
+                            <h3><a href="{% url 'shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <p style="font-size: 1.5rem">
+                                        <b>Organisateur :</b> {{shotgun.club.name}}<br><br>
+                                        <b>Ce shotgun est terminé depuis le {{shotgun.ending_date}}.</b><br><br>
+                                        <b>Motivation :</b>
+                                        {%if shotgun.requires_motivation%}
+                                            Requise.
+                                        {%else%}
+                                            Non.
+                                        {%endif%}<br><br>
+                                        <b>Nombre de places :</b> {{shotgun.size}}
+                                    </p>
+                                </div>
+                                <div class="col-lg-5">
+                                    <p style="font-size: 1.5rem">
+                                        <b> Description :</b> {{shotgun.content}}
+                                    </p>
+                                </div>
+                            </div>          
+                        </div>
+                        {%endfor%}
+                    {%else%}
+                        <div class="box">
+                            <h3>Aucun shotgun terminé.</h3>
+                        </div>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>
