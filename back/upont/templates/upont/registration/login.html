@@ -33,7 +33,7 @@
                             <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username" required>
                             <input type="password" class="login-input" placeholder="mot de passe" name="password" required>
                             <!--Login Links-->
-                            <p class="login-links"><a class="link" href="">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
+                            <p class="login-links"><a class="link" href="{% url 'cas_ng_login' %}">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
                             <!--Login Errors-->
                             {% if form.errors %}
                                 <p class="login-errors">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
