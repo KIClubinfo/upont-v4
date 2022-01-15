@@ -99,33 +99,68 @@
                                 {% else %}
                                     <a href="{% url 'news:post_like' post_id=post.id action='Like'%}" class="news-card-button"><i class="far fa-heart"></i></a>
                                 {% endif %}
-                                <a href="#" onClick="input()" class="news-card-button"><i class="far fa-comment"></i></a>
                             </div>
                             <div class="news-card-popularity">
                                 <span><i class="fas fa-heart" style="color: red;"></i>{{post.total_likes}}</span>
-                                <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i> 45</span>
+                                <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i>{{ post.total_comments }}</span>
                             </div>
                         </div>
-                        <div class="news-card-comments">
+                        <div class="news-card-comments" style="display: block">
                         {% for comment in post.comments.all %}
                         <div class="news-card-comment">
-                            <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                            {% if comment.club %}
-                                <div> {{ comment.club }} </div>
-                            {% else %}
-                                <div> {{ comment.author }} </div>
-                            {% endif %}
+                            <table>
+                                <tr>
+                                    <td class="text-center">
+                                        {% if comment.club %}
+                                            {% if comment.club.logo %}
+                                                <div class="news-card-header-image"><img src="{{comment.club.logo.path}}"></div>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if comment.author.picture %}
+                                                <div class="news-card-header-image"><img src="{{comment.author.picture.path}}"></div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        {% if comment.club %}
+                                            <div> {{ comment.club }} </div>
+                                        {% else %}
+                                            <div> {{ comment.author }} </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
                             <div class="news-card-comment-box"> {{ comment.content }} </div>
+                            {% if comment in my_comments %}
+                                <a href={% url 'news:comment_delete' comment_id=comment.id post_id=post.id %}>Supprimer</a>
+                            {% endif %}
                         </div>
                         {% endfor %}
                         <div class="news-card-edit-comment">
                             <!-- comment form -->
                             <form method="post" >
                             {% csrf_token %}
-                                <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                                {{ form.club }}
-                                {{ form.content }}
-                                <input type="submit" class="btn btn-info" value="Envoyer">
+                                <table>
+                                    <tr>
+                                        <td class="align-middle">
+                                            {% if user.student.picture %}
+                                                <div class="news-card-header-image"><img src="{{user.student.picture.path}}"></div>
+                                            {% endif %}
+                                            {{ form.club }}
+                                        </td>
+                                        <td>
+                                            {{ form.content }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>&nbsp</td>
+                                        <td class="text-center">
+                                            <input type="submit" class="btn btn-info align-con" value="Envoyer">
+                                        </td>
+                                    </tr>
+                                </table>
                                 {{ form.post.as_hidden }}
                                 {% if form.errors %}
                                     {% for field in form %}
@@ -147,12 +182,5 @@
         </div>
         <script src="{% static 'js/sidenav.js' %}"></script>
         <script src="{% static 'js/flickity.pkgd.min.js' %}"></script>
-        <script>
-            <!--Ca marche pas quand y'a plusieurs posts...>
-            const input = () => {
-                const field = document.querySelector('.news-card-edit-comment-input');
-                field.focus();
-            }
-        </script>
     </body>
 </html>

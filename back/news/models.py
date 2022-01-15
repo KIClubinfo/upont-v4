@@ -45,6 +45,9 @@ class Post(models.Model):
     def total_likes(self):
         return self.likes.count()
 
+    def total_comments(self):
+        return self.comments.count()
+
 
 class Comment(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")

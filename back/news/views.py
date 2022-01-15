@@ -27,7 +27,15 @@ def posts(request):
             (post, CommentForm(post.id, student.id)) for post in all_posts_list
         ]
 
-        context = {"all_posts_and_forms": all_posts_and_forms, "my_posts": my_posts}
+        my_comments = Comment.objects.filter(author__pk=student.id, club=None)
+        for membership in membership_club_list:
+            my_comments |= Comment.objects.filter(club=membership.club)
+
+        context = {
+            "all_posts_and_forms": all_posts_and_forms,
+            "my_posts": my_posts,
+            "my_comments": my_comments,
+        }
         return render(request, "news/posts.html", context)
 
     if request.method == "POST":
@@ -41,7 +49,7 @@ def posts(request):
             new_comment.author = request.user.student
             new_comment.date = timezone.now()
             new_comment.save()
-            return redirect(reverse("news:posts"))
+            return redirect(reverse("news:posts") + f"#{commented_post_id}")
 
         else:
             all_posts_list = Post.objects.order_by("-date")
@@ -61,7 +69,15 @@ def posts(request):
                     break
             all_posts_and_forms[commented_post_index] = (commented_post, filled_form)
 
-            context = {"all_posts_and_forms": all_posts_and_forms, "my_posts": my_posts}
+            my_comments = Comment.objects.filter(author__pk=student.id, club=None)
+            for membership in membership_club_list:
+                my_comments |= Comment.objects.filter(club=membership.club)
+
+            context = {
+                "all_posts_and_forms": all_posts_and_forms,
+                "my_posts": my_posts,
+                "my_comments": my_comments,
+            }
             return render(request, "news/posts.html", context)
 
 
@@ -213,3 +229,13 @@ def post_like(request, post_id, action):
     elif action == "Like":
         post.likes.add(student)
     return redirect("news:posts")
+
+
+@login_required()
+def comment_delete(request, comment_id, post_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    student = get_object_or_404(Student, user__id=request.user.id)
+    student_clubs = student.clubs
+    if comment.author.pk == student.pk or (comment.club in student_clubs):
+        comment.delete()
+    return redirect(reverse("news:posts") + f"#{post_id}")
