@@ -54,4 +54,16 @@ class EditPost(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ["post", "author", "published_as_student", "content"]
+        fields = ("post", "club", "content")
+        widgets = {
+            "club": forms.Select(attrs={"class": ""}),
+            "content": forms.Textarea(attrs={"class": "news-card-edit-comment-input"}),
+        }
+
+    def __init__(self, post_id, user_id, *args, **kwargs):
+        super(CommentForm, self).__init__(*args, **kwargs)
+        self.fields["club"].choices = [("", "Élève")] + [
+            (membership.club.id, membership.club)
+            for membership in Membership.objects.filter(student__user__pk=user_id)
+        ]
+        self.fields["post"].initial = post_id

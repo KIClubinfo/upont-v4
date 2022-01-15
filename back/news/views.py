@@ -1,60 +1,68 @@
 from datetime import datetime
 
-# from django.utils import timezone
-# from django.urls import reverse
-# from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
 from social.models import Membership, Student
 
-from .forms import EditEvent, EditPost, CommentForm
-from .models import Event, Post, Comment
+from .forms import CommentForm, EditEvent, EditPost
+from .models import Comment, Event, Post
 
 
+@login_required()
 def posts(request):
     student = get_object_or_404(Student, user__id=request.user.id)
-    all_posts_list = Post.objects.order_by("-date")
-    membership_club_list = Membership.objects.filter(student__pk=student.id)
 
-    my_posts = Post.objects.filter(author__pk=student.id, club=None)
+    if request.method == "GET":
+        all_posts_list = Post.objects.order_by("-date")
 
-    for membership in membership_club_list:
-        my_posts |= Post.objects.filter(club=membership.club)
+        membership_club_list = Membership.objects.filter(student__pk=student.id)
+        my_posts = Post.objects.filter(author__pk=student.id, club=None)
+        for membership in membership_club_list:
+            my_posts |= Post.objects.filter(club=membership.club)
 
-    context = {
-        "all_posts_list": all_posts_list,
-        "my_posts": my_posts
-    }
-    return render(request, "news/posts.html", context)
+        all_posts_and_forms = [
+            (post, CommentForm(post.id, student.id)) for post in all_posts_list
+        ]
 
-# class Posts(View):
-#     def get(self, request):
-#         all_posts_list = Post.objects.order_by("-date")
-#         all_posts_and_forms = [(post, CommentForm()) for post in all_posts_list]
-#         context = {"all_posts_and_forms": all_posts_and_forms}
-#         return render(request, "news/posts.html", context)
-#
-#     def post(self, request):
-#         comment_form = CommentForm(data=request.POST)
-#         if comment_form.is_valid():
-#             new_comment = comment_form.save(commit=False)
-#             new_comment.date = timezone.now()
-#             new_comment.save()
-#             return redirect(reverse("news:posts"))
-#         else:
-#             all_posts_list = Post.objects.order_by("-date")
-#             all_posts_and_forms = [(post, CommentForm()) for post in all_posts_list]
-#             commented_post = request.POST.get("post")
-#             print(type(commented_post))
-#             print(commented_post)
-#             commented_post_index = 0
-#             for index, post in enumerate(all_posts_list):
-#                 if post == commented_post:
-#                     commented_post_index = index
-#             all_posts_and_forms[commented_post_index] = (commented_post, comment_form)
-#             context = {"all_posts_and_forms": all_posts_and_forms}
-#             return render(request, "news/posts.html", context)
+        context = {"all_posts_and_forms": all_posts_and_forms, "my_posts": my_posts}
+        return render(request, "news/posts.html", context)
+
+    if request.method == "POST":
+        commented_post_id = request.POST.get("post")
+        commented_post = get_object_or_404(Post, id=commented_post_id)
+        filled_form = CommentForm(commented_post_id, student.id, data=request.POST)
+
+        if filled_form.is_valid():
+            new_comment = filled_form.save(commit=False)
+            new_comment.post = commented_post
+            new_comment.author = request.user.student
+            new_comment.date = timezone.now()
+            new_comment.save()
+            return redirect(reverse("news:posts"))
+
+        else:
+            all_posts_list = Post.objects.order_by("-date")
+
+            membership_club_list = Membership.objects.filter(student__pk=student.id)
+            my_posts = Post.objects.filter(author__pk=student.id, club=None)
+            for membership in membership_club_list:
+                my_posts |= Post.objects.filter(club=membership.club)
+
+            all_posts_and_forms = [
+                (post, CommentForm(post.id, student.id)) for post in all_posts_list
+            ]
+            commented_post_index = 0
+            for index, post in enumerate(all_posts_list):
+                if post.id == commented_post_id:
+                    commented_post_index = index + 1
+                    break
+            all_posts_and_forms[commented_post_index] = (commented_post, filled_form)
+
+            context = {"all_posts_and_forms": all_posts_and_forms, "my_posts": my_posts}
+            return render(request, "news/posts.html", context)
 
 
 def events(request):

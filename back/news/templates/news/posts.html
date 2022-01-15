@@ -47,7 +47,7 @@
                 <div style="text-align:center">
                     <a href="{% url 'news:post_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
                 </div>
-                {% for post in all_posts_list %}
+                {% for post, form in all_posts_and_forms %}
                     <div class="news-card" id="{{post.id}}">
                         <div class="news-card-header">
                             <!--Poster-Image-Name-and-Title-of-the-post-->
@@ -107,16 +107,41 @@
                             </div>
                         </div>
                         <div class="news-card-comments">
-                            <div class="news-card-comment">
+                        {% for comment in post.comments.all %}
+                        <div class="news-card-comment">
+                            <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                            {% if comment.club %}
+                                <div> {{ comment.club }} </div>
+                            {% else %}
+                                <div> {{ comment.author }} </div>
+                            {% endif %}
+                            <div class="news-card-comment-box"> {{ comment.content }} </div>
+                        </div>
+                        {% endfor %}
+                        <div class="news-card-edit-comment">
+                            <!-- comment form -->
+                            <form method="post" >
+                            {% csrf_token %}
                                 <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                                <div class="news-card-comment-box">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro itaque veritatis error voluptatum aperiam est enim praesentium. Quae atque fuga, dolore officiis iure laboriosam sunt consequatur laudantium minima magni porro voluptatibus quod sint quidem assumenda dicta natus! Assumenda quidem molestias explicabo provident. Necessitatibus maiores expedita, laboriosam optio suscipit libero quidem.</div>
-                            </div>
-                            <div class="news-card-edit-comment">
-                                <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                                <textarea class="news-card-edit-comment-input" type="text" name="" id=""></textarea>
-                            </div>
+                                {{ form.club }}
+                                {{ form.content }}
+                                <input type="submit" class="btn btn-info" value="Envoyer">
+                                {{ form.post.as_hidden }}
+                                {% if form.errors %}
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <div class="login-errors">{{ error|escape }}</div>
+                                        {% endfor %}
+                                    {% endfor %}
+
+                                    {% for error in form.non_field_errors %}
+                                        <div class="login-errors">{{ error|escape }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            </form>
                         </div>
                     </div>
+                </div>
                 {% endfor %}
             </div>
         </div>

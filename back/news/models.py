@@ -49,14 +49,17 @@ class Post(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(
-        "social.Membership", verbose_name="author", on_delete=models.SET_NULL, null=True
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
     )
-    published_as_student = models.BooleanField()
+    club = models.ForeignKey(
+        "social.club", on_delete=models.SET_NULL, null=True, blank=True
+    )
     date = models.DateTimeField()
     content = models.TextField()
 
     def __str__(self):
-        return f"Comment {self.content} by {self.author}"
+        author = [self.author, self.club][bool(self.club)]
+        return f"Comment from {author}: '{self.content}'"
 
 
 class Shotgun(models.Model):
