@@ -61,6 +61,7 @@ def shotgun_detail(request, shotgun_id):
         "already_participated": already_participated,
         "got_accepted": got_accepted,
         "motivation": motivation,
+        "student_is_admin": shotgun.club.is_admin(student.id),
     }
     return render(request, "news/shotgun_detail.html", context)
 

@@ -116,6 +116,11 @@
                             
                     </div>
                 {%endif%}
+                {%if student_is_admin %}
+                    <div class="box", style="margin-bottom: 1rem">
+                        <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="form-control">Administrer ce shotgun</button></a>
+                    </div>
+                {%endif%}
             </div>
         </div>
         <script src="{% static 'js/sidenav.js' %}"></script>
