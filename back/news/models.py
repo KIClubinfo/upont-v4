@@ -73,12 +73,19 @@ class Shotgun(models.Model):
     ending_date = models.DateTimeField()
     size = models.IntegerField(default=0)
     requires_motivation = models.BooleanField(default=False)
+    motivations_review_finished = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
 
-    def accepted_participations(self):
+    def participations(self):
         participations = Participation.objects.filter(shotgun=self)
+        return participations.order_by("shotgun_date")
+
+    def accepted_participations(self):
+        participations = Participation.objects.filter(
+            shotgun=self, failed_motivation=False
+        )
         return participations.order_by("shotgun_date")[: self.size]
 
     def is_started(self):
@@ -90,10 +97,9 @@ class Shotgun(models.Model):
         return timezone.now() > self.ending_date
 
     def participated(self, student: Student):
-        participations = Participation.objects.filter(shotgun=self)
-        for participation in participations.all():
-            if participation.participant == student:
-                return True
+        participation = Participation.objects.filter(shotgun=self, participant=student)
+        if participation.exists():
+            return True
         return False
 
     def got_accepted(self, student: Student):

@@ -93,14 +93,27 @@
                         </div>
                     </div>    
                 </div>
-                {%if already_participated and not shotgun.requires_motivation%}
+                {%if already_participated %}
                     <div class="box", style="margin-bottom: 1rem">
                         <h1>Résultats</h1>
-                        {%if got_accepted%}
-                            <h4 style="text-align: center">Tu as réussi ce shotgun ! Félicitations !</h4>
-                        {%else%}
-                        <h4 style="text-align: center">Tu n'as pas réussi ce shotgun. Essaye d'être plus rapide la prochaine fois !</h4>
-                        {%endif%}
+                        {% if not shotgun.requires_motivation %}
+                            {%if got_accepted%}
+                                <h4 style="text-align: center">Tu as réussi ce shotgun ! Félicitations !</h4>
+                            {%else%}
+                                <h4 style="text-align: center">Tu n'as pas réussi ce shotgun. Essaye d'être plus rapide la prochaine fois !</h4>
+                            {%endif%}
+                        {% else %}
+                            {%if shotgun.motivations_review_finished %}
+                                {% if got_accepted %}
+                                    <h4 style="text-align: center">Tu as réussi ce shotgun ! Félicitations !</h4>
+                                {% else %}
+                                    <h4 style="text-align: center">Tu n'as pas réussi ce shotgun. Peut-être une prochaine fois !</h4>
+                                {% endif %}
+                            {%else%}
+                                <h4 style="text-align: center">Les organisateurs n'ont pas fini d'examiner ta motivation. Reviens plus tard !</h4>
+                            {%endif%}
+                        {% endif %}
+                            
                     </div>
                 {%endif%}
             </div>

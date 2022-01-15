@@ -68,31 +68,49 @@
                             <p style="font-size: 1.5rem">
                                 <b> Description :</b> {{shotgun.content}}
                             </p>
-                            <br><br><br>
-                                <a href="{% url 'delete_shotgun_detail' shotgun.id %}"><button form=1 type="submit" value="Supprimer" class="form-control">Supprimer</button></a>
+                            <br><br>
+                            <a href="{% url 'delete_shotgun' shotgun.id %}" style="text-decoration: none"><button class="form-control">Supprimer</button></a>
+                            <br>
+                            <a href="{% url 'edit_shotgun' shotgun.id %}" style="text-decoration: none"><button class="form-control">Éditer</button></a>
                         </div>
                     </div> 
                     <hr>
                     <h3>Participations :</h3>
-                    {% for participation in shotgun.accepted_participations %}
-                    <div class="box", style="margin-bottom: 1rem">
-                        <h4>Motivation :</h4> {{participation.motivation}}
-                        <br><br>
-                        {% if participation.failed_motivation %}
-                            <p style="text-align: center"><strong>Participation recallée !</strong></p>
+                    <p>Les participations s'affichent par ordre de shotgun. Les {{shotgun.size}} premières participations non recallées seront acceptées.</p>
+                    {% if shotgun.is_ended %}
+                        {% if shotgun.motivations_review_finished %}
+                            <h5>Les résultats ont été publiés !</h5>
                         {% else %}
-                        <form action="{% url 'fail_participation' participation.id %}" method="post" class="form-control" id="1">
-                            {% csrf_token %}
-                            <fieldset>
-                                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                            </fieldset>
-                            <button form=1 type="submit" value="Recaller" class="form-control">Recaller</button>
-                        </form>
+                            <a href="{% url 'publish_shotgun_results' shotgun.id %}" style="text-decoration: none"><button class="form-control">Publier les résultats</button></a>
                         {% endif %}
-                    </div>
-                    {% empty %}
-                        <p>Aucune participation pour le moment.</p>
-                    {% endfor %}
+                        <br>
+                    {% endif %}
+                    {% if not shotgun.motivations_review_finished %}
+                        {% for participation in shotgun.participations %}
+                        <div class="box", style="margin-bottom: 1rem">
+                            <h5>Motivation :</h5> {{participation.motivation}}
+                            <br><br>
+                            {% if participation.failed_motivation %}
+                                <p style="text-align: center"><strong>Participation recallée !</strong></p>
+                                <a href="{% url 'unfail_participation' participation.id %}" style="text-decoration: none"><button class="form-control">Annuler</button></a>
+                            {% else %}
+                            <a href="{% url 'fail_participation' participation.id %}" style="text-decoration: none"><button class="form-control">Recaller</button></a>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                            <h5>Aucune participation pour le moment.</h5>
+                        {% endfor %}
+                    {% else %}
+                        <h5>Participations acceptées :</h5>
+                        {% for participation in shotgun.accepted_participations %}
+                        <div class="box", style="margin-bottom: 1rem">
+                            <h5>{{participation.participant.user.first_name}} {{participation.participant.user.last_name}}</h5>
+                            <p><b>Motivation :</b> {{participation.motivation}}</p>
+                        </div>
+                        {% empty %}
+                            <h5>Personne n'a été accepté.</h5>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
