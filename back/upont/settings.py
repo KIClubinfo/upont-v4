@@ -137,8 +137,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    "upont.auth.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
+    "upont.auth.EmailBackend",
     "django_cas_ng.backends.CASBackend",
 ]
 
@@ -220,3 +220,6 @@ LOGGING = {
 # SSO CONNECT
 CAS_SERVER_URL = "http://cas.enpc.fr/cas/"
 CAS_CREATE_USER = False
+CAS_CHECK_NEXT = False
+CAS_REDIRECT_URL = "/"
+CAS_ADMIN_PREFIX = "admin/"
