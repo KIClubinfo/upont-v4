@@ -3,16 +3,33 @@
 <html>
     <!--Header-->
     <head>
+        <!--Meta-->
         <meta charset='utf-8'>
+        <meta name="description" content="uPont est l'intranet étudiant de l'École des Ponts ParisTech.">
+        <meta name="keywords" content="">
+        <meta name="author" content="Bastien Le Chenadec, Louis Boilly, Thomas Buiron, Theilo Terisse, David Nahmias">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!--Title-->
         <title>{% if title %}{{title}}{% else %}Pas de titre{% endif %}</title>
+
+        <!--Favicon-->
+        <link rel="icon" type="image/x-icon" href="{% static 'assets/img/logo.png' %}">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/img/logo.png' %}">
+
+        <!--Styles-->
         <link rel="stylesheet" href="{% static 'css/styles.css' %}">
         <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
         <link  rel="stylesheet" href="{% static 'tellme/vendor/feedback/feedback.css' %}">
+
+        <!--Icons-->
         <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
+
         <!-- jQuery -->
         {%  block jquery %}
         <script src="{% static 'tellme/vendor/jquery/jquery-3.5.1.js' %}"></script>
         {% endblock %}
+
         <!-- XDSoft DateTimePicker -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
