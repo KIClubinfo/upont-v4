@@ -7,5 +7,6 @@ ENV PATH="$VENV/bin:$PATH"
 
 WORKDIR /src
 COPY requirements.txt .
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 COPY . .

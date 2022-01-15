@@ -1,0 +1,32 @@
+
+<div class="content-header">
+    <div class="row justify-content-between w-100">
+        <div class="col">
+            {% if all_student_list%}
+                <datalist id="search-choices-student">
+                     {% for student in all_student_list %}
+                         <option value="{{student.user.first_name}} {{student.user.last_name}} {{student.department}} {{student.promo.nickname}}">{{student.user.first_name}} {{student.user.last_name}} - {{student.department}} - '{{student.promo.nickname}}</option>
+                     {% endfor %}
+                 </datalist>
+                 <form class="search-input-group">
+                     <input name="user" type="text" list="search-choices-student" class="search-input" placeholder="Chercher un élève">
+                     <button class="button search-button" type="submit" formaction="{% url 'social:search' %}"><i class="fas fa-search "></i></button>
+                 </form>
+            {% endif %}
+            {% if all_clubs_list %}
+               <datalist id="search-choices-club">
+                     {% for club in all_clubs_list %}
+                         <option value="{{club.name}}">{{club.name}} {% if club.nickname %}- {{club.nickname}}{% endif %}</option>
+                     {% endfor %}
+                     {% for category in all_categories_list %}
+                         <option value="{{category.name}}">Catégorie: {{category.name}}</option>
+                     {% endfor %}
+                 </datalist>
+                 <form class="search-input-group">
+                     <input name="club" type="text" list="search-choices-club" class="search-input" placeholder="Chercher un club">
+                     <button class="button search-button" type="submit" formaction="{% url 'social:search' %}"><i class="fas fa-search "></i></button>
+                 </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
