@@ -17,6 +17,7 @@ import django_cas_ng.views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from upont.add_promo import add
 
@@ -27,6 +28,11 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo/", add),
+    path(
+        "login/",
+        auth_views.LoginView.as_view(redirect_authenticated_user=True),
+        name="login",
+    ),  # forces redirection of already authenticated users
     path("", include("django.contrib.auth.urls")),
     path("", views.root_redirect),
     path("cas/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
