@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from social.models import Student
 
 
@@ -12,6 +13,9 @@ class Event(models.Model):
         Student,
         related_name="events",
         blank=True,
+    )
+    shotgun = models.ForeignKey(
+        "Shotgun", on_delete=models.SET_NULL, null=True, blank=True
     )
 
     def __str__(self):
@@ -48,6 +52,14 @@ class Comment(models.Model):
         return self.content
 
 
+class Participation(models.Model):
+    participant = models.ForeignKey("social.Student", on_delete=models.CASCADE)
+    shotgun = models.ForeignKey("Shotgun", on_delete=models.CASCADE, null=True)
+    shotgun_date = models.DateTimeField()
+    motivation = models.TextField(null=True)
+    failed_motivation = models.BooleanField(default=False)
+
+
 class Shotgun(models.Model):
     title = models.CharField(max_length=50)
     club = models.ForeignKey(
@@ -57,9 +69,41 @@ class Shotgun(models.Model):
         null=True,
     )
     content = models.TextField()
-    date = models.DateTimeField()
+    starting_date = models.DateTimeField()
+    ending_date = models.DateTimeField()
     size = models.IntegerField(default=0)
     requires_motivation = models.BooleanField(default=False)
+    motivations_review_finished = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
+
+    def participations(self):
+        participations = Participation.objects.filter(shotgun=self)
+        return participations.order_by("shotgun_date")
+
+    def accepted_participations(self):
+        participations = Participation.objects.filter(
+            shotgun=self, failed_motivation=False
+        )
+        return participations.order_by("shotgun_date")[: self.size]
+
+    def is_started(self):
+        return timezone.now() > self.starting_date
+
+    def is_ended(self):
+        if self.ending_date == None:
+            return False
+        return timezone.now() > self.ending_date
+
+    def participated(self, student: Student):
+        participation = Participation.objects.filter(shotgun=self, participant=student)
+        if participation.exists():
+            return True
+        return False
+
+    def got_accepted(self, student: Student):
+        for participation in self.accepted_participations():
+            if participation.participant == student:
+                return True
+        return False

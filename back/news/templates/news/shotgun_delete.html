@@ -1,0 +1,40 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Suppression d'un shotgun" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="users" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-main">
+                <h1>Administration des shotguns :</h1>
+                <div class="box", style="margin-bottom: 1rem">
+                    <h3>{{shotgun.title}}</a>:</h3>
+                    <h5>Veux-tu vraiment supprimer ce shotgun ? Cette action sera irréversible et supprimera également toutes les participations de tous les élèves.</h5>
+                    <form action="{% url 'delete_shotgun' shotgun.id %}" method="post" id="1">
+                        {% csrf_token %}
+                        <button form=1 type="submit" value="Supprimer" class="form-control">Supprimer</button>
+                    </form>
+                    <br>
+                    <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="form-control">Annuler</button></a>
+            </div>
+        </div>
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>

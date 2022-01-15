@@ -1,0 +1,69 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Gestion des shotguns" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="users" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-main">
+                <h1>Administration des shotguns :</h1>
+                {% if not_empty %}
+                    {% for club_and_shotguns in clubs_and_shotguns %}
+                    <div class="box", style="margin-bottom: 1rem">
+                        <h2>{{club_and_shotguns.club}}</h2>
+                        {% for shotgun in club_and_shotguns.shotguns %}
+                            <div class="box", style="margin-bottom: 1rem">
+                                <h3><a href="{% url 'shotguns_admin_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
+                                <div class="row">
+                                    <div class="col-lg-5">
+                                        <p style="font-size: 1.5rem">
+                                            {%if shotgun.is_started%}
+                                                <b>Ce shotgun a commencé</a></b> !
+                                            {%elif not shotgun.is_ended%}
+                                                <b>Début du shotgun :</b> {{shotgun.starting_date}}
+                                            {%endif%}<br><br>
+                                            <b>Fin du shotgun :</b> {{shotgun.ending_date}}<br><br>
+                                                <b>Motivation :</b>
+                                            {%if shotgun.requires_motivation%}
+                                                Requise.
+                                            {%else%}
+                                                Non.
+                                            {%endif%}<br><br>
+                                            <b>Nombre de places :</b> {{shotgun.size}}
+                                        </p>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <p style="font-size: 1.5rem">
+                                            <b> Description :</b> {{shotgun.content}}
+                                        </p>
+                                    </div>
+                                </div> 
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <h3>Tu n'as aucun shotgun à administrer !</h3>
+                {% endif %}
+            </div>
+        </div>
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>
