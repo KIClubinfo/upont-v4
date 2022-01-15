@@ -9,4 +9,11 @@
         <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
         <link  rel="stylesheet" href="{% static 'tellme/vendor/feedback/feedback.css' %}">
         <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
+        <!-- jQuery -->
+        {%  block jquery %}
+        <script src="{% static 'tellme/vendor/jquery/jquery-3.5.1.js' %}"></script>
+        {% endblock %}
+        <!-- XDSoft DateTimePicker -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
     </head>

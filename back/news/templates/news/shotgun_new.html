@@ -1,39 +1,16 @@
 {% load static %}
-<!doctype html>
-<html>
-    <!--Header-->
-    <head>
-        <meta charset='utf-8'>
-        <title>Shotguns</title>
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-        <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
+<!--Header-->
+{% include "header.html" with title="Nouveau shotgun" %}
 
-        <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-
-        <!-- XDSoft DateTimePicker -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
-    </head>
+    <!--Body-->
     <body>
-        <div class="sidenav-container">
-            <nav class="sidenav">
-                <div class="sidenav-first-link">
-                    <a href=""><img src="{% static 'assets/img/logo.png' %}" class="logo" alt=""></a>
-                    <div class="toggle "><i class="fas fa-bars "></i></div>
-                </div>
-                <div class="sidenav-links">
-                    <a href="#" class="sidenav-link"><i class="fas fa-newspaper "></i></a>
-                    <a href="#" class="sidenav-link active"><i class="fas fa-user-graduate "></i></a>
-                    <a href="#" class="sidenav-link"><i class="fas fa-gamepad "></i></a>
-                    <a href="#" class="sidenav-link"><i class="fas fa-file-alt "></i></a>
-                    <a href="#" class="sidenav-link"><i class="fas fa-address-card "></i></a>
-                    <a href="#" class="sidenav-link"><i class="fas fa-user-edit "></i></a>
-                </div>
-                <a href="#" class="sidenav-last-link sidenav-link"><i class="fas fa-sign-out-alt "></i></a>
-            </nav>
-        </div>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="profile" %}
+
+        <!--Content-->
         <div class="content">
             <div class="content-header">
                 <div class="row justify-content-between w-100">
@@ -68,7 +45,7 @@
                     {{form.starting_date}}
                     <script>
                         $(function () {
-                          $("#id_starting_date").datetimepicker({
+                            $("#id_starting_date").datetimepicker({
                             format: 'd/m/Y H:i',
                           });
                         });
@@ -79,7 +56,7 @@
                     {{form.ending_date}}
                     <script>
                         $(function () {
-                          $("#id_ending_date").datetimepicker({
+                            $("#id_ending_date").datetimepicker({
                             format: 'd/m/Y H:i',
                           });
                         });
