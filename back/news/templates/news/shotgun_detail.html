@@ -35,7 +35,7 @@
                             {%if shotgun.is_ended%}
                                 <h2 style="text-align: center">Ce shotgun est terminé depuis le {{shotgun.ending_date}}.</h2>
                             {%else%}
-                                <form action="{% url 'shotgun_participate' shotgun.id %}" method="post" class="form-control" id="1"><br>
+                                <form action="{% url 'shotgun_participate' shotgun.id %}" method="post" class="form-control" id="1" style="text-align: center"><br>
                                 {% csrf_token %}
                                 <fieldset>
                                     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -43,7 +43,7 @@
                                     <textarea name = "motivation" class="form-control" placeholder="Motivation"></textarea><br><br>
                                     {%endif%}
                                 </fieldset>
-                                <button form=1 type="submit" value="Participer" class="form-control">Participer</button><br>
+                                <button form=1 type="submit" value="Participer" class="button green-button">Participer</button><br>
                                 </form>
                             {%endif%}
                         {%else%}
@@ -97,8 +97,8 @@
                     </div>
                 {%endif%}
                 {%if student_is_admin %}
-                    <div class="box", style="margin-bottom: 1rem">
-                        <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="form-control">Administrer ce shotgun</button></a>
+                    <div class="box", style="margin-bottom: 1rem; text-align: center">
+                        <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button blue-button">Administrer ce shotgun</button></a>
                     </div>
                 {%endif%}
             </div>

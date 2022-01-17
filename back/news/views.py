@@ -111,9 +111,7 @@ def shotguns_admin(request):
     )
     clubs_and_shotguns = []
     for club_membership in clubs_admin_memberships:
-        club_shotguns = Shotgun.objects.filter(
-            club=club_membership.club, requires_motivation=True
-        )
+        club_shotguns = Shotgun.objects.filter(club=club_membership.club)
         if len(club_shotguns) > 0:
             clubs_and_shotguns.append(
                 {"club": club_membership.club, "shotguns": club_shotguns}

@@ -49,32 +49,31 @@
                                 <b> Description :</b> {{shotgun.content}}
                             </p>
                             <br><br>
-                            <a href="{% url 'delete_shotgun' shotgun.id %}" style="text-decoration: none"><button class="form-control">Supprimer</button></a>
-                            <br>
-                            <a href="{% url 'edit_shotgun' shotgun.id %}" style="text-decoration: none"><button class="form-control">Éditer</button></a>
+                            <a href="{% url 'edit_shotgun' shotgun.id %}" style="text-decoration: none"><button class="button green-button">Éditer</button></a>
+                            <a href="{% url 'delete_shotgun' shotgun.id %}" style="text-decoration: none"><button class="button red-button">Supprimer</button></a>
                         </div>
                     </div> 
                     <hr>
                     <h3>Participations :</h3>
                     <p>Les participations s'affichent par ordre de shotgun. Les {{shotgun.size}} premières participations non recallées seront acceptées.</p>
-                    {% if shotgun.is_ended %}
+                    {% if shotgun.is_ended and shotgun.requires_motivation%}
                         {% if shotgun.motivations_review_finished %}
                             <h5>Les résultats ont été publiés !</h5>
                         {% else %}
-                            <a href="{% url 'publish_shotgun_results' shotgun.id %}" style="text-decoration: none"><button class="form-control">Publier les résultats</button></a>
+                            <a href="{% url 'publish_shotgun_results' shotgun.id %}" style="text-decoration: none"><button class="button red-button">Publier les résultats</button></a>
                         {% endif %}
                         <br>
                     {% endif %}
-                    {% if not shotgun.motivations_review_finished %}
+                    {% if shotgun.requires_motivation and not shotgun.motivations_review_finished %}
                         {% for participation in shotgun.participations %}
                         <div class="box", style="margin-bottom: 1rem">
                             <h5>Motivation :</h5> {{participation.motivation}}
                             <br><br>
                             {% if participation.failed_motivation %}
                                 <p style="text-align: center"><strong>Participation recallée !</strong></p>
-                                <a href="{% url 'unfail_participation' participation.id %}" style="text-decoration: none"><button class="form-control">Annuler</button></a>
+                                <a href="{% url 'unfail_participation' participation.id %}" style="text-decoration: none"><button class="button red-button">Annuler</button></a>
                             {% else %}
-                            <a href="{% url 'fail_participation' participation.id %}" style="text-decoration: none"><button class="form-control">Recaller</button></a>
+                            <a href="{% url 'fail_participation' participation.id %}" style="text-decoration: none"><button class="button red-button">Recaller</button></a>
                             {% endif %}
                         </div>
                         {% empty %}
@@ -85,7 +84,9 @@
                         {% for participation in shotgun.accepted_participations %}
                         <div class="box", style="margin-bottom: 1rem">
                             <h5>{{participation.participant.user.first_name}} {{participation.participant.user.last_name}}</h5>
-                            <p><b>Motivation :</b> {{participation.motivation}}</p>
+                            {% if shotgun.requires_motivation %}
+                                <p><b>Motivation :</b> {{participation.motivation}}</p>
+                            {% endif %}
                         </div>
                         {% empty %}
                             <h5>Personne n'a été accepté.</h5>
