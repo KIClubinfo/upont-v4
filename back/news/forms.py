@@ -1,7 +1,7 @@
 from django import forms
 from social.models import Membership
 
-from .models import Event, Post, Comment
+from .models import Comment, Event, Post
 
 
 class EditEvent(forms.ModelForm):
@@ -56,7 +56,7 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ("post", "club", "content")
         widgets = {
-            "club": forms.Select(attrs={"class": ""}),
+            "club": forms.Select(),
             "content": forms.Textarea(attrs={"class": "news-card-edit-comment-input"}),
         }
 
