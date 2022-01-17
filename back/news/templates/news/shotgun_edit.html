@@ -68,8 +68,9 @@
                 Requiert une motivation :
                 {{form.requires_motivation.errors}}
                 {{form.requires_motivation}}
-                <button form=1 type="submit" value="Modifier" class="form-control">Appliquer les modifications</button><br>
-                <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="form-control">Annuler</button></a>
+                <br>
+                <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
+                <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button red-button">Annuler</button></a>
                 </form>
             </div>
         </div>

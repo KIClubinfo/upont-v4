@@ -29,10 +29,8 @@
                     <h5>Veux-tu vraiment supprimer ce shotgun ? Cette action sera irréversible et supprimera également toutes les participations de tous les élèves.</h5>
                     <form action="{% url 'delete_shotgun' shotgun.id %}" method="post" id="1">
                         {% csrf_token %}
-                        <button form=1 type="submit" value="Supprimer" class="form-control">Supprimer</button>
+                        <button form=1 type="submit" value="Supprimer" class="button red-button">Supprimer</button><a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button type="button" class="button green-button">Annuler</button></a>
                     </form>
-                    <br>
-                    <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="form-control">Annuler</button></a>
             </div>
         </div>
         <script src="{% static 'js/sidenav.js' %}"></script>
