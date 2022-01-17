@@ -73,7 +73,7 @@ def search(request):
 
 def partition(words):
     gaps = len(words) - 1  # one gap less than words (fencepost problem)
-    for i in range(1 << gaps):  # the 2^n possible partitions
+    for i in range(1, 1 << gaps):  # the 2^n possible partitions
         result = words[:1]  # The result starts with the first word
         for word in words[1:]:
             if i & 1:
@@ -87,9 +87,14 @@ def partition(words):
 def search_user(request):
     searched_expression = request.GET.get("user", None)
     key_words_list = [word.strip() for word in searched_expression.split()]
+    all_possible_lists = [key_words_list]
+    if len(key_words_list) > 1:
+        all_possible_lists += [
+            possible_list for possible_list in partition(key_words_list)
+        ]
     queryset = Student.objects.none()
 
-    for possible_list in partition(key_words_list):
+    for possible_list in all_possible_lists:
         partial_queryset = Student.objects.all()
 
         for key_word in possible_list:
@@ -116,9 +121,15 @@ def search_user(request):
 def search_club(request):
     searched_expression = request.GET.get("club", None)
     key_words_list = [word.strip() for word in searched_expression.split()]
+    all_possible_lists = [key_words_list]
+    if len(key_words_list) > 1:
+        all_possible_lists += [
+            possible_list for possible_list in partition(key_words_list)
+        ]
+
     queryset = Club.objects.none()
 
-    for possible_list in partition(key_words_list):
+    for possible_list in all_possible_lists:
         partial_queryset = Club.objects.all()
 
         for key_word in possible_list:
