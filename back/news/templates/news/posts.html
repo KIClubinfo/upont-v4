@@ -86,8 +86,6 @@
                                 <!--All-Images-Linked-With-The-Post-->
                                 <div class="news-card-carousel" data-flickity='{}'>
                                     <div class="carousel-cell"><img src="{{post.illustration.path}}" style="height: 100%;" alt=""></div>
-                                    <div class="carousel-cell"><img src="{% static 'assets/img/user.jpeg' %}" style="height: 100%;" alt=""></div>
-                                    <div class="carousel-cell"><img src="{% static 'assets/img/user.jpeg' %}" style="height: 100%;" alt=""></div>
                                 </div>
                             </div>
                         {%endif%}
@@ -101,8 +99,8 @@
                                 {% endif %}
                             </div>
                             <div class="news-card-popularity">
-                                <span><i class="fas fa-heart" style="color: red;"></i>{{post.total_likes}}</span>
-                                <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i>{{ post.total_comments }}</span>
+                                <span><i class="fas fa-heart" style="color: red;"></i> {{post.total_likes}}</span>
+                                <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i> {{ post.total_comments }}</span>
                             </div>
                         </div>
                         <div class="news-card-comments" style="display: block">
@@ -128,43 +126,43 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        {% endfor %}
-                        <!-- comment form -->
-                        <form method="post" >
-                        {% csrf_token %}
-                            <div class="news-card-edit-comment">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            {% if user.student.picture %}
-                                                <div class="news-card-comment-user-pic"><img src="{{user.student.picture.path}}"></div>
-                                            {% else %}
-                                                <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {{ form.club }}
-                                        </td>
-                                    </tr>
-                                </table>
-                                <textarea class="news-card-edit-comment-input" type="text" name="content" id=""></textarea>
-                                <button type="submit" class="news-card-button"><i class="far fa-comment"></i></button>
-                                {{ form.post.as_hidden }}
-                                {% if form.errors %}
-                                    {% for field in form %}
-                                        {% for error in field.errors %}
+                            {% endfor %}
+                            <!-- comment form -->
+                            <form method="post" >
+                            {% csrf_token %}
+                                <div class="news-card-edit-comment">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                {% if user.student.picture %}
+                                                    <div class="news-card-comment-user-pic"><img src="{{user.student.picture.path}}"></div>
+                                                {% else %}
+                                                    <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                {{ form.club }}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <textarea class="news-card-edit-comment-input" type="text" name="content" id=""></textarea>
+                                    <button type="submit" class="news-card-button"><i class="far fa-comment"></i></button>
+                                    {{ form.post.as_hidden }}
+                                    {% if form.errors %}
+                                        {% for field in form %}
+                                            {% for error in field.errors %}
+                                                <div class="login-errors">{{ error|escape }}</div>
+                                            {% endfor %}
+                                        {% endfor %}
+
+                                        {% for error in form.non_field_errors %}
                                             <div class="login-errors">{{ error|escape }}</div>
                                         {% endfor %}
-                                    {% endfor %}
-
-                                    {% for error in form.non_field_errors %}
-                                        <div class="login-errors">{{ error|escape }}</div>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                        </form>
+                                    {% endif %}
+                                </div>
+                            </form>
                     </div>
                 </div>
                 {% endfor %}

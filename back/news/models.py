@@ -55,7 +55,7 @@ class Comment(models.Model):
         "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
     )
     club = models.ForeignKey(
-        "social.club", on_delete=models.SET_NULL, null=True, blank=True
+        "social.Club", on_delete=models.SET_NULL, null=True, blank=True
     )
     date = models.DateTimeField()
     content = models.TextField()
