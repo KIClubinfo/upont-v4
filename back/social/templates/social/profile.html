@@ -1,0 +1,66 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Profil" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="profile" %}
+
+        <!--Content-->
+        <div class="content">
+            {% include "../social/searchbar.html" with all_student_list=all_student_list %}
+            <div class="content-main">
+                <div class="box profil-box">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" height="100%" width="100%" alt=""></div>
+                                </div>
+                                <div class="col-lg-7" style="text-align: center;">
+                                    <div class="section-title">Mes informations personnelles</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-5" style="text-align: center;">
+                                    <div class="profil-information-box">{% if student.user.first_name %}{{student.user.first_name}}{% else %}---Prénom---{% endif %}</div>
+                                    <div class="profil-information-box">{% if student.phone_number %}{{student.phone_number}}{% else %}---Tel---{% endif %}</div>
+                                    <div class="profil-information-box">{% if student.gender %}{{student.gender}}{% else %}------{% endif %}</div>
+                                </div>
+                                <div class="col-lg-7" style="text-align: center;">
+                                    <div class="profil-information-box">{% if student.user.last_name %}{{student.user.last_name}}{% else %}---Nom---{% endif %}</div>
+                                    <div class="profil-information-box">{% if student.department %}{{student.department}}{% else %}-------{% endif %}</div>
+                                    <div class="profil-information-box">{% if student.origin %}{{student.origin}}{% else %}-------{% endif %}</div>
+                                    <a href="{% url 'social:profile_edit' %}">
+                                        <button class="button blue-button">Modifier mon profil</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4" style="border-left: solid hsla(0, 0%, 100%, 0.25) 0.25px;">
+                            <div class="section-title">Mes activités associatives</div>
+                            {% if membership_club_list %}
+                                {% for membership in membership_club_list %}
+                                    <div class="user-card">
+                                        <div class="user-image"><img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                        <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span> <span>{{membership.role.name}}</span></div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>Je ne suis pas membre d'un club.</p> <!--TO DO : écrire ça bien-->
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>

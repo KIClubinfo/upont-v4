@@ -1,0 +1,62 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Ajout d'une promotion" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="admin" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                    <!--<div class="col" style="text-align: end;">
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                        <button class="button"><i class="fas fa-bell"></i></button>
+                    </div>-->
+                </div>
+            </div>
+            <div class="content-main">
+                <p> Les informations doivent être dans l'ordre suivant : {{order}}.</p>
+                <p>Utiliser le format CSV uniquement, avec encodage UTF-8, délimité avec ";".</p>
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" id="file1" name="file">
+                    <button type="submit">Uploader</button>
+                </form><br>
+                {% if type_error %}
+                    <strong>Erreur: le fichier doit être au format .csv .</strong><br><br>
+                {% endif %}
+                {% if no_file %}
+                    <strong>Erreur: Aucun fichier n'a été uploadé.</strong><br><br>
+                {% endif %}
+                {% if promo_not_added %}
+                    <strong>La promotion n'a pas été ajoutée.</strong><br><br>
+                {% endif %}
+                {% if promo_added %}
+                    <strong>La promotion a été ajoutée.</strong><br><br>
+                {% endif %}
+                {% if students_not_added %}
+                    <p>Les étudiants suivants n'ont pas pu être ajoutés :</p>
+                    {% for student in students_not_added %}
+                        <li>{{student}}</li>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>

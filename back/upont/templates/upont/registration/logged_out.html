@@ -1,0 +1,29 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Logout" %}
+    <!--Body-->
+    <body>
+        <!--Background-->
+        {% include "registration/background.html" %}
+        {% include "feedback.html" %}
+
+        <!--Logged Out Card-->
+        <div class="login-content">
+            <div class="login-card">
+                <div class="row h-100">
+                    <!--Logged Out Card Left Side-->
+                    <div class="col-sm-5 logo-col" style="padding: 1rem;">
+                        <img class="login-logo" src="{% static 'assets/img/logo.png' %}"  alt="">
+                    </div>
+                    <!--Logged Out Card Right Side-->
+                    <div class="col-sm-7 white-border" style="padding: 1rem;">
+                        <div class="login-card-form">
+                            <h1 class="login-title" style="margin-bottom: 3rem;">Tu es bien déconnecté(e) !</h1>
+                            <a href="{% url 'login' %}" class="btn btn-info">Revenir à la page de connexion</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

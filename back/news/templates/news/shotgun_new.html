@@ -1,0 +1,81 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Nouveau shotgun" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="profile" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-main">
+                <h1>Nouveau shotgun :</h1>
+                {% if has_clubs_admins %}
+                    <form action="{% url 'new_shotgun' %}" method="post" class="form-control" id="1"><br>
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    Club :
+                    {{form.club.errors}}
+                    {{form.club}}
+                    <br>
+                    Titre :
+                    {{form.title.errors}}
+                    {{form.title}}
+                    <br>
+                    Description :
+                    {{form.content.errors}}
+                    {{form.content}}
+                    <br>
+                    Date de début :
+                    {{form.starting_date.errors}}
+                    {{form.starting_date}}
+                    <script>
+                        $(function () {
+                            $("#id_starting_date").datetimepicker({
+                            format: 'd/m/Y H:i',
+                          });
+                        });
+                      </script>
+                    <br>
+                    Date de fin :
+                    {{form.ending_date.errors}}
+                    {{form.ending_date}}
+                    <script>
+                        $(function () {
+                            $("#id_ending_date").datetimepicker({
+                            format: 'd/m/Y H:i',
+                          });
+                        });
+                      </script>
+                    <br>
+                    Nombre de places :
+                    {{form.size.errors}}
+                    {{form.size}}
+                    <br>
+                    Requiert une motivation :
+                    {{form.requires_motivation.errors}}
+                    {{form.requires_motivation}}
+                    <br><button form=1 type="submit" value="Créer" class="button green-button">Créer</button><a href="{% url 'shotguns' %}" style="text-decoration: none"><button type="button" class="button red-button">Annuler</button></a>
+                    </form>
+                {% else %}
+                    <h4>Tu ne peux pas créer de nouveaux shotguns, essaye de devenir administrateur d'un club !</h4>
+                {% endif %}
+            </div>
+        </div>
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
+</html>

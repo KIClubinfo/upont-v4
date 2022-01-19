@@ -1,7 +1,6 @@
 from django import forms
-from social.models import Membership
-
-from .models import Comment, Event, Post
+from social.models import Membership, Club
+from .models import Comment, Event, Post, Shotgun
 
 
 class EditEvent(forms.ModelForm):
@@ -67,3 +66,23 @@ class CommentForm(forms.ModelForm):
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
         self.fields["post"].initial = post_id
+
+
+class AddShotgun(forms.ModelForm):
+    class Meta:
+        model = Shotgun
+        fields = (
+            "club",
+            "title",
+            "content",
+            "starting_date",
+            "ending_date",
+            "size",
+            "requires_motivation",
+        )
+
+    def __init__(self, clubs, *args, **kwargs):
+        super(AddShotgun, self).__init__(*args, **kwargs)
+        self.fields["club"].choices = []
+        for club in clubs:
+            self.fields["club"].choices.append((str(club.id), str(club.name)))

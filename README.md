@@ -4,7 +4,6 @@ Refonte de uPont [TODO : liens vers site et ancien repo] en python (django) pour
 
 * framework full-stack django
 * base de données PostgreSQL
-* [TODO : separate front-end framework if needed, since django is more back-end oriented]
 
 # Installation
 
@@ -18,15 +17,6 @@ Site accessible au port 8000 : (configurable dans le fichier .env)
 $ $BROWSER localhost:8000
 ```
 
-Accès à la DB par docker exec : [TODO : setup django admin site]
-```
-$ docker exec -it $(docker ps -f 'name=db' --format '{{.ID}}') psql -U upont
-```
-
-Accès à django par docker-compose exec :
-```
-$ docker-compose exec back /bin/sh
-```
 
 Installation des pre-commit hooks :
 ```
@@ -67,7 +57,12 @@ $ git push
 
 # Commandes Django
 
-Commencer par entrer dans le conteneur :
+Accès à la DB par docker exec :
+```
+$ docker exec -it $(docker ps -f 'name=db' --format '{{.ID}}') psql -U upont
+```
+
+Pour les commandes python, commencer par entrer dans le conteneur :
 ```
 $ docker-compose exec back /bin/sh
 ```
@@ -90,4 +85,23 @@ $ python manage.py makemigrations
 Appliquer les migrations :
 ```
 $ python manage.py migrate
+```
+
+# Mise en production
+
+À l'intérieur du container back, nginx reçoit les requêtes et les transmet à gunicorn, qui se charge de faire le lien avec le serveur python.
+
+Lancer le build :
+```
+$ bash build.sh
+```
+
+Lancer le serveur :
+```
+$ bash start.sh
+```
+
+Stopper le serveur :
+```
+$ bash stop.sh
 ```

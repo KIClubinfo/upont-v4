@@ -88,6 +88,7 @@ class Club(models.Model):
     name = models.CharField(max_length=50, default="Club")
     nickname = models.CharField(max_length=10, default="Club", null=True, blank=True)
     logo = models.ImageField(upload_to="logos", null=True, blank=True)
+    background_picture = models.ImageField(upload_to="background_picture", null=True, blank=True)
     description = models.TextField()
     active = models.BooleanField()
     has_fee = models.BooleanField()
@@ -105,6 +106,18 @@ class Club(models.Model):
 
     def __str__(self):
         return self.name
+
+    def is_member(self, student_id):
+        for student in self.members.all():
+            if student.id == student_id:
+                return True
+        return False
+
+    def is_admin(self, student_id):
+        membership = Membership.objects.get(student__id=student_id, club=self)
+        if membership.is_admin:
+            return True
+        return False
 
 
 class Membership(models.Model):

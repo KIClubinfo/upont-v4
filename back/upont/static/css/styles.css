@@ -21,7 +21,18 @@ body{
     margin: 0;
     padding: 0;
 }
+/*------------------------------------------------------------------------------*/
+/*----------------------------- FEEDBACK BUTTON --------------------------------*/
+/*------------------------------------------------------------------------------*/
 
+ .vertical-right-aligned {
+    transform: rotate(-90deg);
+    transform-origin: 100% 100%;
+    position: fixed;
+    right: 0;
+    top: 50%;
+    z-index: 100;
+}
 
 /*------------------------------------------------------------------------------*/
 /*---------------------------------- SIDE-NAV ----------------------------------*/
@@ -387,6 +398,7 @@ h1,h2,h3,h4,h5,h6{
 
 .user-card{
     /* Positioning */
+    position: relative;
     display: flex;
     flex-direction: row;
     /* Sizing */
@@ -472,6 +484,7 @@ h1,h2,h3,h4,h5,h6{
     color: white;
     font-size: 1rem;
     font-weight: 400;
+    text-align:center;
     border-radius: 0.5rem;
 }
 
@@ -483,6 +496,7 @@ h1,h2,h3,h4,h5,h6{
     /* Sizing */
     margin: 1rem auto;
     padding: 0.5rem 1rem;
+    height: 2.5rem;
     width: 80%;
     /* Styling */
     background-color: var(--primary-bg-color);
@@ -490,13 +504,55 @@ h1,h2,h3,h4,h5,h6{
     color: white;
     font-size: 1rem;
     font-weight: 400;
+    text-align:center;
     border-radius: 0.5rem;
+}
+
+.profil-input[type="file"]{
+    color: rgb(156, 156, 156);
 }
 
 .profil-input:focus{
     outline: 0;
 }
 
+.profil-input::file-selector-button {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 400;
+    background-color: transparent;
+    overflow: hidden;
+    pointer-events: none;
+    border-color: inherit;
+    border-style: solid;
+    border-width: 0;
+    border-inline-end-width: 1px;
+    border-radius: 15;
+}
+
+.profil-select{
+    width: 80%;
+    height: 2.5rem;
+    margin: 1rem auto;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #fff;
+    background-color: var(--primary-bg-color);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1.5rem center;
+    background-size: 16px 12px;
+    border: solid var(--border-color) var(--border-width);
+    border-radius: 0.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.profil-select:focus{
+    outline: 0;
+}
 /*-------------------------------------------------*/
 /*------------------- GLASS CARD ------------------*/
 /*-------------------------------------------------*/
@@ -682,6 +738,10 @@ h1,h2,h3,h4,h5,h6{
     border-left: solid var(--border-color) var(--border-width);
 }
 
+.bottom-border{
+    border-bottom: solid var(--border-color) var(--border-width);
+}
+
 @media(max-width:670px){
     .white-border{
         border-left: none var(--border-color) var(--border-width);
@@ -861,6 +921,7 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .vignette-club-mini{
+    position:relative;
     display: flex;
     margin-top: 2rem;
     min-height: 6rem;
@@ -976,7 +1037,7 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .carousel-cell{
-    margin:0rem 0.5rem; 
+    margin:0rem 0.5rem;
     height: 100%;
 }
 
@@ -1005,6 +1066,11 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .news-card-comment-user-pic{
+    height: 6rem;
+    padding: 0 1rem;
+}
+
+.news-card-comments-user-pic{
     /* Positioning */
     display: flex;
     /* Sizing */
@@ -1019,6 +1085,7 @@ h1,h2,h3,h4,h5,h6{
     display: flex;
     justify-content: left;
     padding: 1rem 0rem;
+    align-items: center;
 }
 
 .news-card-comment-box{
@@ -1057,4 +1124,8 @@ h1,h2,h3,h4,h5,h6{
 
 .news-card-edit-comment-input:focus{
     outline: 0;
+}
+
+.news-card-comments-input{
+    height: 0;
 }

@@ -13,6 +13,12 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+import environ
+
+# getting environmnent variables
+env = environ.Env()
+environ.Env.read_env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,13 +26,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-2-e3q#*pqsgm+lhrgrkc=ex%!^8(3^*6@q^367*ma4j1$=54$f"
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "upont.enpc.org",
+    "upont-dev.enpc.org",
+    "localhost",
+    "127.0.0.1",
+    "back",
+]
+
+if DEBUG:
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY = "django-insecure-2-e3q#*pqsgm+lhrgrkc=ex%!^8(3^*6@q^367*ma4j1$=54$f"
+else:
+    SECRET_KEY = env("SECRET_KEY", default=None)
+    SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT", default=False)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # Application definition
@@ -42,6 +60,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "tellme",
+    "django.contrib.postgres",
+    "django_cas_ng",
 ]
 
 MIDDLEWARE = [
@@ -52,6 +73,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_cas_ng.middleware.CASMiddleware",
 ]
 
 ROOT_URLCONF = "upont.urls"
@@ -90,6 +112,12 @@ DATABASES = {
 }
 
 
+# Login redirection
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "social:index_users"
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -108,6 +136,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "upont.auth.EmailBackend",
+    "django_cas_ng.backends.CASBackend",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -127,6 +160,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "upont/static"),
 ]
@@ -140,4 +174,52 @@ FIXTURE_DIRS = ["/fixtures/"]
 
 # Default media folder
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "../media/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+
+# Email backend
+if DEBUG:
+    DEFAULT_FROM_EMAIL = "test@mail.com"
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, "../emails/")
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = True
+else:
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="upont@enpc.org")
+    EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+    SENDGRID_API_KEY = env("SENDGRID_API_KEY", default=None)
+    ADMIN_EMAIL = env("ADMIN_EMAIL", default=None)
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+# Logs
+if DEBUG:
+    DJANGO_LOG_LEVEL = "DEBUG"
+else:
+    DJANGO_LOG_LEVEL = "INFO"
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "myapp": {
+            "handlers": ["console"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": True,
+        },
+    },
+}
+
+# SSO CONNECT
+CAS_SERVER_URL = "http://cas.enpc.fr/cas/"
+CAS_CREATE_USER = False
+CAS_CHECK_NEXT = False
+CAS_REDIRECT_URL = "/"
+CAS_ADMIN_PREFIX = "admin/"

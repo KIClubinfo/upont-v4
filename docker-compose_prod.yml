@@ -1,0 +1,55 @@
+version: "3.6"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+  back:
+    build:
+      context: back
+      dockerfile: Dockerfile_prod
+    command: gunicorn upont.wsgi:application --bind 0.0.0.0:8000
+    expose:
+    - 8000
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - static_volume:/src/static
+      - media_volume:/src/media
+    restart: always
+    environment:
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_NAME: $DB_NAME
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      SENDGRID_API_KEY: $SENDGRID_API_KEY
+      ADMIN_EMAIL: $ADMIN_EMAIL
+      DEFAULT_FROM_EMAIL: $DEFAULT_FROM_EMAIL
+      SECRET_KEY: $SECRET_KEY
+      DEBUG: $DEBUG
+      GUNICORN_NB_WORKERS: $GUNICORN_NB_WORKERS
+      SECURE_SSL_REDIRECT: $SECURE_SSL_REDIRECT
+  nginx:
+    build: ./nginx
+    ports:
+      - $BACK_PORT:80
+    depends_on:
+      - back
+    volumes:
+      - static_volume:/src/static
+      - media_volume:/src/media
+    restart: always
+
+volumes:
+  static_volume:
+  media_volume:
+  database:
