@@ -1,18 +1,34 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Login" %}
+{% include "header.html" with title="Erreur 403" %}
+
     <!--Body-->
     <body>
-        <!--Background-->
-        {% include "registration/background.html" %}
+        <!--Feedback Button-->
         {% include "feedback.html" %}
 
-        <!--Login Card-->
-        <div class="login-content">
-            <div class="login-card">
-                <h1 style="color: white; text-align: center">Accès refusé</h1>
-                <h4 style="color: white; text-align: center">Tu n'as pas accès à cette page.</h4>
+        <!--Sidenav-->
+        {% include "sidenav.html" %}
+
+        <!--Content-->
+        <div class="content">
+            <div class="content-header">
+                <div class="row justify-content-between w-100">
+                    <div class="col">
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" placeholder="Rechercher">
+                            <button class="button search-button"><i class="fas fa-search "></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-main">
+                <h3 class="page-title">Erreur 403 : Tu n'as pas accès à cette page.</h3>
             </div>
         </div>
+        <!--EndContent-->
+
+        <!--Scripts-->
+        <script src="{% static 'js/sidenav.js' %}"></script>
     </body>
 </html>
