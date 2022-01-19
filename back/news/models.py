@@ -14,6 +14,7 @@ class Event(models.Model):
         related_name="events",
         blank=True,
     )
+    poster = models.ImageField(upload_to="poster", null=True, blank=True)
     shotgun = models.ForeignKey(
         "Shotgun", on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -25,31 +26,47 @@ class Event(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=50)
     author = models.ForeignKey(
-        "social.Membership", verbose_name="author", on_delete=models.SET_NULL, null=True
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
     )
-    published_as_student = models.BooleanField()
+    club = models.ForeignKey(
+        "social.Club", on_delete=models.SET_NULL, null=True, blank=True
+    )
     date = models.DateTimeField()
     illustration = models.ImageField(
         upload_to="post_illustrations", null=True, blank=True
     )
     content = models.TextField()
     event = models.ForeignKey("Event", on_delete=models.SET_NULL, null=True, blank=True)
+    likes = models.ManyToManyField(
+        Student,
+        related_name="posts",
+        blank=True,
+    )
 
     def __str__(self):
         return self.title
 
+    def total_likes(self):
+        return self.likes.count()
+
+    def total_comments(self):
+        return self.comments.count()
+
 
 class Comment(models.Model):
-    post = models.ForeignKey("Post", on_delete=models.CASCADE)
+    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(
-        "social.Membership", verbose_name="author", on_delete=models.SET_NULL, null=True
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
     )
-    published_as_student = models.BooleanField()
+    club = models.ForeignKey(
+        "social.Club", on_delete=models.SET_NULL, null=True, blank=True
+    )
     date = models.DateTimeField()
     content = models.TextField()
 
     def __str__(self):
-        return self.content
+        author = [self.author, self.club][bool(self.club)]
+        return f"Comment from {author}: '{self.content}'"
 
 
 class Participation(models.Model):

@@ -1062,6 +1062,10 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .news-card-comments{
+    padding: 0 1rem;
+}
+
+.news-card-comment-user-pic{
     height: 6rem;
     padding: 0 1rem;
 }
@@ -1079,8 +1083,47 @@ h1,h2,h3,h4,h5,h6{
 
 .news-card-comment{
     display: flex;
+    justify-content: left;
+    padding: 1rem 0rem;
     align-items: center;
-    justify-content: center;
+}
+
+.news-card-comment-box{
+    /* Sizing */
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
+    width: 65%;
+    /* Styling */
+    background-color: transparent;
+    border: solid var(--border-color) var(--border-width);
+    color: white;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0.5rem;
+}
+
+.news-card-edit-comment{
+    display: flex;
+    justify-content: left;
+    padding: 1rem 0rem;
+}
+
+.news-card-edit-comment-input{
+    /* Sizing */
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
+    width: 85%;
+    /* Styling */
+    background-color: var(--primary-bg-color);
+    border: solid var(--border-color) var(--border-width);
+    color: white;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0.5rem;
+}
+
+.news-card-edit-comment-input:focus{
+    outline: 0;
 }
 
 .news-card-comments-input{
