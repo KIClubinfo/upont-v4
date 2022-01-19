@@ -32,3 +32,7 @@ def media(request, path):
         return response
     else:
         return HttpResponseForbidden()
+
+
+def page_not_created(request):
+    return render(request, "page_not_created.html")
