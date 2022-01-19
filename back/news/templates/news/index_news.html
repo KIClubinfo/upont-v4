@@ -1,6 +1,6 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Suppression d'un shotgun" %}
+{% include "header.html" with title="Fil d'actualité" %}
 
     <!--Body-->
     <body>
@@ -23,14 +23,9 @@
                 </div>
             </div>
             <div class="content-main">
-                <h1>Administration des shotguns :</h1>
-                <div class="box", style="margin-bottom: 1rem">
-                    <h3>{{shotgun.title}}</a>:</h3>
-                    <h5>Veux-tu vraiment supprimer ce shotgun ? Cette action sera irréversible et supprimera également toutes les participations de tous les élèves.</h5>
-                    <form action="{% url 'delete_shotgun' shotgun.id %}" method="post" id="1">
-                        {% csrf_token %}
-                        <button form=1 type="submit" value="Supprimer" class="button red-button">Supprimer</button><a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button type="button" class="button green-button">Annuler</button></a>
-                    </form>
+                <a href="{% url 'news:posts' %}">Posts</a>
+                <a href="{% url 'news:events' %}">Évènements</a>
+                <a href="{% url 'news:shotguns' %}">Shotguns</a>
             </div>
         </div>
         <script src="{% static 'js/sidenav.js' %}"></script>

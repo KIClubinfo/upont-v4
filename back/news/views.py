@@ -1,15 +1,20 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.http import Http404, HttpResponseRedirect
-
 from social.models import Membership, Student
-from .forms import CommentForm, EditEvent, EditPost, AddShotgun
-from .models import Comment, Event, Post, Participation, Shotgun
+
+from .forms import AddShotgun, CommentForm, EditEvent, EditPost
+from .models import Comment, Event, Participation, Post, Shotgun
+
+
+@login_required()
+def index(request):
+    return render(request, "news/index_news.html")
 
 
 @login_required()
