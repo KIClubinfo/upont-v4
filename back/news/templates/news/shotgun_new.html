@@ -8,7 +8,7 @@
         {% include "feedback.html" %}
 
         <!--Sidenav-->
-        {% include "sidenav.html" with active_link="profile" %}
+        {% include "sidenav.html" with active_link="news" %}
 
         <!--Content-->
         <div class="content">
@@ -25,7 +25,7 @@
             <div class="content-main">
                 <h1>Nouveau shotgun :</h1>
                 {% if has_clubs_admins %}
-                    <form action="{% url 'new_shotgun' %}" method="post" class="form-control" id="1"><br>
+                    <form action="{% url 'news:new_shotgun' %}" method="post" class="form-control" id="1"><br>
                     {% csrf_token %}
                     {{ form.non_field_errors }}
                     Club :
@@ -69,7 +69,7 @@
                     Requiert une motivation :
                     {{form.requires_motivation.errors}}
                     {{form.requires_motivation}}
-                    <br><button form=1 type="submit" value="Créer" class="button green-button">Créer</button><a href="{% url 'shotguns' %}" style="text-decoration: none"><button type="button" class="button red-button">Annuler</button></a>
+                    <br><button form=1 type="submit" value="Créer" class="button green-button">Créer</button><a href="{% url 'news:shotguns' %}" style="text-decoration: none"><button type="button" class="button red-button">Annuler</button></a>
                     </form>
                 {% else %}
                     <h4>Tu ne peux pas créer de nouveaux shotguns, essaye de devenir administrateur d'un club !</h4>
