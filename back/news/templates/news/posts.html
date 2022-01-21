@@ -24,6 +24,10 @@
             </div>
             <div class="content-main">
                 <h3 class="page-title">News</h3>
+
+                <!--Navigation-->
+                {% include "../news/newsnav.html" %}
+
                 <br>
                 <div style="text-align:center">
                     <a href="{% url 'news:post_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>

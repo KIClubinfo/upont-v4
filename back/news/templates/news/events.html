@@ -24,6 +24,10 @@
             </div>
             <div class="content-main">
                 <h3 class="page-title">News : Events</h3>
+
+                <!--Navigation-->
+                {% include "../news/newsnav.html" %}
+
                 {% for event in all_events_list %}
                 <div class="news-card">
                     <div class="news-card-header">
