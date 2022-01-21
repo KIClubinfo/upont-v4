@@ -35,7 +35,7 @@
                             {%if shotgun.is_ended%}
                                 <h2 style="text-align: center">Ce shotgun est terminé depuis le {{shotgun.ending_date}}.</h2>
                             {%else%}
-                                <form action="{% url 'shotgun_participate' shotgun.id %}" method="post" class="form-control" id="1" style="text-align: center"><br>
+                                <form action="{% url 'news:shotgun_participate' shotgun.id %}" method="post" class="form-control" id="1" style="text-align: center"><br>
                                 {% csrf_token %}
                                 <fieldset>
                                     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -96,11 +96,12 @@
                             
                     </div>
                 {%endif%}
-                {%if student_is_admin %}
                     <div class="box", style="margin-bottom: 1rem; text-align: center">
-                        <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button blue-button">Administrer ce shotgun</button></a>
+                        {%if student_is_admin %}
+                            <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button blue-button">Administrer ce shotgun</button></a>
+                        {%endif%}
+                        <a href="{% url 'news:shotguns' %}" style="text-decoration: none"><button class="button blue-button">Retour à l'index</button></a>
                     </div>
-                {%endif%}
             </div>
         </div>
         <script src="{% static 'js/sidenav.js' %}"></script>

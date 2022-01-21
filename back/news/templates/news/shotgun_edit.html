@@ -24,7 +24,7 @@
             </div>
             <div class="content-main">
                 <h1>Édition d'un shotgun :</h1>
-                <form action="{% url 'edit_shotgun' shotgun.id %}" method="post" class="form-control" id="1"><br>
+                <form action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" class="form-control" id="1"><br>
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 Club :
@@ -70,7 +70,7 @@
                 {{form.requires_motivation}}
                 <br>
                 <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
-                <a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button red-button">Annuler</button></a>
+                <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button red-button">Annuler</button></a>
                 </form>
             </div>
         </div>

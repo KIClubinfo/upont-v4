@@ -23,18 +23,21 @@
                 </div>
             </div>
             <div class="content-main">
-                <div class="box", style="margin-bottom: 1rem">
+                <h3 class="page-title">News: Shotguns</h3>
+                <!--Navigation-->
+                {% include "../news/newsnav.html" %}
+                <div class="box news-card", style="width: auto; margin-left: 17rem; margin-right: 4rem;">
                     <h1>Prochains shotguns :</h1>
                     {%if has_next_shotguns%}
                         {%for shotgun in next_shotguns%}
                             <div class="box", style="margin-bottom: 1rem">
-                                <h3><a href="{% url 'shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
+                                <h3><a href="{% url 'news:shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
                                 <div class="row">
                                     <div class="col-lg-5">
                                         <p style="font-size: 1.5rem">
                                             <b>Organisateur :</b> {{shotgun.club.name}}<br><br>
                                             {%if shotgun.is_started%}
-                                                <b>Ce shotgun a <a href="{% url 'shotgun_detail' shotgun.id %}">commencé</a></b> !
+                                                <b>Ce shotgun a <a href="{% url 'news:shotgun_detail' shotgun.id %}">commencé</a></b> !
                                             {%elif not shotgun.is_ended%}
                                                 <b>Début du shotgun :</b> {{shotgun.starting_date}}
                                             {%endif%}<br><br>
@@ -63,12 +66,12 @@
                     {%endif%}
                 </div>
                 <br>
-                <div class="box", style="margin-bottom: 1rem">
+                <div class="box news-card", style="width: auto; margin-left: 17rem; margin-right: 4rem;">
                     <h1>Mes shotguns :</h1>
                     {%if has_user_shotguns%}
                         {%for shotgun in user_shotguns%}
                         <div class="box", style="margin-bottom: 1rem">
-                            <h3><a href="{% url 'shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
+                            <h3><a href="{% url 'news:shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
                             <div class="row">
                                 <div class="col-lg-5">
                                     <p style="font-size: 1.5rem">
@@ -99,12 +102,12 @@
                     {%endif%}
                 </div>
                 <br>
-                <div class="box", style="margin-bottom: 1rem">
+                <div class="box news-card", style="width: auto; margin-left: 17rem; margin-right: 4rem;">
                     <h1>Shotguns terminés :</h1>
                     {%if has_old_shotguns%}
                         {%for shotgun in old_shotguns%}
                         <div class="box", style="margin-bottom: 1rem">
-                            <h3><a href="{% url 'shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
+                            <h3><a href="{% url 'news:shotgun_detail' shotgun.id %}">{{shotgun.title}}</a>:</h3>
                             <div class="row">
                                 <div class="col-lg-5">
                                     <p style="font-size: 1.5rem">
@@ -132,6 +135,10 @@
                             <h3>Aucun shotgun terminé.</h3>
                         </div>
                     {%endif%}
+                </div>
+                <div style="text-align:center">
+                    <br><br>
+                    <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
                 </div>
             </div>
         </div>
