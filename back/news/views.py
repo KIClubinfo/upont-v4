@@ -13,11 +13,6 @@ from .models import Comment, Event, Participation, Post, Shotgun
 
 
 @login_required()
-def index(request):
-    return render(request, "news/index_news.html")
-
-
-@login_required()
 def posts(request):
     student = get_object_or_404(Student, user__id=request.user.id)
 
