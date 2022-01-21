@@ -1,18 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-        {{EditEvent}}
-        <div>
-            <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
-            <input  type="submit" name="Supprimer" value="Supprimer">
-            <input  type="submit" name= "Valider" value="Valider">
-        </div>
-        </form>
-</body>
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Modifier l'évènement" %}
+
+    <!--Body-->
+    <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
+        <!--Sidenav-->
+        {% include "sidenav.html" with active_link="news" %}
+
+        <!--Content-->
+        <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+            {{EditEvent}}
+            <div>
+                <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
+                <input  type="submit" name="Supprimer" value="Supprimer">
+                <input  type="submit" name= "Valider" value="Valider">
+            </div>
+            </form>
+    </body>
 </html>

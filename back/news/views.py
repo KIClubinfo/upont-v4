@@ -1,15 +1,15 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.http import Http404, HttpResponseRedirect
-
 from social.models import Membership, Student
-from .forms import CommentForm, EditEvent, EditPost, AddShotgun
-from .models import Comment, Event, Post, Participation, Shotgun
+
+from .forms import AddShotgun, CommentForm, EditEvent, EditPost
+from .models import Comment, Event, Participation, Post, Shotgun
 
 
 @login_required()
@@ -303,7 +303,7 @@ def shotgun_participate(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
     student = get_object_or_404(Student, user__id=request.user.id)
     if shotgun.participated(student):
-        return HttpResponseRedirect(reverse("shotgun_detail", args=(shotgun_id,)))
+        return HttpResponseRedirect(reverse("news:shotgun_detail", args=(shotgun_id,)))
     if shotgun.requires_motivation:
         try:
             motivation = request.POST["motivation"]
@@ -311,7 +311,7 @@ def shotgun_participate(request, shotgun_id):
             error_message = "Tu n'as pas fourni de motivation !"
             return HttpResponseRedirect(
                 reverse(
-                    "shotgun_detail",
+                    "news:shotgun_detail",
                     args=(
                         shotgun_id,
                         error_message,
@@ -332,7 +332,7 @@ def shotgun_participate(request, shotgun_id):
             participant=student,
         )
         participation.save()
-    return HttpResponseRedirect(reverse("shotgun_detail", args=(shotgun_id,)))
+    return HttpResponseRedirect(reverse("news:shotgun_detail", args=(shotgun_id,)))
 
 
 @login_required()
@@ -377,7 +377,7 @@ def fail_participation(request, participation_id):
     participation.failed_motivation = True
     participation.save()
     return HttpResponseRedirect(
-        reverse("shotguns_admin_detail", args=(participation.shotgun.id,))
+        reverse("news:shotguns_admin_detail", args=(participation.shotgun.id,))
     )
 
 
@@ -390,7 +390,7 @@ def unfail_participation(request, participation_id):
     participation.failed_motivation = False
     participation.save()
     return HttpResponseRedirect(
-        reverse("shotguns_admin_detail", args=(participation.shotgun.id,))
+        reverse("news:shotguns_admin_detail", args=(participation.shotgun.id,))
     )
 
 
@@ -419,7 +419,7 @@ def new_shotgun(request):
         )
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse("shotguns"))
+            return HttpResponseRedirect(reverse("news:shotguns"))
 
 
 @login_required()
@@ -437,7 +437,7 @@ def delete_shotgun(request, shotgun_id):
 
     if request.method == "POST":
         shotgun.delete()
-        return HttpResponseRedirect(reverse("shotguns_admin"))
+        return HttpResponseRedirect(reverse("news:shotguns_admin"))
 
 
 @login_required()
@@ -466,7 +466,7 @@ def edit_shotgun(request, shotgun_id):
             if form.is_valid():
                 form.save()
                 return HttpResponseRedirect(
-                    reverse("shotguns_admin_detail", args=(shotgun.id,))
+                    reverse("news:shotguns_admin_detail", args=(shotgun.id,))
                 )
     else:
         raise PermissionDenied()
@@ -480,7 +480,7 @@ def publish_shotgun_results(request, shotgun_id):
         shotgun.motivations_review_finished = True
         shotgun.save()
         return HttpResponseRedirect(
-            reverse("shotguns_admin_detail", args=(shotgun.id,))
+            reverse("news:shotguns_admin_detail", args=(shotgun.id,))
         )
     else:
         raise PermissionDenied()

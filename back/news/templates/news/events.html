@@ -1,49 +1,16 @@
 {% load static %}
-<!DOCTYPE html>
-<html>
-    <!--Header-->
-    <head>
-        <!--Meta-->
-        <meta charset='utf-8'>
-        <meta name="description" content="uPont est l'intranet étudiant de l'École des Ponts ParisTech">
-        <meta name="keywords" content="">
-        <meta name="author" content="Bastien Le Chenadec, Louis Boilly, Thomas Buiron, Theilo Terisse, David Nahmias">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!--Header-->
+{% include "header.html" with title="Évènements" %}
 
-        <!--Title-->
-        <title>Index</title>
-
-        <!--Favicon-->
-        <link rel="icon" type="image/x-icon" href="{% static 'assets/img/logo.png' %}">
-        <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/img/logo.png' %}">
-
-        <!--Styles-->
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-        <link rel="stylesheet" href="{% static 'css/flickity.css' %}">
-
-        <!--Icons-->
-        <script src="https://kit.fontawesome.com/e89ead331b.js" crossorigin="anonymous"></script>
-    </head>
+    <!--Body-->
     <body>
+        <!--Feedback Button-->
+        {% include "feedback.html" %}
+
         <!--Sidenav-->
-        <div class="sidenav-container">
-            <nav class="sidenav">
-                <div class="sidenav-first-link">
-                    <a href=""><img src="{% static 'assets/img/logo.png' %}" class="logo" alt=""></a>
-                    <div class="toggle "><i class="fas fa-bars "></i></div>
-                </div>
-                <div class="sidenav-links">
-                    <a href="#" class="sidenav-link {% if active_link == 'news' %} active {% endif %}"><i class="fas fa-newspaper "></i></a>
-                    <a href="/social/index_users" class="sidenav-link {% if active_link  == 'users' %} active {% endif %}"><i class="fas fa-user-graduate "></i></a>
-                    <a href="#" class="sidenav-link {% if active_link == 'clubs' %} active {% endif %}"><i class="fas fa-gamepad "></i></a>
-                    <a href="#" class="sidenav-link {% if active_link == 'resources' %} active {% endif %}"><i class="fas fa-file-alt "></i></a>
-                    <a href="/social/index_profile" class="sidenav-link {% if active_link == 'profile' %} active {% endif %}"><i class="fas fa-address-card "></i></a>
-                    <a href="#" class="sidenav-link {% if active_link == 'admin' %} active {% endif %}"><i class="fas fa-user-edit "></i></a>
-                </div>
-                <a href="#" class="sidenav-last-link sidenav-link {% if active_link == 'log-out' %} active {% endif %}"><i class="fas fa-sign-out-alt "></i></a>
-            </nav>
-        </div>
+        {% include "sidenav.html" with active_link="news" %}
+
+        <!--Content-->
         <div class="content">
             <div class="content-header">
                 <div class="row justify-content-between w-100">
@@ -57,6 +24,10 @@
             </div>
             <div class="content-main">
                 <h3 class="page-title">News : Events</h3>
+
+                <!--Navigation-->
+                {% include "../news/newsnav.html" %}
+
                 {% for event in all_events_list %}
                 <div class="news-card">
                     <div class="news-card-header">

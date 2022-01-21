@@ -1129,3 +1129,31 @@ h1,h2,h3,h4,h5,h6{
 .news-card-comments-input{
     height: 0;
 }
+
+/*-------------------------------------------------*/
+/*------------------- NAV OF NEWS -----------------*/
+/*-------------------------------------------------*/
+
+.news-nav{
+    position: fixed;
+    top: 14rem;
+    left: 13rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 8rem;
+    min-width: 9rem;
+}
+
+.news-nav a{
+    font-family: 'Neue Helvetica Thin';
+    font-weight: normal;
+    text-decoration: none;
+    font-size: 1.6rem;
+    padding: 1rem 1rem;
+    border-bottom: solid var(--border-width) var(--border-color);
+}
+
+.news-nav a:hover{
+    color: #39cbfb;
+}

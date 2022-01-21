@@ -8,7 +8,7 @@
         {% include "feedback.html" %}
 
         <!--Sidenav-->
-        {% include "sidenav.html" with active_link="users" %}
+        {% include "sidenav.html" with active_link="news" %}
 
         <!--Content-->
         <div class="content">
@@ -27,9 +27,9 @@
                 <div class="box", style="margin-bottom: 1rem">
                     <h3>{{shotgun.title}}</a>:</h3>
                     <h5>Veux-tu vraiment supprimer ce shotgun ? Cette action sera irréversible et supprimera également toutes les participations de tous les élèves.</h5>
-                    <form action="{% url 'delete_shotgun' shotgun.id %}" method="post" id="1">
+                    <form action="{% url 'news:delete_shotgun' shotgun.id %}" method="post" id="1">
                         {% csrf_token %}
-                        <button form=1 type="submit" value="Supprimer" class="button red-button">Supprimer</button><a href="{% url 'shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button type="button" class="button green-button">Annuler</button></a>
+                        <button form=1 type="submit" value="Supprimer" class="button red-button">Supprimer</button><a href="{% url 'news:shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button type="button" class="button green-button">Annuler</button></a>
                     </form>
             </div>
         </div>
