@@ -28,7 +28,7 @@ urlpatterns = [
     path("news/", include("news.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
-    path("add_promo/", add),
+    path("add_promo/", add, name="add_promo"),
     path(
         "login/",
         auth_views.LoginView.as_view(redirect_authenticated_user=True),
