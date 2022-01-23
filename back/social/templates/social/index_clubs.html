@@ -31,7 +31,7 @@
                                     <div class="club-card">
                                         <div class="club-card-content">
                                             {% if club.logo %}
-                                                <img class="club-card-image" src={{club.logo.path}} alt="">
+                                                <img class="club-card-image" src={{club.logo.url}} alt="">
                                             {% else %}
                                                 <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
                                             {% endif %}
@@ -62,7 +62,7 @@
                                     <div class="col-12">
                                         <div class="vignette-club-mini">
                                             {% if membership.club.logo %}
-                                                <img class="vignette-image-mini" src={{membership.club.logo.path}} alt="">
+                                                <img class="vignette-image-mini" src={{membership.club.logo.url}} alt="">
                                             {% else %}
                                                 <img class="vignette-image-mini" src="{% static 'assets/img/bde.png' %}" alt="">
                                             {% endif %}

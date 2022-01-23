@@ -38,11 +38,11 @@
                             <!--Poster-Image-Name-and-Title-of-the-post-->
                             {% if post.club %}
                                 {% if post.club.logo %}
-                                    <div class="news-card-header-image"><img src="{{post.club.logo.path}}"></div>
+                                    <div class="news-card-header-image"><img src="{{post.club.logo.url}}"></div>
                                 {% endif %}
                             {% else %}
                                 {% if post.author.picture %}
-                                    <div class="news-card-header-image"><img src="{{post.author.picture.path}}"></div>
+                                    <div class="news-card-header-image"><img src="{{post.author.picture.url}}"></div>
                                 {% endif %}
                             {% endif %}
                             <div class="news-card-header-text">
@@ -70,7 +70,7 @@
                             <div class="news-card-images">
                                 <!--All-Images-Linked-With-The-Post-->
                                 <div class="news-card-carousel" data-flickity='{}'>
-                                    <div class="carousel-cell"><img src="{{post.illustration.path}}" style="height: 100%;" alt=""></div>
+                                    <div class="carousel-cell"><img src="{{post.illustration.url}}" style="height: 100%;" alt=""></div>
                                 </div>
                             </div>
                         {%endif%}
@@ -94,13 +94,13 @@
                                 <div class="news-card-comment">
                                     {% if comment.club %}
                                         {% if comment.club.logo %}
-                                            <div class="news-card-comment-user-pic"><img src="{{comment.club.logo.path}}"></div>
+                                            <div class="news-card-comment-user-pic"><img src="{{comment.club.logo.url}}"></div>
                                         {% else %}
                                             <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
                                         {% endif %}
                                     {% else %}
                                         {% if comment.author.picture %}
-                                            <div class="news-card-comment-user-pic"><img src="{{comment.author.picture.path}}"></div>
+                                            <div class="news-card-comment-user-pic"><img src="{{comment.author.picture.url}}"></div>
                                         {% else %}
                                             <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
                                         {% endif %}
@@ -120,7 +120,7 @@
                                         <tr>
                                             <td>
                                                 {% if user.student.picture %}
-                                                    <div class="news-card-comment-user-pic"><img src="{{user.student.picture.path}}"></div>
+                                                    <div class="news-card-comment-user-pic"><img src="{{user.student.picture.url}}"></div>
                                                 {% else %}
                                                     <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
                                                 {% endif %}

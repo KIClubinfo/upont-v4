@@ -18,7 +18,7 @@
                         {% csrf_token %}
                         <div class="club-group-image-container">
                             {% if club.background_picture %}
-                                <img class="club-card-image" src={{club.background_picture.path}} height="100%" width="100%" alt="">
+                                <img class="club-card-image" src={{club.background_picture.url}} height="100%" width="100%" alt="">
                             {% else %}
                                 <img class="club-card-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
                             {% endif %}</div>
@@ -28,7 +28,7 @@
                             <div class="col-lg-4">
                                 <div class="club-image">
                                     {% if club.logo %}
-                                        <img class="club-card-image" src={{club.logo.path}} height="100%" width="100%" alt="">
+                                        <img class="club-card-image" src={{club.logo.url}} height="100%" width="100%" alt="">
                                     {% else %}
                                             <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
                                     {% endif %}
