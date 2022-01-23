@@ -28,11 +28,15 @@
                 <!--Navigation-->
                 {% include "../news/newsnav.html" %}
 
+                <div class="mt-2" style="text-align:center">
+                    <a href="{% url 'news:event_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
+                </div>
+
                 {% for event in all_events_list %}
                 <div class="news-card">
                     <div class="news-card-header">
                         <!--Poster-Image-Name-and-Title-of-the-post-->
-                        <div class="news-card-header-image"><img src="assets/img/bde.png" alt=""></div>
+                        <div class="news-card-header-image"><img src="https://i.imgur.com/hczKIze.jpg" alt=""></div>
                         <div class="news-card-header-text">
                             <span class="news-card-header-name">{{event.club}}</span>
                             <span class="news-card-header-title">{{event.name}}</span>
