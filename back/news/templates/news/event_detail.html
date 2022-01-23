@@ -32,11 +32,11 @@
                                 <!--Poster-Image-Name-and-Title-of-the-post-->
                                 {% if post.club %}
                                     {% if post.club.logo %}
-                                        <div class="news-card-header-image"><img src="{{post.club.logo.path}}"></div>
+                                        <div class="news-card-header-image"><img src="{{post.club.logo.url}}"></div>
                                     {% endif %}
                                 {% else %}
                                     {% if post.author.picture %}
-                                        <div class="news-card-header-image"><img src="{{post.author.picture.path}}"></div>
+                                        <div class="news-card-header-image"><img src="{{post.author.picture.url}}"></div>
                                     {% endif %}
                                 {% endif %}
                                 <div class="news-card-header-text">
@@ -64,7 +64,7 @@
                             <div class="news-card-images">
                                     <!--All-Images-Linked-With-The-Post-->
                                     <div class="news-card-carousel" data-flickity='{}'>
-                                        <div class="carousel-cell"><img src="{{post.illustration.path}}" style="height: 100%;" alt=""></div>
+                                        <div class="carousel-cell"><img src="{{post.illustration.url}}" style="height: 100%;" alt=""></div>
                                     </div>
                                 </div>
                             {%endif%}

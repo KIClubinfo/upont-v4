@@ -185,7 +185,7 @@ def post_edit(request, post_id):
             )
             if form.is_valid():
                 if "illustration" in request.FILES:
-                    post.poster.delete()
+                    post.illustration.delete()
                 form.save()
                 return redirect("news:posts")
 
