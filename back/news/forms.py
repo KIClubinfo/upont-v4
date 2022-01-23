@@ -1,5 +1,6 @@
 from django import forms
-from social.models import Membership, Club
+from social.models import Club, Membership
+
 from .models import Comment, Event, Post, Shotgun
 
 
@@ -7,6 +8,14 @@ class EditEvent(forms.ModelForm):
     class Meta:
         model = Event
         fields = ("name", "description", "date", "location", "poster", "club")
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "profil-input"}),
+            "description": forms.Textarea(attrs={"class": "profil-input"}),
+            "date": forms.TextInput(attrs={"class": "profil-input"}),
+            "location": forms.TextInput(attrs={"class": "profil-input"}),
+            "poster": forms.FileInput(attrs={"class": "profil-input"}),
+            "club": forms.Select(attrs={"class": "profil-select"}),
+        }
 
     def __init__(self, user_id, *args, **kwargs):
         super(EditEvent, self).__init__(*args, **kwargs)
@@ -55,8 +64,7 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ("post", "club", "content")
         widgets = {
-            "club": forms.Select(),
-            "content": forms.Textarea(attrs={"class": "news-card-edit-comment-input"}),
+            "club": forms.Select(attrs={"class": "profil-select"}),
         }
 
     def __init__(self, post_id, user_id, *args, **kwargs):

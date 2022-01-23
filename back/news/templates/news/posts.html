@@ -23,13 +23,12 @@
                 </div>
             </div>
             <div class="content-main">
-                <h3 class="page-title">News</h3>
+                <h3 class="page-title">News : Posts</h3>
 
                 <!--Navigation-->
                 {% include "../news/newsnav.html" %}
 
-                <br>
-                <div style="text-align:center">
+                <div class="mt-2" style="text-align:center">
                     <a href="{% url 'news:post_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
                 </div>
                 {% for post, form in all_posts_and_forms %}
@@ -37,13 +36,9 @@
                         <div class="news-card-header">
                             <!--Poster-Image-Name-and-Title-of-the-post-->
                             {% if post.club %}
-                                {% if post.club.logo %}
-                                    <div class="news-card-header-image"><img src="{{post.club.logo.url}}"></div>
-                                {% endif %}
+                                <div class="news-card-header-image"><img src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}"></div>
                             {% else %}
-                                {% if post.author.picture %}
-                                    <div class="news-card-header-image"><img src="{{post.author.picture.url}}"></div>
-                                {% endif %}
+                                <div class="news-card-header-image"><img src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}"></div>
                             {% endif %}
                             <div class="news-card-header-text">
                                 <span class="news-card-header-name">
@@ -96,13 +91,13 @@
                                         {% if comment.club.logo %}
                                             <div class="news-card-comment-user-pic"><img src="{{comment.club.logo.url}}"></div>
                                         {% else %}
-                                            <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                                            <div class="news-card-comment-user-pic"><img src="https://i.imgur.com/hczKIze.jpg" alt=""></div>
                                         {% endif %}
                                     {% else %}
                                         {% if comment.author.picture %}
                                             <div class="news-card-comment-user-pic"><img src="{{comment.author.picture.url}}"></div>
                                         {% else %}
-                                            <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
+                                            <div class="news-card-comment-user-pic"><img src="https://i.imgur.com/hczKIze.jpg" alt=""></div>
                                         {% endif %}
                                     {% endif %}
                                     <div class="news-card-comment-box"> {{ comment.content }} </div>
@@ -116,40 +111,33 @@
                             <form method="post" >
                             {% csrf_token %}
                                 <div class="news-card-edit-comment">
-                                    <table>
-                                        <tr>
-                                            <td>
-                                                {% if user.student.picture %}
-                                                    <div class="news-card-comment-user-pic"><img src="{{user.student.picture.url}}"></div>
-                                                {% else %}
-                                                    <div class="news-card-comment-user-pic"><img src="{% static 'assets/img/user.jpeg' %}" alt=""></div>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                {{ form.club }}
-                                            </td>
-                                        </tr>
-                                    </table>
+                                    {% if user.student.picture %}
+                                        <div class="news-card-comment-user-pic"><img src="{{user.student.picture.url}}"></div>
+                                    {% else %}
+                                        <div class="news-card-comment-user-pic"><img src="https://i.imgur.com/hczKIze.jpg" alt=""></div>
+                                    {% endif %}
                                     <textarea class="news-card-edit-comment-input" type="text" name="content" id=""></textarea>
-                                    <button type="submit" class="news-card-button"><i class="far fa-comment"></i></button>
-                                    {{ form.post.as_hidden }}
-                                    {% if form.errors %}
-                                        {% for field in form %}
-                                            {% for error in field.errors %}
-                                                <div class="login-errors">{{ error|escape }}</div>
-                                            {% endfor %}
-                                        {% endfor %}
-
-                                        {% for error in form.non_field_errors %}
+                                </div>
+                                Publier en tant que :
+                                <div class="news-card-edit-comment">
+                                    {{ form.club }}
+                                    <button class="button green-button" type="submit" class="news-card-button"><i class="far fa-comment"></i></button>
+                                </div>
+                                {{ form.post.as_hidden }}
+                                {% if form.errors %}
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
                                             <div class="login-errors">{{ error|escape }}</div>
                                         {% endfor %}
-                                    {% endif %}
-                                </div>
+                                    {% endfor %}
+
+                                    {% for error in form.non_field_errors %}
+                                        <div class="login-errors">{{ error|escape }}</div>
+                                    {% endfor %}
+                                {% endif %}
                             </form>
+                        </div>
                     </div>
-                </div>
                 {% endfor %}
             </div>
         </div>

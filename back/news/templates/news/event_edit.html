@@ -11,14 +11,60 @@
         {% include "sidenav.html" with active_link="news" %}
 
         <!--Content-->
-        <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-            {{EditEvent}}
-            <div>
-                <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
-                <input  type="submit" name="Supprimer" value="Supprimer">
-                <input  type="submit" name= "Valider" value="Valider">
+        <div class="content">
+            <div class="content-main">
+                {% if Edit %}
+                    <h3 class="page-title">Éditer un event</h3>
+                {% else %}
+                    <h3 class="page-title">Créer un event</h3>
+                {% endif %}
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="news-card">
+                        <div class="news-card-content">
+                            {{EditEvent.name.errors}}
+                            Nom de l'évènement :<br>
+                            {{EditEvent.name}}<br>
+
+                            {{EditEvent.description.errors}}
+                            Description de l'évènement :<br>
+                            {{EditEvent.description}}<br>
+
+                            {{EditEvent.date.errors}}
+                            Date de l'évènement :<br>
+                            {{EditEvent.date}}
+                            <script>
+                                $(function () {
+                                    $("#id_date").datetimepicker({
+                                    format: 'd/m/Y H:i',
+                                    });
+                                });
+                            </script><br>
+
+                            {{EditEvent.location.errors}}
+                            Où se déroulera l'évènement :<br>
+                            {{EditEvent.location}}<br>
+
+                            {{EditEvent.poster.errors}}
+                            Ajouter une image :<br>
+                            {{EditEvent.poster}}<br>
+
+                            {{EditEvent.club.errors}}
+                            Club :<br>
+                            {{EditEvent.club}}<br>
+                        </div>
+                        <div class="news-card-actions">
+                            <div class="news-card-popularity">
+                                <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
+                                <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                {% if Edit %}
+                                    <input class="button red-button" type="submit" name="Supprimer" value="Supprimer l'event">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-            </form>
+        </div>
     </body>
 </html>
