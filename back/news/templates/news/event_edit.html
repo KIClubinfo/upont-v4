@@ -32,7 +32,14 @@
 
                             {{EditEvent.date.errors}}
                             Date de l'évènement :<br>
-                            {{EditEvent.date}}<br>
+                            {{EditEvent.date}}
+                            <script>
+                                $(function () {
+                                    $("#id_date").datetimepicker({
+                                    format: 'd/m/Y H:i',
+                                    });
+                                });
+                            </script><br>
 
                             {{EditEvent.location.errors}}
                             Où se déroulera l'évènement :<br>
