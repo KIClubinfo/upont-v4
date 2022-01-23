@@ -140,7 +140,7 @@ img.logo{
         /* Styling */
         border-style: none; /* Faut etre sur la aussi */
     }
-    
+
     .sidenav{
         /* Sizing */
         min-width: 100vw;
@@ -166,7 +166,7 @@ img.logo{
         /* Styling */
         font-size: 1rem;
     }
-    
+
     .sidenav-first-link{
         /* Positioning */
         display: flex;
@@ -179,14 +179,14 @@ img.logo{
         /* Styling */
         border-bottom: solid var(--border-color) var(--border-width);
     }
-    
+
     .show-last-link{
         /* Sizing */
         margin: 0rem 4rem;
         /* Styling */
         border-top: solid var(--border-color) var(--border-width);
     }
-    
+
 
     img.logo{
         /* Sizing */
@@ -385,6 +385,11 @@ h1,h2,h3,h4,h5,h6{
     outline: 0;
 }
 
+.centered-div{
+    width: 100%;
+    text-align: center;
+}
+
 @media(max-width:856px){
     .search-input-group{
         /* Positioning */
@@ -431,7 +436,7 @@ h1,h2,h3,h4,h5,h6{
     /* Styling */
     font-size: 1rem;
     text-align: center;
-    
+
 }
 
 .user-name{
@@ -484,7 +489,7 @@ h1,h2,h3,h4,h5,h6{
     color: white;
     font-size: 1rem;
     font-weight: 400;
-    text-align:center;
+    text-align: center;
     border-radius: 0.5rem;
 }
 
@@ -648,9 +653,9 @@ h1,h2,h3,h4,h5,h6{
 
 .logo-col{
     /* Positioning */
-    display: flex; 
+    display: flex;
     flex-direction: column;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
     /* Styling */
     color: white;
@@ -1062,15 +1067,11 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .news-card-comments{
+    min-height: 6rem;
     padding: 0 1rem;
 }
 
 .news-card-comment-user-pic{
-    height: 6rem;
-    padding: 0 1rem;
-}
-
-.news-card-comments-user-pic{
     /* Positioning */
     display: flex;
     /* Sizing */
@@ -1085,7 +1086,6 @@ h1,h2,h3,h4,h5,h6{
     display: flex;
     justify-content: left;
     padding: 1rem 0rem;
-    align-items: center;
 }
 
 .news-card-comment-box{
@@ -1120,6 +1120,8 @@ h1,h2,h3,h4,h5,h6{
     font-size: 1rem;
     font-weight: 400;
     border-radius: 0.5rem;
+    align-items: center;
+    justify-content: center;
 }
 
 .news-card-edit-comment-input:focus{
