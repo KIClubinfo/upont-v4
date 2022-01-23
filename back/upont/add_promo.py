@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.core.exceptions import PermissionDenied
 from social.models import Promotion, Student
 
 
@@ -13,7 +14,7 @@ from social.models import Promotion, Student
 def add(request):
     order = "promo, nom, prénom, mail"
     if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse("login"))
+        raise PermissionDenied()
     context = {
         "order": order,
     }
