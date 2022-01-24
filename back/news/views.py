@@ -25,7 +25,7 @@ def posts(request):
             my_posts |= Post.objects.filter(club=membership.club)
 
         all_posts_and_forms = [
-            (post, CommentForm(post.id, student.id)) for post in all_posts_list
+            (post, CommentForm(post.id, student.user.id)) for post in all_posts_list
         ]
 
         my_comments = Comment.objects.filter(author__pk=student.id, club=None)
@@ -61,7 +61,7 @@ def posts(request):
                 my_posts |= Post.objects.filter(club=membership.club)
 
             all_posts_and_forms = [
-                (post, CommentForm(post.id, student.id)) for post in all_posts_list
+                (post, CommentForm(post.id, student.user.id)) for post in all_posts_list
             ]
             commented_post_index = 0
             for index, post in enumerate(all_posts_list):
