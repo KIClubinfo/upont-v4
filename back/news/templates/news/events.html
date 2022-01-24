@@ -49,7 +49,17 @@
                     <div class="news-card-actions">
                         <!--Likes-Comments-Favorite-->
                         <div class="news-card-popularity">
-                            <span><i class="fas fa-users" style="color: red;"></i> {{event.participants.count}} </span>
+                            <span><i class="fas fa-users" style="color: red;"></i>
+                                {% if event.shotgun %}
+                                    {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
+                                        0
+                                    {% else %}
+                                        {{event.shotgun.accepted_participations.count}}
+                                    {% endif %}
+                                {% else %}
+                                    {{event.participants.count}}
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
                     <div class="news-card-actions">
