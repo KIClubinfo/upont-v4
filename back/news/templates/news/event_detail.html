@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="content-main">
-                <h3 class="page-title">News : Events : Nom de l'event</h3>
+                <h3 class="page-title">News : Events : {{event.name}}</h3>
                 <div class="row">
                     {% if event_posts %}
                         <div class="col-lg-6">
@@ -115,11 +115,33 @@
                             <p><strong>Où ?</strong> {{event.location}}</p>
                             <p><strong>Description de l'évènement :</strong> {{event.description}}</p>
                             <div class="centered-div" style="margin: 2rem 0rem;">
-                                <a href="" class="button blue-button">Je participe</a>
-                                <a href="" class="button red-button">Je ne participe plus</a>
+                                {% if student in event.participants.all %}
+                                    <a href="{% url 'news:event_participate' event_id=event.id action='Unparticipate'%}" class="button red-button">Je ne participe plus</a>
+                                {% else %}
+                                    <a href="{% url 'news:event_participate' event_id=event.id action='Participate'%}" class="button blue-button">Je participe</a>
+                                {% endif %}
                                 <a href="{% url 'news:events' %}" class="button green-button">Retour à l'index</a>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-lg-12">
+                        {% if event.participants.all %}
+                            <br><br>
+                            <h3>Participants</h3>
+                            {% for participant in event.participants.all %}
+                                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                    <div class="user-card">
+                                        <div class="user-image"><img src="{% if participant.picture %}{{participant.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                        <div class="user-information">
+                                            <span class="user-name">{{participant.user.first_name}} {{participant.user.last_name}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <br><br>
+                            <h4>Cet évènement n'a pas encore d'inscrits :(</h4>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -93,7 +93,7 @@ def event_detail(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     event_posts = Post.objects.filter(event__pk=event_id).order_by("-date")
     is_member = Membership.objects.filter(student__pk=student.id, club=event.club)
-    context = {"event": event, "event_posts": event_posts, "is_member": is_member}
+    context = {"event": event, "event_posts": event_posts, "is_member": is_member, "student": student}
     return render(request, "news/event_detail.html", context)
 
 
@@ -153,6 +153,17 @@ def event_create(request):
         form = EditEvent(request.user.id)
     context["EditEvent"] = form
     return render(request, "news/event_edit.html", context)
+
+
+@login_required(login_url="/login/")
+def event_participate(request, event_id, action):
+    event = get_object_or_404(Event, id=event_id)
+    student = get_object_or_404(Student, user__id=request.user.id)
+    if action == "Unparticipate":
+        event.participants.remove(student)
+    elif action == "Participate":
+        event.participants.add(student)
+    return redirect("news:event_detail", event_id)
 
 
 @login_required(login_url="/login/")
