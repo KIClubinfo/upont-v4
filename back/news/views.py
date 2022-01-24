@@ -97,7 +97,7 @@ def event_detail(request, event_id):
     return render(request, "news/event_detail.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def event_edit(request, event_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     event = get_object_or_404(Event, pk=event_id)
@@ -134,7 +134,7 @@ def event_edit(request, event_id):
     return render(request, "news/event_edit.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def event_create(request):
     context = {}
     if request.method == "POST":
@@ -155,7 +155,7 @@ def event_create(request):
     return render(request, "news/event_edit.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def event_participate(request, event_id, action):
     event = get_object_or_404(Event, id=event_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -166,7 +166,7 @@ def event_participate(request, event_id, action):
     return redirect("news:event_detail", event_id)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def post_edit(request, post_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     post = get_object_or_404(Post, pk=post_id)
@@ -209,7 +209,7 @@ def post_edit(request, post_id):
     return render(request, "news/post_edit.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def post_create(request):
     context = {}
     if request.method == "POST":
@@ -234,7 +234,7 @@ def post_create(request):
     return render(request, "news/post_edit.html", context)
 
 
-@login_required(login_url="/login/")
+@login_required()
 def post_like(request, post_id, action):
     post = get_object_or_404(Post, id=post_id)
     student = get_object_or_404(Student, user__id=request.user.id)
