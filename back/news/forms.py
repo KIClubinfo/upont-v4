@@ -88,6 +88,14 @@ class AddShotgun(forms.ModelForm):
             "size",
             "requires_motivation",
         )
+        widgets = {
+            "club": forms.Select(attrs={"class": "profil-select"}),
+            "title": forms.TextInput(attrs={"class": "profil-input"}),
+            "content": forms.TextInput(attrs={"class": "profil-input"}),
+            "starting_date": forms.TextInput(attrs={"class": "profil-input"}),
+            "ending_date": forms.TextInput(attrs={"class": "profil-input"}),
+            "size": forms.TextInput(attrs={"class": "profil-input"}),
+        }
 
     def __init__(self, clubs, *args, **kwargs):
         super(AddShotgun, self).__init__(*args, **kwargs)
