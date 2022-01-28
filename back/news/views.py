@@ -263,29 +263,23 @@ def shotguns(request):
     user_shotguns = []
     for participation in user_participations:
         user_shotguns.append(participation.shotgun)
-    has_user_shotguns = not len(user_participations) == 0
     # shotguns that are not ended and to which the user did not participate :
     next_shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by(
         "starting_date"
     )
     for user_shotgun in user_shotguns:
         next_shotguns = next_shotguns.exclude(id=user_shotgun.pk)
-    has_next_shotguns = not len(next_shotguns) == 0
     # shotguns that are ended and to which the user did not participate :
     old_shotguns = Shotgun.objects.filter(ending_date__lte=timezone.now()).order_by(
         "ending_date"
     )
     for user_shotgun in user_shotguns:
         old_shotguns = old_shotguns.exclude(id=user_shotgun.pk)
-    has_old_shotguns = not len(old_shotguns) == 0
 
     context = {
         "next_shotguns": next_shotguns,
-        "has_next_shotguns": has_next_shotguns,
         "old_shotguns": old_shotguns,
-        "has_old_shotguns": has_old_shotguns,
         "user_shotguns": user_shotguns,
-        "has_user_shotguns": has_user_shotguns,
     }
     return render(request, "news/shotguns.html", context)
 
