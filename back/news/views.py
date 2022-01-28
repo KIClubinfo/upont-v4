@@ -355,10 +355,8 @@ def shotguns_admin(request):
             clubs_and_shotguns.append(
                 {"club": club_membership.club, "shotguns": club_shotguns}
             )
-    not_empty = len(clubs_and_shotguns) > 0
     context = {
         "clubs_and_shotguns": clubs_and_shotguns,
-        "not_empty": not_empty,
     }
     return render(request, "news/shotguns_admin.html", context)
 
