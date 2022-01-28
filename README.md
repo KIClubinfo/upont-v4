@@ -120,6 +120,7 @@ Les variables d'environnement suivantes sont placées dans le fichier *.env* :
 | BACK_PORT | Port d'accès au site (externe) | 8000 | **** |
 | SENDGRID_API_KEY | Clé permettant d'envoyer des mails avec l'API sendgrid (à récupérer sur le site de Sendgrid) | key | SECRET |
 | ADMIN_EMAIL | Adressse recevant les mails d'administration de Django pour alertir de certaines actions (création d'un compte...) | upont@enpc.org | Autre |
+| DEFAULT_FROM_EMAIL | Adresse envoyant les mails (avec Sendigrd, n'importe quelle adresse en @enpc.org fonctionne) | upont@enpc.org | upont@enpc.org |
 | SECRET_KEY | Clé secrète utilisée par Django | ChangeThatPlease | SECRET |
 | DEBUG | Défini si le mode DEBUG est activé. | True | False |
 | GUNICORN_NB_WORKERS | Nombre de workers pour le WSGI gunicorn |  | 10 |
