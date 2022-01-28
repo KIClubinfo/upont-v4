@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "back"
+version = "0.1.0"
+description = ""
+authors = ["bastienlc <bastien.le-chenadec@eleves.enpc.fr>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Django = "3.2.11"
+psycopg2 = "2.8.2"
+Pillow = "9.0.0"
+django-tellme = "0.7.2"
+six = "1.16.0"
+django-sendgrid-v5 = "1.2.0"
+django-environ = "0.8.1"
+gunicorn = "20.1.0"
+django-cas-ng = "4.3.0"
+
+[tool.poetry.dev-dependencies]
