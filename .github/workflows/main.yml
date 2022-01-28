@@ -15,5 +15,6 @@ jobs:
           python-version: 3.9.6
           architecture: x64
           cache: 'pip'
+      - run: cd back/
       - run: pip install -r requirements.txt
       - run: python manage.py test
