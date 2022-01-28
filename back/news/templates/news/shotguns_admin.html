@@ -61,6 +61,9 @@
                     <h3>Tu n'as aucun shotgun à administrer !</h3>
                 {% endfor %}
             </div>
+            <div style="text-align:center">
+                <a href="{% url 'news:shotguns' %}" style="text-decoration: none"><button class="button blue-button">Retour à l'index</button></a>
+            </div>
         </div>
         <script src="{% static 'js/sidenav.js' %}"></script>
     </body>
