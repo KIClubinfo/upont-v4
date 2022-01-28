@@ -275,11 +275,15 @@ def shotguns(request):
     )
     for user_shotgun in user_shotguns:
         old_shotguns = old_shotguns.exclude(id=user_shotgun.pk)
+    
+    # check is user is admin of at least one club :
+    display_admin_button = len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
 
     context = {
         "next_shotguns": next_shotguns,
         "old_shotguns": old_shotguns,
         "user_shotguns": user_shotguns,
+        "display_admin_button": display_admin_button,
     }
     return render(request, "news/shotguns.html", context)
 

@@ -1,6 +1,6 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Élèves" %}
+{% include "header.html" with title="Shotguns" %}
 
     <!--Body-->
     <body>
@@ -133,6 +133,10 @@
                 <div style="text-align:center">
                     <br><br>
                     <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
+                    {% if display_admin_button %}
+                        <br>
+                        <a href="{% url 'news:shotguns_admin' %}" style="text-decoration: none"><button class="button blue-button">Administration des shotguns</button></a>
+                    {% endif %}
                 </div>
             </div>
         </div>
