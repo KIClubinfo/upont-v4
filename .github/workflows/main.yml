@@ -9,12 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9.6
-          architecture: x64
-          cache: 'pip'
-      - run: cd back/
-      - run: pip install -r requirements.txt
-      - run: python manage.py test
+      - name: Build containers
+        run: docker-compose build
+      - name: Start containers
+        run: docker-compose up -d
+      - name: Run tests
+        run: docker-compose exec back python manage.py test
