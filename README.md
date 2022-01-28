@@ -93,15 +93,15 @@ $ python manage.py migrate
 
 Lancer le build :
 ```
-$ bash build.sh
+$ bash scripts/build.sh
 ```
 
 Lancer le serveur :
 ```
-$ bash start.sh
+$ bash scripts/start.sh
 ```
 
 Stopper le serveur :
 ```
-$ bash stop.sh
+$ bash scripts/stop.sh
 ```
