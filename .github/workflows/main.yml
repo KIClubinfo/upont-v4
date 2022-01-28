@@ -14,4 +14,4 @@ jobs:
       - name: Start containers
         run: docker-compose up -d
       - name: Run tests
-        run: docker-compose exec back python manage.py test
+        run: docker-compose exec -T back python manage.py test
