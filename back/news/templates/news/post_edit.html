@@ -2,64 +2,64 @@
 <!--Header-->
 {% include "header.html" with title="Modifier la publication" %}
 
-    <!--Body-->
-    <body>
-        <!--Feedback Button-->
-        {% include "feedback.html" %}
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
 
-        <!--Sidenav-->
-        {% include "sidenav.html" with active_link="news" %}
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="news" %}
 
-        <!--Content-->
-        <div class="content">
-            <div class="content-main">
-                {% if Edit %}
-                    <h3 class="page-title">Éditer un post</h3>
-                {% else %}
-                    <h3 class="page-title">Créer un post</h3>
-                {% endif %}
-                <form action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="news-card">
-                        <div class="news-card-content">
-                            {{EditPost.event.errors}}
-                            Évènement concerné :<br>
-                            {{EditPost.event}}<br>
-                            {{EditPost.club.errors}}
-                            Publier en tant que :<br>
-                            {{EditPost.club}}<br>
-                            {{EditPost.title.errors}}
-                            Titre :<br>
-                            {{EditPost.title}}<br>
-                            {{EditPost.content.errors}}
-                            Description :<br>
-                            {{EditPost.content}}<br>
-                            {{EditPost.illustration.errors}}
-                            Ajouter une image :<br>
-                            {{EditPost.illustration}}<br>
+    <!--Content-->
+    <div class="content">
+        <div class="content-main">
+            {% if Edit %}
+                <h3 class="page-title">Éditer un post</h3>
+            {% else %}
+                <h3 class="page-title">Créer un post</h3>
+            {% endif %}
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="news-card">
+                    <div class="news-card-content">
+                        {{EditPost.event.errors}}
+                        Évènement concerné :<br>
+                        {{EditPost.event}}<br>
+                        {{EditPost.club.errors}}
+                        Publier en tant que :<br>
+                        {{EditPost.club}}<br>
+                        {{EditPost.title.errors}}
+                        Titre :<br>
+                        {{EditPost.title}}<br>
+                        {{EditPost.content.errors}}
+                        Description :<br>
+                        {{EditPost.content}}<br>
+                        {{EditPost.illustration.errors}}
+                        Ajouter une image :<br>
+                        {{EditPost.illustration}}<br>
+                    </div>
+                    {%if post.illustration%}
+                        <div class="news-card-images">
+                            <!--All-Images-Linked-With-The-Post-->
+                            <div class="news-card-carousel" data-flickity='{}'>
+                                <div class="carousel-cell"><img src="{{post.illustration.url}}" style="height: 100%;" alt=""></div>
+                            </div>
                         </div>
-                        {%if post.illustration%}
-                            <div class="news-card-images">
-                                <!--All-Images-Linked-With-The-Post-->
-                                <div class="news-card-carousel" data-flickity='{}'>
-                                    <div class="carousel-cell"><img src="{{post.illustration.url}}" style="height: 100%;" alt=""></div>
-                                </div>
-                            </div>
-                        {%endif%}
-                        <div class="news-card-actions">
-                            <div class="news-card-popularity">
-                                <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
-                                <input class="button green-button" type="submit" name= "Valider" value="Valider">
-                                {% if Edit %}
-                                    <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
-                                {% endif %}
-                            </div>
+                    {%endif%}
+                    <div class="news-card-actions">
+                        <div class="news-card-popularity">
+                            <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
+                            <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                            {% if Edit %}
+                                <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
+                            {% endif %}
                         </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
-        <script src="{% static 'js/sidenav.js' %}"></script>
-        <script src="{% static 'js/flickity.pkgd.min.js' %}"></script>
-    </body>
+    </div>
+    <script src="{% static 'js/sidenav.js' %}"></script>
+    <script src="{% static 'js/flickity.pkgd.min.js' %}"></script>
+</body>
 </html>

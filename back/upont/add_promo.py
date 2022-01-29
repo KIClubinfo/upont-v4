@@ -3,10 +3,10 @@ import io
 
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.core.exceptions import PermissionDenied
 from social.models import Promotion, Student
 
 

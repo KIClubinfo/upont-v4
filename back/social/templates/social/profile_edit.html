@@ -2,79 +2,79 @@
 <!--Header-->
 {% include "header.html" with title="Édition du profil" %}
 
-    <!--Body-->
-    <body>
-        <!--Feedback Button-->
-        {% include "feedback.html" %}
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
 
-        <!--Sidenav-->
-        {% include "sidenav.html" with active_link="profile" %}
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="profile" %}
 
-        <!--Content-->
-        <div class="content">
-            <div class="content-main">
-                <div class="box profil-box">
-                    <div class="row">
-                        <div class="col-lg-8">
+    <!--Content-->
+    <div class="content">
+        <div class="content-main">
+            <div class="box profil-box">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                            </div>
+                            <div class="col-lg-7" style="text-align: center;">
+                                <div class="section-title">Mes informations personnelles</div>
+                            </div>
+                        </div>
+
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ EditProfile.non_field_errors }}
                             <div class="row">
-                                <div class="col-lg-5">
-                                    <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                <div class="col-lg-5" style="text-align: center;">
+                                    <div class="profil-information-box">{% if student.user.first_name %}{{student.user.first_name}}{% else %}---Prénom---{% endif %}</div>
+                                    {{ EditProfile.phone_number.errors }}
+                                    {{ EditProfile.phone_number }}
+                                    {{ EditProfile.gender.errors }}
+                                    {{ EditProfile.gender }}
                                 </div>
                                 <div class="col-lg-7" style="text-align: center;">
-                                    <div class="section-title">Mes informations personnelles</div>
+                                    <div class="profil-information-box">{% if student.user.last_name %}{{student.user.last_name}}{% else %}---Nom---{% endif %}</div>
+                                    {{ EditProfile.department.errors }}
+                                    {{ EditProfile.department }}
+                                    {{ EditProfile.picture }}
+                                    <div style="text-align: center;">
+                                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                        <input class="button red-button" type="submit" name="Annuler" value="Annuler">
+                                    </div>
                                 </div>
                             </div>
+                        </form>
 
-                                <form action="" method="post" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    {{ EditProfile.non_field_errors }}
-                                    <div class="row">
-                                        <div class="col-lg-5" style="text-align: center;">
-                                            <div class="profil-information-box">{% if student.user.first_name %}{{student.user.first_name}}{% else %}---Prénom---{% endif %}</div>
-                                            {{ EditProfile.phone_number.errors }}
-                                            {{ EditProfile.phone_number }}
-                                            {{ EditProfile.gender.errors }}
-                                            {{ EditProfile.gender }}
-                                        </div>
-                                        <div class="col-lg-7" style="text-align: center;">
-                                            <div class="profil-information-box">{% if student.user.last_name %}{{student.user.last_name}}{% else %}---Nom---{% endif %}</div>
-                                            {{ EditProfile.department.errors }}
-                                            {{ EditProfile.department }}
-                                            {{ EditProfile.picture }}
-                                            <div style="text-align: center;">
-                                                <input class="button green-button" type="submit" name= "Valider" value="Valider">
-                                                <input class="button red-button" type="submit" name="Annuler" value="Annuler">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-
-                        </div>
-                        <div class="col-lg-4" style="border-left: solid hsla(0, 0%, 100%, 0.25) 0.25px;">
-                            <div class="section-title">Mes activités associatives</div>
-                            {% if membership_club_list %}
-                                {% for membership in membership_club_list %}
-                                    <div class="user-card">
-                                        {% if membership.club.logo %}
-                                            <div class="user-image"><img src="{{membership.club.logo.url}}" alt=""></div>
-                                        {% else %}
-                                            <div class="user-image"><img src="{% static 'assets/img/bde.png' %}" alt=""></div>
-                                        {% endif %}
-                                        <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}{{membership.club.nickname}}{% endif %}</span> <span>{{membership.role.name}}</span></div>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <p>Je ne suis pas membre d'un club.</p> <!--TO DO : écrire ça bien-->
-                            {% endif %}
-                        </div>
+                    </div>
+                    <div class="col-lg-4" style="border-left: solid hsla(0, 0%, 100%, 0.25) 0.25px;">
+                        <div class="section-title">Mes activités associatives</div>
+                        {% if membership_club_list %}
+                            {% for membership in membership_club_list %}
+                                <div class="user-card">
+                                    {% if membership.club.logo %}
+                                        <div class="user-image"><img src="{{membership.club.logo.url}}" alt=""></div>
+                                    {% else %}
+                                        <div class="user-image"><img src="{% static 'assets/img/bde.png' %}" alt=""></div>
+                                    {% endif %}
+                                    <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}{{membership.club.nickname}}{% endif %}</span> <span>{{membership.role.name}}</span></div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Je ne suis pas membre d'un club.</p> <!--TO DO : écrire ça bien-->
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-        <!--EndContent-->
+    </div>
+    <!--EndContent-->
 
-        <!--Scripts-->
-        <script src="{% static 'js/sidenav.js' %}"></script>
-    </body>
+    <!--Scripts-->
+    <script src="{% static 'js/sidenav.js' %}"></script>
+</body>
 </html>
 
