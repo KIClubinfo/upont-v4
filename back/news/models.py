@@ -109,7 +109,7 @@ class Shotgun(models.Model):
         return timezone.now() > self.starting_date
 
     def is_ended(self):
-        if self.ending_date == None:
+        if self.ending_date is None:
             return False
         return timezone.now() > self.ending_date
 

@@ -19,7 +19,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
-from upont.add_promo import add
 
 from . import views
 
@@ -28,7 +27,7 @@ urlpatterns = [
     path("news/", include("news.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
-    path("add_promo/", add, name="add_promo"),
+    path("add_promo/", views.add, name="add_promo"),
     path(
         "login/",
         auth_views.LoginView.as_view(redirect_authenticated_user=True),

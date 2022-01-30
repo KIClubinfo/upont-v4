@@ -1,57 +1,57 @@
 {% load static %}
 <!--Header-->
 {% include "header.html" with title="Connexion" %}
-    <!--Body-->
-    <body>
-        <!--Background-->
-        {% include "registration/background.html" %}
-        {% include "feedback.html" %}
+<!--Body-->
+<body>
+    <!--Background-->
+    {% include "registration/background.html" %}
+    {% include "feedback.html" %}
 
-        <!--Login Card-->
-        <div class="login-content">
-            <div class="login-card">
-                <div class="row h-100">
-                    <!--Login Card Left Side-->
-                    <div class="col-sm-5 logo-col" style="padding: 1rem;">
-                        <img class="login-logo" src="{% static 'assets/img/logo.png' %}"  alt="">
-                        <h1 class="login-title">Bienvenue sur uPont</h1>
-                    </div>
-                    <!--Login Card Right Side-->
-                    <div class="col-sm-7 white-border" style="padding: 1rem;">
-                        <!--Login Form-->
-                        <form class="login-card-form" method="post" action="{% url 'login' %}">
+    <!--Login Card-->
+    <div class="login-content">
+        <div class="login-card">
+            <div class="row h-100">
+                <!--Login Card Left Side-->
+                <div class="col-sm-5 logo-col" style="padding: 1rem;">
+                    <img class="login-logo" src="{% static 'assets/img/logo.png' %}"  alt="">
+                    <h1 class="login-title">Bienvenue sur uPont</h1>
+                </div>
+                <!--Login Card Right Side-->
+                <div class="col-sm-7 white-border" style="padding: 1rem;">
+                    <!--Login Form-->
+                    <form class="login-card-form" method="post" action="{% url 'login' %}">
                         {% csrf_token %}
-                            <h1 class="login-title">Connecte-toi !</h1>
-                            <!--Indications if not connected-->
-                            {% if next %}
-                                {% if user.is_authenticated %}
-                                    <p class="login-links">Ton compte n'a pas accès à cette page. Pour continuer, connecte-toi avec un compte ayant les droits suffisants.</p>
-                                {% else %}
-                                    <p class="login-links">Connecte-toi pour accéder à cette page !</p>
-                                {% endif %}
+                        <h1 class="login-title">Connecte-toi !</h1>
+                        <!--Indications if not connected-->
+                        {% if next %}
+                            {% if user.is_authenticated %}
+                                <p class="login-links">Ton compte n'a pas accès à cette page. Pour continuer, connecte-toi avec un compte ayant les droits suffisants.</p>
+                            {% else %}
+                                <p class="login-links">Connecte-toi pour accéder à cette page !</p>
                             {% endif %}
-                            <!--Login Inputs-->
-                            <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username" required>
-                            <input type="password" class="login-input" placeholder="mot de passe" name="password" required>
-                            <!--Login Links-->
-                            <p class="login-links"><a class="link" href="{% url 'cas_ng_login' %}">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
-                            <!--Login Errors-->
-                            {% if form.errors %}
-                                <p class="login-errors">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
-                            {% endif %}
-                            <!--Submit Button-->
-                            <input type="submit" class="btn btn-info" value="Se connecter">
-                            <input type="hidden" name="next" value="{{ next }}">
-                        </form>
-                    </div>
+                        {% endif %}
+                        <!--Login Inputs-->
+                        <input type="email" class="login-input" placeholder="prenom.nom@eleves.enpc.fr" name="username" required>
+                        <input type="password" class="login-input" placeholder="mot de passe" name="password" required>
+                        <!--Login Links-->
+                        <p class="login-links"><a class="link" href="{% url 'cas_ng_login' %}">Connexion SSO</a> - <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié</a> - <a class="link" href="">Aide</a></p>
+                        <!--Login Errors-->
+                        {% if form.errors %}
+                            <p class="login-errors">Identifiant ou mot de passe erroné... Rentre-les à nouveau !</p>
+                        {% endif %}
+                        <!--Submit Button-->
+                        <input type="submit" class="btn btn-info" value="Se connecter">
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!--Scripts for apparition-->
-        <!--Need to get ride of the link for production-->
-        <script src="https://unpkg.com/scrollreveal"></script>
-        <script src="{% static 'js/login_appear.js' %}"></script>
+    <!--Scripts for apparition-->
+    <!--Need to get ride of the link for production-->
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="{% static 'js/login_appear.js' %}"></script>
 
-    </body>
+</body>
 </html>

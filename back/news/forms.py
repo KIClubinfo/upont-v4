@@ -1,5 +1,5 @@
 from django import forms
-from social.models import Club, Membership
+from social.models import Membership
 
 from .models import Comment, Event, Post, Shotgun
 

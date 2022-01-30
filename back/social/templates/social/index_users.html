@@ -2,54 +2,54 @@
 <!--Header-->
 {% include "header.html" with title="Élèves" %}
 
-    <!--Body-->
-    <body>
-        <!--Feedback Button-->
-        {% include "feedback.html" %}
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
 
-        <!--Sidenav-->
-        {% include "sidenav.html" with active_link="users" %}
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="users" %}
 
-        <!--Content-->
-        <div class="content">
-            {% include "../social/searchbar.html" with all_student_list=all_student_list %}
-            <div class="content-main">
-                <h3 class="page-title">
-                    {% if searched_expression %}
-                        Résultats de la recherche "{{searched_expression}}"
-                    {% else %}
-                        Élèves
-                    {% endif %}
-                </h3>
-                <div class="row">
-                    {% if student_displayed_list %}
-                        {% for student in student_displayed_list %}
-                            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
-                                <div class="user-card">
-                                    <div class="user-image">
-                                        <img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
-                                    </div>
-                                    <div class="user-information">
-                                        <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
-                                        <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
-                                    </div>
-                                    <a href="{% url 'social:profile_viewed' student.user.id %}" class="stretched-link"></a>
+    <!--Content-->
+    <div class="content">
+        {% include "../social/searchbar.html" with all_student_list=all_student_list %}
+        <div class="content-main">
+            <h3 class="page-title">
+                {% if searched_expression %}
+                    Résultats de la recherche "{{searched_expression}}"
+                {% else %}
+                    Élèves
+                {% endif %}
+            </h3>
+            <div class="row">
+                {% if student_displayed_list %}
+                    {% for student in student_displayed_list %}
+                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                            <div class="user-card">
+                                <div class="user-image">
+                                    <img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
                                 </div>
+                                <div class="user-information">
+                                    <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
+                                    <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
+                                </div>
+                                <a href="{% url 'social:profile_viewed' student.user.id %}" class="stretched-link"></a>
                             </div>
-                        {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {% if searched_expression %}
+                        <p>Aucun élève n'a été trouvé</p>
                     {% else %}
-                        {% if searched_expression %}
-                            <p>Aucun élève n'a été trouvé</p>
-                        {% else %}
-                            <p>Il n'y a pas d'élèves dans la base de données.</p>
-                        {% endif %}
+                        <p>Il n'y a pas d'élèves dans la base de données.</p>
                     {% endif %}
-                </div>
+                {% endif %}
             </div>
         </div>
-        <!--EndContent-->
+    </div>
+    <!--EndContent-->
 
-        <!--Scripts-->
-        <script src="{% static 'js/sidenav.js' %}"></script>
-    </body>
+    <!--Scripts-->
+    <script src="{% static 'js/sidenav.js' %}"></script>
+</body>
 </html>

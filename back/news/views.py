@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.http import Http404, HttpResponseRedirect
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -12,8 +12,12 @@ from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
 
 
-@login_required()
+@login_required
 def posts(request):
+    """
+    Fetches posts with associated empty forms to publish comments, as well as the user's posts and comments.
+    If invoked with POST request, validates the form's data and creates the corresponding comment.
+    """
     student = get_object_or_404(Student, user__id=request.user.id)
 
     if request.method == "GET":
@@ -42,7 +46,7 @@ def posts(request):
     if request.method == "POST":
         commented_post_id = request.POST.get("post")
         commented_post = get_object_or_404(Post, id=commented_post_id)
-        filled_form = CommentForm(commented_post_id, student.id, data=request.POST)
+        filled_form = CommentForm(commented_post_id, student.user.id, data=request.POST)
 
         if filled_form.is_valid():
             new_comment = filled_form.save(commit=False)
@@ -82,22 +86,29 @@ def posts(request):
             return render(request, "news/posts.html", context)
 
 
+@login_required
 def events(request):
     all_events_list = Event.objects.order_by("-date")
     context = {"all_events_list": all_events_list}
     return render(request, "news/events.html", context)
 
 
+@login_required
 def event_detail(request, event_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     event = get_object_or_404(Event, pk=event_id)
     event_posts = Post.objects.filter(event__pk=event_id).order_by("-date")
     is_member = Membership.objects.filter(student__pk=student.id, club=event.club)
-    context = {"event": event, "event_posts": event_posts, "is_member": is_member, "student": student}
+    context = {
+        "event": event,
+        "event_posts": event_posts,
+        "is_member": is_member,
+        "student": student,
+    }
     return render(request, "news/event_detail.html", context)
 
 
-@login_required()
+@login_required
 def event_edit(request, event_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     event = get_object_or_404(Event, pk=event_id)
@@ -134,7 +145,7 @@ def event_edit(request, event_id):
     return render(request, "news/event_edit.html", context)
 
 
-@login_required()
+@login_required
 def event_create(request):
     context = {}
     if request.method == "POST":
@@ -155,7 +166,7 @@ def event_create(request):
     return render(request, "news/event_edit.html", context)
 
 
-@login_required()
+@login_required
 def event_participate(request, event_id, action):
     event = get_object_or_404(Event, id=event_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -166,7 +177,7 @@ def event_participate(request, event_id, action):
     return redirect("news:event_detail", event_id)
 
 
-@login_required()
+@login_required
 def post_edit(request, post_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     post = get_object_or_404(Post, pk=post_id)
@@ -209,7 +220,7 @@ def post_edit(request, post_id):
     return render(request, "news/post_edit.html", context)
 
 
-@login_required()
+@login_required
 def post_create(request):
     context = {}
     if request.method == "POST":
@@ -234,7 +245,7 @@ def post_create(request):
     return render(request, "news/post_edit.html", context)
 
 
-@login_required()
+@login_required
 def post_like(request, post_id, action):
     post = get_object_or_404(Post, id=post_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -245,17 +256,17 @@ def post_like(request, post_id, action):
     return redirect("news:posts")
 
 
-@login_required()
-def comment_delete(request, comment_id, post_id):
+@login_required
+def delete_comment(request, comment_id, post_id):
     comment = get_object_or_404(Comment, id=comment_id)
     student = get_object_or_404(Student, user__id=request.user.id)
-    student_clubs = student.clubs
+    student_clubs = student.clubs.all()
     if comment.author.pk == student.pk or (comment.club in student_clubs):
         comment.delete()
     return redirect(reverse("news:posts") + f"#{post_id}")
 
 
-@login_required()
+@login_required
 def shotguns(request):
     # shotguns to which the user participated :
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -263,34 +274,34 @@ def shotguns(request):
     user_shotguns = []
     for participation in user_participations:
         user_shotguns.append(participation.shotgun)
-    has_user_shotguns = not len(user_participations) == 0
     # shotguns that are not ended and to which the user did not participate :
     next_shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by(
         "starting_date"
     )
     for user_shotgun in user_shotguns:
         next_shotguns = next_shotguns.exclude(id=user_shotgun.pk)
-    has_next_shotguns = not len(next_shotguns) == 0
     # shotguns that are ended and to which the user did not participate :
     old_shotguns = Shotgun.objects.filter(ending_date__lte=timezone.now()).order_by(
         "ending_date"
     )
     for user_shotgun in user_shotguns:
         old_shotguns = old_shotguns.exclude(id=user_shotgun.pk)
-    has_old_shotguns = not len(old_shotguns) == 0
+
+    # check is user is admin of at least one club :
+    display_admin_button = (
+        len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
+    )
 
     context = {
         "next_shotguns": next_shotguns,
-        "has_next_shotguns": has_next_shotguns,
         "old_shotguns": old_shotguns,
-        "has_old_shotguns": has_old_shotguns,
         "user_shotguns": user_shotguns,
-        "has_user_shotguns": has_user_shotguns,
+        "display_admin_button": display_admin_button,
     }
     return render(request, "news/shotguns.html", context)
 
 
-@login_required()
+@login_required
 def shotgun_detail(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -311,7 +322,7 @@ def shotgun_detail(request, shotgun_id):
     return render(request, "news/shotgun_detail.html", context)
 
 
-@login_required()
+@login_required
 def shotgun_participate(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -348,7 +359,7 @@ def shotgun_participate(request, shotgun_id):
     return HttpResponseRedirect(reverse("news:shotgun_detail", args=(shotgun_id,)))
 
 
-@login_required()
+@login_required
 def shotguns_admin(request):
     student = get_object_or_404(Student, user__id=request.user.id)
     clubs_admin_memberships = Membership.objects.filter(
@@ -361,15 +372,13 @@ def shotguns_admin(request):
             clubs_and_shotguns.append(
                 {"club": club_membership.club, "shotguns": club_shotguns}
             )
-    not_empty = len(clubs_and_shotguns) > 0
     context = {
         "clubs_and_shotguns": clubs_and_shotguns,
-        "not_empty": not_empty,
     }
     return render(request, "news/shotguns_admin.html", context)
 
 
-@login_required()
+@login_required
 def shotguns_admin_detail(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -381,7 +390,7 @@ def shotguns_admin_detail(request, shotgun_id):
     return render(request, "news/shotguns_admin_detail.html", context)
 
 
-@login_required()
+@login_required
 def fail_participation(request, participation_id):
     participation = get_object_or_404(Participation, pk=participation_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -394,7 +403,7 @@ def fail_participation(request, participation_id):
     )
 
 
-@login_required()
+@login_required
 def unfail_participation(request, participation_id):
     participation = get_object_or_404(Participation, pk=participation_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -407,18 +416,19 @@ def unfail_participation(request, participation_id):
     )
 
 
-@login_required()
+@login_required
 def new_shotgun(request):
     student = get_object_or_404(Student, user__id=request.user.id)
-    clubs_memberships = Membership.objects.filter(student__pk=student.id, is_admin=True)
+    admin_clubs_memberships = Membership.objects.filter(
+        student__pk=student.id, is_admin=True
+    )
     clubs = []
-    for membership in clubs_memberships:
+    for membership in admin_clubs_memberships:
         clubs.append(membership.club)
 
     if request.method == "GET":
         form = AddShotgun(clubs)
         context = {
-            "clubs": clubs,
             "has_clubs_admins": len(clubs) > 0,
             "form": form,
         }
@@ -435,7 +445,7 @@ def new_shotgun(request):
             return HttpResponseRedirect(reverse("news:shotguns"))
 
 
-@login_required()
+@login_required
 def delete_shotgun(request, shotgun_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
@@ -453,7 +463,7 @@ def delete_shotgun(request, shotgun_id):
         return HttpResponseRedirect(reverse("news:shotguns_admin"))
 
 
-@login_required()
+@login_required
 def edit_shotgun(request, shotgun_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
@@ -485,7 +495,7 @@ def edit_shotgun(request, shotgun_id):
         raise PermissionDenied()
 
 
-@login_required()
+@login_required
 def publish_shotgun_results(request, shotgun_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)

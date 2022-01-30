@@ -115,7 +115,7 @@ DATABASES = {
 # Login redirection
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "social:index_users"
+LOGIN_REDIRECT_URL = "news:posts"
 
 
 # Password validation
@@ -170,6 +170,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Fixtures directory
 FIXTURE_DIRS = ["/fixtures/"]
 
 # Default media folder
