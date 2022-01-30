@@ -14,6 +14,10 @@ from .models import Comment, Event, Participation, Post, Shotgun
 
 @login_required
 def posts(request):
+    """
+    Fetches posts with associated empty forms to publish comments, as well as the user's posts and comments.
+    If invoked with POST request, validates the form's data and creates the corresponding comment.
+    """
     student = get_object_or_404(Student, user__id=request.user.id)
 
     if request.method == "GET":
@@ -42,7 +46,7 @@ def posts(request):
     if request.method == "POST":
         commented_post_id = request.POST.get("post")
         commented_post = get_object_or_404(Post, id=commented_post_id)
-        filled_form = CommentForm(commented_post_id, student.id, data=request.POST)
+        filled_form = CommentForm(commented_post_id, student.user.id, data=request.POST)
 
         if filled_form.is_valid():
             new_comment = filled_form.save(commit=False)
