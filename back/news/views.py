@@ -408,15 +408,14 @@ def unfail_participation(request, participation_id):
 @login_required
 def new_shotgun(request):
     student = get_object_or_404(Student, user__id=request.user.id)
-    clubs_memberships = Membership.objects.filter(student__pk=student.id, is_admin=True)
+    admin_clubs_memberships = Membership.objects.filter(student__pk=student.id, is_admin=True)
     clubs = []
-    for membership in clubs_memberships:
+    for membership in admin_clubs_memberships:
         clubs.append(membership.club)
 
     if request.method == "GET":
         form = AddShotgun(clubs)
         context = {
-            "clubs": clubs,
             "has_clubs_admins": len(clubs) > 0,
             "form": form,
         }
