@@ -40,11 +40,12 @@ def media(request, path):
         return HttpResponseForbidden()
 
 
+@login_required
 def page_not_created(request):
     return render(request, "page_not_created.html")
 
 
-@login_required()
+@login_required
 def add(request):
     order = "promo, nom, prénom, mail"
     if not request.user.is_superuser:

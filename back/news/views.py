@@ -12,7 +12,7 @@ from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
 
 
-@login_required()
+@login_required
 def posts(request):
     student = get_object_or_404(Student, user__id=request.user.id)
 
@@ -82,12 +82,14 @@ def posts(request):
             return render(request, "news/posts.html", context)
 
 
+@login_required
 def events(request):
     all_events_list = Event.objects.order_by("-date")
     context = {"all_events_list": all_events_list}
     return render(request, "news/events.html", context)
 
 
+@login_required
 def event_detail(request, event_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     event = get_object_or_404(Event, pk=event_id)
@@ -97,7 +99,7 @@ def event_detail(request, event_id):
     return render(request, "news/event_detail.html", context)
 
 
-@login_required()
+@login_required
 def event_edit(request, event_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     event = get_object_or_404(Event, pk=event_id)
@@ -134,7 +136,7 @@ def event_edit(request, event_id):
     return render(request, "news/event_edit.html", context)
 
 
-@login_required()
+@login_required
 def event_create(request):
     context = {}
     if request.method == "POST":
@@ -155,7 +157,7 @@ def event_create(request):
     return render(request, "news/event_edit.html", context)
 
 
-@login_required()
+@login_required
 def event_participate(request, event_id, action):
     event = get_object_or_404(Event, id=event_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -166,7 +168,7 @@ def event_participate(request, event_id, action):
     return redirect("news:event_detail", event_id)
 
 
-@login_required()
+@login_required
 def post_edit(request, post_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     post = get_object_or_404(Post, pk=post_id)
@@ -209,7 +211,7 @@ def post_edit(request, post_id):
     return render(request, "news/post_edit.html", context)
 
 
-@login_required()
+@login_required
 def post_create(request):
     context = {}
     if request.method == "POST":
@@ -234,7 +236,7 @@ def post_create(request):
     return render(request, "news/post_edit.html", context)
 
 
-@login_required()
+@login_required
 def post_like(request, post_id, action):
     post = get_object_or_404(Post, id=post_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -245,7 +247,7 @@ def post_like(request, post_id, action):
     return redirect("news:posts")
 
 
-@login_required()
+@login_required
 def comment_delete(request, comment_id, post_id):
     comment = get_object_or_404(Comment, id=comment_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -255,7 +257,7 @@ def comment_delete(request, comment_id, post_id):
     return redirect(reverse("news:posts") + f"#{post_id}")
 
 
-@login_required()
+@login_required
 def shotguns(request):
     # shotguns to which the user participated :
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -288,7 +290,7 @@ def shotguns(request):
     return render(request, "news/shotguns.html", context)
 
 
-@login_required()
+@login_required
 def shotgun_detail(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -309,7 +311,7 @@ def shotgun_detail(request, shotgun_id):
     return render(request, "news/shotgun_detail.html", context)
 
 
-@login_required()
+@login_required
 def shotgun_participate(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -346,7 +348,7 @@ def shotgun_participate(request, shotgun_id):
     return HttpResponseRedirect(reverse("news:shotgun_detail", args=(shotgun_id,)))
 
 
-@login_required()
+@login_required
 def shotguns_admin(request):
     student = get_object_or_404(Student, user__id=request.user.id)
     clubs_admin_memberships = Membership.objects.filter(
@@ -365,7 +367,7 @@ def shotguns_admin(request):
     return render(request, "news/shotguns_admin.html", context)
 
 
-@login_required()
+@login_required
 def shotguns_admin_detail(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -377,7 +379,7 @@ def shotguns_admin_detail(request, shotgun_id):
     return render(request, "news/shotguns_admin_detail.html", context)
 
 
-@login_required()
+@login_required
 def fail_participation(request, participation_id):
     participation = get_object_or_404(Participation, pk=participation_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -390,7 +392,7 @@ def fail_participation(request, participation_id):
     )
 
 
-@login_required()
+@login_required
 def unfail_participation(request, participation_id):
     participation = get_object_or_404(Participation, pk=participation_id)
     student = get_object_or_404(Student, user__id=request.user.id)
@@ -403,7 +405,7 @@ def unfail_participation(request, participation_id):
     )
 
 
-@login_required()
+@login_required
 def new_shotgun(request):
     student = get_object_or_404(Student, user__id=request.user.id)
     clubs_memberships = Membership.objects.filter(student__pk=student.id, is_admin=True)
@@ -431,7 +433,7 @@ def new_shotgun(request):
             return HttpResponseRedirect(reverse("news:shotguns"))
 
 
-@login_required()
+@login_required
 def delete_shotgun(request, shotgun_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
@@ -449,7 +451,7 @@ def delete_shotgun(request, shotgun_id):
         return HttpResponseRedirect(reverse("news:shotguns_admin"))
 
 
-@login_required()
+@login_required
 def edit_shotgun(request, shotgun_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
@@ -481,7 +483,7 @@ def edit_shotgun(request, shotgun_id):
         raise PermissionDenied()
 
 
-@login_required()
+@login_required
 def publish_shotgun_results(request, shotgun_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
