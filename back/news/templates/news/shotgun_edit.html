@@ -2,29 +2,29 @@
 <!--Header-->
 {% include "header.html" with title="Modification du shotgun" %}
 
-    <!--Body-->
-    <body>
-        <!--Feedback Button-->
-        {% include "feedback.html" %}
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
 
-        <!--Sidenav-->
-        {% include "sidenav.html" with active_link="news" %}
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="news" %}
 
-        <!--Content-->
-        <div class="content">
-            <div class="content-header">
-                <div class="row justify-content-between w-100">
-                    <div class="col">
-                        <div class="search-input-group">
-                            <input type="text" class="search-input" placeholder="Rechercher">
-                            <button class="button search-button"><i class="fas fa-search "></i></button>
-                        </div>
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
                     </div>
                 </div>
             </div>
-            <div class="content-main">
-                <h1>Édition d'un shotgun :</h1>
-                <form action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" class="form-control" id="1"><br>
+        </div>
+        <div class="content-main">
+            <h1>Édition d'un shotgun :</h1>
+            <form action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" class="form-control" id="1"><br>
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 Club :
@@ -45,7 +45,7 @@
                 <script>
                     $(function () {
                         $("#id_starting_date").datetimepicker({
-                        format: 'd/m/Y H:i',
+                            format: 'd/m/Y H:i',
                         });
                     });
                 </script>
@@ -56,7 +56,7 @@
                 <script>
                     $(function () {
                         $("#id_ending_date").datetimepicker({
-                        format: 'd/m/Y H:i',
+                            format: 'd/m/Y H:i',
                         });
                     });
                 </script>
@@ -71,9 +71,9 @@
                 <br>
                 <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
                 <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button red-button">Annuler</button></a>
-                </form>
-            </div>
+            </form>
         </div>
-        <script src="{% static 'js/sidenav.js' %}"></script>
-    </body>
+    </div>
+    <script src="{% static 'js/sidenav.js' %}"></script>
+</body>
 </html>

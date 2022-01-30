@@ -7,7 +7,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import AddMember, AddRole, EditClub, EditProfile
-from .models import Category, Club, Membership, Role, Student
+from .models import Category, Club, Membership, Student
 
 
 @login_required

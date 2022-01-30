@@ -37,11 +37,13 @@ FROM python-base as builder-base
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         # deps for installing poetry
-        curl \
+        curl=7.74.0 \
         # deps for building python deps
-        build-essential
+        build-essential=12.9 \
+    && rm -rf /var/lib/apt/lists/*
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
 
 # copy project requirement files here to ensure they will be cached.
@@ -67,13 +69,15 @@ RUN poetry install
 WORKDIR /src
 COPY . .
 
-# install netcat
-RUN apt update \
-    && apt install -y netcat
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+        # for checking when db is up
+        netcat=1.10-46 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY ./entrypoint.dev.sh .
-RUN sed -i 's/\r$//g' /src/entrypoint.dev.sh
-RUN chmod +x /src/entrypoint.dev.sh
+RUN sed -i 's/\r$//g' /src/entrypoint.dev.sh \
+    && chmod +x /src/entrypoint.dev.sh
 
 ENTRYPOINT ["/src/entrypoint.dev.sh"]
 
@@ -93,12 +97,14 @@ RUN poetry install
 WORKDIR /src
 COPY . .
 
-# install netcat
-RUN apt update \
-    && apt install -y netcat
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+        # for checking when db is up
+        netcat=1.10-46 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY ./entrypoint.dev.sh .
-RUN sed -i 's/\r$//g' /src/entrypoint.prod.sh
-RUN chmod +x /src/entrypoint.prod.sh
+RUN sed -i 's/\r$//g' /src/entrypoint.prod.sh \
+    && chmod +x /src/entrypoint.prod.sh
 
 ENTRYPOINT ["/src/entrypoint.prod.sh"]

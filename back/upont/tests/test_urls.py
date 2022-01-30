@@ -1,6 +1,13 @@
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-from django.contrib.auth.views import *
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordChangeDoneView,
+    PasswordChangeView,
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
 from django.test import SimpleTestCase
 from django.urls import resolve, reverse
 
