@@ -14,6 +14,10 @@ from .models import Comment, Event, Participation, Post, Shotgun
 
 @login_required
 def posts(request):
+    """
+    Fetches posts with associated empty forms to publish comments, as well as the user's posts and comments.
+    If invoked with POST request, validates the form's data and creates the corresponding comment.
+    """
     student = get_object_or_404(Student, user__id=request.user.id)
 
     if request.method == "GET":
@@ -42,7 +46,7 @@ def posts(request):
     if request.method == "POST":
         commented_post_id = request.POST.get("post")
         commented_post = get_object_or_404(Post, id=commented_post_id)
-        filled_form = CommentForm(commented_post_id, student.id, data=request.POST)
+        filled_form = CommentForm(commented_post_id, student.user.id, data=request.POST)
 
         if filled_form.is_valid():
             new_comment = filled_form.save(commit=False)
@@ -253,10 +257,10 @@ def post_like(request, post_id, action):
 
 
 @login_required
-def comment_delete(request, comment_id, post_id):
+def delete_comment(request, comment_id, post_id):
     comment = get_object_or_404(Comment, id=comment_id)
     student = get_object_or_404(Student, user__id=request.user.id)
-    student_clubs = student.clubs
+    student_clubs = student.clubs.all()
     if comment.author.pk == student.pk or (comment.club in student_clubs):
         comment.delete()
     return redirect(reverse("news:posts") + f"#{post_id}")

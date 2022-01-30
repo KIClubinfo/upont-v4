@@ -19,8 +19,8 @@ urlpatterns = [
     path("post/create", views.post_create, name="post_create"),
     path("post/<int:post_id>/<str:action>", views.post_like, name="post_like"),
     path(
-        "comment/<int:comment_id>/<int:post_id>",
-        views.comment_delete,
+        "comment/delete/<int:comment_id>/<int:post_id>",
+        views.delete_comment,
         name="comment_delete",
     ),
     path("shotgun/", views.shotguns, name="shotguns"),
