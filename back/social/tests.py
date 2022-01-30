@@ -71,7 +71,7 @@ class ClubModelTest(TestCase):
         club.save()
         retrieved_club = Club.objects.get(pk=club.pk)
         self.assertEqual(retrieved_club.pk, club.pk)
-    
+
     def test_function_is_member(self):
         test_user = models.User()
         test_user.save()
@@ -89,7 +89,7 @@ class ClubModelTest(TestCase):
         membership = Membership(is_admin=False, club=test_club, student=test_student)
         membership.save()
         self.assertTrue(test_club.is_member(test_student.id))
-    
+
     def test_function_is_admin(self):
         test_user = models.User()
         test_user.save()

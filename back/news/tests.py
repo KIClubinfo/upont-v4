@@ -1,13 +1,13 @@
 import datetime
 
 from django.contrib.auth import models
-from django.test import TestCase, Client
-from django.utils import timezone
-from social.models import Student, Club, Membership
 from django.http import HttpRequest
+from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
+from social.models import Club, Membership, Student
 
-from .models import Participation, Shotgun, Comment, Post
+from .models import Comment, Participation, Post, Shotgun
 from .views import posts
 
 
@@ -279,7 +279,7 @@ class CommentModelTest(TestCase):
         post = Post(
             title="Test Post",
             author=post_author,
-            date=timezone.now()-datetime.timedelta(days=1),
+            date=timezone.now() - datetime.timedelta(days=1),
             content="Some test post",
         )
         post.save()
@@ -335,10 +335,10 @@ class CommentViewsTest(TestCase):
         )
         cls.comment_author.save()
         cls.club = Club(
-            name= "Test Club",
+            name="Test Club",
             description="Some test club",
-            active= True,
-            has_fee= False,
+            active=True,
+            has_fee=False,
         )
         cls.club.save()
         comment_author_club_membership = Membership(
@@ -362,7 +362,7 @@ class CommentViewsTest(TestCase):
         comment = Comment(
             post=self.post,
             author=self.comment_author,
-            club= self.club,
+            club=self.club,
             date=timezone.now(),
             content="Some test comment",
         )
@@ -388,7 +388,9 @@ class CommentViewsTest(TestCase):
         comment_2 = self.create_comment_from_student()
         client = Client()
         client.force_login(self.comment_user)
-        response = client.get(reverse("news:comment_delete", args=(comment_2.id, self.post.id)))
+        response = client.get(
+            reverse("news:comment_delete", args=(comment_2.id, self.post.id))
+        )
         self.assertEqual(response.status_code, 302)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 1)
@@ -408,7 +410,9 @@ class CommentViewsTest(TestCase):
         deleter_student.save()
         client = Client()
         client.force_login(deleter_user)
-        response = client.get(reverse("news:comment_delete", args=(comment_2.id, self.post.id)))
+        response = client.get(
+            reverse("news:comment_delete", args=(comment_2.id, self.post.id))
+        )
         self.assertEqual(response.status_code, 302)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 2)
@@ -448,7 +452,9 @@ class CommentViewsTest(TestCase):
         deleter_club_membership.save()
         client = Client()
         client.force_login(deleter_user)
-        response = client.get(reverse("news:comment_delete", args=(comment_2.id, self.post.id)))
+        response = client.get(
+            reverse("news:comment_delete", args=(comment_2.id, self.post.id))
+        )
         self.assertEqual(response.status_code, 302)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 1)
@@ -481,7 +487,9 @@ class CommentViewsTest(TestCase):
         deleter_club_membership.save()
         client = Client()
         client.force_login(deleter_user)
-        response = client.get(reverse("news:comment_delete", args=(comment_2.id, self.post.id)))
+        response = client.get(
+            reverse("news:comment_delete", args=(comment_2.id, self.post.id))
+        )
         self.assertEqual(response.status_code, 302)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 2)
