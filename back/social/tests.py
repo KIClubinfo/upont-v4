@@ -71,6 +71,45 @@ class ClubModelTest(TestCase):
         club.save()
         retrieved_club = Club.objects.get(pk=club.pk)
         self.assertEqual(retrieved_club.pk, club.pk)
+    
+    def test_function_is_member(self):
+        test_user = models.User()
+        test_user.save()
+        test_student = Student(
+            user=test_user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+        )
+        test_student.save()
+        test_club = Club(description="Un Club", active=True, has_fee=True)
+        test_club.save()
+        self.assertFalse(test_club.is_member(test_student.id))
+        membership = Membership(is_admin=False, club=test_club, student=test_student)
+        membership.save()
+        self.assertTrue(test_club.is_member(test_student.id))
+    
+    def test_function_is_admin(self):
+        test_user = models.User()
+        test_user.save()
+        test_student = Student(
+            user=test_user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+        )
+        test_student.save()
+        test_club = Club(description="Un Club", active=True, has_fee=True)
+        test_club.save()
+        self.assertFalse(test_club.is_admin(test_student.id))
+        membership = Membership(is_admin=False, club=test_club, student=test_student)
+        membership.save()
+        self.assertFalse(test_club.is_admin(test_student.id))
+        membership.is_admin = True
+        membership.save()
+        self.assertTrue(test_club.is_admin(test_student.id))
 
 
 class MembershipModelTest(TestCase):
