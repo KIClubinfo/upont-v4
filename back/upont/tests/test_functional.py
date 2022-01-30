@@ -1,11 +1,9 @@
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
-from ..settings import LOGIN_REDIRECT_URL, LOGIN_URL
+from ..settings import LOGIN_REDIRECT_URL
 
 
 class TestAuthenticate(TestCase):

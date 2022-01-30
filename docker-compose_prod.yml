@@ -13,7 +13,8 @@ services:
   back:
     build:
       context: back
-      dockerfile: Dockerfile_prod
+      dockerfile: Dockerfile
+      target: production
     command: gunicorn upont.wsgi:application --bind 0.0.0.0:8000
     expose:
     - 8000

@@ -8,7 +8,10 @@ services:
       POSTGRES_USER: $DB_USER
       POSTGRES_PASSWORD: $DB_PASSWORD
   back:
-    build: back
+    build:
+      context: back
+      dockerfile: Dockerfile
+      target: development
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./back:/src

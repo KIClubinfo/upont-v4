@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.http import Http404, HttpResponseRedirect
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -99,7 +99,12 @@ def event_detail(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     event_posts = Post.objects.filter(event__pk=event_id).order_by("-date")
     is_member = Membership.objects.filter(student__pk=student.id, club=event.club)
-    context = {"event": event, "event_posts": event_posts, "is_member": is_member, "student": student}
+    context = {
+        "event": event,
+        "event_posts": event_posts,
+        "is_member": is_member,
+        "student": student,
+    }
     return render(request, "news/event_detail.html", context)
 
 
@@ -281,9 +286,11 @@ def shotguns(request):
     )
     for user_shotgun in user_shotguns:
         old_shotguns = old_shotguns.exclude(id=user_shotgun.pk)
-    
+
     # check is user is admin of at least one club :
-    display_admin_button = len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
+    display_admin_button = (
+        len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
+    )
 
     context = {
         "next_shotguns": next_shotguns,
@@ -412,15 +419,16 @@ def unfail_participation(request, participation_id):
 @login_required
 def new_shotgun(request):
     student = get_object_or_404(Student, user__id=request.user.id)
-    clubs_memberships = Membership.objects.filter(student__pk=student.id, is_admin=True)
+    admin_clubs_memberships = Membership.objects.filter(
+        student__pk=student.id, is_admin=True
+    )
     clubs = []
-    for membership in clubs_memberships:
+    for membership in admin_clubs_memberships:
         clubs.append(membership.club)
 
     if request.method == "GET":
         form = AddShotgun(clubs)
         context = {
-            "clubs": clubs,
             "has_clubs_admins": len(clubs) > 0,
             "form": form,
         }

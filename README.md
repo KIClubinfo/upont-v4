@@ -93,15 +93,42 @@ $ python manage.py migrate
 
 Lancer le build :
 ```
-$ bash build.sh
+$ bash scripts/build.sh
 ```
 
 Lancer le serveur :
 ```
-$ bash start.sh
+$ bash scripts/start.sh
 ```
 
 Stopper le serveur :
 ```
-$ bash stop.sh
+$ bash scripts/stop.sh
+```
+
+# Variables d'environnement
+
+Les variables d'environnement suivantes sont placées dans le fichier *.env* :
+
+| Variable | Description | Dev | Prod |
+| -------- | -------------|----- | ------|
+| DB_HOST | Nom du host de la BDD | db | db |
+| DB_PORT | Port de la BDD (interne au container) | 5432 | 5432 |
+| DB_USER | Utilisateur de la BDD | upont | upont |
+| DB_NAME | Nom de la BDD | upont | upont |
+| DB_PASSWORD | Mot de passe de la BDD | upont | SECRET |
+| BACK_PORT | Port d'accès au site (externe) | 8000 | **** |
+| SENDGRID_API_KEY | Clé permettant d'envoyer des mails avec l'API sendgrid (à récupérer sur le site de Sendgrid) | key | SECRET |
+| ADMIN_EMAIL | Adressse recevant les mails d'administration de Django pour alertir de certaines actions (création d'un compte...) | upont@enpc.org | Autre |
+| DEFAULT_FROM_EMAIL | Adresse envoyant les mails (avec Sendigrd, n'importe quelle adresse en @enpc.org fonctionne) | upont@enpc.org | upont@enpc.org |
+| SECRET_KEY | Clé secrète utilisée par Django | ChangeThatPlease | SECRET |
+| DEBUG | Défini si le mode DEBUG est activé. | True | False |
+| GUNICORN_NB_WORKERS | Nombre de workers pour le WSGI gunicorn |  | 10 |
+| SECURE_SSL_REDIRECT | Redirige automatiquement les requêtes non HTTPS vers des requêtes HTTPS. Laisser à False si un autre proxy fait déjà cete redirection. | False | False |
+
+
+Commande pour générer une clé secrète (vous devez avoir Django installé):
+
+```
+$ python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
 ```
