@@ -13,7 +13,7 @@ Le site se divise en plusieurs applications django : uPont (principale), Social,
 ## Social
 
 L’application sociale correspond au cœur de tout ce qui touche aux élèves. Elle comporte notamment les
-pages de profils, où les utilisateurs peuvent modifier certaines informations présentes sur leurs profils, ainsi que
+pages de profils, où les utilisateurs peuvent modifier certaines informations présentes sur leur profil, ainsi que
 voir les profils des autres utilisateurs. Elle leur permet également d’accéder à la liste des clubs, et de voir les
 différentes responsabilités de chacun des membres. Si l’utilisateur a été ajouté en tant que membre d’un club,
 il est également possible de lui donner l’autorisation d’éditer son club. Enfin, une barre de recherche permet de
@@ -23,8 +23,8 @@ permet de rechercher des clubs sur la base de leur nom, de leur surnom et de leu
 
 ## News
 
-L’application News regroupe l’ensemble des actualités de la vie associative des ponts. Elle est inspirée du
-fonctionnent des groupes Facebook, mais l’idée était d’adapter ce fonctionnement pour qu’il soit le plus pratique
+L’application News regroupe l’ensemble des actualités de la vie associative des Ponts. Elle est inspirée du
+fonctionnement des groupes Facebook, mais l’idée était d’adapter ce fonctionnement pour qu’il soit le plus pratique
 et adapté à l’usage possible. Nous avons donc utilisé l’architecture suivante : un club peut créer un event, lié à une
 date, qui correspond à un évènement organisé par le club. L’event est le bloc central de l’application. L’utilisateur
 peut accéder à une page recensant l’ensemble des events à venir, par ordre chronologique. L’idée étant d’avoir un
@@ -37,9 +37,9 @@ renvoyer vers un event préalablement créé par le club. Ainsi, un club peut cr
 pour l’annoncer, et ensuite faire des rappels ou des précisions avec des posts régulièrement espacés dans le temps.
 De plus, dans la vue propre à un event, l’ensemble des posts qui concernent cet event sont regroupés, il est donc
 facile de voir les dernières informations concernant l’évènement. Enfin, l’application permet aux élèves de modifier
-leurs posts, ainsi que d’éditer les posts et les évenements créés par les clubs dont ils sont membres.
+leurs posts, ainsi que d’éditer les posts et les événements créés par les clubs dont ils sont membres.
 Le système de commentaire permet simplement aux élèves de laisser des messages sous les posts du fil d’actualités, visibles par tous les autres élèves. Un utilisateur peut décider de commenter en tant qu’élève ou en tant qu’un
-des clubs dont il membre : l’avatar identifiant l’auteur du commentaire est alors choisi en conséquence (image de
+des clubs dont il est membre : l’avatar identifiant l’auteur du commentaire est alors choisi en conséquence (image de
 profil de l’étudiant ou du club). Un utilisateur a également la possibilité de supprimer les commentaires publiés
 par lui-même ou par l’un des clubs dont il est membre. Enfin, un élève peut également "liker" un post. Chaque
 post comporte alors des compteurs pour le nombre de likes et de commentaires.
