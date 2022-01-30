@@ -1,9 +1,13 @@
 # Upont 4.0
 
-Refonte de uPont [TODO : liens vers site et ancien repo] en python (django) pour une meilleure accessibilité aux nouveaux développeurs (et purge).
+Refonte de uPont en python avec le framework django pour une meilleure accessibilité aux nouveaux développeurs.
 
 * framework full-stack django
 * base de données PostgreSQL
+
+Site de développement : https://upont-dev.enpc.org
+
+Ancien repository : https://github.com/KIClubinfo/upont/
 
 # Installation
 
@@ -22,37 +26,6 @@ Installation des pre-commit hooks :
 ```
 $ pip install pre-commit
 $ pre-commit install
-```
-
-# Développement d'une feature
-
-Toujours travailler sur une nouvelle branche :
-```
-$ git branch feature
-$ git checkout feature
-```
-
-Mettre la branche en ligne et créer une pull request :
-```
-$ git push --set-upstream origin feature
-```
-
-Quand un reviewer a validé la pull request, faire un rebase de la nouvelle branche dans master :
-```
-$ git checkout feature
-$ git rebase master
-```
-
-Faire un rebase de master dans la feature :
-```
-$ git checkout master
-$ git rebase feature
-```
-
-Mettre les changements en ligne :
-```
-$ git checkout master
-$ git push
 ```
 
 # Commandes Django
@@ -131,4 +104,35 @@ Commande pour générer une clé secrète (vous devez avoir Django installé):
 
 ```
 $ python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+```
+
+# Workflow git
+
+Toujours travailler sur une nouvelle branche :
+```
+$ git branch feature
+$ git checkout feature
+```
+
+Mettre la branche en ligne et créer une pull request :
+```
+$ git push --set-upstream origin feature
+```
+
+Quand un reviewer a validé la pull request, faire un rebase de la nouvelle branche dans master :
+```
+$ git checkout feature
+$ git rebase master
+```
+
+Faire un rebase de master dans la feature :
+```
+$ git checkout master
+$ git rebase feature
+```
+
+Mettre les changements en ligne :
+```
+$ git checkout master
+$ git push
 ```
