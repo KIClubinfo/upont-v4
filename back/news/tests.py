@@ -384,20 +384,21 @@ class CommentViewsTest(TestCase):
         self.assertEqual(retrieved_comment.content, comment_request.POST["content"])
 
     def test_deleting_my_own_comment_on_post_works(self):
-        comment_1 = self.create_comment_from_student()
-        comment_2 = self.create_comment_from_student()
+        # Create several comments to check whether the view actually deletes only one comment
+        self.create_comment_from_student()
+        comment = self.create_comment_from_student()
         client = Client()
         client.force_login(self.comment_user)
         response = client.get(
-            reverse("news:comment_delete", args=(comment_2.id, self.post.id))
+            reverse("news:comment_delete", args=(comment.id, self.post.id))
         )
         self.assertEqual(response.status_code, 302)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 1)
 
     def test_deleting_someone_else_comment_fails(self):
-        comment_1 = self.create_comment_from_student()
-        comment_2 = self.create_comment_from_student()
+        self.create_comment_from_student()
+        comment = self.create_comment_from_student()
         deleter_user = models.User(username="deleter_user")
         deleter_user.save()
         deleter_student = Student(
@@ -411,7 +412,7 @@ class CommentViewsTest(TestCase):
         client = Client()
         client.force_login(deleter_user)
         response = client.get(
-            reverse("news:comment_delete", args=(comment_2.id, self.post.id))
+            reverse("news:comment_delete", args=(comment.id, self.post.id))
         )
         self.assertEqual(response.status_code, 302)
         retrieved_comments = Comment.objects.filter(post=self.post)
@@ -432,8 +433,8 @@ class CommentViewsTest(TestCase):
         self.assertEqual(retrieved_comment.content, comment_request.POST["content"])
 
     def test_deleting_post_from_another_club_fails(self):
-        comment_1 = self.create_comment_from_club()
-        comment_2 = self.create_comment_from_club()
+        self.create_comment_from_club()
+        comment = self.create_comment_from_club()
         deleter_user = models.User(username="deleter_user")
         deleter_user.save()
         deleter_student = Student(
@@ -453,15 +454,15 @@ class CommentViewsTest(TestCase):
         client = Client()
         client.force_login(deleter_user)
         response = client.get(
-            reverse("news:comment_delete", args=(comment_2.id, self.post.id))
+            reverse("news:comment_delete", args=(comment.id, self.post.id))
         )
         self.assertEqual(response.status_code, 302)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 1)
 
     def test_deleting_post_from_someone_else_in_my_club_works(self):
-        comment_1 = self.create_comment_from_club()
-        comment_2 = self.create_comment_from_club()
+        self.create_comment_from_club()
+        comment = self.create_comment_from_club()
         deleter_user = models.User(username="deleter_user")
         deleter_user.save()
         deleter_student = Student(
@@ -488,7 +489,7 @@ class CommentViewsTest(TestCase):
         client = Client()
         client.force_login(deleter_user)
         response = client.get(
-            reverse("news:comment_delete", args=(comment_2.id, self.post.id))
+            reverse("news:comment_delete", args=(comment.id, self.post.id))
         )
         self.assertEqual(response.status_code, 302)
         retrieved_comments = Comment.objects.filter(post=self.post)
