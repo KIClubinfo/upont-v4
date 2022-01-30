@@ -136,3 +136,26 @@ Mettre les changements en ligne :
 $ git checkout master
 $ git push
 ```
+
+# Documentation
+
+Fonctionnement du site :
+
+* [Documentation du site](docs/workings.md)
+
+Les indispensables :
+
+* Gestionnaire de versions : [git](https://doc.ubuntu-fr.org/git)
+* [HTML/CSS](http://openclassrooms.com/courses/apprenez-a-creer-votre-site-web-avec-html5-et-css3)
+* Framework : [Django](https://docs.djangoproject.com/en/3.2/)
+* Utilisation de conteneurs : [Docker](https://docs.docker.com/)
+* Pour gérer facilement différents conteneurs : [docker-compose](https://docs.docker.com/compose/)
+
+Autres technologies utilisées :
+
+* Pour uniformiser la syntaxe sur le projet : [pre-commit](https://pre-commit.com/index.html)
+* Gestionnaire de dépendances python : [Poetry](https://python-poetry.org/docs/)
+* Application WSGI pour la mise en production : [Gunicorn](https://docs.gunicorn.org/en/stable/)
+* Serveur web et reverse-proxy : [Nginx](https://docs.nginx.com/)
+* Base de données : [PostgreSQL](https://www.postgresql.org/docs/)
+* Intégration continue : [Github Actions](https://docs.github.com/en/actions)
