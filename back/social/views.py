@@ -6,7 +6,7 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import AddMember, AddRole, EditClub, EditProfile, ClubRequestForm
+from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
 from .models import Category, Club, Membership, Student
 
 

@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Club, Membership, Role, Student, ClubRequest
+from .models import Club, ClubRequest, Membership, Role, Student
 
 
 class EditProfile(forms.ModelForm):
@@ -88,7 +88,10 @@ class AddRole(forms.ModelForm):
 class ClubRequestForm(forms.ModelForm):
     class Meta:
         model = ClubRequest
-        fields = ("name", "content",)
+        fields = (
+            "name",
+            "content",
+        )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
             "content": forms.Textarea(attrs={"class": "profil-input"}),
