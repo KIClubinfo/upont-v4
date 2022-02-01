@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import Category, Club, Membership, Nationality, Promotion, Role, Student
+from .models import (
+    Category,
+    Club,
+    ClubRequest,
+    Membership,
+    Nationality,
+    Promotion,
+    Role,
+    Student,
+)
 
 
 class StudentAdmin(admin.ModelAdmin):
@@ -18,3 +27,4 @@ admin.site.register(Role)
 admin.site.register(Membership)
 admin.site.register(Category)
 admin.site.register(Club, ClubAdmin)
+admin.site.register(ClubRequest)

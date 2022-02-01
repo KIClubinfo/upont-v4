@@ -130,3 +130,12 @@ class Membership(models.Model):
 
     def __str__(self):
         return self.club.name + " : " + self.student.user.username
+
+
+class ClubRequest(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    name = models.CharField(max_length=30)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.student.user.username + " : " + self.name

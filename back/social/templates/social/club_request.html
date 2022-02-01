@@ -1,0 +1,46 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Demande de création d'un club" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="clubs" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-main">
+            <h4 class="club-box">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <br>
+                    <h2 class="page-subtitle">Demande de création de club:</h2>
+                    <div class="row border-bottom">
+                        <div class="col-lg-6">
+                            <br>
+                            Nom du club:<br>
+                            {{ ClubRequest.name.errors }}
+                            {{ ClubRequest.name }}
+                            <br>
+                            Décris rapidement le club et motive ta demande: <br>
+                            {{ ClubRequest.content.errors }}
+                            {{ ClubRequest.content }}
+                        </div>
+                        <div style="text-align: center;">
+                            <input class="button red-button" type="submit" name="Annuler" value="Annuler">
+                            <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+    <script src="{% static 'js/sidenav.js' %}"></script>
+</body>
+</html>
