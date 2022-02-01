@@ -6,7 +6,7 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import AddMember, AddRole, EditClub, EditProfile
+from .forms import AddMember, AddRole, EditClub, EditProfile, ClubRequestForm
 from .models import Category, Club, Membership, Student
 
 
@@ -316,3 +316,26 @@ def club_edit(request, club_id):
     context["AddMember"] = form_membership
     context["AddRole"] = form_role
     return render(request, "social/club_edit.html", context)
+
+
+@login_required
+def club_request(request):
+    context = {}
+
+    if request.method == "POST":
+        if "Annuler" in request.POST:
+            return redirect("social:club_index")
+        elif "Valider" in request.POST:
+            form = ClubRequestForm(
+                request.POST,
+            )
+            if form.is_valid():
+                new_request = form.save(commit=False)
+                new_request.student = Student.objects.get(user__id=request.user.id)
+                new_request.save()
+                return redirect("social:club_index")
+
+    else:
+        form = ClubRequestForm()
+    context["ClubRequest"] = form
+    return render(request, "social/club_request.html", context)
