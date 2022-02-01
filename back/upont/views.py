@@ -79,7 +79,7 @@ def add(request):
     students_not_added = []
     for column in csv.reader(io_string, delimiter=";", quotechar="|"):
         password = models.User.objects.make_random_password()  # à envoyer par mail
-        user, created = models.User.objects.update_or_create(
+        user, created = models.User.objects.get_or_create(
             last_name=column[1],
             first_name=column[2],
             username=(column[2] + "." + column[1]).replace(" ", "-").lower(),
@@ -88,12 +88,16 @@ def add(request):
         if created:
             user.set_password(password)
             user.save()
-        promo, created3 = Promotion.objects.get_or_create(year=column[0])
-        student, created2 = Student.objects.update_or_create(
-            user=user,
-            promo=promo,
-            department=Student.Department.A1,
+        promo, created3 = Promotion.objects.get_or_create(
+            year=column[0], nickname="0" + str(column[0])
         )
+        student, created2 = Student.objects.get_or_create(
+            user=user,
+        )
+        if created2:
+            student.department = Student.Department.A1
+            student.promo = promo
+            student.save()
         if not created or not created2:
             students_not_added.append(
                 (column[2] + "." + column[1]).replace(" ", "-").lower()
