@@ -44,6 +44,17 @@
                                 </div>
                             {% endfor %}
                             <!--End of clubs cards-->
+                            <div class="col-clubmd-4 col-clubsm-6">
+                                <div class="club-card">
+                                    <div class="club-card-content">
+                                        <i class="fas fa-plus-circle fa-5x"></i>
+                                    </div>
+                                    <div class="club-card-title">
+                                        <span>Demander la création <br> d'un club</span>
+                                    </div>
+                                    <a href="{% url 'social:club_request' %}" class="stretched-link"></a>
+                                </div>
+                            </div>
                         {% else %}
                             {% if searched_expression %}
                                 <p>Aucun club n'a été trouvé</p>
