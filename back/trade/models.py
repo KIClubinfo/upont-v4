@@ -17,4 +17,13 @@ class Transaction(models.Model):
     date = models.DateTimeField()
 
     def __str__(self):
-        return self.good.name + " : " + self.student.user.username
+        string_to_return = self.good.name + " : "
+        if self.student is not None:
+            string_to_return += self.student.user.username
+        return string_to_return
+
+    def balance_change_for_student(self):
+        return -(self.quantity * self.good.price) / 100
+
+    def balance_change_for_club(self):
+        return (self.quantity * self.good.price) / 100

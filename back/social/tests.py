@@ -1,6 +1,8 @@
 from django.contrib.auth import models
 from django.core.validators import ValidationError
 from django.test import TestCase
+from django.utils import timezone
+from trade.models import Good, Transaction
 
 from .models import Category, Club, Membership, Nationality, Promotion, Role, Student
 
@@ -56,6 +58,32 @@ class StudentModelTest(TestCase):
         )
         self.assertRaises(ValidationError, student.full_clean)
 
+    fixtures = ["test_trade.json"]
+
+    def test_balance_in_cents(self):
+        student = Student.objects.get(pk=1)
+        self.assertEqual(-500, student.balance_in_cents())
+        club = Club.objects.get(pk=1)
+        good = Good(name="test_provision_account", price=-50, club=club)
+        good.save()
+        transaction = Transaction(
+            good=good, quantity=1, student=student, date=timezone.now()
+        )
+        transaction.save()
+        self.assertEqual(-450, student.balance_in_cents())
+
+    def test_balance_in_euros(self):
+        student = Student.objects.get(pk=1)
+        self.assertEqual(-5, student.balance_in_euros())
+        club = Club.objects.get(pk=1)
+        good = Good(name="test_provision_account", price=-50, club=club)
+        good.save()
+        transaction = Transaction(
+            good=good, quantity=1, student=student, date=timezone.now()
+        )
+        transaction.save()
+        self.assertEqual(-4.5, student.balance_in_euros())
+
 
 class CategoryModelTest(TestCase):
     def test_category_saves_in_database(self):
@@ -110,6 +138,32 @@ class ClubModelTest(TestCase):
         membership.is_admin = True
         membership.save()
         self.assertTrue(test_club.is_admin(test_student.id))
+
+    fixtures = ["test_trade.json"]
+
+    def test_balance_in_cents(self):
+        club = Club.objects.get(pk=1)
+        self.assertEqual(500, club.balance_in_cents())
+        student = Student.objects.get(pk=1)
+        good = Good(name="test_provision_account", price=-50, club=club)
+        good.save()
+        transaction = Transaction(
+            good=good, quantity=1, student=student, date=timezone.now()
+        )
+        transaction.save()
+        self.assertEqual(450, club.balance_in_cents())
+
+    def test_balance_in_euros(self):
+        club = Club.objects.get(pk=1)
+        self.assertEqual(5, club.balance_in_euros())
+        student = Student.objects.get(pk=1)
+        good = Good(name="test_provision_account", price=-50, club=club)
+        good.save()
+        transaction = Transaction(
+            good=good, quantity=1, student=student, date=timezone.now()
+        )
+        transaction.save()
+        self.assertEqual(4.5, club.balance_in_euros())
 
 
 class MembershipModelTest(TestCase):

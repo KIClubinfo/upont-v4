@@ -8,6 +8,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 from unidecode import unidecode
+from trade.models import Transaction
 
 
 class Promotion(models.Model):
@@ -87,6 +88,16 @@ class Student(models.Model):
     def __str__(self):
         return self.user.username
 
+    def balance_in_cents(self):
+        transactions = Transaction.objects.filter(student=self)
+        balance = 0
+        for transaction in transactions:
+            balance -= transaction.good.price * transaction.quantity
+        return balance
+
+    def balance_in_euros(self):
+        return self.balance_in_cents() / 100
+
 
 class Category(models.Model):
     name = models.CharField(max_length=30)
@@ -140,6 +151,16 @@ class Club(models.Model):
         if len(membership) > 0 and membership[0].is_admin:
             return True
         return False
+
+    def balance_in_cents(self):
+        transactions = Transaction.objects.filter(good__club=self)
+        balance = 0
+        for transaction in transactions:
+            balance += transaction.good.price * transaction.quantity
+        return balance
+
+    def balance_in_euros(self):
+        return self.balance_in_cents() / 100
 
 
 class Membership(models.Model):

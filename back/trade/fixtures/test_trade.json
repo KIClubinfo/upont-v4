@@ -1,0 +1,268 @@
+[
+    {
+        "model": "social.promotion",
+        "pk": 1,
+        "fields": {
+            "year": 23,
+            "name": "default",
+            "nickname": "023"
+        }
+    },
+    {
+        "model": "social.student",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "promo": 1,
+            "department": "1A",
+            "gender": "Autre",
+            "origin": "Concours Commun",
+            "phone_number": null,
+            "picture": "",
+            "nationality": null
+        }
+    },
+    {
+        "model": "social.club",
+        "pk": 1,
+        "fields": {
+            "name": "test_club",
+            "nickname": "test_club",
+            "logo": "",
+            "background_picture": "",
+            "description": "test",
+            "active": true,
+            "has_fee": false,
+            "category": []
+        }
+    },
+    {
+        "model": "trade.good",
+        "pk": 1,
+        "fields": {
+            "name": "test_good",
+            "price": 100,
+            "club": 1
+        }
+    },
+    {
+        "model": "trade.transaction",
+        "pk": 1,
+        "fields": {
+            "good": 1,
+            "quantity": 5,
+            "student": 1,
+            "date": "2022-01-31T16:10:34Z"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$HDCEmX98SWKhIo4ChoOlDo$uplAN0jXRzIFof1CjoSqjG/n4eJM8V6ks+/kKyi0nt4=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "test_user",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-01-31T16:10:00.517Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 1,
+        "fields": {
+            "app_label": "news",
+            "model": "event"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 2,
+        "fields": {
+            "app_label": "news",
+            "model": "shotgun"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 3,
+        "fields": {
+            "app_label": "news",
+            "model": "post"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 4,
+        "fields": {
+            "app_label": "news",
+            "model": "participation"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 5,
+        "fields": {
+            "app_label": "news",
+            "model": "comment"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 6,
+        "fields": {
+            "app_label": "pochtron",
+            "model": "alcohol"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 7,
+        "fields": {
+            "app_label": "social",
+            "model": "category"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 8,
+        "fields": {
+            "app_label": "social",
+            "model": "club"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 9,
+        "fields": {
+            "app_label": "social",
+            "model": "nationality"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 10,
+        "fields": {
+            "app_label": "social",
+            "model": "promotion"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 11,
+        "fields": {
+            "app_label": "social",
+            "model": "role"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 12,
+        "fields": {
+            "app_label": "social",
+            "model": "student"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 13,
+        "fields": {
+            "app_label": "social",
+            "model": "membership"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 14,
+        "fields": {
+            "app_label": "trade",
+            "model": "good"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 15,
+        "fields": {
+            "app_label": "trade",
+            "model": "transaction"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 16,
+        "fields": {
+            "app_label": "admin",
+            "model": "logentry"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 17,
+        "fields": {
+            "app_label": "auth",
+            "model": "permission"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 18,
+        "fields": {
+            "app_label": "auth",
+            "model": "group"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 19,
+        "fields": {
+            "app_label": "auth",
+            "model": "user"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 20,
+        "fields": {
+            "app_label": "contenttypes",
+            "model": "contenttype"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 21,
+        "fields": {
+            "app_label": "sessions",
+            "model": "session"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 22,
+        "fields": {
+            "app_label": "tellme",
+            "model": "feedback"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 23,
+        "fields": {
+            "app_label": "django_cas_ng",
+            "model": "proxygrantingticket"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 24,
+        "fields": {
+            "app_label": "django_cas_ng",
+            "model": "sessionticket"
+        }
+    }
+]

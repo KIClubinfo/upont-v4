@@ -1,0 +1,56 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Transactions" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="news" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            <h1>Balance : {{club.balance_in_euros|floatformat:2}} €</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Quoi ?</td>
+                        <td>Quantité</td>
+                        <td>Balance</td>
+                        <td>Date</td>
+                        <td>Élève</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td>{{transaction.good.name}}</td>
+                            <td>{{transaction.quantity}}</td>
+                            <td>{{transaction.balance_change_for_club}}</td>
+                            <td>{{transaction.date}}</td>
+                            <td>{{transaction.student.user.first_name}} {{transaction.student.user.last_name}}</td>
+                        </tr>
+                    {% empty %}
+                        <th colspan="5" style="text-align: center">Aucune transaction</th>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <script src="{% static 'js/sidenav.js' %}"></script>
+</body>
+</html>
