@@ -118,7 +118,7 @@ $ git checkout feature
 Ajouter vos changements :
 ```
 $ git add ...
-$ git commit -p "Nom de commit explicite"
+$ git commit -m "Nom de commit explicite"
 ```
 
 Mettre la branche en ligne et créer une pull request :
