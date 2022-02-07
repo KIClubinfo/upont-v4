@@ -507,3 +507,8 @@ def publish_shotgun_results(request, shotgun_id):
         )
     else:
         raise PermissionDenied()
+
+
+@login_required
+def markdown(request):
+    return render(request, "news/markdown.html")

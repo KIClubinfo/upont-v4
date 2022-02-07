@@ -1,6 +1,7 @@
 {% load static %}
 <!--Header-->
 {% include "header.html" with title="Shotguns" %}
+{% load markdownify %}
 
 <!--Body-->
 <body>
@@ -52,7 +53,7 @@
                             </div>
                             <div class="col-lg-5">
                                 <p style="font-size: 1.5rem">
-                                    <b> Description :</b> {{shotgun.content}}
+                                    <b> Description :</b> {{shotgun.content | markdownify}}
                                 </p>
                             </div>
                         </div>

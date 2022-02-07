@@ -1,7 +1,7 @@
 {% load static %}
 <!--Header-->
 {% include "header.html" with title="Publications" %}
-
+{% load markdownify %}
 <!--Body-->
 <body>
     <!--Feedback Button-->
@@ -59,7 +59,7 @@
                         {% endif %}
                     </div>
                     <div class="news-card-content">
-                        <p>{{post.content}}</p>
+                        {{post.content | markdownify}}
                     </div>
                     {%if post.illustration%}
                         <div class="news-card-images">

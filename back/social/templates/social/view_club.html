@@ -1,6 +1,7 @@
 {% load static %}
 <!--Header-->
 {% include "header.html" with title="Nom du club" %}
+{% load markdownify %}
 
 <!--Body-->
 <body>
@@ -37,7 +38,7 @@
                     <div class="col-12">
                         <div class="club-description-content">
                             <span class="club-description-title">Description du club</span>
-                            <p class="club-description">{{club.description}}</p>
+                            <p class="club-description">{{club.description|markdownify}}</p>
                             <span class="club-description-title">Membres du club</span>
                             {% if members %}
                                 <div class="row">
