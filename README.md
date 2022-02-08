@@ -152,9 +152,9 @@ Sur la page de la pull request, utiliser github pour résoudre les conflits en l
 
 # Documentation
 
-Fonctionnement du site :
+Documentation du site :
 
-* [Documentation du site](docs/workings.md)
+* [Table des matières](docs/table_of_contents.md)
 
 Les indispensables :
 
