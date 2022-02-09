@@ -110,8 +110,15 @@ $ python3 -c 'from django.core.management.utils import get_random_secret_key; pr
 
 Toujours travailler sur une nouvelle branche :
 ```
+$ git checkout dev
 $ git branch feature
 $ git checkout feature
+```
+
+Ajouter vos changements :
+```
+$ git add ...
+$ git commit -m "Nom de commit explicite"
 ```
 
 Mettre la branche en ligne et créer une pull request :
@@ -119,29 +126,35 @@ Mettre la branche en ligne et créer une pull request :
 $ git push --set-upstream origin feature
 ```
 
-Quand un reviewer a validé la pull request, faire un rebase de la nouvelle branche dans master :
+### Méthode 1 :
+
+Quand un reviewer a validé la pull request et que les checks sont réussis, faire un rebase de la nouvelle branche dans dev :
 ```
 $ git checkout feature
-$ git rebase master
+$ git rebase dev
 ```
 
-Faire un rebase de master dans la feature :
+Faire un rebase de dev dans la feature (on pourra faire un rebase interactif pour squash plusieurs commits):
 ```
-$ git checkout master
+$ git checkout dev
 $ git rebase feature
 ```
 
 Mettre les changements en ligne :
 ```
-$ git checkout master
+$ git checkout dev
 $ git push
 ```
 
+### Méthode 2 :
+
+Sur la page de la pull request, utiliser github pour résoudre les conflits en ligne et pour "squash & merge".
+
 # Documentation
 
-Fonctionnement du site :
+Documentation du site :
 
-* [Documentation du site](docs/workings.md)
+* [Table des matières](docs/table_of_contents.md)
 
 Les indispensables :
 
