@@ -1,11 +1,9 @@
-const path = require('path');
-const webpack = require('webpack');
-
+'use strict';
 module.exports = {
   devtool: 'eval-source-map',
   mode: 'development',
   entry: {
-    index_users: './src/index_users.js',
+    IndexUsers: './src/index_users.js',
   },
   resolve: {
     modules: [__dirname, 'node_modules'],
