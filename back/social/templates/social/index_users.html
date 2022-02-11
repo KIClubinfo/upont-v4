@@ -21,35 +21,42 @@
                     Élèves
                 {% endif %}
             </h3>
-            <div class="row">
+            {% if display_students_with_react %}
+                <div id="students">
+                    <!--  Students are rendered with React  -->
+                </div>
+            {% else %}
                 {% if student_displayed_list %}
-                    {% for student in student_displayed_list %}
-                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
-                            <div class="user-card">
-                                <div class="user-image">
-                                    <img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+                    <div class="row">
+                        {% for student in student_displayed_list %}
+                            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                <div class="user-card">
+                                    <div class="user-image">
+                                        <img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+                                    </div>
+                                    <div class="user-information">
+                                        <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
+                                        <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
+                                    </div>
+                                    <a href="{% url 'social:profile_viewed' student.user.id %}" class="stretched-link"></a>
                                 </div>
-                                <div class="user-information">
-                                    <span class="user-name">{{student.user.first_name}} {{student.user.last_name}}</span>
-                                    <span>{{student.department}} - Promo '{{student.promo.nickname}}</span>
-                                </div>
-                                <a href="{% url 'social:profile_viewed' student.user.id %}" class="stretched-link"></a>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 {% else %}
                     {% if searched_expression %}
                         <p>Aucun élève n'a été trouvé</p>
-                    {% else %}
-                        <p>Il n'y a pas d'élèves dans la base de données.</p>
                     {% endif %}
                 {% endif %}
-            </div>
+            {% endif %}
         </div>
-    </div>
-    <!--EndContent-->
+        <!--EndContent-->
 
-    <!--Scripts-->
-    <script src="{% static 'js/sidenav.js' %}"></script>
-</body>
+        <!--Scripts-->
+        <script>
+            window.react_mount = document.getElementById('students');
+        </script>
+        <script src="{% static 'react/index_users.bundle.js' %}"></script>
+        <script src="{% static 'js/sidenav.js' %}"></script>
+    </body>
 </html>

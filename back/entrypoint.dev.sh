@@ -9,6 +9,5 @@ done
 echo "PostgreSQL started"
 
 python3 manage.py migrate --noinput
-python3 manage.py test
 
 exec "$@"

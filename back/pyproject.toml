@@ -16,5 +16,6 @@ django-environ = "0.8.1"
 gunicorn = "20.1.0"
 django-cas-ng = "4.3.0"
 django-markdownify = "^0.9.0"
+djangorestframework = "3.13.1"
 
 [tool.poetry.dev-dependencies]

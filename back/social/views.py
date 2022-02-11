@@ -5,19 +5,35 @@ from django.db.models import Q
 from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from rest_framework import viewsets
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
 from .models import Category, Club, Membership, Student
+from .serializers import StudentSerializer
 
 
 @login_required
 def index_users(request):
-    all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
+    all_student_list = Student.objects.order_by(
+        "-promo__year", "user__first_name", "user__last_name"
+    )
     context = {
         "all_student_list": all_student_list,
-        "student_displayed_list": all_student_list,
+        "display_students_with_react": True,
     }
     return render(request, "social/index_users.html", context)
+
+
+class StudentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows students to be viewed or edited.
+    """
+
+    queryset = Student.objects.all().order_by(
+        "-promo__year", "user__first_name", "user__last_name"
+    )
+    serializer_class = StudentSerializer
+    http_method_names = ["get"]
 
 
 @login_required

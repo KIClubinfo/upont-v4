@@ -20,11 +20,13 @@ services:
     - 8000
     depends_on:
       - db
+      - webinstaller
     links:
       - db
     volumes:
       - static_volume:/src/static
       - media_volume:/src/media
+      - bundles:/src/upont/static/react
     restart: always
     environment:
       DB_HOST: $DB_HOST
@@ -49,8 +51,16 @@ services:
       - static_volume:/src/static
       - media_volume:/src/media
     restart: always
-
+  webinstaller:
+    build:
+      context: ./
+      dockerfile: ./webinstaller/Dockerfile
+      target: production
+    volumes:
+      - bundles:/src/upont/static/react
 volumes:
   static_volume:
   media_volume:
   database:
+  bundles:
+    driver: local

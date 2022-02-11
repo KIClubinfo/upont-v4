@@ -19,8 +19,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from rest_framework import routers
+from social.views import StudentViewSet
 
 from . import views
+
+router = routers.DefaultRouter()
+router.register(r"students", StudentViewSet)
 
 urlpatterns = [
     path("social/", include("social.urls")),
@@ -38,6 +43,7 @@ urlpatterns = [
     path("cas/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
     path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
     path("page_not_created/", views.page_not_created, name="page_not_created"),
+    path("api/", include(router.urls)),
 ]
 
 if settings.DEBUG:  # in debug anyone can access any image
