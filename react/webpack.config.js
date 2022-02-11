@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 module.exports = {
   devtool: 'eval-source-map',
   mode: 'development',
   entry: {
-    IndexUsers: './src/index_users.js',
+    IndexUsers: './src/index_users.js'
   },
   resolve: {
     modules: [__dirname, 'node_modules'],
@@ -21,5 +21,5 @@ module.exports = {
         loader: 'babel-loader'
       }
     ]
-  },
-};
+  }
+}
