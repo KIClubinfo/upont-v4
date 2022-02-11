@@ -69,7 +69,8 @@ RUN poetry install
 WORKDIR /src
 COPY . .
 # to give the webinstaller service access to this folder
-RUN chmod 777 /src/upont/static/react
+RUN mkdir -p /src/upont/static/react \
+    && chmod 777 /src/upont/static/react
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
@@ -99,7 +100,8 @@ RUN poetry install
 WORKDIR /src
 COPY . .
 # to give the webinstaller service access to this folder
-RUN chmod 777 /src/upont/static/react
+RUN mkdir -p /src/upont/static/react \
+    && chmod 777 /src/upont/static/react
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
