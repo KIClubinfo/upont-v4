@@ -9,63 +9,84 @@
 
     <!--Sidenav-->
     {% include "sidenav.html" with active_link="news" %}
+    <script src="{% static 'js/sidenav.js' %}"></script>
 
     <!--Content-->
     <div class="content">
+
+        <!--Main Content-->
         <div class="content-main">
-            {% if Edit %}
-                <h3 class="page-title">Éditer un event</h3>
-            {% else %}
-                <h3 class="page-title">Créer un event</h3>
-            {% endif %}
-            <form action="" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="news-card">
-                    <div class="news-card-content">
-                        {{EditEvent.name.errors}}
-                        Nom de l'évènement :<br>
-                        {{EditEvent.name}}<br>
 
-                        {{EditEvent.description.errors}}
-                        Description de l'évènement :<br>
-                        {{EditEvent.description}}<br>
-                        <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
+            <h3 class="page-title">{% if Edit %}Éditer{% else %}Créer{% endif %} un event</h3>
 
-                        {{EditEvent.date.errors}}
-                        Date de l'évènement :<br>
-                        {{EditEvent.date}}
-                        <script>
-                            $(function () {
-                                $("#id_date").datetimepicker({
-                                    format: 'd/m/Y H:i',
-                                });
-                            });
-                        </script><br>
+            <!--News Card-->
+            <div class="news-card">
 
-                        {{EditEvent.location.errors}}
-                        Où se déroulera l'évènement :<br>
-                        {{EditEvent.location}}<br>
-
-                        {{EditEvent.poster.errors}}
-                        Ajouter une image :<br>
-                        {{EditEvent.poster}}<br>
-
-                        {{EditEvent.club.errors}}
-                        Club :<br>
-                        {{EditEvent.club}}<br>
-                    </div>
-                    <div class="news-card-actions">
-                        <div class="news-card-popularity">
-                            <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
-                            <input class="button green-button" type="submit" name= "Valider" value="Valider">
-                            {% if Edit %}
-                                <input class="button red-button" type="submit" name="Supprimer" value="Supprimer l'event">
-                            {% endif %}
-                        </div>
+                <div class="news-card-header">
+                    <div class="news-card-header-image"><img src="../assets/img/bde.png" alt=""></div>
+                    <div class="news-card-header-text">
+                        <span class="news-card-header-name">Nom de la personne</span>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-</body>
-</html>
+
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="news-card-content">
+                        <div class="centered-div">
+                            {{EditEvent.name.errors}}
+                            <div class="input-title">Nom de l'évènement :</div>
+                            {{EditEvent.name}}
+
+                            {{EditEvent.description.errors}}
+                            <div class="input-title">Description de l'évènement :</div>
+                            <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
+                            {{EditEvent.description}}
+
+                            {{EditEvent.date.errors}}
+                            <div class="input-title">Date de l'évènement :</div>
+                            {{EditEvent.date}}
+                            <script>
+                                $(function () {
+                                    $("#id_date").datetimepicker({
+                                        format: 'd/m/Y H:i',
+                                    });
+                                });
+                            </script>
+
+                            {{EditEvent.location.errors}}
+                            <div class="input-title">Où se déroule l'évènement :</div>
+                            {{EditEvent.location}}
+
+                            {{EditEvent.poster.errors}}
+                            <div class="input-title">Ajouter/modifier une image :</div>
+                            {{EditEvent.poster}}
+
+                            {{EditEvent.club.errors}}
+                            <div class="input-title">Club :</div>
+                            {{EditEvent.club}}
+                        </div>
+                    </div>
+                    <!--If edit and post.illustration-->
+                    <div class="news-card-images">
+                        <div class="news-card-carousel">
+                            <div class="carousel-cell">
+                                <img class="news-card_image_sized" src="../assets/img/guartcamole.jpg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="centered-div">
+                        <a href="{% url 'news:posts' %}"><button class="button red-button">Annuler</button></a>
+                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                        {% if Edit %}
+                            <input class="button red-button" type="submit" name="Supprimer" value="Supprimer l'event">
+                        {% endif %}
+                    </div>
+                </form>
+
+            </div><!--End of News Card-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+</body><!--End of Body-->
+</html><!--End of Document-->

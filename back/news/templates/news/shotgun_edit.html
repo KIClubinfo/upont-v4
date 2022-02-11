@@ -9,72 +9,84 @@
 
     <!--Sidenav-->
     {% include "sidenav.html" with active_link="news" %}
+    <script src="{% static 'js/sidenav.js' %}"></script>
 
     <!--Content-->
     <div class="content">
-        <div class="content-header">
-            <div class="row justify-content-between w-100">
-                <div class="col">
-                    <div class="search-input-group">
-                        <input type="text" class="search-input" placeholder="Rechercher">
-                        <button class="button search-button"><i class="fas fa-search "></i></button>
+
+        <!--Main Content-->
+        <div class="content-main">
+
+            <h3 class="page-title">Édition d'un shotgun</h3>
+
+            <!--News Card-->
+            <div class="news-card">
+                <div class="news-card-header">
+                    <div class="news-card-header-image"><img src="../assets/img/bde.png" alt=""></div>
+                    <div class="news-card-header-text">
+                        <span class="news-card-header-name">Nom de la personne</span>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="content-main">
-            <h1>Édition d'un shotgun :</h1>
-            <form action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" class="form-control" id="1"><br>
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                Club :
-                {{form.club.errors}}
-                {{form.club}}
-                <br>
-                Titre :
-                {{form.title.errors}}
-                {{form.title}}
-                <br>
-                Description :
-                {{form.content.errors}}
-                {{form.content}}
-                <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
-                <br>
-                Date de début :
-                {{form.starting_date.errors}}
-                {{form.starting_date}}
-                <script>
-                    $(function () {
-                        $("#id_starting_date").datetimepicker({
-                            format: 'd/m/Y H:i',
-                        });
-                    });
-                </script>
-                <br>
-                Date de fin :
-                {{form.ending_date.errors}}
-                {{form.ending_date}}
-                <script>
-                    $(function () {
-                        $("#id_ending_date").datetimepicker({
-                            format: 'd/m/Y H:i',
-                        });
-                    });
-                </script>
-                <br>
-                Nombre de places :
-                {{form.size.errors}}
-                {{form.size}}
-                <br>
-                Requiert une motivation :
-                {{form.requires_motivation.errors}}
-                {{form.requires_motivation}}
-                <br>
-                <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
-                <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button red-button">Annuler</button></a>
-            </form>
-        </div>
-    </div>
-    <script src="{% static 'js/sidenav.js' %}"></script>
-</body>
-</html>
+                <div class="news-card-content">
+                    <form class="centered-div" action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" id="1">
+                        {% csrf_token %}
+
+                        {{ form.non_field_errors }}
+
+                        {{form.club.errors}}
+                        <div class="input-title">Club :</div>
+                        {{form.club}}
+
+                        {{form.title.errors}}
+                        <div class="input-title">Titre :</div>
+                        {{form.title}}
+
+                        {{form.content.errors}}
+                        <div class="input-title">Description :</div>
+                        <div class="input-title">Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</div>
+                        {{form.content}}
+
+                        {{form.starting_date.errors}}
+                        <div class="input-title">Date de début :</div>
+                        {{form.starting_date}}
+                        <script>
+                            $(function () {
+                                $("#id_starting_date").datetimepicker({
+                                    format: 'd/m/Y H:i',
+                                });
+                            });
+                        </script>
+
+                        {{form.ending_date.errors}}
+                        <div class="input-title">Date de fin :</div>
+                        {{form.ending_date}}
+                        <script>
+                            $(function () {
+                                $("#id_ending_date").datetimepicker({
+                                    format: 'd/m/Y H:i',
+                                });
+                            });
+                        </script>
+
+                        {{form.size.errors}}
+                        <div class="input-title">Nombre de place :</div>
+                        {{form.size}}
+
+                        {{form.requires_motivation.errors}}
+                        <div class="input-title">Requiert une motivation :</div>
+                        {{form.requires_motivation}}
+
+                        <div class="centered-div">
+                            <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
+                            <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}"><button class="button red-button">Annuler</button></a>
+                        </div>
+                    </form>
+                </div>
+            </div><!--End of News Card-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+</html><!--End of Document-->

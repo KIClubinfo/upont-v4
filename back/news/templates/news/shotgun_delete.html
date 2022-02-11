@@ -9,9 +9,12 @@
 
     <!--Sidenav-->
     {% include "sidenav.html" with active_link="news" %}
+    <script src="{% static 'js/sidenav.js' %}"></script>
 
     <!--Content-->
     <div class="content">
+
+        <!--Header Content-->
         <div class="content-header">
             <div class="row justify-content-between w-100">
                 <div class="col">
@@ -22,17 +25,31 @@
                 </div>
             </div>
         </div>
+
+        <!--Main Content-->
         <div class="content-main">
-            <h1>Administration des shotguns :</h1>
-            <div class="box", style="margin-bottom: 1rem">
-                <h3>{{shotgun.title}}</a>:</h3>
-            <h5>Veux-tu vraiment supprimer ce shotgun ? Cette action sera irréversible et supprimera également toutes les participations de tous les élèves.</h5>
-            <form action="{% url 'news:delete_shotgun' shotgun.id %}" method="post" id="1">
-                {% csrf_token %}
-                <button form=1 type="submit" value="Supprimer" class="button red-button">Supprimer</button><a href="{% url 'news:shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button type="button" class="button green-button">Annuler</button></a>
-            </form>
-        </div>
-    </div>
-    <script src="{% static 'js/sidenav.js' %}"></script>
-</body>
-</html>
+
+            <h3 class="page-title">Administration des Shotguns</h3>
+
+            <!--Box-->
+            <div class="box small-box">
+                <h5 class="section-title">{{shotgun.title}}</h5>
+                <p class="text-center mt-2">Veux-tu vraiment supprimer ce shotgun ? Cette action sera irréversible et supprimera également toutes les participations de tous les élèves.</p>
+
+                <form action="{% url 'news:delete_shotgun' shotgun.id %}" method="post" id="1">
+                    {% csrf_token %}
+                    <div class="centered-div">
+                        <button form=1 type="submit" value="Supprimer" class="button red-button">Supprimer</button>
+                        <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}">
+                            <button type="button" class="button green-button">Annuler</button>
+                        </a>
+                    </div>
+                </form>
+
+            </div><!--End of Box-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+</body><!--End of Body-->
+</html><!--End of Document-->

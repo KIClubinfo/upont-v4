@@ -9,58 +9,73 @@
 
     <!--Sidenav-->
     {% include "sidenav.html" with active_link="news" %}
+    <script src="{% static 'js/sidenav.js' %}"></script>
 
     <!--Content-->
     <div class="content">
+
+        <!--Main Content-->
         <div class="content-main">
-            {% if Edit %}
-                <h3 class="page-title">Éditer un post</h3>
-            {% else %}
-                <h3 class="page-title">Créer un post</h3>
-            {% endif %}
-            <form action="" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="news-card">
+
+            <h3 class="page-title">{% if Edit %}Éditer{% else %}Créer{% endif %} un post</h3>
+
+            <!--News Card-->
+            <div class="news-card">
+                <div class="news-card-header">
+                    <div class="news-card-header-image"><img src="../assets/img/bde.png" alt=""></div>
+                    <div class="news-card-header-text">
+                        <span class="news-card-header-name">Nom de la personne</span>
+                    </div>
+                </div>
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
                     <div class="news-card-content">
-                        {{EditPost.event.errors}}
-                        Évènement concerné :<br>
-                        {{EditPost.event}}<br>
-                        {{EditPost.club.errors}}
-                        Publier en tant que :<br>
-                        {{EditPost.club}}<br>
-                        {{EditPost.title.errors}}
-                        Titre :<br>
-                        {{EditPost.title}}<br>
-                        {{EditPost.content.errors}}
-                        Description :<br>
-                        {{EditPost.content}}<br>
-                        <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
-                        {{EditPost.illustration.errors}}
-                        Ajouter une image :<br>
-                        {{EditPost.illustration}}<br>
+                        <div class="centered-div">
+                            {{EditPost.club.errors}}
+                            <div class="input-title">Publier en tant que :</div>
+                            {{EditPost.club}}
+
+                            {{EditPost.event.errors}}
+                            <div class="input-title">Est-ce que ce post est associé à un évènement ?</div>
+                            {{EditPost.event}}
+
+                            {{EditPost.title.errors}}
+                            <div class="input-title">Titre :</div>
+                            {{EditPost.title}}<br>
+
+                            {{EditPost.content.errors}}
+                            <div class="input-title">Description :</div>
+                            {{EditPost.content}}<br>
+                            <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
+
+                            {{EditPost.illustration.errors}}
+                            <div class="input-title">Ajouter/modifier une image :</div>
+                            {{EditPost.illustration}}<br>
+                        </div>
                     </div>
                     {%if post.illustration%}
                         <div class="news-card-images">
                             <!--All-Images-Linked-With-The-Post-->
-                            <div class="news-card-carousel" data-flickity='{}'>
-                                <div class="carousel-cell"><img src="{{post.illustration.url}}" style="height: 100%;" alt=""></div>
+                            <div class="news-card-carousel">
+                                <div class="carousel-cell">
+                                    <img class="news-card_image_sized" src="{{post.illustration.url}}" alt="">
+                                </div>
                             </div>
                         </div>
                     {%endif%}
-                    <div class="news-card-actions">
-                        <div class="news-card-popularity">
-                            <a href="{% url 'news:posts' %}"><span class="button red-button">Annuler</span></a>
-                            <input class="button green-button" type="submit" name= "Valider" value="Valider">
-                            {% if Edit %}
-                                <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
-                            {% endif %}
-                        </div>
+                    <div class="centered-div">
+                        <a href="{% url 'news:posts' %}"><button class="button red-button">Annuler</button></a>
+                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                        {% if Edit %}
+                            <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
+                        {% endif %}
                     </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <script src="{% static 'js/sidenav.js' %}"></script>
-    <script src="{% static 'js/flickity.pkgd.min.js' %}"></script>
-</body>
-</html>
+                </form>
+            </div><!--End of News Card-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+</html><!--End of Document-->
