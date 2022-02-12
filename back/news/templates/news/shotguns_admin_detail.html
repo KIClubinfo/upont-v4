@@ -67,12 +67,9 @@
 
                     <h3 class="page-title mt-2">Participations</h3>
 
-                    <!--Box-->
-                    <div class="box small-box">
-
-
-
-                        {% if shotgun.is_ended and shotgun.requires_motivation%}
+                    {% if shotgun.is_ended and shotgun.requires_motivation%}
+                        <!--Box-->
+                        <div class="box small-box">
                             {% if shotgun.motivations_review_finished %}
                                 <h5 class="section-title">
                                     <strong class="text-bold">Les résultats ont été publiés !</strong>
@@ -89,9 +86,8 @@
                                     <a href="{% url 'news:publish_shotgun_results' shotgun.id %}"><button class="button red-button">Publier les résultats</button></a>
                                 </div>
                             {% endif %}
-                        {% endif %}
-
-                    </div><!--End of Box-->
+                        </div><!--End of Box-->
+                    {% endif %}
 
                     {% if shotgun.requires_motivation and not shotgun.motivations_review_finished %}
                         {% for participation in shotgun.participations %}
