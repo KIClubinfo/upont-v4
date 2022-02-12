@@ -98,7 +98,7 @@ def event_detail(request, event_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     event = get_object_or_404(Event, pk=event_id)
     event_posts = Post.objects.filter(event__pk=event_id).order_by("-date")
-    is_member = Membership.objects.filter(student__pk=student.id, club=event.club)
+    is_member = event.club.is_member(student.id)
     context = {
         "event": event,
         "event_posts": event_posts,
