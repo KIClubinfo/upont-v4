@@ -82,7 +82,7 @@ def add(request):
         user, created = models.User.objects.get_or_create(
             last_name=column[1],
             first_name=column[2],
-            username=(column[2] + "." + column[1]).replace(" ", "-").lower(),
+            username=column[3].split("@")[0],
             email=column[3],
         )
         if created:
