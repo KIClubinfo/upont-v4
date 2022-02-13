@@ -72,6 +72,16 @@
                             {% endif %}
                         </div>
                     </div>
+                    {%if event.poster%}
+                        <div class="news-card-images">
+                            <!--All-Images-Linked-With-The-Event-->
+                            <div class="news-card-carousel">
+                                <div class="carousel-cell">
+                                    <img class="news-card_image_sized" src="{{event.poster.url}}" alt="">
+                                </div>
+                            </div>
+                        </div>
+                    {%endif%}
                 </div><!--End of Column-->
 
                 <!--Column-->
