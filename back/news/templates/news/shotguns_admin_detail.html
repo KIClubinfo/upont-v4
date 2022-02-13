@@ -87,6 +87,12 @@
                                 </div>
                             {% endif %}
                         </div><!--End of Box-->
+                    {% else %}
+                        <div class="box small-box">
+                            <h5 class="section-title">
+                                <strong class="text-bold">Les résultats pourront être publiés quand le shotgun sera terminé.</strong>
+                            </h5>
+                        </div>
                     {% endif %}
 
                     {% if shotgun.requires_motivation and not shotgun.motivations_review_finished %}

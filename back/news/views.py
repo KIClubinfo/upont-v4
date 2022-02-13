@@ -180,19 +180,15 @@ def event_participate(request, event_id, action):
 @login_required
 def post_edit(request, post_id):
     student = get_object_or_404(Student, user__id=request.user.id)
-    post = get_object_or_404(Post, pk=post_id)
+    post = get_object_or_404(Post, id=post_id)
 
     if post.club:
-        membership_club_list = Membership.objects.filter(
-            student__pk=student.id, club__pk=post.club.id
-        )
-        if not membership_club_list:  # If no match is found
+        if not post.club.is_member(student.id):
             raise PermissionDenied
     else:
         if post.author.user.id != request.user.id:
             raise PermissionDenied
 
-    post = get_object_or_404(Post, id=post_id)
     context = {}
     if request.method == "POST":
         if "Annuler" in request.POST:
@@ -216,6 +212,7 @@ def post_edit(request, post_id):
     else:
         form = EditPost(request.user.id, instance=post)
     context["EditPost"] = form
+    context["post"] = post
     context["Edit"] = True
     return render(request, "news/post_edit.html", context)
 

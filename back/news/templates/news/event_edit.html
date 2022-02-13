@@ -64,6 +64,10 @@
                             {{EditEvent.club.errors}}
                             <div class="input-title">Club :</div>
                             {{EditEvent.club}}
+
+                            {{EditEvent.shotgun.errors}}
+                            <div class="input-title">Shotgun :</div>
+                            {{EditEvent.shotgun}}
                         </div>
                     </div>
                     <!--If edit and post.illustration-->
@@ -75,7 +79,7 @@
                         </div>
                     </div>
                     <div class="centered-div">
-                        <a href="{% url 'news:posts' %}"><button class="button red-button">Annuler</button></a>
+                        <input class="button red-button" type="submit" name= "Annuler" value="Annuler">
                         <input class="button green-button" type="submit" name= "Valider" value="Valider">
                         {% if Edit %}
                             <input class="button red-button" type="submit" name="Supprimer" value="Supprimer l'event">

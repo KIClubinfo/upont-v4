@@ -91,9 +91,9 @@
                                 <div class="news-card-header">
                                     <!--Poster-Image-Name-and-Title-of-the-post-->
                                     {% if post.club %}
-                                        <div class="news-card-header-image"><img src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}{% endif %}"></div>
+                                        <div class="news-card-header-image"><img src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}"></div>
                                     {% else %}
-                                        <div class="news-card-header-image"><img src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}{% endif %}"></div>
+                                        <div class="news-card-header-image"><img src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}"></div>
                                     {% endif %}
                                     <div class="news-card-header-text">
                                         <span class="news-card-header-name">

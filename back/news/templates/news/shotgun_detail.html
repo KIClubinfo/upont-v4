@@ -65,7 +65,7 @@
 
                         {%if already_participated%}
                             <p class="text-bold text-center mt-2">Tu as déjà participé à ce shotgun</p>
-                            <p class="text-center">Ta motivation :</p>
+                            {% if shotgun.requires_motivation %}<p class="text-center">Ta motivation :</p>{% endif %}
                             {%if shotgun.requires_motivation%}
                                 <div class="information-box">
                                     <p class="text-justified mb-0">{{motivation}}</p>
@@ -78,20 +78,20 @@
                                 {%else%}
                                     <form action="{% url 'news:shotgun_participate' shotgun.id %}" method="post" class="form-control" id="1" style="display: flex; justify-content: center; flex-direction: column;">
                                         {% csrf_token %}
-                                        <p class="text-center mt-2">Tu n'as pas encore participé à ce shotgun.<br>Tu peux entrer une motivation pour participer.</p>
+                                        <p class="text-center mt-2">Tu n'as pas encore participé à ce shotgun.{% if shotgun.requires_motivation %}<br>Tu peux entrer une motivation pour participer.</p>{% endif %}
 
-                                        {% if error_message %}
-                                            <p class="text-center mt-2">{{ error_message }}</p>
-                                        {% endif %}
+                                            {% if error_message %}
+                                                <p class="text-center mt-2">{{ error_message }}</p>
+                                            {% endif %}
 
-                                        {%if shotgun.requires_motivation%}
-                                            <textarea name="motivation" id="" cols="30" rows="2" class="text-input" placeholder="Motivation"></textarea>
-                                        {%endif%}
+                                            {%if shotgun.requires_motivation%}
+                                                <textarea name="motivation" id="" cols="30" rows="2" class="text-input" placeholder="Motivation"></textarea>
+                                            {%endif%}
 
-                                        <div class="centered-div">
-                                            <button form=1 type="submit" value="Participer" class="button green-button">Participer</button>
-                                        </div>
-                                    </form>
+                                            <div class="centered-div">
+                                                <button form=1 type="submit" value="Participer" class="button green-button">Participer</button>
+                                            </div>
+                                        </form>
                                 {%endif%}
                             {%else%}
                                 <p class="text-center mt-2">Ce shotgun commencera le {{shotgun.starting_date}}.</p>
