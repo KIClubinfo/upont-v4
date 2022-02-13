@@ -171,9 +171,9 @@ def profile_edit(request):
                 instance=Student.objects.get(user=request.user),
             )
             if form.is_valid():
-                if "picture" in request.FILES:
-                    student.picture.delete()
                 form.save()
+                if "picture" in request.FILES:
+                    student.picture.delete(save=False)
                 return redirect("social:profile")
 
     else:
@@ -251,9 +251,9 @@ def club_edit(request, club_id):
             )
             if form_club.is_valid():
                 if "logo" in request.FILES:
-                    club.logo.delete()
+                    club.logo.delete(save=False)
                 if "background_picture" in request.FILES:
-                    club.logo.delete()
+                    club.background_picture.delete(save=False)
                 form_club.save()
                 return redirect("social:club_detail", club_id=club.id)
 
