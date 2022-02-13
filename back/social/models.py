@@ -80,7 +80,8 @@ class Student(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        self.picture = compress_image(self.picture, 50, self.user.username)
+        if self.picture:
+            self.picture = compress_image(self.picture, 50, self.user.username)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -117,10 +118,12 @@ class Club(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        self.logo = compress_image(self.logo, 30, unidecode(self.name))
-        self.background_picture = compress_image(
-            self.background_picture, 50, unidecode(self.name)
-        )
+        if self.logo:
+            self.logo = compress_image(self.logo, 30, unidecode(self.name))
+        if self.background_picture:
+            self.background_picture = compress_image(
+                self.background_picture, 50, unidecode(self.name)
+            )
         super().save(*args, **kwargs)
 
     def __str__(self):
