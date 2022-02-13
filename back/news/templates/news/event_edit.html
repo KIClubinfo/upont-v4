@@ -22,13 +22,6 @@
             <!--News Card-->
             <div class="news-card">
 
-                <div class="news-card-header">
-                    <div class="news-card-header-image"><img src="../assets/img/bde.png" alt=""></div>
-                    <div class="news-card-header-text">
-                        <span class="news-card-header-name">Nom de la personne</span>
-                    </div>
-                </div>
-
                 <form action="" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="news-card-content">
@@ -70,16 +63,18 @@
                             {{EditEvent.shotgun}}
                         </div>
                     </div>
-                    <!--If edit and post.illustration-->
-                    <div class="news-card-images">
-                        <div class="news-card-carousel">
-                            <div class="carousel-cell">
-                                <img class="news-card_image_sized" src="../assets/img/guartcamole.jpg" alt="">
+                    {%if event.poster%}
+                        <div class="news-card-images">
+                            <!--All-Images-Linked-With-The-Event-->
+                            <div class="news-card-carousel">
+                                <div class="carousel-cell">
+                                    <img class="news-card_image_sized" src="{{event.poster.url}}" alt="">
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {%endif%}
                     <div class="centered-div">
-                        <input class="button red-button" type="submit" name= "Annuler" value="Annuler">
+                        <a href="{% url 'news:event_detail' event.id %}"><button type="button" class="button red-button">Annuler</button></a>
                         <input class="button green-button" type="submit" name= "Valider" value="Valider">
                         {% if Edit %}
                             <input class="button red-button" type="submit" name="Supprimer" value="Supprimer l'event">

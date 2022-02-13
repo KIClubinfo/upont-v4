@@ -121,9 +121,7 @@ def event_edit(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     context = {}
     if request.method == "POST":
-        if "Annuler" in request.POST:
-            return redirect("news:event_detail", event_id=event.id)
-        elif "Supprimer" in request.POST:
+        if "Supprimer" in request.POST:
             event.delete()
             return redirect("news:events")
         elif "Valider" in request.POST:
@@ -142,6 +140,7 @@ def event_edit(request, event_id):
     else:
         form = EditEvent(request.user.id, instance=event)
     context["EditEvent"] = form
+    context["event"] = event
     return render(request, "news/event_edit.html", context)
 
 
@@ -149,9 +148,7 @@ def event_edit(request, event_id):
 def event_create(request):
     context = {}
     if request.method == "POST":
-        if "Annuler" in request.POST:
-            return redirect("news:events")
-        elif "Valider" in request.POST:
+        if "Valider" in request.POST:
             form = EditEvent(
                 request.user.id,
                 request.POST,
@@ -191,9 +188,7 @@ def post_edit(request, post_id):
 
     context = {}
     if request.method == "POST":
-        if "Annuler" in request.POST:
-            return redirect("news:posts")
-        elif "Supprimer" in request.POST:
+        if "Supprimer" in request.POST:
             post.delete()
             return redirect("news:posts")
         elif "Valider" in request.POST:
@@ -221,9 +216,7 @@ def post_edit(request, post_id):
 def post_create(request):
     context = {}
     if request.method == "POST":
-        if "Annuler" in request.POST:
-            return redirect("news:posts")
-        elif "Valider" in request.POST:
+        if "Valider" in request.POST:
             form = EditPost(
                 request.user.id,
                 request.POST,
