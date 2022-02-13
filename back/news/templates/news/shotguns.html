@@ -36,6 +36,14 @@
             <!--Navigation-->
             {% include "../news/newsnav.html" %}
 
+            <div class="centered-div mt-2">
+                {% if display_admin_button %}
+                    <a href="{% url 'news:shotguns_admin' %}" style="text-decoration: none"><button class="button blue-button">Administration des shotguns</button></a>
+                    <br>
+                {% endif %}
+                <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
+            </div>
+
             {% for shotgun in next_shotguns %}
                 <!--Box-->
                 <div class="box small-box">
@@ -71,15 +79,6 @@
             {% endfor %}
 
             <h3 class="page-title">Mes Shotguns</h3>
-
-            <div class="centered-div mt-2">
-                {% if display_admin_button %}
-                    <a href="{% url 'news:shotguns_admin' %}" style="text-decoration: none"><button class="button blue-button">Administration des shotguns</button></a>
-                    <br>
-                {% endif %}
-                <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
-            </div>
-
 
             {% for shotgun in user_shotguns %}
                 <!--Box-->

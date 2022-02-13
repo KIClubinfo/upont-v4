@@ -65,8 +65,8 @@
 
                         {%if already_participated%}
                             <p class="text-bold text-center mt-2">Tu as déjà participé à ce shotgun</p>
-                            {% if shotgun.requires_motivation %}<p class="text-center">Ta motivation :</p>{% endif %}
-                            {%if shotgun.requires_motivation%}
+                            {% if shotgun.requires_motivation %}
+                                <p class="text-center">Ta motivation :</p>
                                 <div class="information-box">
                                     <p class="text-justified mb-0">{{motivation}}</p>
                                 </div>
