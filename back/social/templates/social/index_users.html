@@ -9,11 +9,17 @@
 
     <!--Sidenav-->
     {% include "sidenav.html" with active_link="users" %}
+    <script src="../js/sidenav.js"></script>
 
     <!--Content-->
     <div class="content">
+
+        <!--Header Content-->
         {% include "../social/searchbar.html" with all_student_list=all_student_list %}
+
+        <!--Main Content-->
         <div class="content-main">
+
             <h3 class="page-title">
                 {% if searched_expression %}
                     Résultats de la recherche "{{searched_expression}}"
@@ -21,9 +27,13 @@
                     Élèves
                 {% endif %}
             </h3>
-            <div class="row">
-                {% if student_displayed_list %}
+
+            {% if student_displayed_list %}
+                <!--Row-->
+                <div class="row">
+
                     {% for student in student_displayed_list %}
+                        <!--Column-->
                         <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                             <div class="user-card">
                                 <div class="user-image">
@@ -35,21 +45,22 @@
                                 </div>
                                 <a href="{% url 'social:profile_viewed' student.user.id %}" class="stretched-link"></a>
                             </div>
-                        </div>
+                        </div><!--End of Column-->
                     {% endfor %}
-                {% else %}
-                    {% if searched_expression %}
-                        <p>Aucun élève n'a été trouvé</p>
-                    {% else %}
-                        <p>Il n'y a pas d'élèves dans la base de données.</p>
-                    {% endif %}
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <!--EndContent-->
 
-    <!--Scripts-->
-    <script src="{% static 'js/sidenav.js' %}"></script>
-</body>
-</html>
+                </div><!--End of Row-->
+            {% else %}
+                {% if searched_expression %}
+                    <h5 class="section-title mt-1">Aucun élève n'a été trouvé</h5>
+                {% else %}
+                    <h5 class="section-title mt-1">Il n'y a pas d'élèves dans la base de données</h5>
+                {% endif %}
+            {% endif %}
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+
+</html><!--End of Document-->
