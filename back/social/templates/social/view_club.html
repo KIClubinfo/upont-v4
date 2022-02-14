@@ -34,7 +34,7 @@
             <div class="club-box">
 
                 <div class="club-group-image-container">
-                    <img src="{% if club.background_picture %}{{club.background_picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" class="club-group-image" alt="">
+                    <img src="{% if club.background_picture %}{{club.background_picture.url}}{% else %}{% static 'assets/img/equipe.jpg' %}{% endif %}" class="club-group-image" alt="">
                 </div>
 
                 <!--Row-->
@@ -59,7 +59,7 @@
 
                         <p class="text-thin text-justified mt-2" style="font-size: medium;">{{club.description|markdownify}}</p>
 
-                        <h5 class="section-title text-bold mt-4">Membre du club :</h5>
+                        <h5 class="section-title text-bold mt-4">Membres du club :</h5>
 
                         {% if members %}
                             <!--End of Row-->
