@@ -21,12 +21,6 @@
 
             <!--News Card-->
             <div class="news-card">
-                <div class="news-card-header">
-                    <div class="news-card-header-image"><img src="../assets/img/bde.png" alt=""></div>
-                    <div class="news-card-header-text">
-                        <span class="news-card-header-name">Nom de la personne</span>
-                    </div>
-                </div>
                 <form action="{% if Edit %}{% url 'news:post_edit' post.id %}{% else %}{% url 'news:post_create' %}{% endif %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="news-card-content">
@@ -46,7 +40,7 @@
                             {{EditPost.content.errors}}
                             <div class="input-title">Description :</div>
                             {{EditPost.content}}<br>
-                            <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
+                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</p>
 
                             {{EditPost.illustration.errors}}
                             <div class="input-title">Ajouter/modifier une image :</div>

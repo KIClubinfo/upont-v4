@@ -37,7 +37,7 @@
 
                         {{form.content.errors}}
                         <div class="input-title">Description :</div>
-                        <div class="input-title">Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</div>
+                        <div class="input-title">Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</div>
                         {{form.content}}
 
                         {{form.starting_date.errors}}
