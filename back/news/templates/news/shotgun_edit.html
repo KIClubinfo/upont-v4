@@ -21,12 +21,6 @@
 
             <!--News Card-->
             <div class="news-card">
-                <div class="news-card-header">
-                    <div class="news-card-header-image"><img src="../assets/img/bde.png" alt=""></div>
-                    <div class="news-card-header-text">
-                        <span class="news-card-header-name">Nom de la personne</span>
-                    </div>
-                </div>
                 <div class="news-card-content">
                     <form class="centered-div" action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" id="1">
                         {% csrf_token %}

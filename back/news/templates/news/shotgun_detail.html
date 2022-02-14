@@ -9,7 +9,7 @@
 
     <!--Sidenav-->
     {% include "sidenav.html" with active_link="news" %}
-    <script src="../js/sidenav.js"></script>
+    <script src="{% static 'js/sidenav.js' %}"></script>
 
     <!--Content-->
     <div class="content">
@@ -40,7 +40,7 @@
                         <h5 class="section-title">Information sur ce shotgun</h5>
                         <ul class="">
                             <li><div class="text-bold mt-2">Organisateur : <strong class="text-thin">{{shotgun.club.name}}</strong></div></li>
-                            <li><div class="text-bold mt-2">Début du shotgun : <strong class="text-thin">{shotgun.starting_date}}</strong></div></li>
+                            <li><div class="text-bold mt-2">Début du shotgun : <strong class="text-thin">{{shotgun.starting_date}}</strong></div></li>
                             <li><div class="text-bold mt-2">Fin du shotgun : <strong class="text-thin">{{shotgun.ending_date}}</strong></div></li>
                             <li><div class="text-bold mt-2">Motivation : <strong class="text-thin">{%if shotgun.requires_motivation%}Requise.{%else%}Non.{%endif%}</strong></div></li>
                             <li><div class="text-bold mt-2">Nombre de places : <strong class="text-thin">{{shotgun.size}}</strong></div></li>
