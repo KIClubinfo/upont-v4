@@ -12,58 +12,93 @@
 
     <!--Content-->
     <div class="content">
+
+        <!--Header Content-->
         {% include "../social/searchbar.html" with all_student_list=all_student_list %}
+
+        <!--Main Content-->
         <div class="content-main">
+
+            <!--Box-->
             <div class="box profil-box">
+
+                <!--Row-->
                 <div class="row">
+
+                    <!--Column-->
                     <div class="col-lg-8">
+
+                        <!--Row-->
                         <div class="row">
+
+                            <!--Column-->
                             <div class="col-lg-5">
-                                <div class="profil-image"><img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" height="100%" width="100%" alt=""></div>
+                                <div class="profil-image">
+                                    <img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+                                </div>
                             </div>
-                            <div class="col-lg-7" style="text-align: center;">
-                                <div class="section-title">Mes informations personnelles</div>
-                            </div>
-                        </div>
+                            <div class="centered-div col-lg-7">
+                                <h5 class="section-title">Mes informations personnelles</h5>
+                            </div><!--End of Column-->
+
+                        </div><!--End of Row-->
+
+                        <!--Row-->
                         <div class="row">
-                            <div class="col-lg-5" style="text-align: center;">
+
+                            <!--Column-->
+                            <div class="centered-div col-lg-5">
                                 <div class="profil-information-box">{% if student.user.first_name %}{{student.user.first_name}}{% else %}---Prénom---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.phone_number %}{{student.phone_number}}{% else %}---Tel---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.gender %}{{student.gender}}{% else %}------{% endif %}</div>
-                            </div>
-                            <div class="col-lg-7" style="text-align: center;">
+
+                                <a href="{% url 'social:profile_edit' %}"><button class="button blue-button">Modifier mon profil</button></a>
+                            </div><!--End of Column-->
+
+                            <!--Column-->
+                            <div class="centered-div col-lg-7">
                                 <div class="profil-information-box">{% if student.user.last_name %}{{student.user.last_name}}{% else %}---Nom---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.department %}{{student.department}}{% else %}-------{% endif %}</div>
                                 <div class="profil-information-box">{% if student.origin %}{{student.origin}}{% else %}-------{% endif %}</div>
-                                <a href="{% url 'social:profile_edit' %}">
-                                    <button class="button blue-button">Modifier mon profil</button>
-                                </a>
-                                <a href="{% url 'password_change' %}">
-                                    <button class="button blue-button">Changer mon mot de passe</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4" style="border-left: solid hsla(0, 0%, 100%, 0.25) 0.25px;">
-                        <div class="section-title">Mes activités associatives</div>
+
+                                <a href="{% url 'password_change' %}"><button class="button blue-button">Changer mon mot de passe</button></a>
+                            </div><!--End of Column-->
+
+                        </div><!--End of Row-->
+
+                    </div><!--End of Column-->
+
+                    <!--Column-->
+                    <div class="col-lg-4">
+
+                        <h5 class="section-title">Mes activités associatives</h5>
+
                         {% if membership_club_list %}
                             {% for membership in membership_club_list %}
                                 <div class="user-card">
-                                    <div class="user-image"><img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
-                                    <div class="user-information"><span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span> <span>{{membership.role.name}}</span></div>
+                                    <div class="user-image">
+                                        <img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+                                    </div>
+                                    <div class="user-information">
+                                        <span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span>
+                                        <span>{{membership.role.name}}</span>
+                                    </div>
                                 </div>
                             {% endfor %}
                         {% else %}
-                            <p>Je ne suis pas membre d'un club.</p> <!--TO DO : écrire ça bien-->
+                            <div class="text-bold text-center mt-2">Je ne suis pas membre d'un club.</div>
                         {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--EndContent-->
 
-    <!--Scripts-->
-    <script src="{% static 'js/sidenav.js' %}"></script>
-</body>
-</html>
+                    </div><!--End of Column-->
+
+                </div><!--End of Row-->
+
+            </div><!--End of Box-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+
+</html><!--End of Document-->

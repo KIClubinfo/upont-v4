@@ -12,35 +12,53 @@
 
     <!--Content-->
     <div class="content">
-        <div class="content-main">
-            <h4 class="club-box">
-                <form action="" method="POST">
-                    {% csrf_token %}
-                    <br>
-                    <h2 class="page-subtitle">Demande de création de club:</h2>
-                    <div class="row border-bottom">
-                        <div class="col-lg-6">
-                            <br>
-                            Nom du club:<br>
-                            {{ ClubRequest.name.errors }}
-                            {{ ClubRequest.name }}
-                            <br>
-                            Décris rapidement le club et motive ta demande: <br>
-                            {{ ClubRequest.content.errors }}
-                            {{ ClubRequest.content }}
-                        </div>
-                        <div style="text-align: center;">
-                            <input class="button red-button" type="submit" name="Annuler" value="Annuler">
-                            <input class="button green-button" type="submit" name= "Valider" value="Valider">
-                        </div>
+
+        <!--Header Content-->
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
-    <!--EndContent-->
 
-    <!--Scripts-->
-    <script src="{% static 'js/sidenav.js' %}"></script>
-</body>
-</html>
+        <!--Main Content-->
+        <div class="content-main">
+
+            <h3 class="page-title">Demande d'ajout de club</h3>
+
+            <!--Box-->
+            <div class="box small-box">
+
+                <!--Form-->
+                <form action="" method="POST" class="centered-div">
+
+                    {% csrf_token %}
+
+                    <div class="input-title">Nom du club :</div>
+                    {{ ClubRequest.name.errors }}
+                    {{ ClubRequest.name }}
+
+                    <div class="input-title mb-2">Décris rapidement le club et motive ta demande :</div>
+                    {{ ClubRequest.content.errors }}
+                    {{ ClubRequest.content }}
+
+                    <div class="centered-div">
+                        <a href="{% url 'social:club_index' %}"><button class="button red-button">Annuler</button></a>
+                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                    </div>
+
+                </form><!--End of Form-->
+
+            </div><!--End of Box-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+
+</html><!--End of Document-->

@@ -94,5 +94,5 @@ class ClubRequestForm(forms.ModelForm):
         )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
-            "content": forms.Textarea(attrs={"class": "profil-input"}),
+            "content": forms.Textarea(attrs={"class": "text-input"}),
         }
