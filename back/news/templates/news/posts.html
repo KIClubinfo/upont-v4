@@ -46,9 +46,9 @@
                 <div class="news-card" id="{{post.id}}">
                     <div class="news-card-header">
                         {% if post.club %}
-                            <div class="news-card-header-image"><img src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}"></div>
+                            <div class="news-card-header-image"><img src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"></div>
                         {% else %}
-                            <div class="news-card-header-image"><img src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}"></div>
+                            <div class="news-card-header-image"><img src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"></div>
                         {% endif %}
                         <div class="news-card-header-text">
                             <span class="news-card-header-name">
@@ -99,14 +99,17 @@
                                 <div class="news-card-comment">
                                     {% if comment.club %}
                                         <div class="news-card-comment-user-pic">
-                                            <img src="{% if comment.club.logo %}{{comment.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}">
+                                            <img src="{% if comment.club.logo %}{{comment.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}">
                                         </div>
                                     {% else %}
                                         <div class="news-card-comment-user-pic">
-                                            <img src="{% if comment.author.picture %}{{comment.author.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}">
+                                            <img src="{% if comment.author.picture %}{{comment.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
                                         </div>
                                     {% endif %}
-                                    <div class="news-card-comment-box">{{ comment.content }}</div>
+                                    <div class="news-card-comment-box">
+                                        <span class="text-bold">{{comment.author.user.first_name}} {{comment.author.user.last_name}}</span><br>
+                                        {{ comment.content }}
+                                    </div>
                                     {% if comment in my_comments %}
                                         <a href="{% url 'news:comment_delete' comment_id=comment.id post_id=post.id %}"><i class="fas fa-times-circle"></i></a>
                                     {% endif %}
@@ -118,7 +121,7 @@
                             {% csrf_token %}
                             <div class="news-card-edit-comment">
                                 <div class="news-card-comment-user-pic">
-                                    <img src="{% if user.student.picture %}{{user.student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}">
+                                    <img src="{% if user.student.picture %}{{user.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
                                 </div>
                                 <textarea class="news-card-edit-comment-input" type="text" name="content" id=""></textarea>
                             </div>

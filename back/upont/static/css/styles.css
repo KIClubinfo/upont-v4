@@ -256,7 +256,7 @@ img.logo{
     align-items: center;
     /* Sizing */
     width: 100vw;
-    min-height: 100vh;
+    height: 100vh;
     /* Z-Positioning */
     z-index: 1;
     /* Styling */
@@ -856,9 +856,10 @@ a.text-green:hover{
 
 .club-group-image-container{
     margin-top: -10rem;
-    background: rgba(255, 255, 255, 0.09);
+    background: var(--primary-bg-color);
+    border: solid hsla(0, 0%, 100%, 0.05) 4px;
     border-radius: 0.5rem;
-    max-height: 60vh;
+    height: 60vh;
     overflow: hidden;
 }
 
@@ -1186,6 +1187,7 @@ a.text-green:hover{
     font-size: 1rem;
     font-weight: 400;
     border-radius: 0.5rem;
+    word-wrap: break-word;
 }
 
 .news-card-edit-comment{

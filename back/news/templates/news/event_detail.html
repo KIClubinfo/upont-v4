@@ -100,9 +100,9 @@
                                 <div class="news-card-header">
                                     <!--Poster-Image-Name-and-Title-of-the-post-->
                                     {% if post.club %}
-                                        <div class="news-card-header-image"><img src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}"></div>
+                                        <div class="news-card-header-image"><img src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"></div>
                                     {% else %}
-                                        <div class="news-card-header-image"><img src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}"></div>
+                                        <div class="news-card-header-image"><img src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"></div>
                                     {% endif %}
                                     <div class="news-card-header-text">
                                         <span class="news-card-header-name">
@@ -161,7 +161,7 @@
                             {% for participation in event.shotgun.accepted_participations %}
                                 <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                     <div class="user-card">
-                                        <div class="user-image"><img src="{% if participation.participant.picture %}{{participation.participant.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                        <div class="user-image"><img src="{% if participation.participant.picture %}{{participation.participant.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
                                         <div class="user-information">
                                             <span class="user-name">{{participation.participant.user.first_name}} {{participation.participant.user.last_name}}</span>
                                         </div>
@@ -177,7 +177,7 @@
                             {% for participant in event.participants.all %}
                                 <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                     <div class="user-card">
-                                        <div class="user-image"><img src="{% if participant.picture %}{{participant.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                        <div class="user-image"><img src="{% if participant.picture %}{{participant.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
                                         <div class="user-information">
                                             <span class="user-name">{{participant.user.first_name}} {{participant.user.last_name}}</span>
                                         </div>

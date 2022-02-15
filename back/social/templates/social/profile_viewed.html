@@ -38,7 +38,7 @@
                     <div class="box profil-box">
 
                         <div class="profil-image">
-                            <img src="{% if student.picture %}{{student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+                            <img src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
                         </div>
                         <h5 class="section-title">{{student.user.first_name}} {{student.user.last_name}}</h5>
                         {% if student.phone_number is not None %}
@@ -67,7 +67,7 @@
                                 <div class="col-clublg-6">
 
                                     <div class="vignette-club-mini">
-                                        <img class="vignette-image-mini" src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/bde.png' %}{% endif %}" alt="">
+                                        <img class="vignette-image-mini" src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
                                         <div class="vignette-mini-title">
                                             <span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span>
                                             <span>{{membership.role.name}}</span>

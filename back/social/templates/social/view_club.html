@@ -34,7 +34,7 @@
             <div class="club-box">
 
                 <div class="club-group-image-container">
-                    <img src="{% if club.background_picture %}{{club.background_picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" class="club-group-image" alt="">
+                    <img src="{% if club.background_picture %}{{club.background_picture.url}}{% else %}{% endif %}" class="club-group-image" alt="">
                 </div>
 
                 <!--Row-->
@@ -43,7 +43,7 @@
                     <!--Column-->
                     <div class="col-lg-4">
                         <div class="club-image">
-                            <img src="{% if club.logo %}{{club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" height="100%" width="100%" alt="">
+                            <img src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" height="100%" width="100%" alt="">
                         </div>
                     </div><!--End of Column-->
 
@@ -70,7 +70,7 @@
                                     <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                         <div class="user-card">
                                             <div class="user-image">
-                                                <img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+                                                <img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
                                             </div>
                                             <div class="user-information">
                                                 <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
