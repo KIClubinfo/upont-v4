@@ -48,7 +48,7 @@
                             Description du club : <br>
                             {{ EditClub.description.errors }}
                             {{ EditClub.description }}
-                            <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
+                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</p>
                             <br>
                             Modifier la photo d'arrière plan du club :<br>
                             {{ EditClub.background_picture }}
@@ -60,11 +60,11 @@
                             Le club est actif :
                             {{ EditClub.active.errors }}
                             {{ EditClub.active }}
-                            <br>
+                            <br><br>
                             Le club a une cotisation :
                             {{ EditClub.has_fee.errors }}
                             {{ EditClub.has_fee }}
-                            <br>
+                            <br><br>
                             Modifier les catégories du club :
                             {{ EditClub.category.errors }}
                             {{ EditClub.category }}

@@ -31,7 +31,7 @@
 
                             {{EditEvent.description.errors}}
                             <div class="input-title">Description de l'évènement :</div>
-                            <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
+                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</p>
                             {{EditEvent.description}}
 
                             {{EditEvent.date.errors}}
@@ -73,7 +73,7 @@
                         </div>
                     {%endif%}
                     <div class="centered-div">
-                        <a href="{% url 'news:event_detail' event.id %}"><button type="button" class="button red-button">Annuler</button></a>
+                        <a href="{% if event %}{% url 'news:event_detail' event.id %}{% else %}{% url 'news:events' %}{% endif %}"><button type="button" class="button red-button">Annuler</button></a>
                         <input class="button green-button" type="submit" name= "Valider" value="Valider">
                         {% if Edit %}
                             <input class="button red-button" type="submit" name="Supprimer" value="Supprimer l'event">
