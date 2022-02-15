@@ -1,7 +1,13 @@
+from io import BytesIO
+from uuid import uuid4
+
 from django.contrib.auth import models as models2
+from django.core.files import File
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from PIL import Image
+from unidecode import unidecode
 
 
 class Promotion(models.Model):
@@ -68,10 +74,15 @@ class Student(models.Model):
     phone_number = models.CharField(
         validators=[phone_regex], max_length=17, null=True, blank=True
     )  # validators should be a list
-    picture = models.ImageField(upload_to="pictures", null=True, blank=True)
+    picture = models.ImageField(upload_to="pictures/", null=True, blank=True)
     nationality = models.ForeignKey(
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
     )
+
+    def save(self, *args, **kwargs):
+        if self.picture:
+            self.picture = compress_image(self.picture, 50, self.user.username)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.user.username
@@ -87,9 +98,9 @@ class Category(models.Model):
 class Club(models.Model):
     name = models.CharField(max_length=50, default="Club")
     nickname = models.CharField(max_length=10, default="Club", null=True, blank=True)
-    logo = models.ImageField(upload_to="logos", null=True, blank=True)
+    logo = models.ImageField(upload_to="logos/", null=True, blank=True)
     background_picture = models.ImageField(
-        upload_to="background_picture", null=True, blank=True
+        upload_to="background_pictures/", null=True, blank=True
     )
     description = models.TextField()
     active = models.BooleanField()
@@ -105,6 +116,15 @@ class Club(models.Model):
         related_name="clubs",
         blank=True,
     )
+
+    def save(self, *args, **kwargs):
+        if self.logo:
+            self.logo = compress_image(self.logo, 30, unidecode(self.name))
+        if self.background_picture:
+            self.background_picture = compress_image(
+                self.background_picture, 50, unidecode(self.name)
+            )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -139,3 +159,12 @@ class ClubRequest(models.Model):
 
     def __str__(self):
         return self.student.user.username + " : " + self.name
+
+
+def compress_image(image, quality, name):
+    im = Image.open(image)
+    im = im.convert("RGB")
+    im_io = BytesIO()
+    im.save(im_io, "JPEG", quality=quality, optimize=True)
+    new_image = File(im_io, name=name + "_" + uuid4().hex + ".jpg")
+    return new_image
