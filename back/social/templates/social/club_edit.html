@@ -18,9 +18,9 @@
                     {% csrf_token %}
                     <div class="club-group-image-container">
                         {% if club.background_picture %}
-                            <img class="club-card-image" src={{club.background_picture.url}} alt="">
+                            <img class="club-group-image" src={{club.background_picture.url}} alt="">
                         {% else %}
-                            <img class="club-card-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
+                            <img class="club-group-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
                         {% endif %}
                     </div>
                     <div class="row">

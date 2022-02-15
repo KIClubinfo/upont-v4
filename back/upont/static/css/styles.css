@@ -868,7 +868,7 @@ a.text-green:hover{
     margin-top: -10rem;
     background: var(--primary-bg-color);
     border-radius: 0.5rem;
-    height: 60vh;
+    max-height: 60vh;
     overflow: hidden;
 }
 
