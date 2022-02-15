@@ -55,11 +55,10 @@
                                 {%if shotgun.is_started%}
                                     Ce shotgun a commencé !
                                 {%elif not shotgun.is_ended%}
-                                    Début du shotgun : <strong class="text-thin">{shotgun.starting_date}}</strong>
+                                    Début du shotgun : <strong class="text-thin">{{shotgun.starting_date}}</strong>
                                 {%endif%}
                             </div>
                         </li>
-                        <li><div class="text-bold mt-2">Début du shotgun : <strong class="text-thin">{shotgun.starting_date}}</strong></div></li>
                         <li><div class="text-bold mt-2">Fin du shotgun : <strong class="text-thin">{{shotgun.ending_date}}</strong></div></li>
                         <li><div class="text-bold mt-2">Motivation : <strong class="text-thin">{%if shotgun.requires_motivation%}Requise.{%else%}Non.{%endif%}</strong></div></li>
                         <li><div class="text-bold mt-2">Nombre de places : <strong class="text-thin">{{shotgun.size}}</strong></div></li>
