@@ -26,7 +26,7 @@ def index_users(request):
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows students to be viewed or edited.
+    API endpoint that allows students to be viewed.
     """
 
     queryset = Student.objects.all().order_by(

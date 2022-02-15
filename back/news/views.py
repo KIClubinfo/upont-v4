@@ -6,10 +6,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework import viewsets
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
+from .serializers import PostSerializer
 
 
 @login_required
@@ -84,6 +86,16 @@ def posts(request):
                 "my_comments": my_comments,
             }
             return render(request, "news/posts.html", context)
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows posts to be viewed.
+    """
+
+    queryset = Post.objects.all().order_by("-date", "title")
+    serializer_class = PostSerializer
+    http_method_names = ["get"]
 
 
 @login_required

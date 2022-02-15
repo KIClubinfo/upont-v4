@@ -19,13 +19,19 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from news.views import PostViewSet
 from rest_framework import routers
 from social.views import StudentViewSet
 
 from . import views
 
+# ---- API URLS ----#
+
 router = routers.DefaultRouter()
 router.register(r"students", StudentViewSet)
+router.register(r"posts", PostViewSet)
+
+# ---- OTHER URLS ----#
 
 urlpatterns = [
     path("social/", include("social.urls")),
