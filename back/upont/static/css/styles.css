@@ -256,7 +256,7 @@ img.logo{
     align-items: center;
     /* Sizing */
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     /* Z-Positioning */
     z-index: 1;
     /* Styling */
@@ -666,6 +666,10 @@ a.text-green:hover{
     border-bottom: solid var(--border-color) var(--border-width);
 }
 
+.image-centered{
+    height: 100%;
+}
+
 /*-------------------------------------------------*/
 /*-------------------- USER CARD ------------------*//*      A REVOIR      */
 /*-------------------------------------------------*/
@@ -735,6 +739,7 @@ a.text-green:hover{
 .profil-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     margin-top: -141px;
     margin-left: auto;
@@ -840,7 +845,7 @@ a.text-green:hover{
     display: flex;
     flex-direction: column;
     color: white;
-    padding: 0rem 7rem;
+    padding: 0rem 5rem;
     border-radius: 0.5rem;
     background-color: hsla(0, 0%, 100%, 0.05);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -857,9 +862,8 @@ a.text-green:hover{
 .club-group-image-container{
     margin-top: -10rem;
     background: var(--primary-bg-color);
-    border: solid hsla(0, 0%, 100%, 0.05) 4px;
     border-radius: 0.5rem;
-    height: 60vh;
+    max-height: 60vh;
     overflow: hidden;
 }
 
@@ -896,25 +900,6 @@ a.text-green:hover{
     font-size: 1.5rem;
 
     border-bottom: solid var(--border-color) var(--border-width);
-}
-
-.club-description-content{
-    margin: 1rem 3rem;
-}
-
-.club-description-title{
-    text-decoration: underline;
-    text-align: left;
-    font-style: normal;
-    font-size: 1rem;
-}
-
-.club-description{
-    font-family:'Neue Helvetica Ultra Light';
-    font-weight:normal;
-    margin: 1rem 0rem;
-    text-align: justify;
-    font-size: 1rem;
 }
 
 @media(max-width:440px){

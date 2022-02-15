@@ -34,7 +34,7 @@
                             <!--Column-->
                             <div class="col-lg-5">
                                 <div class="profil-image">
-                                    <img src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
+                                    <img class="image-centered" src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
                                 </div>
                             </div>
                             <div class="centered-div col-lg-7">

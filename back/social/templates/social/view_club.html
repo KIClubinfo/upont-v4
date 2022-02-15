@@ -34,7 +34,7 @@
             <div class="club-box">
 
                 <div class="club-group-image-container">
-                    <img src="{% if club.background_picture %}{{club.background_picture.url}}{% else %}{% static 'assets/img/equipe.jpg' %}{% endif %}" class="club-group-image" alt="">
+                    <img class="image-centered" src="{% if club.background_picture %}{{club.background_picture.url}}{% else %}{% static 'assets/img/equipe.jpg' %}{% endif %}" alt="">
                 </div>
 
                 <!--Row-->

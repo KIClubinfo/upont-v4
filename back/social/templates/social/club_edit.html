@@ -20,17 +20,18 @@
                         {% if club.background_picture %}
                             <img class="club-card-image" src={{club.background_picture.url}} height="100%" width="100%" alt="">
                         {% else %}
-                            <img class="club-card-image" src="" alt="">
-                        {% endif %}</div>
+                            <img class="club-card-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
+                        {% endif %}
+                    </div>
                     <div class="row">
                         {% csrf_token %}
                         {{ EditClub.non_field_errors }}
                         <div class="col-lg-4">
                             <div class="club-image">
                                 {% if club.logo %}
-                                    <img class="club-card-image" src={{club.logo.url}} height="100%" width="100%" alt="">
+                                    <img class="image-centered" src={{club.logo.url}} height="100%" width="100%" alt="">
                                 {% else %}
-                                    <img class="club-card-image" src="{% static 'assets/img/logo_default.png' %}" alt="">
+                                    <img class="image-centered" src="{% static 'assets/img/logo_default.png' %}" alt="">
                                 {% endif %}
                             </div>
                         </div>
