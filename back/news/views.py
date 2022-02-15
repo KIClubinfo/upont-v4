@@ -141,6 +141,7 @@ def event_edit(request, event_id):
         form = EditEvent(request.user.id, instance=event)
     context["EditEvent"] = form
     context["event"] = event
+    context["Edit"] = True
     return render(request, "news/event_edit.html", context)
 
 
@@ -422,7 +423,7 @@ def new_shotgun(request):
             "has_clubs_admins": len(clubs) > 0,
             "form": form,
         }
-        return render(request, "news/shotgun_new.html", context)
+        return render(request, "news/shotgun_edit.html", context)
 
     if request.method == "POST":
         form = AddShotgun(
@@ -469,6 +470,7 @@ def edit_shotgun(request, shotgun_id):
             context = {
                 "shotgun": shotgun,
                 "form": form,
+                "edit": True,
             }
             return render(request, "news/shotgun_edit.html", context)
 

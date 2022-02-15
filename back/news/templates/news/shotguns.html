@@ -39,8 +39,8 @@
                 {% if display_admin_button %}
                     <a href="{% url 'news:shotguns_admin' %}" style="text-decoration: none"><button class="button blue-button">Administration des shotguns</button></a>
                     <br>
+                    <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
                 {% endif %}
-                <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
             </div>
 
             {% for shotgun in next_shotguns %}

@@ -44,10 +44,10 @@
                 <div class="news-card">
                     <div class="news-card-header">
                         <div class="news-card-header-image">
-                            <img class="image-centered" src="{% static 'assets/img/logo_default.png' %}" alt="">
+                            <img class="image-centered" src="{% if event.club.logo %}{{event.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
                         </div>
                         <div class="news-card-header-text">
-                            <span class="news-card-header-name">{{event.club}}</span>
+                            <span class="news-card-header-name">{{event.club.name}}</span>
                             <span class="news-card-header-title">{{event.name}}</span>
                         </div>
                     </div>
