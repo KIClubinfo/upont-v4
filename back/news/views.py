@@ -98,7 +98,7 @@ def event_detail(request, event_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     event = get_object_or_404(Event, pk=event_id)
     event_posts = Post.objects.filter(event__pk=event_id).order_by("-date")
-    is_member = Membership.objects.filter(student__pk=student.id, club=event.club)
+    is_member = event.club.is_member(student.id)
     context = {
         "event": event,
         "event_posts": event_posts,
@@ -121,9 +121,7 @@ def event_edit(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     context = {}
     if request.method == "POST":
-        if "Annuler" in request.POST:
-            return redirect("news:event_detail", event_id=event.id)
-        elif "Supprimer" in request.POST:
+        if "Supprimer" in request.POST:
             event.delete()
             return redirect("news:events")
         elif "Valider" in request.POST:
@@ -142,6 +140,7 @@ def event_edit(request, event_id):
     else:
         form = EditEvent(request.user.id, instance=event)
     context["EditEvent"] = form
+    context["event"] = event
     return render(request, "news/event_edit.html", context)
 
 
@@ -149,9 +148,7 @@ def event_edit(request, event_id):
 def event_create(request):
     context = {}
     if request.method == "POST":
-        if "Annuler" in request.POST:
-            return redirect("news:events")
-        elif "Valider" in request.POST:
+        if "Valider" in request.POST:
             form = EditEvent(
                 request.user.id,
                 request.POST,
@@ -180,24 +177,18 @@ def event_participate(request, event_id, action):
 @login_required
 def post_edit(request, post_id):
     student = get_object_or_404(Student, user__id=request.user.id)
-    post = get_object_or_404(Post, pk=post_id)
+    post = get_object_or_404(Post, id=post_id)
 
     if post.club:
-        membership_club_list = Membership.objects.filter(
-            student__pk=student.id, club__pk=post.club.id
-        )
-        if not membership_club_list:  # If no match is found
+        if not post.club.is_member(student.id):
             raise PermissionDenied
     else:
         if post.author.user.id != request.user.id:
             raise PermissionDenied
 
-    post = get_object_or_404(Post, id=post_id)
     context = {}
     if request.method == "POST":
-        if "Annuler" in request.POST:
-            return redirect("news:posts")
-        elif "Supprimer" in request.POST:
+        if "Supprimer" in request.POST:
             post.delete()
             return redirect("news:posts")
         elif "Valider" in request.POST:
@@ -216,6 +207,7 @@ def post_edit(request, post_id):
     else:
         form = EditPost(request.user.id, instance=post)
     context["EditPost"] = form
+    context["post"] = post
     context["Edit"] = True
     return render(request, "news/post_edit.html", context)
 
@@ -224,9 +216,7 @@ def post_edit(request, post_id):
 def post_create(request):
     context = {}
     if request.method == "POST":
-        if "Annuler" in request.POST:
-            return redirect("news:posts")
-        elif "Valider" in request.POST:
+        if "Valider" in request.POST:
             form = EditPost(
                 request.user.id,
                 request.POST,
@@ -507,3 +497,8 @@ def publish_shotgun_results(request, shotgun_id):
         )
     else:
         raise PermissionDenied()
+
+
+@login_required
+def markdown(request):
+    return render(request, "news/markdown.html")

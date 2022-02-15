@@ -1,5 +1,6 @@
 from django import forms
-from social.models import Membership
+from django.shortcuts import get_object_or_404
+from social.models import Membership, Student
 
 from .models import Comment, Event, Post, Shotgun
 
@@ -7,7 +8,15 @@ from .models import Comment, Event, Post, Shotgun
 class EditEvent(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ("name", "description", "date", "location", "poster", "club")
+        fields = (
+            "name",
+            "description",
+            "date",
+            "location",
+            "poster",
+            "club",
+            "shotgun",
+        )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
             "description": forms.Textarea(attrs={"class": "profil-input"}),
@@ -15,6 +24,7 @@ class EditEvent(forms.ModelForm):
             "location": forms.TextInput(attrs={"class": "profil-input"}),
             "poster": forms.FileInput(attrs={"class": "profil-input"}),
             "club": forms.Select(attrs={"class": "profil-select"}),
+            "shotgun": forms.Select(attrs={"class": "profil-select"}),
         }
 
     def __init__(self, user_id, *args, **kwargs):
@@ -23,6 +33,12 @@ class EditEvent(forms.ModelForm):
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
+        shotguns_choices_list = [("", "Pas de shotgun")]
+        student = get_object_or_404(Student, user__id=user_id)
+        for shotgun in Shotgun.objects.all():
+            if shotgun.club.is_member(student.id):
+                shotguns_choices_list.append((shotgun.id, shotgun.title))
+        self.fields["shotgun"].choices = shotguns_choices_list
 
 
 class EditPost(forms.ModelForm):

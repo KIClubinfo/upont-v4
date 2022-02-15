@@ -62,4 +62,9 @@ urlpatterns = [
         views.publish_shotgun_results,
         name="publish_shotgun_results",
     ),
+    path(
+        "markdown",
+        views.markdown,
+        name="markdown",
+    ),
 ]

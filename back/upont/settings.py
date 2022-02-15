@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "tellme",
     "django.contrib.postgres",
     "django_cas_ng",
+    "markdownify.apps.MarkdownifyConfig",
 ]
 
 MIDDLEWARE = [
@@ -224,3 +225,46 @@ CAS_CREATE_USER = False
 CAS_CHECK_NEXT = False
 CAS_REDIRECT_URL = "/"
 CAS_ADMIN_PREFIX = "admin/"
+
+MARKDOWNIFY = {
+    "default": {
+        "MARKDOWN_EXTENSIONS": [
+            "markdown.extensions.fenced_code",
+            "markdown.extensions.extra",
+        ],
+        "STRIP": True,
+        "WHITELIST_TAGS": [
+            "a",
+            "abbr",
+            "acronym",
+            "b",
+            "blockquote",
+            "em",
+            "i",
+            "li",
+            "ol",
+            "p",
+            "strong",
+            "ul",
+            "code",
+            "span",
+            "div",
+            "class",
+            "pre",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+        ],
+        "WHITELIST_ATTRS": [
+            "href",
+            "style",
+        ],
+        "WHITELIST_STYLES": [
+            "color",
+            "text-decoration",
+        ],
+    }
+}

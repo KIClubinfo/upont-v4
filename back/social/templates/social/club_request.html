@@ -1,6 +1,6 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Suppression d'un shotgun" %}
+{% include "header.html" with title="Demande de création d'un club" %}
 
 <!--Body-->
 <body>
@@ -8,7 +8,7 @@
     {% include "feedback.html" %}
 
     <!--Sidenav-->
-    {% include "sidenav.html" with active_link="news" %}
+    {% include "sidenav.html" with active_link="clubs" %}
 
     <!--Content-->
     <div class="content">
@@ -28,27 +28,37 @@
         <!--Main Content-->
         <div class="content-main">
 
-            <h3 class="page-title">Administration des Shotguns</h3>
+            <h3 class="page-title">Demande d'ajout de club</h3>
 
             <!--Box-->
             <div class="box small-box">
-                <h5 class="section-title">{{shotgun.title}}</h5>
-                <p class="text-center mt-2">Veux-tu vraiment supprimer ce shotgun ? Cette action sera irréversible et supprimera également toutes les participations de tous les élèves.</p>
 
-                <form action="{% url 'news:delete_shotgun' shotgun.id %}" method="post" id="1">
+                <!--Form-->
+                <form action="" method="POST" class="centered-div">
+
                     {% csrf_token %}
+
+                    <div class="input-title">Nom du club :</div>
+                    {{ ClubRequest.name.errors }}
+                    {{ ClubRequest.name }}
+
+                    <div class="input-title mb-2">Décris rapidement le club et motive ta demande :</div>
+                    {{ ClubRequest.content.errors }}
+                    {{ ClubRequest.content }}
+
                     <div class="centered-div">
-                        <button form=1 type="submit" value="Supprimer" class="button red-button">Supprimer</button>
-                        <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}">
-                            <button type="button" class="button green-button">Annuler</button>
-                        </a>
+                        <a href="{% url 'social:club_index' %}"><button class="button red-button">Annuler</button></a>
+                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
                     </div>
-                </form>
+
+                </form><!--End of Form-->
 
             </div><!--End of Box-->
 
         </div><!--End of Main Content-->
 
     </div><!--End of Content-->
+
 </body><!--End of Body-->
+
 </html><!--End of Document-->

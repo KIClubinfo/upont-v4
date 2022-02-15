@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models import F
+from django.db.models.expressions import Window
+from django.db.models.functions import Rank
 from django.utils import timezone
 from social.models import Student
 
@@ -96,8 +99,10 @@ class Shotgun(models.Model):
         return self.title
 
     def participations(self):
-        participations = Participation.objects.filter(shotgun=self)
-        return participations.order_by("shotgun_date")
+        participations = Participation.objects.filter(shotgun=self).annotate(
+            rank=Window(expression=Rank(), order_by=F("shotgun_date").asc()),
+        )
+        return participations
 
     def accepted_participations(self):
         participations = Participation.objects.filter(

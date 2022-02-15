@@ -1,0 +1,110 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Markdown" %}
+{% load markdownify %}
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="news" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header"></div>
+        <div class="content-main">
+            <h3 class="page-title">Tutoriel Markddown</h3>
+            <div class="content" >
+                <p>Un certain nombre de pages de Upont prennent en charge le markdown pour faire des jolis posts, donc un petit tutoriel s'impose.</p>
+            </div>
+            <h4 class="page-title"> Les fonctions de base </h4>
+            <ul>
+                <li>Les titres: pour créer un titre, il faut encardrer le texte par "#". Plus il y en a, plus le titre est petit (on peut descendre jusqu'à 6).</li>
+                <li>Emphase : pour mettre en italique ou en gras, il faut encadrer respectivement par "*" et "**"</li>
+                <li>Les listes : pour faire une liste ordonnée ou non, il faut utiliser "1. " ou "- " (il faut impérativement un espace après le tag)</li>
+                <li>Les caractères spéciaux : pour ajouter les caractères liés au markdown sans rendre le markdown, il faut ajouter un "/" devant</li>
+            </ul>
+            <div class="content">
+                <style type="text/css">
+                    .tg  {border-collapse:collapse;border-spacing:0;}
+                    .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+                        overflow:hidden;padding:10px 5px;word-break:normal;}
+                    .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+                        font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+                    .tg .tg-c3ow{border-color:inherit;text-align:center;vertical-align:top}
+                    .tg .tg-0lax{text-align:left;vertical-align:top}
+                </style>
+                <table class="tg">
+                    <thead>
+                        <tr>
+                            <th class="tg-c3ow">Markdown</th>
+                            <th class="tg-c3ow">Résultat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tg-c3ow">#Grand titre#<br>###Petit titre###<br></td>
+                            <td class="tg-c3ow"><h1>Grand titre</h1><br><h3>Petit titre</h3><br></td>
+                        </tr>
+                        <tr>
+                            <td class="tg-0lax">*texte en italique*<br>**texte en gras**</td>
+                            <td class="tg-0lax"><em/>texte en italique</em><br><strong>texte en gras</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="tg-0lax">* liste non ordonnée (1)<br>* liste non ordonnée (2)<br>1. liste ordonnée (1)<br>2. liste ordonnée (2)<br></td>
+                        <td class="tg-0lax"><ul><br><li>liste non ordonnée (1)</li><br><li>liste non ordonnée (2)</li><br></ul><br><ol><br><li>liste ordonnée (1)</li><br><li>liste ordonnée (2)</li><br></ol><br></td>
+                    </tr>
+                    <tr>
+                        <td class="tg-0lax">/* Astérisque</td>
+                        <td class="tg-0lax"><p>* Astérisque</p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Pour des informations plus complètes, notamment sur les syntaxes alternatives, vous pouvez vous rendre <a href="https://www.markdownguide.org/basic-syntax/">sur ce lien</a></p>
+        </ul></p>
+</div>
+<h4 class="page-title"> Les fonctions avancées </h4>
+<p>En plus de ces fonctions de base, il existe quelques fonctions plus avancées:</p>
+<ul>
+    <li>Les liens hypertextes : pour changer le texte du lien, il faut écrire le texte entre "[" et "]", et le lien entre "(" et ")".</li>
+    <li>Les styles CSS : il est possible d'ajouter des styles CSS pour des blocs (soit des paragraphes séparés par des sauts de ligne, soit des blocs de markdown). La syntaxe n'est pas évidente car cela ne fait pas partie du standard Markdown, donc n'hésitez pas à regarder les exemples. Pour cela, il faut ajouter après le bloc:
+        <ul>
+            <li>{: style="color:green";} pour changer la couleur. Vous pouvez remplacer "green" par n'importe quelle <a href="https://www.w3schools.com/colors/colors_hexadecimal.asp">couleur hexadécimale.</a></li>
+            <li>{: style="text-decoration:underline";} pour souligner. Tous les styles de soulignage sont disponibles à <a href="https://developer.mozilla.org/fr/docs/Web/CSS/text-decoration"> cette adresse.</a></li>
+        </ul>
+    </li>
+</ul>
+<style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;}
+    .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg .tg-baqh{text-align:center;vertical-align:top}
+    .tg .tg-c3ow{border-color:inherit;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+    <thead>
+        <tr>
+            <th class="tg-c3ow">Markdown</th>
+            <th class="tg-c3ow">Résultat</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="tg-c3ow">[lien vers la doc](https://www.markdownguide.org/basic-syntax/)<br><br></td>
+            <td class="tg-c3ow"><a href="https://www.markdownguide.org/basic-syntax/">lien vers la doc </a><br></td>
+        </tr>
+        <tr>
+            <td class="tg-baqh">**texte en rouge**{: style="color:red";}<br>**lien dans une couleur hexadécimale**{: style="color:#ffccff";}<br></td>
+            <td class="tg-baqh"><strong style="color:red">texte en rouge</strong><br><a href="#" style="color:#ffccff">lien dans une couleur héxadécimale</strong><br></td>
+        </tr>
+        <tr>
+            <td class="tg-baqh">**texte souligné**{: style="text-decoration:underline";}<br>**Texte avec plein de décorations**{: style="text-decoration:underline overline #FF3028";}</td>
+            <td class="tg-baqh"><strong style ="text-decoration:underline">texte souligné</strong><br><h6><strong style="text-decoration:underline overline #FF3028">Texte avec plein de décorations</strong></h6></td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -6,7 +6,7 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import AddMember, AddRole, EditClub, EditProfile
+from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
 from .models import Category, Club, Membership, Student
 
 
@@ -171,9 +171,9 @@ def profile_edit(request):
                 instance=Student.objects.get(user=request.user),
             )
             if form.is_valid():
-                if "picture" in request.FILES:
-                    student.picture.delete()
                 form.save()
+                if "picture" in request.FILES:
+                    student.picture.delete(save=False)
                 return redirect("social:profile")
 
     else:
@@ -251,9 +251,9 @@ def club_edit(request, club_id):
             )
             if form_club.is_valid():
                 if "logo" in request.FILES:
-                    club.logo.delete()
+                    club.logo.delete(save=False)
                 if "background_picture" in request.FILES:
-                    club.logo.delete()
+                    club.background_picture.delete(save=False)
                 form_club.save()
                 return redirect("social:club_detail", club_id=club.id)
 
@@ -316,3 +316,26 @@ def club_edit(request, club_id):
     context["AddMember"] = form_membership
     context["AddRole"] = form_role
     return render(request, "social/club_edit.html", context)
+
+
+@login_required
+def club_request(request):
+    context = {}
+
+    if request.method == "POST":
+        if "Annuler" in request.POST:
+            return redirect("social:club_index")
+        elif "Valider" in request.POST:
+            form = ClubRequestForm(
+                request.POST,
+            )
+            if form.is_valid():
+                new_request = form.save(commit=False)
+                new_request.student = Student.objects.get(user__id=request.user.id)
+                new_request.save()
+                return redirect("social:club_index")
+
+    else:
+        form = ClubRequestForm()
+    context["ClubRequest"] = form
+    return render(request, "social/club_request.html", context)
