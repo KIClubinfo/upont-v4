@@ -12,6 +12,8 @@
 
     <!--Content-->
     <div class="content">
+
+        <!--Header Content-->
         <div class="content-header">
             <div class="row justify-content-between w-100">
                 <div class="col">
@@ -22,32 +24,38 @@
                 </div>
             </div>
         </div>
+
+        <!--Main Content-->
         <div class="content-main">
-            <h3 class="page-title">News : Events</h3>
 
-            <!--Navigation-->
+            <h3 class="page-title">Évènements</h3>
+
+            <!--News Navigation-->
             {% include "../news/newsnav.html" %}
+            <!--End of News Navigation-->
 
-            <div class="mt-2" style="text-align:center">
+            <div class="centered-div mt-2">
+                <h5 class="text-bold mb-2">Ajouter un évènement</h5>
                 <a href="{% url 'news:event_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
             </div>
 
             {% for event in all_events_list %}
+                <!--News Card-->
                 <div class="news-card">
                     <div class="news-card-header">
-                        <!--Poster-Image-Name-and-Title-of-the-post-->
-                        <div class="news-card-header-image"><img src="https://i.imgur.com/hczKIze.jpg" alt=""></div>
+                        <div class="news-card-header-image"><img src="{% static 'assets/img/logo_default.png' %}" alt=""></div>
                         <div class="news-card-header-text">
                             <span class="news-card-header-name">{{event.club}}</span>
                             <span class="news-card-header-title">{{event.name}}</span>
                         </div>
                     </div>
                     <div class="news-card-content">
-                        <p style="margin: 0;"><strong>Date de l'évènement :</strong> {{event.date}}</p>
-                        <p style="margin: 0;"><strong>Où ?</strong> {{event.location}}</p>
+                        <ul>
+                            <li><div class="text-bold mt-1">Date de l'évènement : <strong class="text-thin">{{event.date}}</strong></div></li>
+                            <li><div class="text-bold mt-1">Où se déroulera l'évènement ? <strong class="text-thin">{{event.location}}</strong></div></li>
+                        </ul>
                     </div>
                     <div class="news-card-actions">
-                        <!--Likes-Comments-Favorite-->
                         <div class="news-card-popularity">
                             <span><i class="fas fa-users" style="color: red;"></i>
                                 {% if event.shotgun %}
@@ -62,15 +70,14 @@
                             </span>
                         </div>
                     </div>
-                    <div class="news-card-actions">
-                        <!--Likes-Comments-Favorite-->
-                        <div class="centered-div">
-                            <a href="{% url 'news:event_detail' event.pk %}" class="button green-button">Voir plus</a>
-                        </div>
+                    <div class="centered-div">
+                        <a href="{% url 'news:event_detail' event.pk %}"><button class="button green-button">Voir plus</button></a>
                     </div>
-                </div>
+                </div><!--End of News Card-->
             {% endfor %}
-        </div>
-    </div>
-</body>
-</html>
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+</body><!--End of Body-->
+</html><!--End of Document-->
