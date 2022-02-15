@@ -38,7 +38,20 @@
                 <!--Column-->
                 <div class="col-detail-lg-6">
                     <h4 class="page-title">Informations sur l'évènement : {{event.name}}</h4>
+
+                    <!--Box-->
                     <div class="box">
+                        {%if event.poster%}
+                            <div class="news-card-images">
+                                <!--All-Images-Linked-With-The-Event-->
+                                <div class="news-card-carousel">
+                                    <div class="carousel-cell">
+                                        <img class="news-card_image_sized" src="{{event.poster.url}}" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        {%endif%}
+
                         <ul>
                             <li><div class="text-bold mt-2">Organisateur : <strong class="text-thin">{{event.club}}</strong></div></li>
                             <li><div class="text-bold mt-2">Date de l'évènement : <strong class="text-thin">{{event.date}}</strong></div></li>
@@ -70,17 +83,8 @@
                             {% if is_member %} <a href="{% url 'news:event_edit' event_id=event.id%}"><button class="button blue-button">Modifier</button></a>
                             {% endif %}
                         </div>
-                    </div>
-                    {%if event.poster%}
-                        <div class="news-card-images">
-                            <!--All-Images-Linked-With-The-Event-->
-                            <div class="news-card-carousel">
-                                <div class="carousel-cell">
-                                    <img class="news-card_image_sized" src="{{event.poster.url}}" alt="">
-                                </div>
-                            </div>
-                        </div>
-                    {%endif%}
+                    </div><!--End of Box-->
+
                 </div><!--End of Column-->
 
                 <!--Column-->
