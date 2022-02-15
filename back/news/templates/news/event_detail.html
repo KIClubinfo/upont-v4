@@ -164,8 +164,9 @@
                         {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
                             <h4 class="page-title">Les participations acceptées ne sont pas disponibles pour le moment.</h4>
                         {% else %}
-                            <h4 class="page-title">Participations acceptées</h4>
                             {% for participation in event.shotgun.accepted_participations %}
+                                <h4 class="page-title">Participations acceptées</h4>
+
                                 <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                     <div class="user-card">
                                         <div class="user-image"><img src="{% if participation.participant.picture %}{{participation.participant.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
