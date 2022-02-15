@@ -43,7 +43,9 @@
                 <!--News Card-->
                 <div class="news-card">
                     <div class="news-card-header">
-                        <div class="news-card-header-image"><img src="{% static 'assets/img/logo_default.png' %}" alt=""></div>
+                        <div class="news-card-header-image">
+                            <img class="image-centered" src="{% static 'assets/img/logo_default.png' %}" alt="">
+                        </div>
                         <div class="news-card-header-text">
                             <span class="news-card-header-name">{{event.club}}</span>
                             <span class="news-card-header-title">{{event.name}}</span>

@@ -256,7 +256,7 @@ img.logo{
     align-items: center;
     /* Sizing */
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     /* Z-Positioning */
     z-index: 1;
     /* Styling */
@@ -545,11 +545,6 @@ a.text-green:hover{
     font-weight: 400;
     text-align:center;
     border-radius: 0.5rem;
-    word-wrap: break-word;
-}
-
-.text-input:focus{
-    outline: none;
 }
 
 .text-input:focus{
@@ -695,10 +690,15 @@ a.text-green:hover{
 .user-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     height: 90px;
     width: 90px;
+    margin-left: auto;
+    margin-right: auto;
     /* Styling */
+    background-color: var(--primary-bg-color);
+    border: solid 2px rgba(255, 255, 255, 0.05);
     border-radius: 50%;
     overflow: hidden;
 }
@@ -753,6 +753,7 @@ a.text-green:hover{
     width: 250px;
     /* Styling */
     border: 8px solid var(--primary-bg-color);
+    background-color: var(--primary-bg-color);
     border-radius: 50%;
     overflow: hidden;
 }
@@ -881,6 +882,7 @@ a.text-green:hover{
 .club-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     margin-top: -6rem;
     margin-left: auto;
@@ -888,7 +890,7 @@ a.text-green:hover{
     height: 14rem;
     width: 14rem;
     /* Styling */
-    background-color: #26272b;
+    background-color: var(--primary-bg-color);
     border: 8px solid var(--primary-bg-color);
     border-radius: 50%;
     overflow: hidden;
@@ -964,6 +966,7 @@ a.text-green:hover{
 .club-card .club-card-content .club-card-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     margin: 1rem auto;
     height: 11rem;
@@ -1014,6 +1017,7 @@ a.text-green:hover{
 .vignette-club-mini .vignette-image-mini{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     height: 5rem;
     width: 5rem;
@@ -1070,10 +1074,12 @@ a.text-green:hover{
 .news-card-header-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     height: 4rem;
     width: 4rem;
     /* Styling */
+    border: 2px solid var(--primary-bg-color);
     border-radius: 50%;
     overflow: hidden;
 }
@@ -1151,10 +1157,12 @@ a.text-green:hover{
 .news-card-comment-user-pic{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     height: 3rem;
     width: 3rem;
     /* Styling */
+    border: 1px solid var(--primary-bg-color);
     border-radius: 50%;
     overflow: hidden;
 }

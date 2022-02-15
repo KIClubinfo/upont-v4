@@ -46,9 +46,13 @@
                 <div class="news-card" id="{{post.id}}">
                     <div class="news-card-header">
                         {% if post.club %}
-                            <div class="news-card-header-image"><img src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"></div>
+                            <div class="news-card-header-image">
+                                <img class="image-centered" src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}">
+                            </div>
                         {% else %}
-                            <div class="news-card-header-image"><img src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"></div>
+                            <div class="news-card-header-image">
+                                <img class="image-centered" src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
+                            </div>
                         {% endif %}
                         <div class="news-card-header-text">
                             <span class="news-card-header-name">
@@ -99,11 +103,11 @@
                                 <div class="news-card-comment">
                                     {% if comment.club %}
                                         <div class="news-card-comment-user-pic">
-                                            <img src="{% if comment.club.logo %}{{comment.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}">
+                                            <img class="image-centered" src="{% if comment.club.logo %}{{comment.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}">
                                         </div>
                                     {% else %}
                                         <div class="news-card-comment-user-pic">
-                                            <img src="{% if comment.author.picture %}{{comment.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
+                                            <img class="image-centered" src="{% if comment.author.picture %}{{comment.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
                                         </div>
                                     {% endif %}
                                     <div class="news-card-comment-box">
@@ -125,7 +129,7 @@
                             {% csrf_token %}
                             <div class="news-card-edit-comment">
                                 <div class="news-card-comment-user-pic">
-                                    <img src="{% if user.student.picture %}{{user.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
+                                    <img class="image-centered" src="{% if user.student.picture %}{{user.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
                                 </div>
                                 <textarea class="news-card-edit-comment-input" type="text" name="content" id=""></textarea>
                             </div>

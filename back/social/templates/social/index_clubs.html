@@ -42,7 +42,9 @@
                                 <div class="col-clubmd-4 col-clubsm-6">
                                     <div class="club-card">
                                         <div class="club-card-content">
-                                            <img class="club-card-image" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                                            <div class="club-card-image">
+                                                <img class="image-centered" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                                            </div>
                                         </div>
                                         <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span></div>
                                         <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
@@ -83,7 +85,9 @@
                                 <!--Column-->
                                 <div class="col-12">
                                     <div class="vignette-club-mini">
-                                        <img class="vignette-image-mini" src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                                        <div class="vignette-image-mini">
+                                            <img class="image-centered" src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                                        </div>
                                         <div class="vignette-mini-title">
                                             <span>{{membership.club.name}}</span>
                                             <span class="vignette-mini-role"><br>{{membership.role}}</span>
