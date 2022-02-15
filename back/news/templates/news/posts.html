@@ -107,7 +107,11 @@
                                         </div>
                                     {% endif %}
                                     <div class="news-card-comment-box">
-                                        <span class="text-bold">{{comment.author.user.first_name}} {{comment.author.user.last_name}}</span><br>
+                                        {% if comment.club%}
+                                            <span class="text-bold">{{comment.club.name}}</span><br>
+                                        {% else %}
+                                            <span class="text-bold">{{comment.author.user.first_name}} {{comment.author.user.last_name}}</span><br>
+                                        {% endif %}
                                         {{ comment.content }}
                                     </div>
                                     {% if comment in my_comments %}
