@@ -3,7 +3,8 @@ module.exports = {
   devtool: 'eval-source-map',
   mode: 'development',
   entry: {
-    IndexUsers: './src/index_users.js'
+    IndexUsers: './src/index_users.js',
+    Posts: './src/posts.js'
   },
   resolve: {
     modules: [__dirname, 'node_modules'],

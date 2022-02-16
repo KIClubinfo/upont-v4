@@ -83,18 +83,12 @@ class Students extends React.Component {
         return <InfiniteScroll
             loadMore={this.fetchData}
             hasMore={this.state.more_exist}
-            loader={<div key="-1" style={{ "textAlign": "center", "marginTop": "10%" }}><i className="fa fa-lg fa-spinner fa-spin"></i></div>}
+            loader={<div style={{ "textAlign": "center", "marginTop": "10%" }}><i className="fa fa-lg fa-spinner fa-spin"></i></div>}
             >
-            <div className="row" key="-2">
+            <div className="row">
                 {
                     this.state.students.map(function f(student) {
-                        if (student.picture_url) {
-                            var picture_url = student.picture_url
-                        }
-                        else {
-                            picture_url = "https://i.imgur.com/hczKIze.jpg"
-                        }
-                        return <Student student={student} picture_url={picture_url} key={student.user.id} />
+                        return <Student student={student} picture_url={student.picture_url} key={student.user.id} />
                     })
                 }
             </div>

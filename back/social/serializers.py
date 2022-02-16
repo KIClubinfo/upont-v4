@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.templatetags.static import static
 from django.urls import reverse
 from rest_framework import serializers
 
@@ -31,7 +32,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         if obj.picture:
             return obj.picture.url
         else:
-            return False
+            return static("assets/img/user_default.png")
 
     class Meta:
         model = Student
@@ -47,7 +48,7 @@ class ClubSerializer(
         if obj.logo:
             return obj.logo.url
         else:
-            return False
+            return static("assets/img/logo_default.png")
 
     background_picture_url = serializers.SerializerMethodField()
 
