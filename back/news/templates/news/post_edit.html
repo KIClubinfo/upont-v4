@@ -63,7 +63,7 @@
                         </div>
                     {%endif%}
                     <div class="centered-div">
-                        <a href="{% url 'news:posts' %}"><button type="button" class="button red-button">Annuler</button></a>
+                        <button type="button" class="button red-button" onclick="history.back()">Annuler</button>
                         <input class="button green-button" type="submit" name= "Valider" value="Valider">
                         {% if Edit %}
                             <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
