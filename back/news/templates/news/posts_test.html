@@ -1,0 +1,48 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Publications" %}
+{% load markdownify %}
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="news" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            <h3 class="page-title">News : Posts</h3>
+
+            <!--Navigation-->
+            {% include "../news/newsnav.html" %}
+
+            <div class="mt-2" style="text-align:center">
+                <a href="{% url 'news:post_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
+            </div>
+
+            <div id="posts">
+                <!--  Posts are rendered with React  -->
+            </div>
+
+        </div>
+    </div>
+    <script>
+        window.react_mount = document.getElementById('posts');
+    </script>
+    <script src="{% static 'react/Posts.bundle.js' %}"></script>
+    <script src="{% static 'js/sidenav.js' %}"></script>
+    <script src="{% static 'js/flickity.pkgd.min.js' %}"></script>
+</body>
+</html>

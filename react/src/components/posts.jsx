@@ -1,78 +1,19 @@
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
-import ReactMarkdown from 'react-markdown'
-
-function comment_logo(state){
-    if (state.comment.club){
-        return(
-            <div className="news-card-comment-user-pic">
-                <img className="image-centered" src={state.comment.club.logo_url}></img>
-            </div>
-        )
-    }
-    else {
-        return(
-            <div className="news-card-comment-user-pic">
-                <img className="image-centered" src={state.comment.author.picture_url}></img>
-            </div>
-        )
-    }
-}
-
-function comment_content(state){
-    if (state.comment.club){
-        return (
-            <div className="news-card-comment-box">
-                <span className="text-bold">{state.comment.club.name}</span><br></br>{state.comment.content}
-            </div>
-        )
-    }
-    else {
-        return (
-            <div className="news-card-comment-box">
-                <span className="text-bold">{state.comment.author.user.first_name} {state.comment.author.user.last_name}</span><br></br>{state.comment.content}
-            </div>
-        )
-    }
-}
-
-function comment_delete_button(state){
-    if (state.comment.is_my_comment) {
-        return <a href={state.comment.comment_delete_url}><i className="fas fa-times-circle"></i></a>
-    }
-}
-
-class Comment extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            comment: props.comment
-        };
-    }
-
-    render() {
-        return (
-            <div className="news-card-comments">
-                <div className="news-card-comment">
-                    {comment_logo(this.state)}
-                    {comment_content(this.state)}
-                    {comment_delete_button(this.state)}
-                </div>
-            </div>
-        )
-    }
-}
+import ReactMarkdown from 'react-markdown';
+import {Comment} from './comment';
+import {CommentForm} from './commentForm';
 
 
-function post_logo(state){
-    if (state.post.club){
+function post_logo(state) {
+    if (state.post.club) {
         return (
             <div className="news-card-header-image">
                 <img className="image-centered" src={state.post.club.logo_url}></img>
             </div>
         )
     }
-    else{
+    else {
         return (
             <div className="news-card-header-image">
                 <img className="image-centered" src={state.post.author.picture_url}></img>
@@ -81,25 +22,25 @@ function post_logo(state){
     }
 }
 
-function post_author(state){
-        if (state.post.club){
-            return (
-                <span className="news-card-header-name">
-                    {state.post.club.name}
-                </span>
-            )
-        }
-        else {
-            return (
-                <span className="news-card-header-name">
-                    {state.post.author.user.first_name} {state.post.author.user.last_name}
-                </span>
-            )
-        }
+function post_author(state) {
+    if (state.post.club) {
+        return (
+            <span className="news-card-header-name">
+                {state.post.club.name}
+            </span>
+        )
+    }
+    else {
+        return (
+            <span className="news-card-header-name">
+                {state.post.author.user.first_name} {state.post.author.user.last_name}
+            </span>
+        )
+    }
 }
 
-function post_title(state){
-    if (state.post.event_url){
+function post_title(state) {
+    if (state.post.event_url) {
         return (
             <a href={state.post.event_url} className="news-card-header-title">{state.post.title}</a>
         )
@@ -111,8 +52,8 @@ function post_title(state){
     }
 }
 
-function post_illustration(state){
-    if (state.post.illustration_url){
+function post_illustration(state) {
+    if (state.post.illustration_url) {
         return (
             <div className="news-card-images">
                 <div className="news-card-carousel">
@@ -125,8 +66,8 @@ function post_illustration(state){
     }
 }
 
-function post_like_button(state){
-    if (state.post.user_liked){
+function post_like_button(state) {
+    if (state.post.user_liked) {
         return (
             <a href={state.post.dislike_url} className="news-card-button"><i className="fas fa-heart"></i></a>
         )
@@ -142,8 +83,25 @@ class Post extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            post: props.post
+            post: props.post,
+            currentStudent: props.currentStudent
         };
+        this.refresh = this.refresh.bind(this);
+    }
+
+    refresh() {
+        fetch("/api/posts/"+this.state.post.id+"/")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({post: result})
+                },
+                (error) => {
+                    this.setState({
+                        error
+                    });
+                }
+            );
     }
 
     render() {
@@ -173,16 +131,20 @@ class Post extends React.Component {
                             {post_like_button(this.state)}
                         </div>
                         <div className="news-card-popularity">
-                            <span><i className="fas fa-heart" style={{color: 'red'}}></i> {this.state.post.total_likes}</span>
-                            <span><i className="fas fa-comment" style={{color: 'rgb(0, 153, 255)'}}></i> {this.state.post.total_comments}</span>
+                            <span><i className="fas fa-heart" style={{ color: 'red' }}></i> {this.state.post.total_likes}</span>
+                            <span><i className="fas fa-comment" style={{ color: 'rgb(0, 153, 255)' }}></i> {this.state.post.total_comments}</span>
                         </div>
                     </div>
 
-                    {
-                        this.state.post.comments.map(function f(comment) {
-                        return <Comment comment={comment} key={comment.id} />
-                        })
-                    }
+                    <div className="news-card-comments" style={{display: "block"}}>
+                        {
+                            this.state.post.comments.map(function f(comment) {
+                                return <Comment comment={comment} key={comment.id} />
+                            })
+                        }
+                        <CommentForm post={this.state.post} currentStudent={this.state.currentStudent} refreshPost={this.refresh}></CommentForm>
+                    </div>
+
                 </div>
             </div>
         )
@@ -195,27 +157,18 @@ class Posts extends React.Component {
         this.state = {
             error: null,
             posts: [],
-            next_url: "/api/posts",
+            next_url: "/api/posts/",
             count: null,
             more_exist: true,
         };
     }
 
     componentDidMount() {
-        fetch(this.state.next_url)
+        fetch("/api/current/")
             .then(res => res.json())
             .then(
                 (result) => {
-                    var has_more = false
-                    if (result.next) {
-                        has_more = true
-                    }
-                    this.setState({
-                        next_url: result.next,
-                        count: result.count,
-                        posts: result.results,
-                        more_exist: has_more
-                    })
+                    this.setState({currentStudent: result.student})
                 },
                 (error) => {
                     this.setState({
@@ -226,6 +179,7 @@ class Posts extends React.Component {
     }
 
     fetchData = () => {
+        this.setState({more_exist: false})
         fetch(this.state.next_url)
             .then(res => res.json())
             .then(
@@ -253,12 +207,12 @@ class Posts extends React.Component {
             loadMore={this.fetchData}
             hasMore={this.state.more_exist}
             loader={<div key="-1" style={{ "textAlign": "center", "marginTop": "10%" }}><i className="fa fa-lg fa-spinner fa-spin"></i></div>}
-            >
+        >
             <div className="row" key="-2">
                 {
                     this.state.posts.map(function f(post) {
-                        return <Post post={post} key={post.id} />
-                    })
+                        return <Post post={post} key={post.id} currentStudent={this.state.currentStudent}/>
+                    }.bind(this))
                 }
             </div>
         </InfiniteScroll>

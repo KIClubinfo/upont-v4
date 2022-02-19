@@ -6,6 +6,8 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
 from .models import Category, Club, Membership, Student
@@ -34,6 +36,37 @@ class StudentViewSet(viewsets.ModelViewSet):
     )
     serializer_class = StudentSerializer
     http_method_names = ["get"]
+
+
+class CurrentStudentView(APIView):
+    """
+    API endpoint that returns the current student.
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        serializer = StudentSerializer(student)
+        return Response({"student": serializer.data})
+
+    @classmethod
+    def get_extra_actions(cls):
+        return []
+
+
+class StudentCanPublishAs(APIView):
+    """
+    API endpoint that returns the clubs that student can publish as.
+    """
+
+    def get(self, request):
+        data = {"": "Élève"}
+        for membership in Membership.objects.filter(student__user__pk=request.user.id):
+            data[membership.club.id] = membership.club.name
+        return Response({"can_publish_as": data})
+
+    @classmethod
+    def get_extra_actions(cls):
+        return []
 
 
 @login_required

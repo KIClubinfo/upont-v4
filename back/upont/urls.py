@@ -21,17 +21,11 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from news.views import PostViewSet
 from rest_framework import routers
-from social.views import StudentViewSet
+from social.views import CurrentStudentView, StudentCanPublishAs, StudentViewSet
 
 from . import views
 
-# ---- API URLS ----#
-
-router = routers.DefaultRouter()
-router.register(r"students", StudentViewSet)
-router.register(r"posts", PostViewSet)
-
-# ---- OTHER URLS ----#
+# ---- MAIN URLS ----#
 
 urlpatterns = [
     path("social/", include("social.urls")),
@@ -49,10 +43,21 @@ urlpatterns = [
     path("cas/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
     path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
     path("page_not_created/", views.page_not_created, name="page_not_created"),
-    path("api/", include(router.urls)),
 ]
 
 if settings.DEBUG:  # in debug anyone can access any image
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
     urlpatterns.append(path("media/<path:path>", views.media))
+
+# ---- API URLS ----#
+
+router = routers.DefaultRouter()
+router.register(r"students", StudentViewSet)
+router.register(r"posts", PostViewSet)
+
+urlpatterns += [
+    path("api/", include(router.urls)),
+    path("api/current/", CurrentStudentView.as_view()),
+    path("api/forms/publish/", StudentCanPublishAs.as_view()),
+]

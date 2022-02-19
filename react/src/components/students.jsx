@@ -26,37 +26,18 @@ class Students extends React.Component {
         this.state = {
             error: null,
             students: [],
-            next_url: "/api/students",
+            next_url: "/api/students/",
             count: null,
             more_exist: true,
+            loading: false,
         };
     }
 
     componentDidMount() {
-        fetch(this.state.next_url)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    var has_more = false
-                    if (result.next) {
-                        has_more = true
-                    }
-                    this.setState({
-                        next_url: result.next,
-                        count: result.count,
-                        students: result.results,
-                        more_exist: has_more
-                    })
-                },
-                (error) => {
-                    this.setState({
-                        error
-                    });
-                }
-            )
     }
 
     fetchData = () => {
+        this.setState({more_exist: false})
         fetch(this.state.next_url)
             .then(res => res.json())
             .then(
@@ -83,9 +64,9 @@ class Students extends React.Component {
         return <InfiniteScroll
             loadMore={this.fetchData}
             hasMore={this.state.more_exist}
-            loader={<div style={{ "textAlign": "center", "marginTop": "10%" }}><i className="fa fa-lg fa-spinner fa-spin"></i></div>}
+            loader={<div key="-1" style={{ "textAlign": "center", "marginTop": "10%" }}><i className="fa fa-lg fa-spinner fa-spin"></i></div>}
             >
-            <div className="row">
+            <div className="row" key="-2">
                 {
                     this.state.students.map(function f(student) {
                         return <Student student={student} picture_url={student.picture_url} key={student.user.id} />
