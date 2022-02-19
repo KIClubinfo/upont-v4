@@ -76,10 +76,10 @@
                     </div>
                 </form>
                 <br>
-                {% if all_club_memberships %}
+                {% if all_active_club_memberships %}
                     Supprimer des membres du club : <br>
                     <div class="row">
-                        {% for membership in all_club_memberships %}
+                        {% for membership in all_active_club_memberships %}
                             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                 <div class="user-card">
                                     <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
@@ -92,6 +92,7 @@
                                         <form action="" method="post" enctype="multipart/form-data">
                                             {% csrf_token %}
                                             <input type="hidden" value="{{membership.student.id}}" name="student_id">
+                                            <input class="button blue-button" type="submit" name="Vieux" value="Vieux">
                                             <input class="button red-button" type="submit" name="Supprimer" value="Supprimer">
                                         </form>
                                     </div>
@@ -132,6 +133,34 @@
                         </form>
                     </div>
                 </div>
+                {% if all_active_club_memberships %}
+                    Gestion des anciens membres du club : <br>
+                    {% for promo,members in all_old_club_memberships.items %}
+                        Promo {{promo}}':
+                        <div class="row">
+                            {% for membership in members %}
+                                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                    <div class="user-card">
+                                        <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
+                                        <div class="user-information">
+                                            <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
+                                            <span>{{membership.role}}</span>
+                                            {% if membership.is_admin %}
+                                                <span>(admin)</span>
+                                            {% endif %}
+                                            <form action="" method="post" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <input type="hidden" value="{{membership.student.id}}" name="student_id">
+                                                <input class="button blue-button" type="submit" name="Actif" value="Actif">
+                                                <input class="button red-button" type="submit" name="Supprimer" value="Supprimer">
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
