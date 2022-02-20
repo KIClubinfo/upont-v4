@@ -18,7 +18,7 @@ from .serializers import PostSerializer
 @login_required
 def posts(request):
     if request.method == "GET":
-        return render(request, "news/posts_test.html")
+        return render(request, "news/posts.html")
 
     elif request.method == "POST":
         student = get_object_or_404(Student, user__id=request.user.id)

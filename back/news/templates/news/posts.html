@@ -42,122 +42,21 @@
             </div>
 
             <!--News Card-->
-            {% for post, form in all_posts_and_forms %}
-                <div class="news-card" id="{{post.id}}">
-                    <div class="news-card-header">
-                        {% if post.club %}
-                            <div class="news-card-header-image">
-                                <img class="image-centered" src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}">
-                            </div>
-                        {% else %}
-                            <div class="news-card-header-image">
-                                <img class="image-centered" src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
-                            </div>
-                        {% endif %}
-                        <div class="news-card-header-text">
-                            <span class="news-card-header-name">
-                                {%if post.club%}
-                                    {{post.club.name}}
-                                {%else%}
-                                    {{post.author.user.first_name}} {{post.author.user.last_name}}
-                                {%endif%}
-                            </span>
-                            {% if post.event %}
-                                <a href="{% url 'news:event_detail' post.event.pk %}" class="news-card-header-title">{{post.title}}</a>
-                            {% else %}
-                                <span class="news-card-header-title">{{post.title}}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="news-card-content">
-                        <p>{{post.content | markdownify}}</p>
-                        <div class="centered-div">
-                            <a href="{% url 'news:post_edit' post.id %}"><button class="button blue-button">Éditer</button></a>
-                        </div>
-                    </div>
-                    {%if post.illustration%}
-                        <div class="news-card-images">
-                            <div class="news-card-carousel">
-                                <div class="carousel-cell">
-                                    <img class="news-card_image_sized" src="{{post.illustration.url}}" alt="">
-                                </div>
-                            </div>
-                        </div>
-                    {%endif%}
-                    <div class="news-card-actions">
-                        <div class="news-card-buttons">
-                            {% if user.student in post.likes.all  %}
-                                <a href="{% url 'news:post_like' post_id=post.id action='Dislike'%}" class="news-card-button"><i class="fas fa-heart"></i></a>
-                            {% else %}
-                                <a href="{% url 'news:post_like' post_id=post.id action='Like'%}" class="news-card-button"><i class="far fa-heart"></i></a>
-                            {% endif %}
-                        </div>
-                        <div class="news-card-popularity">
-                            <span><i class="fas fa-heart" style="color: red;"></i> {{post.total_likes}}</span>
-                            <span><i class="fas fa-comment" style="color: rgb(0, 153, 255);"></i> {{ post.total_comments }}</span>
-                        </div>
-                    </div>
-                    <div class="news-card-comments" style="display: block">
-                        {% for comment in post.comments.all %}
-                            <div class="news-card-comments">
-                                <div class="news-card-comment">
-                                    {% if comment.club %}
-                                        <div class="news-card-comment-user-pic">
-                                            <img class="image-centered" src="{% if comment.club.logo %}{{comment.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}">
-                                        </div>
-                                    {% else %}
-                                        <div class="news-card-comment-user-pic">
-                                            <img class="image-centered" src="{% if comment.author.picture %}{{comment.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
-                                        </div>
-                                    {% endif %}
-                                    <div class="news-card-comment-box">
-                                        {% if comment.club%}
-                                            <span class="text-bold">{{comment.club.name}}</span><br>
-                                        {% else %}
-                                            <span class="text-bold">{{comment.author.user.first_name}} {{comment.author.user.last_name}}</span><br>
-                                        {% endif %}
-                                        {{ comment.content }}
-                                    </div>
-                                    {% if comment in my_comments %}
-                                        <a href="{% url 'news:comment_delete' comment_id=comment.id post_id=post.id %}"><i class="fas fa-times-circle"></i></a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                        <!-- comment form -->
-                        <form method="post" >
-                            {% csrf_token %}
-                            <div class="news-card-edit-comment">
-                                <div class="news-card-comment-user-pic">
-                                    <img class="image-centered" src="{% if user.student.picture %}{{user.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
-                                </div>
-                                <textarea class="news-card-edit-comment-input" type="text" name="content" id=""></textarea>
-                            </div>
-                            Publier en tant que :
-                            <div class="news-card-edit-comment">
-                                {{ form.club }}
-                                <button class="button green-button" type="submit" class="news-card-button"><i class="far fa-comment"></i></button>
-                            </div>
-                            {{ form.post.as_hidden }}
-                            {% if form.errors %}
-                                {% for field in form %}
-                                    {% for error in field.errors %}
-                                        <div class="login-errors">{{ error|escape }}</div>
-                                    {% endfor %}
-                                {% endfor %}
-
-                                {% for error in form.non_field_errors %}
-                                    <div class="login-errors">{{ error|escape }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </form>
-                    </div>
-                </div><!--End of News Card-->
-            {% endfor %}
+            <div id="posts">
+                <!--  Posts are rendered with React  -->
+            </div>
+            <!--End of News Card-->
 
         </div><!--End of Main Content-->
 
     </div><!--End of Content-->
+
+    <!--Scripts-->
+    <script>
+        window.react_mount = document.getElementById('posts');
+    </script>
+    <script src="{% static 'react/Posts.bundle.js' %}"></script>
+    <!--End of Scripts-->
 
 </body><!--End of Body-->
 </html><!--End of Document-->
