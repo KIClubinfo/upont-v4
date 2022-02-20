@@ -214,17 +214,21 @@ def post_like(request, post_id, action):
         post.likes.remove(student)
     elif action == "Like":
         post.likes.add(student)
-    return redirect("news:posts")
+    else:
+        return HttpResponse(status=500)
+    return HttpResponse(status=200)
 
 
 @login_required
-def delete_comment(request, comment_id, post_id):
+def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     student = get_object_or_404(Student, user__id=request.user.id)
     student_clubs = student.clubs.all()
     if comment.author.pk == student.pk or (comment.club in student_clubs):
         comment.delete()
-    return redirect(reverse("news:posts") + f"#{post_id}")
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=403)
 
 
 @login_required

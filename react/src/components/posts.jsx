@@ -66,18 +66,6 @@ function post_illustration(state) {
     }
 }
 
-function post_like_button(state) {
-    if (state.post.user_liked) {
-        return (
-            <a href={state.post.dislike_url} className="news-card-button"><i className="fas fa-heart"></i></a>
-        )
-    }
-    else {
-        return (
-            <a href={state.post.like_url} className="news-card-button"><i className="far fa-heart"></i></a>
-        )
-    }
-}
 
 class Post extends React.Component {
     constructor(props) {
@@ -87,6 +75,8 @@ class Post extends React.Component {
             currentStudent: props.currentStudent
         };
         this.refresh = this.refresh.bind(this);
+        this.like = this.like.bind(this);
+        this.post_like_button = this.post_like_button.bind(this);
     }
 
     refresh() {
@@ -102,6 +92,41 @@ class Post extends React.Component {
                     });
                 }
             );
+    }
+
+    like(event) {
+        event.preventDefault();
+        let url;
+        if (this.state.post.user_liked) {
+            url = this.state.post.dislike_url;
+        }
+        else {
+            url = this.state.post.like_url;
+        }
+        const csrfmiddlewaretoken = getCookie('csrftoken');
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'text/html', 'X-CSRFToken': csrfmiddlewaretoken},
+        };
+        fetch(url, requestOptions)
+            .then(this.setState({
+            }))
+            .then(response => console.log('Liked / Disliked successfully'))
+            .catch(error => console.log('Submit error', error))
+        setTimeout(() => this.refresh(), 200);
+    }
+
+    post_like_button() {
+        if (this.state.post.user_liked) {
+            return (
+                <a onClick={this.like} className="news-card-button"><i className="fas fa-heart"></i></a>
+            )
+        }
+        else {
+            return (
+                <a onClick={this.like} className="news-card-button"><i className="far fa-heart"></i></a>
+            )
+        }
     }
 
     render() {
@@ -128,7 +153,7 @@ class Post extends React.Component {
 
                     <div className="news-card-actions">
                         <div className="news-card-buttons">
-                            {post_like_button(this.state)}
+                            {this.post_like_button()}
                         </div>
                         <div className="news-card-popularity">
                             <span><i className="fas fa-heart" style={{ color: 'red' }}></i> {this.state.post.total_likes}</span>
@@ -139,8 +164,8 @@ class Post extends React.Component {
                     <div className="news-card-comments" style={{display: "block"}}>
                         {
                             this.state.post.comments.map(function f(comment) {
-                                return <Comment comment={comment} key={comment.id} />
-                            })
+                                return <Comment comment={comment} key={comment.id} refreshPost={this.refresh}/>
+                            }.bind(this))
                         }
                         <CommentForm post={this.state.post} currentStudent={this.state.currentStudent} refreshPost={this.refresh}></CommentForm>
                     </div>

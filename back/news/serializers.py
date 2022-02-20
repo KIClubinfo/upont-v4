@@ -13,7 +13,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
     comment_delete_url = serializers.SerializerMethodField()
 
     def get_comment_delete_url(self, obj):
-        return reverse("news:comment_delete", args=(obj.id, obj.post.id))
+        return reverse("news:comment_delete", args=(obj.id,))
 
     is_my_comment = serializers.SerializerMethodField()
 

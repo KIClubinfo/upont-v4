@@ -35,11 +35,6 @@ function comment_content(state) {
     }
 }
 
-function comment_delete_button(state) {
-    if (state.comment.is_my_comment) {
-        return <a href={state.comment.comment_delete_url}><i className="fas fa-times-circle"></i></a>
-    }
-}
 
 class Comment extends React.Component {
     constructor(props) {
@@ -47,6 +42,31 @@ class Comment extends React.Component {
         this.state = {
             comment: props.comment
         };
+        this.delete = this.delete.bind(this);
+        this.comment_delete_button = this.comment_delete_button.bind(this);
+    }
+
+    delete(event) {
+        event.preventDefault();
+        const url = this.state.comment.comment_delete_url;
+        const csrfmiddlewaretoken = getCookie('csrftoken');
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfmiddlewaretoken},
+            body: JSON.stringify({'comment_id': this.state.comment.id})
+        };
+        fetch(url, requestOptions)
+            .then(this.setState({
+            }))
+            .then(response => console.log('Deleted successfully'))
+            .catch(error => console.log('Submit error', error))
+        setTimeout(() => this.props.refreshPost(), 200);
+    }
+
+    comment_delete_button() {
+        if (this.state.comment.is_my_comment) {
+            return <a onClick={this.delete} ><i className="fas fa-times-circle"></i></a>
+        }
     }
 
     render() {
@@ -55,7 +75,7 @@ class Comment extends React.Component {
                 <div className="news-card-comment">
                     {comment_logo(this.state)}
                     {comment_content(this.state)}
-                    {comment_delete_button(this.state)}
+                    {this.comment_delete_button()}
                 </div>
             </div>
         )
