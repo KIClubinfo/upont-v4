@@ -2,62 +2,63 @@
 
 Refonte de uPont en python avec le framework django pour une meilleure accessibilité aux nouveaux développeurs.
 
-* framework full-stack django
+* framework back-end django
+* framework front-end mixte Jinja2 et ReactJS
 * base de données PostgreSQL
 
-Site de développement : https://upont-dev.enpc.org
+[Site de développement](https://upont-dev.enpc.org)
 
-Ancien repository : https://github.com/KIClubinfo/upont/
+[Ancien repository](https://github.com/KIClubinfo/upont/)
 
 # Installation
 
 Pour lancer le site en local (commandes docker-compose standard, version 1.29.2) :
 ```
-$ docker-compose up -d
+docker-compose up -d
 ```
 
 Site accessible au port 8000 : (configurable dans le fichier .env)
 ```
-$ $BROWSER localhost:8000
+$BROWSER localhost:8000
 ```
 
 
 Installation des pre-commit hooks :
 ```
-$ pip install pre-commit
-$ pre-commit install
+pip install pre-commit
+pre-commit install
 ```
 
 # Commandes Django
 
 Accès à la DB par docker exec :
 ```
-$ docker exec -it $(docker ps -f 'name=db' --format '{{.ID}}') psql -U upont
+docker exec -it $(docker ps -f 'name=db' --format '{{.ID}}') psql -U upont
 ```
 
 Pour les commandes python, commencer par entrer dans le conteneur :
 ```
-$ docker-compose exec back /bin/sh
+docker-compose exec back /bin/sh
 ```
 
 Remplir la base de données avec des données de test :
 ```
-$ python manage.py loaddata upont/fixtures/populate.json
+python manage.py loaddata upont/fixtures/populate.json
 ```
 
 Ajouter un administrateur :
 ```
-$ python manage.py createsuperuser
+python manage.py createsuperuser
 ```
 
 Créer les migrations :
 ```
-$ python manage.py makemigrations
+python manage.py makemigrations
 ```
 
 Appliquer les migrations :
 ```
-$ python manage.py migrate
+python manage.py migrate
 ```
 
 # Mise en production
@@ -66,17 +67,17 @@ $ python manage.py migrate
 
 Lancer le build :
 ```
-$ bash scripts/build.sh
+bash scripts/build.sh
 ```
 
 Lancer le serveur :
 ```
-$ bash scripts/start.sh
+bash scripts/start.sh
 ```
 
 Stopper le serveur :
 ```
-$ bash scripts/stop.sh
+bash scripts/stop.sh
 ```
 
 # Variables d'environnement
@@ -103,47 +104,47 @@ Les variables d'environnement suivantes sont placées dans le fichier *.env* :
 Commande pour générer une clé secrète (vous devez avoir Django installé):
 
 ```
-$ python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
 ```
 
 # Workflow git
 
 Toujours travailler sur une nouvelle branche :
 ```
-$ git checkout dev
-$ git branch feature
-$ git checkout feature
+git checkout dev
+git branch feature
+git checkout feature
 ```
 
 Ajouter vos changements :
 ```
-$ git add ...
-$ git commit -m "Nom de commit explicite"
+git add ...
+git commit -m "Nom de commit explicite"
 ```
 
 Mettre la branche en ligne et créer une pull request :
 ```
-$ git push --set-upstream origin feature
+git push --set-upstream origin feature
 ```
 
 ### Méthode 1 :
 
 Quand un reviewer a validé la pull request et que les checks sont réussis, faire un rebase de la nouvelle branche dans dev :
 ```
-$ git checkout feature
-$ git rebase dev
+git checkout feature
+git rebase dev
 ```
 
 Faire un rebase de dev dans la feature (on pourra faire un rebase interactif pour squash plusieurs commits):
 ```
-$ git checkout dev
-$ git rebase feature
+git checkout dev
+git rebase feature
 ```
 
 Mettre les changements en ligne :
 ```
-$ git checkout dev
-$ git push
+git checkout dev
+git push
 ```
 
 ### Méthode 2 :
@@ -161,6 +162,7 @@ Les indispensables :
 * Gestionnaire de versions : [git](https://doc.ubuntu-fr.org/git)
 * [HTML/CSS](http://openclassrooms.com/courses/apprenez-a-creer-votre-site-web-avec-html5-et-css3)
 * Framework : [Django](https://docs.djangoproject.com/en/3.2/)
+* Front : [ReactJS](https://reactjs.org/docs/getting-started.html)
 * Utilisation de conteneurs : [Docker](https://docs.docker.com/)
 * Pour gérer facilement différents conteneurs : [docker-compose](https://docs.docker.com/compose/)
 
@@ -168,7 +170,9 @@ Autres technologies utilisées :
 
 * Pour uniformiser la syntaxe sur le projet : [pre-commit](https://pre-commit.com/index.html)
 * Gestionnaire de dépendances python : [Poetry](https://python-poetry.org/docs/)
+* Gestionnaire de dépendances javascript : [npm](https://docs.npmjs.com/)
 * Application WSGI pour la mise en production : [Gunicorn](https://docs.gunicorn.org/en/stable/)
 * Serveur web et reverse-proxy : [Nginx](https://docs.nginx.com/)
 * Base de données : [PostgreSQL](https://www.postgresql.org/docs/)
 * Intégration continue : [Github Actions](https://docs.github.com/en/actions)
+* Bundler javascript : [webpack](https://webpack.js.org/concepts/)
