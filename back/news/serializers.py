@@ -57,7 +57,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_event_url(self, obj):
         if obj.event:
-            return reverse("news:event_detail", args=(obj.pk,))
+            return reverse("news:event_detail", args=(obj.event.pk,))
         else:
             return False
 

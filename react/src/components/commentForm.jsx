@@ -14,7 +14,6 @@ class CommentForm extends React.Component {
             content: '',
             post: props.post,
             club: '',
-            currentStudent: props.currentStudent,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -68,7 +67,7 @@ class CommentForm extends React.Component {
         let field1, field2;
         field1 =
         <div className="news-card-edit-comment">
-            <div className="news-card-comment-user-pic"><img src={this.state.currentStudent.picture_url}></img></div>
+            <div className="news-card-comment-user-pic"><img src={this.props.currentStudent.picture_url}></img></div>
             <textarea className="news-card-edit-comment-input" type="text" name="content" id="" value={this.state.content} onChange={this.handleChange}></textarea>
         </div>
         field2 =

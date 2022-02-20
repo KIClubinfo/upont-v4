@@ -7,7 +7,7 @@ function Student(props) {
         <div className="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
             <div className="user-card">
                 <div className="user-image">
-                    <img src={props.picture_url} alt=""></img>
+                    <img className="image-centered" src={props.picture_url} alt=""></img>
                 </div>
                 <div className="user-information">
                     <span className="user-name">{props.student.user.first_name} {props.student.user.last_name}</span>

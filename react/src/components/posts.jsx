@@ -72,7 +72,6 @@ class Post extends React.Component {
         super(props);
         this.state = {
             post: props.post,
-            currentStudent: props.currentStudent,
             numberOfCommentsShown: 1,
         };
         this.refresh = this.refresh.bind(this);
@@ -193,7 +192,7 @@ class Post extends React.Component {
                             }.bind(this))
                         }
                         {this.show_comments_button()}
-                        <CommentForm post={this.state.post} currentStudent={this.state.currentStudent} refreshPost={this.refresh}></CommentForm>
+                        <CommentForm post={this.state.post} currentStudent={this.props.currentStudent} refreshPost={this.refresh}></CommentForm>
                     </div>
 
                 </div>
@@ -211,6 +210,7 @@ class Posts extends React.Component {
             next_url: "/api/posts/",
             count: null,
             more_exist: true,
+            currentStudent: null,
         };
     }
 

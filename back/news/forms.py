@@ -7,7 +7,15 @@ from .models import Comment, Event, Post, Shotgun
 class EditEvent(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ("name", "description", "date", "location", "poster", "club")
+        fields = (
+            "name",
+            "description",
+            "date",
+            "location",
+            "poster",
+            "club",
+            "shotgun",
+        )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
             "description": forms.Textarea(attrs={"class": "profil-input"}),
@@ -15,6 +23,7 @@ class EditEvent(forms.ModelForm):
             "location": forms.TextInput(attrs={"class": "profil-input"}),
             "poster": forms.FileInput(attrs={"class": "profil-input"}),
             "club": forms.Select(attrs={"class": "profil-select"}),
+            "shotgun": forms.Select(attrs={"class": "profil-select"}),
         }
 
     def __init__(self, user_id, *args, **kwargs):
