@@ -78,7 +78,7 @@ class CommentForm(forms.ModelForm):
 
     def __init__(self, post_id, user_id, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
-        self.fields["club"].choices = [("", "Élève")] + [
+        self.fields["club"].choices = [("-1", "Élève")] + [
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]

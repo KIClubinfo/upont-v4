@@ -59,7 +59,7 @@ class StudentCanPublishAs(APIView):
     """
 
     def get(self, request):
-        data = {"": "Élève"}
+        data = {"-1": "Élève"}
         for membership in Membership.objects.filter(student__user__pk=request.user.id):
             data[membership.club.id] = membership.club.name
         return Response({"can_publish_as": data})
