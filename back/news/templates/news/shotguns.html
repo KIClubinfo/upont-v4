@@ -39,14 +39,14 @@
                 {% if display_admin_button %}
                     <a href="{% url 'news:shotguns_admin' %}" style="text-decoration: none"><button class="button blue-button">Administration des shotguns</button></a>
                     <br>
+                    <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
                 {% endif %}
-                <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
             </div>
 
             {% for shotgun in next_shotguns %}
                 <!--Box-->
                 <div class="box small-box">
-                    <h5 class="section-title">Nom du shotgun</h5>
+                    <h5 class="section-title">{{shotgun.title}}</h5>
 
                     <ul class="">
                         <li><div class="text-bold mt-2">Organisateur : <strong class="text-thin">{{shotgun.club.name}}</strong></div></li>
@@ -55,11 +55,10 @@
                                 {%if shotgun.is_started%}
                                     Ce shotgun a commencé !
                                 {%elif not shotgun.is_ended%}
-                                    Début du shotgun : <strong class="text-thin">{shotgun.starting_date}}</strong>
+                                    Début du shotgun : <strong class="text-thin">{{shotgun.starting_date}}</strong>
                                 {%endif%}
                             </div>
                         </li>
-                        <li><div class="text-bold mt-2">Début du shotgun : <strong class="text-thin">{shotgun.starting_date}}</strong></div></li>
                         <li><div class="text-bold mt-2">Fin du shotgun : <strong class="text-thin">{{shotgun.ending_date}}</strong></div></li>
                         <li><div class="text-bold mt-2">Motivation : <strong class="text-thin">{%if shotgun.requires_motivation%}Requise.{%else%}Non.{%endif%}</strong></div></li>
                         <li><div class="text-bold mt-2">Nombre de places : <strong class="text-thin">{{shotgun.size}}</strong></div></li>

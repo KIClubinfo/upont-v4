@@ -34,7 +34,7 @@
             <div class="club-box">
 
                 <div class="club-group-image-container">
-                    <img src="{% if club.background_picture %}{{club.background_picture.url}}{% else %}{% static 'assets/img/equipe.jpg' %}{% endif %}" class="club-group-image" alt="">
+                    <img class="club-group-image" src="{% if club.background_picture %}{{club.background_picture.url}}{% else %}{% static 'assets/img/equipe.jpg' %}{% endif %}" alt="">
                 </div>
 
                 <!--Row-->
@@ -43,7 +43,7 @@
                     <!--Column-->
                     <div class="col-lg-4">
                         <div class="club-image">
-                            <img src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" height="100%" width="100%" alt="">
+                            <img class="image-centered" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
                         </div>
                     </div><!--End of Column-->
 
