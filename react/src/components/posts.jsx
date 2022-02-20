@@ -72,11 +72,15 @@ class Post extends React.Component {
         super(props);
         this.state = {
             post: props.post,
-            currentStudent: props.currentStudent
+            currentStudent: props.currentStudent,
+            numberOfCommentsShown: 1,
         };
         this.refresh = this.refresh.bind(this);
         this.like = this.like.bind(this);
         this.post_like_button = this.post_like_button.bind(this);
+        this.show_more = this.show_more.bind(this);
+        this.show_less = this.show_less.bind(this);
+        this.show_comments_button = this.show_comments_button.bind(this);
     }
 
     refresh() {
@@ -129,6 +133,27 @@ class Post extends React.Component {
         }
     }
 
+    show_more() {
+        this.setState({numberOfCommentsShown: this.state.numberOfCommentsShown+5});
+    }
+
+    show_less() {
+        this.setState({numberOfCommentsShown: 1});
+    }
+
+    show_comments_button() {
+        if (this.state.post.comments.length <= 1){
+            return <div></div>;
+        }
+        else if (this.state.numberOfCommentsShown < this.state.post.comments.length) {
+            return <div style={{textAlign: "center"}}><a onClick={this.show_more}>Voir plus de commentaires</a></div>;
+        }
+        else {
+            return <div style={{textAlign: "center"}}><a onClick={this.show_less}>Voir moins de commentaires</a></div>;
+        }
+
+    }
+
     render() {
         return (
             <div>
@@ -163,10 +188,11 @@ class Post extends React.Component {
 
                     <div className="news-card-comments" style={{display: "block"}}>
                         {
-                            this.state.post.comments.map(function f(comment) {
+                            this.state.post.comments.slice(0, this.state.numberOfCommentsShown).map(function f(comment) {
                                 return <Comment comment={comment} key={comment.id} refreshPost={this.refresh}/>
                             }.bind(this))
                         }
+                        {this.show_comments_button()}
                         <CommentForm post={this.state.post} currentStudent={this.state.currentStudent} refreshPost={this.refresh}></CommentForm>
                     </div>
 
