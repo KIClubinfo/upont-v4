@@ -39,7 +39,7 @@ class CommentForm extends React.Component {
             }))
             .then(response => console.log('Submitted successfully'))
             .catch(error => console.log('Form submit error', error))
-        setTimeout(() => this.props.refreshPost(), 200);
+        setTimeout(() => this.props.refreshPost(), 300);
     }
 
     componentDidMount() {

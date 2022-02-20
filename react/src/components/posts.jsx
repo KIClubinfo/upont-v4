@@ -210,7 +210,7 @@ class Posts extends React.Component {
             next_url: "/api/posts/",
             count: null,
             more_exist: true,
-            currentStudent: null,
+            currentStudent: '',
         };
     }
 
