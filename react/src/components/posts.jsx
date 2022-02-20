@@ -239,8 +239,11 @@ class Posts extends React.Component {
                     if (result.next) {
                         has_more = true
                     }
+                    else {
+                        result.next = ""
+                    }
                     this.setState({
-                        next_url: result.next,
+                        next_url: "/" + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''),
                         posts: this.state.posts.concat(result.results),
                         more_exist: has_more
                     })

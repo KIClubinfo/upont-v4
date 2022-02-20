@@ -46,8 +46,12 @@ class Students extends React.Component {
                     if (result.next) {
                         has_more = true
                     }
+                    else {
+                        result.next = ""
+                    }
+                    console.log("/" + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''));
                     this.setState({
-                        next_url: result.next,
+                        next_url: "/" + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''),
                         students: this.state.students.concat(result.results),
                         more_exist: has_more
                     })
