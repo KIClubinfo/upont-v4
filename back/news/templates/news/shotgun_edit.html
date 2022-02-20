@@ -1,6 +1,10 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Modification du shotgun" %}
+{% if edit %}
+    {% include "header.html" with title="Modification du shotgun" %}
+{% else %}
+    {% include "header.html" with title="Nouveau shotgun" %}
+{% endif %}
 
 <!--Body-->
 <body>
@@ -12,69 +16,92 @@
 
     <!--Content-->
     <div class="content">
-        <div class="content-header">
-            <div class="row justify-content-between w-100">
-                <div class="col">
-                    <div class="search-input-group">
-                        <input type="text" class="search-input" placeholder="Rechercher">
-                        <button class="button search-button"><i class="fas fa-search "></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+        <!--Main Content-->
         <div class="content-main">
-            <h1>Édition d'un shotgun :</h1>
-            <form action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" class="form-control" id="1"><br>
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                Club :
-                {{form.club.errors}}
-                {{form.club}}
-                <br>
-                Titre :
-                {{form.title.errors}}
-                {{form.title}}
-                <br>
-                Description :
-                {{form.content.errors}}
-                {{form.content}}
-                <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
-                <br>
-                Date de début :
-                {{form.starting_date.errors}}
-                {{form.starting_date}}
-                <script>
-                    $(function () {
-                        $("#id_starting_date").datetimepicker({
-                            format: 'd/m/Y H:i',
-                        });
-                    });
-                </script>
-                <br>
-                Date de fin :
-                {{form.ending_date.errors}}
-                {{form.ending_date}}
-                <script>
-                    $(function () {
-                        $("#id_ending_date").datetimepicker({
-                            format: 'd/m/Y H:i',
-                        });
-                    });
-                </script>
-                <br>
-                Nombre de places :
-                {{form.size.errors}}
-                {{form.size}}
-                <br>
-                Requiert une motivation :
-                {{form.requires_motivation.errors}}
-                {{form.requires_motivation}}
-                <br>
-                <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
-                <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button red-button">Annuler</button></a>
-            </form>
-        </div>
-    </div>
-    <script src="{% static 'js/sidenav.js' %}"></script>
-</body>
-</html>
+
+            {% if edit %}
+                <h3 class="page-title">Édition d'un shotgun</h3>
+            {% else %}
+                <h3 class="page-title">Nouveau Shotgun</h3>
+            {% endif %}
+
+            <!--News Card-->
+            <div class="news-card">
+                <div class="news-card-content">
+                    {% if has_clubs_admins  or edit %}
+                        {% if edit %}
+                            <form class="centered-div" action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" id="1">
+                        {% else %}
+                            <form class="centered-div" action="{% url 'news:new_shotgun' %}" method="post" id="1">
+                        {% endif %}
+                        {% csrf_token %}
+
+                        {{ form.non_field_errors }}
+
+                        {{form.club.errors}}
+                        <div class="input-title">Club :</div>
+                        {{form.club}}
+
+                        {{form.title.errors}}
+                        <div class="input-title">Titre :</div>
+                        {{form.title}}
+
+                        {{form.content.errors}}
+                        <div class="input-title">Description :</div>
+                        <div class="input-title">Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</div>
+                        {{form.content}}
+
+                        {{form.starting_date.errors}}
+                        <div class="input-title">Date de début :</div>
+                        {{form.starting_date}}
+                        <script>
+                            $(function () {
+                                $("#id_starting_date").datetimepicker({
+                                    format: 'd/m/Y H:i',
+                                });
+                            });
+                        </script>
+
+                        {{form.ending_date.errors}}
+                        <div class="input-title">Date de fin :</div>
+                        {{form.ending_date}}
+                        <script>
+                            $(function () {
+                                $("#id_ending_date").datetimepicker({
+                                    format: 'd/m/Y H:i',
+                                });
+                            });
+                        </script>
+
+                        {{form.size.errors}}
+                        <div class="input-title">Nombre de place :</div>
+                        {{form.size}}
+
+                        {{form.requires_motivation.errors}}
+                        <div class="input-title">Requiert une motivation :</div>
+                        {{form.requires_motivation}}
+
+                        <div class="centered-div">
+                            {% if edit %}
+                                <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
+                                <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}"><button class="button red-button">Annuler</button></a>
+                            {% else %}
+                                <button form=1 type="submit" value="Créer" class="button green-button">Créer</button>
+                                <a href="{% url 'news:shotguns' %}"><button type="button" class="button red-button">Annuler</button></a>
+                            {% endif %}
+
+                        </div>
+                        </form>
+                    {% else %}
+                        <p class="text-bold text-center mt-2">Tu dois être administrateur d'un club pour créer de nouveaux shotguns.</p>
+                    {% endif %}
+                </div>
+            </div><!--End of News Card-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+</html><!--End of Document-->

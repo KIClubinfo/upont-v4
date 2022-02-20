@@ -12,6 +12,8 @@
 
     <!--Content-->
     <div class="content">
+
+        <!--Header Content-->
         <div class="content-header">
             <div class="row justify-content-between w-100">
                 <div class="col">
@@ -22,88 +24,114 @@
                 </div>
             </div>
         </div>
+
+        <!--Main Content-->
         <div class="content-main">
-            <div class="box", style="margin-bottom: 1rem">
-                <h1>{{shotgun.title}}</h1>
-                {%if already_participated%}
-                    <h3 style="text-align: center">Tu as participé à ce shotgun.</h3>
-                    {%if shotgun.requires_motivation%}
-                        <h5>Ta motivation :</h5> <p>{{motivation}}</p>
-                    {% endif %}
-                {%else%}
-                    {%if shotgun.is_started%}
-                        {%if shotgun.is_ended%}
-                            <h2 style="text-align: center">Ce shotgun est terminé depuis le {{shotgun.ending_date}}.</h2>
-                        {%else%}
-                            <form action="{% url 'news:shotgun_participate' shotgun.id %}" method="post" class="form-control" id="1" style="text-align: center"><br>
-                                {% csrf_token %}
-                                <fieldset>
-                                    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                                    {%if shotgun.requires_motivation%}
-                                        <textarea name = "motivation" class="form-control" placeholder="Motivation"></textarea><br><br>
-                                    {%endif%}
-                                </fieldset>
-                                <button form=1 type="submit" value="Participer" class="button green-button">Participer</button><br>
-                            </form>
-                        {%endif%}
-                    {%else%}
-                        <h2 style="text-align: center">Ce shotgun commencera le {{shotgun.starting_date}}.</h2>
-                    {%endif%}
-                {%endif%}
-                <br><hr>
-                <div class="row">
-                    <div class="col-lg-5">
-                        <p style="font-size: 1.5rem">
-                            <b>Organisateur :</b> {{shotgun.club.name}}<br><br>
-                            <b>Début du shotgun :</b> {{shotgun.starting_date}}<br><br>
-                            <b>Fin du shotgun :</b> {{shotgun.ending_date}}<br><br>
-                            <b>Motivation :</b>
-                            {%if shotgun.requires_motivation%}
-                                Requise.
-                            {%else%}
-                                Non.
-                            {%endif%}<br><br>
-                            <b>Nombre de places :</b> {{shotgun.size}}
-                        </p>
-                    </div>
-                    <div class="col-lg-5">
-                        <p style="font-size: 1.5rem">
-                            <b> Description :</b> {{shotgun.content}}
-                        </p>
-                    </div>
-                </div>
-            </div>
-            {%if already_participated %}
-                <div class="box", style="margin-bottom: 1rem">
-                    <h1>Résultats</h1>
-                    {% if not shotgun.requires_motivation %}
-                        {%if got_accepted%}
-                            <h4 style="text-align: center">Tu as réussi ce shotgun ! Félicitations !</h4>
-                        {%else%}
-                            <h4 style="text-align: center">Tu n'as pas réussi ce shotgun. Essaye d'être plus rapide la prochaine fois !</h4>
-                        {%endif%}
-                    {% else %}
-                        {%if shotgun.motivations_review_finished %}
-                            {% if got_accepted %}
-                                <h4 style="text-align: center">Tu as réussi ce shotgun ! Félicitations !</h4>
-                            {% else %}
-                                <h4 style="text-align: center">Tu n'as pas réussi ce shotgun. Peut-être une prochaine fois !</h4>
+
+            <h3 class="page-title">Shotguns | {{shotgun.title}}</h3>
+
+            <!--Row-->
+            <div class="row">
+
+                <!--Column-->
+                <div class="col-clublg-6">
+                    <div class="box small-box">
+                        <h5 class="section-title">Information sur ce shotgun</h5>
+                        <ul class="">
+                            <li><div class="text-bold mt-2">Organisateur : <strong class="text-thin">{{shotgun.club.name}}</strong></div></li>
+                            <li><div class="text-bold mt-2">Début du shotgun : <strong class="text-thin">{{shotgun.starting_date}}</strong></div></li>
+                            <li><div class="text-bold mt-2">Fin du shotgun : <strong class="text-thin">{{shotgun.ending_date}}</strong></div></li>
+                            <li><div class="text-bold mt-2">Motivation : <strong class="text-thin">{%if shotgun.requires_motivation%}Requise.{%else%}Non.{%endif%}</strong></div></li>
+                            <li><div class="text-bold mt-2">Nombre de places : <strong class="text-thin">{{shotgun.size}}</strong></div></li>
+                            <li><div class="text-bold mt-2">Description : <strong class="text-thin">{{shotgun.content}}</strong></div></li>
+                        </ul>
+
+                        <div class="centered-div">
+                            {%if student_is_admin %}
+                                <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}"><button class="button blue-button">Administrer ce shotgun</button></a>
+                            {%endif%}
+                            <a href="{% url 'news:shotguns' %}"><button class="button green-button">Retour à l'index</button></a>
+                        </div>
+                    </div><!--End of Box-->
+                </div><!--End of Column-->
+
+                <!--Column-->
+                <div class="col-clublg-6">
+
+                    <!--Box-->
+                    <div class="box small-box">
+                        <h5 class="section-title">Nom du shotgun</h5>
+
+                        {%if already_participated%}
+                            <p class="text-bold text-center mt-2">Tu as déjà participé à ce shotgun</p>
+                            {% if shotgun.requires_motivation %}
+                                <p class="text-center">Ta motivation :</p>
+                                <div class="information-box">
+                                    <p class="text-justified mb-0">{{motivation}}</p>
+                                </div>
                             {% endif %}
                         {%else%}
-                            <h4 style="text-align: center">Les organisateurs n'ont pas fini d'examiner ta motivation. Reviens plus tard !</h4>
-                        {%endif%}
-                    {% endif %}
+                            {%if shotgun.is_started%}
+                                {%if shotgun.is_ended%}
+                                    <p class="text-center mt-2">Ce shotgun est terminé depuis le {{shotgun.ending_date}}.</p>
+                                {%else%}
+                                    <form action="{% url 'news:shotgun_participate' shotgun.id %}" method="post" class="form-control" id="1" style="display: flex; justify-content: center; flex-direction: column;">
+                                        {% csrf_token %}
+                                        <p class="text-center mt-2">Tu n'as pas encore participé à ce shotgun.{% if shotgun.requires_motivation %}<br>Tu peux entrer une motivation pour participer.</p>{% endif %}
 
-                </div>
-            {%endif%}
-            <div class="box", style="margin-bottom: 1rem; text-align: center">
-                {%if student_is_admin %}
-                    <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}" style="text-decoration: none"><button class="button blue-button">Administrer ce shotgun</button></a>
-                {%endif%}
-                <a href="{% url 'news:shotguns' %}" style="text-decoration: none"><button class="button blue-button">Retour à l'index</button></a>
-            </div>
-        </div>
-    </div>
-    <script src="{% static 'js/sidenav.js' %}"></script>
-</body>
-</html>
+                                            {% if error_message %}
+                                                <p class="text-center mt-2">{{ error_message }}</p>
+                                            {% endif %}
+
+                                            {%if shotgun.requires_motivation%}
+                                                <textarea name="motivation" id="" cols="30" rows="2" class="text-input" placeholder="Motivation"></textarea>
+                                            {%endif%}
+
+                                            <div class="centered-div">
+                                                <button form=1 type="submit" value="Participer" class="button green-button">Participer</button>
+                                            </div>
+                                        </form>
+                                {%endif%}
+                            {%else%}
+                                <p class="text-center mt-2">Ce shotgun commencera le {{shotgun.starting_date}}.</p>
+                            {%endif%}
+                        {%endif%}
+
+                    </div><!--End of Box-->
+
+                    {%if already_participated %}
+                        <!--Box-->
+                        <div class="box small-box">
+                            <h5 class="section-title">Résultats du shotgun</h5>
+
+                            {% if not shotgun.requires_motivation %}
+                                {%if got_accepted%}
+                                    <p class="text-center text-green mt-2">Tu as réussi ce shotgun ! Félicitations !</p>
+                                {%else%}
+                                    <p class="text-center text-red mt-2">Tu n'as pas réussi ce shotgun. Essaye d'être plus rapide la prochaine fois !</p>
+                                {%endif%}
+                            {% else %}
+                                {%if shotgun.motivations_review_finished %}
+                                    {% if got_accepted %}
+                                        <p class="text-center text-green mt-2">Tu as réussi ce shotgun ! Félicitations !</p>
+                                    {% else %}
+                                        <p class="text-center text-red mt-2">Tu n'as pas réussi ce shotgun. Peut-être une prochaine fois !</p>
+                                    {% endif %}
+                                {%else%}
+                                    <p class="text-center mt-2">Les organisateurs n'ont pas fini d'examiner ta motivation. Reviens plus tard !</p>
+                                {%endif%}
+                            {% endif %}
+
+                        </div><!--End of Box-->
+                    {%endif%}
+
+                </div><!--End of Column-->
+
+            </div><!--End of Row-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+</html><!--End of Document-->

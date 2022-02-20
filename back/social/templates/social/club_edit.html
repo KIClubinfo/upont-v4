@@ -18,19 +18,20 @@
                     {% csrf_token %}
                     <div class="club-group-image-container">
                         {% if club.background_picture %}
-                            <img class="club-card-image" src={{club.background_picture.url}} height="100%" width="100%" alt="">
+                            <img class="club-group-image" src={{club.background_picture.url}} alt="">
                         {% else %}
-                            <img class="club-card-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
-                        {% endif %}</div>
+                            <img class="club-group-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
+                        {% endif %}
+                    </div>
                     <div class="row">
                         {% csrf_token %}
                         {{ EditClub.non_field_errors }}
                         <div class="col-lg-4">
                             <div class="club-image">
                                 {% if club.logo %}
-                                    <img class="club-card-image" src={{club.logo.url}} height="100%" width="100%" alt="">
+                                    <img class="image-centered" src={{club.logo.url}} alt="">
                                 {% else %}
-                                    <img class="club-card-image" src="{% static 'assets/img/bde.png' %}" alt="">
+                                    <img class="image-centered" src="{% static 'assets/img/logo_default.png' %}" alt="">
                                 {% endif %}
                             </div>
                         </div>
@@ -48,7 +49,7 @@
                             Description du club : <br>
                             {{ EditClub.description.errors }}
                             {{ EditClub.description }}
-                            <p>Tu peux écrire en markdown, rends toi <a href="/news/markdown">ici</a> pour en savoir plus</p>
+                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</p>
                             <br>
                             Modifier la photo d'arrière plan du club :<br>
                             {{ EditClub.background_picture }}
@@ -60,11 +61,11 @@
                             Le club est actif :
                             {{ EditClub.active.errors }}
                             {{ EditClub.active }}
-                            <br>
+                            <br><br>
                             Le club a une cotisation :
                             {{ EditClub.has_fee.errors }}
                             {{ EditClub.has_fee }}
-                            <br>
+                            <br><br>
                             Modifier les catégories du club :
                             {{ EditClub.category.errors }}
                             {{ EditClub.category }}
@@ -82,7 +83,7 @@
                         {% for membership in all_club_memberships %}
                             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                 <div class="user-card">
-                                    <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt=""></div>
+                                    <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
                                     <div class="user-information">
                                         <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
                                         <span>{{membership.role}}</span>
