@@ -38,7 +38,7 @@
                     <div class="box profil-box">
 
                         <div class="profil-image">
-                            <img src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
+                            <img class="image-centered" src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
                         </div>
                         <h5 class="section-title">{{student.user.first_name}} {{student.user.last_name}}</h5>
                         {% if student.phone_number is not None %}

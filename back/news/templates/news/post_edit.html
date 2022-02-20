@@ -20,12 +20,6 @@
 
             <!--News Card-->
             <div class="news-card">
-                <div class="news-card-header">
-                    <div class="news-card-header-image"><img src="{% static 'assets/img/logo_default.png' %}" alt=""></div>
-                    <div class="news-card-header-text">
-                        <span class="news-card-header-name">Nom de la personne</span>
-                    </div>
-                </div>
                 <form action="{% if Edit %}{% url 'news:post_edit' post.id %}{% else %}{% url 'news:post_create' %}{% endif %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="news-card-content">
