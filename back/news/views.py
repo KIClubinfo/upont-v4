@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -187,7 +186,7 @@ def post_create(request):
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = Student.objects.get(user__id=request.user.id)
-                post.date = datetime.now()
+                post.date = timezone.now()
                 post.save()
                 return redirect("news:posts")
     else:
