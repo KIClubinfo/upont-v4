@@ -49,7 +49,6 @@ class Students extends React.Component {
                     else {
                         result.next = ""
                     }
-                    console.log("/" + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''));
                     this.setState({
                         next_url: "/" + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''),
                         students: this.state.students.concat(result.results),

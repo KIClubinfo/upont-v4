@@ -56,6 +56,8 @@ services:
       context: ./
       dockerfile: ./webinstaller/Dockerfile
       target: production
+    environment:
+      DEBUG: $DEBUG
     volumes:
       - bundles:/src/upont/static/react
 volumes:

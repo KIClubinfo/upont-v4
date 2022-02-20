@@ -4,4 +4,4 @@
 /usr/local/bin/npm install
 
 # compile files with webpack
-npx webpack
+npx webpack --env --mode production
