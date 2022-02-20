@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = ( env ) => {
+module.exports = (env) => {
   return {
     devtool: 'eval-source-map',
     mode: env.mode,
