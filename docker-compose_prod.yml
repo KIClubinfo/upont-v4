@@ -20,7 +20,7 @@ services:
       - 8000
     depends_on:
       - db
-      - nginx
+      - webinstaller
     links:
       - db
     volumes:
@@ -45,6 +45,8 @@ services:
     build: ./nginx
     ports:
       - $BACK_PORT:80
+    depends_on:
+      - back
     volumes:
       - static_volume:/src/static
       - media_volume:/src/media
