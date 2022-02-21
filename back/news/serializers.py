@@ -100,6 +100,20 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
     comments = CommentSerializer(many=True, read_only=True)
 
+    can_edit = serializers.SerializerMethodField()
+
+    def get_can_edit(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        student = get_object_or_404(Student, user__id=user.id)
+        if (
+            obj.club and obj.club.is_member(student.id)
+        ) or obj.author.user.id == user.id:
+            return True
+        return False
+
     class Meta:
         model = Post
         fields = [
@@ -118,4 +132,5 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "user_liked",
             "comments",
             "id",
+            "can_edit",
         ]

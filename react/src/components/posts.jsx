@@ -80,6 +80,7 @@ class Post extends React.Component {
         this.show_more = this.show_more.bind(this);
         this.show_less = this.show_less.bind(this);
         this.show_comments_button = this.show_comments_button.bind(this);
+        this.edit_button = this.edit_button.bind(this);
     }
 
     refresh() {
@@ -150,7 +151,19 @@ class Post extends React.Component {
         else {
             return <div style={{textAlign: "center"}}><a onClick={this.show_less}>Voir moins de commentaires</a></div>;
         }
+    }
 
+    edit_button() {
+        if (this.state.post.can_edit) {
+            return (
+                <div className="centered-div">
+                    <a href={this.state.post.edit_url}><button className="button blue-button">Éditer</button></a>
+                </div>
+            )
+        }
+        else {
+            return <div></div>
+        }
     }
 
     render() {
@@ -166,9 +179,7 @@ class Post extends React.Component {
                     </div>
 
                     <div className="news-card-content">
-                        <div className="centered-div">
-                            <a href={this.state.post.edit_url}><button className="button blue-button">Éditer</button></a>
-                        </div>
+                        {this.edit_button()}
                         <ReactMarkdown>{this.state.post.content}</ReactMarkdown>
                     </div>
 
