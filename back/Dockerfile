@@ -107,6 +107,7 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         # for checking when db is up
         netcat=1.10-46 \
+        iputils-ping=3:20210202-1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./entrypoint.dev.sh .

@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: $DB_NAME
       POSTGRES_USER: $DB_USER
       POSTGRES_PASSWORD: $DB_PASSWORD
+    networks:
+      - db_link
   back:
     build:
       context: back
@@ -21,8 +23,6 @@ services:
     depends_on:
       - db
       - webinstaller
-    links:
-      - db
     volumes:
       - static_volume:/src/static
       - media_volume:/src/media
@@ -41,6 +41,10 @@ services:
       DEBUG: $DEBUG
       GUNICORN_NB_WORKERS: $GUNICORN_NB_WORKERS
       SECURE_SSL_REDIRECT: $SECURE_SSL_REDIRECT
+    networks:
+      - ping
+      - db_link
+      - nginx_link
   nginx:
     build: ./nginx
     ports:
@@ -51,6 +55,8 @@ services:
       - static_volume:/src/static
       - media_volume:/src/media
     restart: always
+    networks:
+      - nginx_link
   webinstaller:
     build:
       context: ./
@@ -58,9 +64,18 @@ services:
       target: production
     volumes:
       - bundles:/src/upont/static/react
+    networks:
+      - ping
 volumes:
   static_volume:
   media_volume:
   database:
   bundles:
     driver: local
+networks:
+  ping:
+    driver: bridge
+  db_link:
+    driver: bridge
+  nginx_link:
+    driver: bridge
