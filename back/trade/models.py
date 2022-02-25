@@ -1,9 +1,14 @@
 from django.db import models
 
 
+class Price(models.Model):  # changing prices are handled with a Price model
+    good = models.ForeignKey("trade.Good", on_delete=models.SET_NULL, null=True)
+    date = models.DateTimeField()
+    price = models.IntegerField()  # in 100th of euros
+
+
 class Good(models.Model):
     name = models.CharField(max_length=50)
-    price = models.IntegerField()  # in 100th of euros
     club = models.ForeignKey("social.Club", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
