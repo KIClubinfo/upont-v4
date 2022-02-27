@@ -92,7 +92,7 @@ class Student(models.Model):
         transactions = Transaction.objects.filter(student=self)
         balance = 0
         for transaction in transactions:
-            balance -= transaction.good.price * transaction.quantity
+            balance += transaction.balance_change_for_student()
         return balance
 
     def balance_in_euros(self):
@@ -156,7 +156,7 @@ class Club(models.Model):
         transactions = Transaction.objects.filter(good__club=self)
         balance = 0
         for transaction in transactions:
-            balance += transaction.good.price * transaction.quantity
+            balance += transaction.balance_change_for_club()
         return balance
 
     def balance_in_euros(self):

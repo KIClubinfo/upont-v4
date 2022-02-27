@@ -2,7 +2,7 @@ from django.contrib.auth import models
 from django.core.validators import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from trade.models import Good, Transaction
+from trade.models import Good, Price, Transaction
 
 from .models import Category, Club, Membership, Nationality, Promotion, Role, Student
 
@@ -64,8 +64,10 @@ class StudentModelTest(TestCase):
         student = Student.objects.get(pk=1)
         self.assertEqual(-500, student.balance_in_cents())
         club = Club.objects.get(pk=1)
-        good = Good(name="test_provision_account", price=-50, club=club)
+        good = Good(name="test_provision_account", club=club)
         good.save()
+        price = Price(good=good, price=-50, date=timezone.now())
+        price.save()
         transaction = Transaction(
             good=good, quantity=1, student=student, date=timezone.now()
         )
@@ -76,8 +78,10 @@ class StudentModelTest(TestCase):
         student = Student.objects.get(pk=1)
         self.assertEqual(-5, student.balance_in_euros())
         club = Club.objects.get(pk=1)
-        good = Good(name="test_provision_account", price=-50, club=club)
+        good = Good(name="test_provision_account", club=club)
         good.save()
+        price = Price(good=good, price=-50, date=timezone.now())
+        price.save()
         transaction = Transaction(
             good=good, quantity=1, student=student, date=timezone.now()
         )
@@ -145,8 +149,10 @@ class ClubModelTest(TestCase):
         club = Club.objects.get(pk=1)
         self.assertEqual(500, club.balance_in_cents())
         student = Student.objects.get(pk=1)
-        good = Good(name="test_provision_account", price=-50, club=club)
+        good = Good(name="test_provision_account", club=club)
         good.save()
+        price = Price(good=good, price=-50, date=timezone.now())
+        price.save()
         transaction = Transaction(
             good=good, quantity=1, student=student, date=timezone.now()
         )
@@ -157,8 +163,10 @@ class ClubModelTest(TestCase):
         club = Club.objects.get(pk=1)
         self.assertEqual(5, club.balance_in_euros())
         student = Student.objects.get(pk=1)
-        good = Good(name="test_provision_account", price=-50, club=club)
+        good = Good(name="test_provision_account", club=club)
         good.save()
+        price = Price(good=good, price=-50, date=timezone.now())
+        price.save()
         transaction = Transaction(
             good=good, quantity=1, student=student, date=timezone.now()
         )

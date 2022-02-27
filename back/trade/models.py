@@ -28,7 +28,13 @@ class Transaction(models.Model):
         return string_to_return
 
     def balance_change_for_student(self):
-        return -(self.quantity * self.good.price) / 100
+        price = Price.objects.filter(good=self.good, date__lte=self.date).order_by(
+            "date"
+        )[0]
+        return -(self.quantity * price.price)
 
     def balance_change_for_club(self):
-        return (self.quantity * self.good.price) / 100
+        price = Price.objects.filter(good=self.good, date__lte=self.date).order_by(
+            "date"
+        )[0]
+        return self.quantity * price.price

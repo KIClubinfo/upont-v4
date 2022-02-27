@@ -10,7 +10,7 @@ class StudentTransactionsViewTest(TestCase):
 
     def test_authenticated_user(self):
         self.client.login(username="test_user", password="azertyuiop123456789!")
-        response = self.client.get(reverse("trade:student_transactions"))
+        response = self.client.get(reverse("pochtron:trade:student_transactions"))
         self.assertEqual(type(response.context["transactions"]), QuerySet)
         self.assertEqual(len(response.context["transactions"]), 1)
         self.failUnlessEqual(response.status_code, 200)
