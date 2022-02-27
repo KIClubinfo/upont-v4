@@ -797,6 +797,15 @@ a.text-green:hover{
     color: rgb(156, 156, 156);
 }
 
+textarea.profil-input{
+    height: 15rem;
+    text-align:left;
+}
+
+.profil-input[type="file"]{
+    color: rgb(156, 156, 156);
+}
+
 .profil-input:focus{
     outline: 0;
 }
