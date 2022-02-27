@@ -1,0 +1,30 @@
+{
+  "name": "uPont",
+  "version": "1.0.0",
+  "description": "uPont",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "babel-loader": "^8.2.3",
+    "babel-preset-react": "^6.24.1",
+    "react": "^17.0.2",
+    "react-devtools": "^4.23.0",
+    "react-dom": "^17.0.2",
+    "react-infinite-scroller": "^1.2.5",
+    "react-markdown": "^8.0.0",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KIClubinfo/upont-v4"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.17.2",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "webpack-dev-server": "^4.7.4"
+  }
+}

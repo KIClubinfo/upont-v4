@@ -58,9 +58,9 @@
                     {%endif%}
                     <div class="centered-div">
                         <a href="{% url 'news:posts' %}"><button type="button" class="button red-button">Annuler</button></a>
-                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                        <button class="button green-button" type="submit" name="Valider">Valider</button>
                         {% if Edit %}
-                            <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
+                            <button class="button red-button" type="submit" name="Supprimer">Supprimer le post</button>
                         {% endif %}
                     </div>
                 </form>

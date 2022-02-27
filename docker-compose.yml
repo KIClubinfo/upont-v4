@@ -16,10 +16,12 @@ services:
     volumes:
       - ./back:/src
       - ./media:/media
+      - bundles:/src/upont/static/react:rw
     ports:
       - "$BACK_PORT:8000"
     depends_on:
       - db
+      - webinstaller
     links:
       - db
     environment:
@@ -33,3 +35,14 @@ services:
       DEFAULT_FROM_EMAIL: $DEFAULT_FROM_EMAIL
       SECRET_KEY: $SECRET_KEY
       DEBUG: $DEBUG
+  webinstaller:
+    build:
+      context: ./
+      dockerfile: ./webinstaller/Dockerfile
+      target: development
+    volumes:
+      - ./react/:/app/:rw
+      - bundles:/src/upont/static/react:rw
+volumes:
+  bundles:
+    driver: local
