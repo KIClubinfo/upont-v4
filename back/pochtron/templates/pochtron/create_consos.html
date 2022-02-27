@@ -1,0 +1,65 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Nom du profil" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="profile" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            <div class="row">
+                <h1> Créer une nouvelle consommation </h1>
+
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-3">
+                            {{EditAlcohol.name.errors}}
+                            Nom de la conso:
+                            {{EditAlcohol.name}}
+                        </div>
+                        <div class="col-lg-3">
+                            {{EditAlcohol.volume.errors}}
+                            Volume de la conso:
+                            {{EditAlcohol.volume}}
+                        </div>
+                        <div class="col-lg-3">
+                            {{EditAlcohol.degree.errors}}
+                            Taux d'alcool (%):
+                            {{EditAlcohol.degree}}
+                        </div>
+                        <div class="col-lg-3">
+                            {{EditPrice.price.errors}}
+                            Prix: <br>
+                            {{EditPrice.price}}
+                        </div>
+                        <div class="col-lg-3">
+                            <input class="button green-button" type="submit" name= "Create" value="Créer">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+    <script src="{% static 'js/sidenav.js' %}"></script>
+</body>
+</html>

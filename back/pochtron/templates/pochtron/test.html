@@ -1,0 +1,41 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Nom du profil" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="profile" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            <div class="row">
+                <div class="col-lg-4">
+                    test
+                </div>
+                <div class="col-lg-8">
+                    test
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+    <script src="{% static 'js/sidenav.js' %}"></script>
+</body>
+</html>
