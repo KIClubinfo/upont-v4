@@ -38,3 +38,7 @@ repos:
         language: docker_image
         types: ["dockerfile"]
         entry: hadolint/hadolint:v2.8.0 hadolint
+  - repo: https://github.com/standard/standard
+    rev: v17.0.0-2
+    hooks:
+      - id: standard

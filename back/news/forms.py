@@ -1,6 +1,5 @@
 from django import forms
-from django.shortcuts import get_object_or_404
-from social.models import Membership, Student
+from social.models import Membership
 
 from .models import Comment, Event, Post, Shotgun
 
@@ -33,12 +32,6 @@ class EditEvent(forms.ModelForm):
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
-        shotguns_choices_list = [("", "Pas de shotgun")]
-        student = get_object_or_404(Student, user__id=user_id)
-        for shotgun in Shotgun.objects.all():
-            if shotgun.club.is_member(student.id):
-                shotguns_choices_list.append((shotgun.id, shotgun.title))
-        self.fields["shotgun"].choices = shotguns_choices_list
 
 
 class EditPost(forms.ModelForm):
@@ -85,7 +78,7 @@ class CommentForm(forms.ModelForm):
 
     def __init__(self, post_id, user_id, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
-        self.fields["club"].choices = [("", "Élève")] + [
+        self.fields["club"].choices = [("-1", "Élève")] + [
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]

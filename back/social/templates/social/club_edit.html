@@ -70,8 +70,8 @@
                             {{ EditClub.category.errors }}
                             {{ EditClub.category }}
                             <div style="text-align: center;">
-                                <input class="button red-button" type="submit" name="Annuler" value="Annuler">
-                                <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                <button class="button red-button" type="submit" name="Annuler">Annuler</button>
+                                <button class="button green-button" type="submit" name="Valider">Valider</button>
                             </div>
                         </div>
                     </div>
@@ -120,7 +120,7 @@
                             Administrateur du club sur Upont
                             {{AddMember.is_admin.errors}}
                             {{AddMember.is_admin}} <br>
-                            <input class="button green-button" type="submit" name="Ajouter-Membre" value="Ajouter un membre au club">
+                            <button class="button green-button" type="submit" name="Ajouter-Membre">Ajouter un membre au club</button>
                         </form>
                     </div>
                     <div class="col-lg-6">
@@ -129,7 +129,7 @@
                             Créez un rôle si aucun ne vous convient: <br>
                             {{AddRole.name.errors}}
                             {{AddRole.name}}<br>
-                            <input class="button green-button" type="submit" name="Ajouter-Role" value="Créer">
+                            <button class="button green-button" type="submit" name="Ajouter-Role">Créer</button>
                         </form>
                     </div>
                 </div>

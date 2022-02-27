@@ -552,9 +552,10 @@ a.text-green:hover{
 }
 
 .button{
+    display: inline-block;
     cursor: pointer;
     /* Sizing */
-    padding: 1rem 1.2rem;
+    padding: 0.75rem 1.5rem;
     /* Styling */
     font-family:'Neue Helvetica Light';
     font-style: normal;
@@ -564,6 +565,10 @@ a.text-green:hover{
     border-radius: 0.5rem;
     background-color: rgba(255, 255, 255, 0.09);
     border-style: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .blue-button{
@@ -956,11 +961,19 @@ a.text-green:hover{
 }
 
 .club-card .club-card-content {
+    transform: translateY(-40px);
 	transition: 0.5s;
 }
 
-.club-card:hover .club-card-content {
-	transform: translateY(-50px);
+@media(min-width:1200px){
+    .club-card .club-card-content {
+        transform: translateY(0px);
+        transition: 0.5s;
+    }
+
+    .club-card:hover .club-card-content {
+        transform: translateY(-40px);
+    }
 }
 
 .club-card .club-card-content .club-card-image{
@@ -983,14 +996,19 @@ a.text-green:hover{
     text-align: center;
 	bottom: 50px;
 	display: flex;
-	transform: translateY(40px);
-	transition: 0.5s;
-	opacity: 0;
 }
 
-.club-card:hover .club-card-title{
-	transform: translateY(0px);
-	opacity: 1;
+@media(min-width:1200px){
+    .club-card .club-card-title {
+        transform: translateY(40px);
+	    transition: 0.5s;
+	    opacity: 0;
+    }
+
+    .club-card:hover .club-card-title{
+        transform: translateY(0px);
+        opacity: 1;
+    }
 }
 
 .vignette-club-mini{
