@@ -19,7 +19,7 @@ class EditEvent(forms.ModelForm):
         )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
-            "description": forms.Textarea(attrs={"class": "profil-input"}),
+            "description": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "date": forms.TextInput(attrs={"class": "profil-input"}),
             "location": forms.TextInput(attrs={"class": "profil-input"}),
             "poster": forms.FileInput(attrs={"class": "profil-input"}),
