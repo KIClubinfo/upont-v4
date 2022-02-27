@@ -19,8 +19,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from news.views import PostViewSet
+from rest_framework import routers
+from social.views import CurrentStudentView, StudentCanPublishAs, StudentViewSet
 
 from . import views
+
+# ---- MAIN URLS ----#
 
 urlpatterns = [
     path("social/", include("social.urls")),
@@ -44,3 +49,15 @@ if settings.DEBUG:  # in debug anyone can access any image
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
     urlpatterns.append(path("media/<path:path>", views.media))
+
+# ---- API URLS ----#
+
+router = routers.DefaultRouter()
+router.register(r"students", StudentViewSet)
+router.register(r"posts", PostViewSet)
+
+urlpatterns += [
+    path("api/", include(router.urls)),
+    path("api/current/", CurrentStudentView.as_view()),
+    path("api/forms/publish/", StudentCanPublishAs.as_view()),
+]

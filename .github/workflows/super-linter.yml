@@ -31,3 +31,5 @@ jobs:
           VALIDATE_CSS: false
           VALIDATE_MARKDOWN: false
           VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_BASH : false
+          VALIDATE_BASH_EXEC: false
