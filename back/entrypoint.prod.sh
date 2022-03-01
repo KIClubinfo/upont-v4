@@ -14,6 +14,7 @@ while ping -c 1 webinstaller > /dev/null; do
 done
 echo "Webinstaller exited"
 
+echo "Copying static files..."
 python3 manage.py collectstatic --noinput
 python3 manage.py check --deploy
 

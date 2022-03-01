@@ -170,12 +170,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 REMOTE_STATIC_STORAGE = env("REMOTE_STATIC_STORAGE", default=False)
-if REMOTE_STATIC_STORAGE:
+if REMOTE_STATIC_STORAGE and not DEBUG:
     FTP_STORAGE_LOCATION = env("FTP_STORAGE_LOCATION")
     ENCODING = "utf-8"
     STATICFILES_STORAGE = "storages.backends.ftp.FTPStorage"
+    STATIC_URL = env("REMOTE_STATIC_URL")
+else:
+    STATIC_URL = "/static/"
 
-STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "upont/static"),

@@ -37,6 +37,7 @@ services:
       DEBUG: $DEBUG
       REMOTE_STATIC_STORAGE: $REMOTE_STATIC_STORAGE
       FTP_STORAGE_LOCATION: $FTP_STORAGE_LOCATION
+      REMOTE_STATIC_URL: $REMOTE_STATIC_URL
   webinstaller:
     build:
       context: ./
