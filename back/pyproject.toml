@@ -18,5 +18,6 @@ django-cas-ng = "4.3.0"
 django-markdownify = "^0.9.0"
 djangorestframework = "3.13.1"
 Unidecode = "^1.3.2"
+django-storages = "^1.12.3"
 
 [tool.poetry.dev-dependencies]

@@ -110,6 +110,25 @@ python-http-client = ">=3.0.0"
 sendgrid = ">=5.0.0"
 
 [[package]]
+name = "django-storages"
+version = "1.12.3"
+description = "Support for many storage backends in Django"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+Django = ">=2.2"
+
+[package.extras]
+azure = ["azure-storage-blob (>=12.0.0)"]
+boto3 = ["boto3 (>=1.4.4)"]
+dropbox = ["dropbox (>=7.2.1)"]
+google = ["google-cloud-storage (>=1.27.0)"]
+libcloud = ["apache-libcloud"]
+sftp = ["paramiko"]
+
+[[package]]
 name = "django-tellme"
 version = "0.7.2"
 description = "A simple Django app that enables user feedback."
@@ -360,7 +379,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "8ef7da704dc32320fe30c609aaf95438878f80146ba68adc3118093bbbfc841d"
+content-hash = "1ca1e98fba873e1d95599ddb7499b88f0c0793b4fefbbdb6cb834e7d83999705"
 
 [metadata.files]
 asgiref = [
@@ -398,6 +417,10 @@ django-markdownify = [
 django-sendgrid-v5 = [
     {file = "django-sendgrid-v5-1.2.0.tar.gz", hash = "sha256:c40d41f7379dac6a3543d6bbe9b745f4e72817bb984257f8c806200d50218157"},
     {file = "django_sendgrid_v5-1.2.0-py2.py3-none-any.whl", hash = "sha256:4476811e750e4cc922441e3f01ec534bb5832998f617898a3823a1bc974237dc"},
+]
+django-storages = [
+    {file = "django-storages-1.12.3.tar.gz", hash = "sha256:a475edb2f0f04c4f7e548919a751ecd50117270833956ed5bd585c0575d2a5e7"},
+    {file = "django_storages-1.12.3-py3-none-any.whl", hash = "sha256:204a99f218b747c46edbfeeb1310d357f83f90fa6a6024d8d0a3f422570cee84"},
 ]
 django-tellme = [
     {file = "django-tellme-0.7.2.zip", hash = "sha256:1d79a5f79e10a133f6fbeb56905c8c71991597ed1927fb347b85f10863acdee6"},

@@ -169,6 +169,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+REMOTE_STATIC_STORAGE = env("REMOTE_STATIC_STORAGE", default=False)
+if REMOTE_STATIC_STORAGE:
+    FTP_STORAGE_LOCATION = env("FTP_STORAGE_LOCATION")
+    ENCODING = "utf-8"
+    STATICFILES_STORAGE = "storages.backends.ftp.FTPStorage"
+
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATICFILES_DIRS = [
