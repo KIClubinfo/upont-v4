@@ -68,15 +68,11 @@
                             <div class="text-bold text-center mt-2">Il n'y a pas de clubs dans la base de données.</div>
                         {% endif %}
                     {% endif %}
-
-
                 </div><!--End of Column-->
 
                 <!--Column-->
                 <div class="col-clublg-4">
-
                     <h4 class="page-title">Mes clubs & assos</h4>
-
                     <!--Row-->
                     <div class="row">
 
@@ -104,11 +100,35 @@
 
                 </div><!--Column-->
 
-            </div><!--End of Row-->
+                {% if inactive_clubs_list %}
+                    <div class="col-clublg-8" style="margin-top:1.5em">
 
-        </div><!--End of Main Content-->
+                        <h4 class="page-title">Clubs & Assos inactifs</h4>
+                        <!--Row-->
+                        <div class="row">
+                            {% for club in inactive_clubs_list %}
+                                <!--Column-->
+                                <div class="col-clubmd-4 col-clubsm-6">
+                                    <div class="club-card">
+                                        <div class="club-card-content">
+                                            <div class="club-card-image">
+                                                <img class="image-centered" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span></div>
+                                        <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                    </div>
+                                </div><!--End of Column-->
+                            {% endfor %}
+                        </div><!--End of Row-->
+                {% endif %}
 
-    </div><!--End of Content-->
+
+            </div><!--End of Column-->
+        </div><!--End of Row-->
+    </div><!--End of Main Content-->
+
+</div><!--End of Content-->
 
 </body><!--End of Body-->
 
