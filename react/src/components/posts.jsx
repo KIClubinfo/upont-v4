@@ -25,16 +25,16 @@ function post_logo(state) {
 function post_author(state) {
     if (state.post.club) {
         return (
-            <span className="news-card-header-name">
+            <a className="news-card-header-name" href={state.post.author_url}>
                 {state.post.club.name}
-            </span>
+            </a>
         )
     }
     else {
         return (
-            <span className="news-card-header-name">
+            <a className="news-card-header-name" href={state.post.author_url}>
                 {state.post.author.user.first_name} {state.post.author.user.last_name}
-            </span>
+            </a>
         )
     }
 }
