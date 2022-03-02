@@ -64,6 +64,7 @@ THIRD_PARTY_APPS = [
     "django_cas_ng",
     "markdownify.apps.MarkdownifyConfig",
     "rest_framework",
+    "corsheaders",
 ]
 
 PROJECT_APPS = [
@@ -76,6 +77,8 @@ PROJECT_APPS = [
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -170,11 +173,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 REMOTE_STATIC_STORAGE = env("REMOTE_STATIC_STORAGE", default=False)
-if REMOTE_STATIC_STORAGE and not DEBUG:
+
+if REMOTE_STATIC_STORAGE:
+    REMOTE_STATIC_URL = env("REMOTE_STATIC_URL", default="/static")
     FTP_STORAGE_LOCATION = env("FTP_STORAGE_LOCATION")
     ENCODING = "utf-8"
     STATICFILES_STORAGE = "storages.backends.ftp.FTPStorage"
-    STATIC_URL = env("REMOTE_STATIC_URL")
+    STATIC_URL = REMOTE_STATIC_URL + "/"
 else:
     STATIC_URL = "/static/"
 
@@ -182,6 +187,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "upont/static"),
 ]
+
+# Allowed origins for Cross-Origin Ressource Sharing
+CORS_ALLOWED_ORIGINS = []
+if REMOTE_STATIC_STORAGE:
+    CORS_ALLOWED_ORIGINS += [
+        REMOTE_STATIC_URL,
+    ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
