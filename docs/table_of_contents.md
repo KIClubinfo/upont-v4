@@ -9,3 +9,6 @@
 
 ## Fonctionnement général du site :
 * [Présentation](workings.md)
+
+## Tutoriels :
+* [Placer les fichiers statiques sur un serveur distant](distant_static_files.md)
