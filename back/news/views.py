@@ -151,7 +151,7 @@ def post_edit(request, post_id):
     if request.method == "POST":
         if "Supprimer" in request.POST:
             post.delete()
-            return redirect("news:posts")
+            return HttpResponseRedirect(request.session["origin"])
         elif "Valider" in request.POST:
             form = EditPost(
                 request.user.id,
@@ -163,18 +163,19 @@ def post_edit(request, post_id):
                 if "illustration" in request.FILES:
                     post.illustration.delete()
                 form.save()
-                return redirect("news:posts")
+                return HttpResponseRedirect(request.session["origin"])
 
     else:
         form = EditPost(request.user.id, instance=post)
     context["EditPost"] = form
     context["post"] = post
     context["Edit"] = True
+    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     return render(request, "news/post_edit.html", context)
 
 
 @login_required
-def post_create(request):
+def post_create(request, event_id=None):
     context = {}
     if request.method == "POST":
         if "Valider" in request.POST:
@@ -188,9 +189,12 @@ def post_create(request):
                 post.author = Student.objects.get(user__id=request.user.id)
                 post.date = timezone.now()
                 post.save()
-                return redirect("news:posts")
+                return HttpResponseRedirect(request.session["origin"])
     else:
         form = EditPost(request.user.id)
+        if event_id is not None:
+            form.fields["event"].initial = get_object_or_404(Event, id=event_id)
+    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     context["EditPost"] = form
     context["Edit"] = False
     return render(request, "news/post_edit.html", context)

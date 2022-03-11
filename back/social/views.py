@@ -270,9 +270,12 @@ def profile_edit(request):
 @login_required
 def index_clubs(request):
     all_clubs_list = Club.objects.order_by("name")
+    active_clubs_list = Club.objects.filter(active=True).order_by("name")
+    inactive_clubs_list = Club.objects.filter(active=False).order_by("name")
     context = {
         "all_clubs_list": all_clubs_list,
-        "club_displayed_list": all_clubs_list,
+        "club_displayed_list": active_clubs_list,
+        "inactive_clubs_list": inactive_clubs_list,
     }
     all_categories_list = Category.objects.order_by("name")
     context["all_categories_list"] = all_categories_list

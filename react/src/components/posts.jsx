@@ -1,6 +1,8 @@
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import ReactMarkdown from 'react-markdown';
+import gfm from 'remark-gfm';
+import emoji from 'remark-emoji';
 import {Comment} from './comment';
 import {CommentForm} from './commentForm';
 
@@ -25,16 +27,16 @@ function post_logo(state) {
 function post_author(state) {
     if (state.post.club) {
         return (
-            <span className="news-card-header-name">
+            <a className="news-card-header-name" href={state.post.author_url}>
                 {state.post.club.name}
-            </span>
+            </a>
         )
     }
     else {
         return (
-            <span className="news-card-header-name">
+            <a className="news-card-header-name" href={state.post.author_url}>
                 {state.post.author.user.first_name} {state.post.author.user.last_name}
-            </span>
+            </a>
         )
     }
 }
@@ -180,7 +182,7 @@ class Post extends React.Component {
 
                     <div className="news-card-content">
                         {this.edit_button()}
-                        <ReactMarkdown>{this.state.post.content}</ReactMarkdown>
+                        <ReactMarkdown  remarkPlugins={[gfm,emoji]}>{this.state.post.content}</ReactMarkdown>
                     </div>
 
                     {post_illustration(this.state)}

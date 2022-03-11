@@ -71,6 +71,17 @@ Django = ">=2.0"
 python-cas = ">=1.6.0"
 
 [[package]]
+name = "django-cors-headers"
+version = "3.11.0"
+description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+Django = ">=2.2"
+
+[[package]]
 name = "django-environ"
 version = "0.8.1"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
@@ -108,6 +119,25 @@ python-versions = "*"
 django = ">=1.8"
 python-http-client = ">=3.0.0"
 sendgrid = ">=5.0.0"
+
+[[package]]
+name = "django-storages"
+version = "1.12.3"
+description = "Support for many storage backends in Django"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+Django = ">=2.2"
+
+[package.extras]
+azure = ["azure-storage-blob (>=12.0.0)"]
+boto3 = ["boto3 (>=1.4.4)"]
+dropbox = ["dropbox (>=7.2.1)"]
+google = ["google-cloud-storage (>=1.27.0)"]
+libcloud = ["apache-libcloud"]
+sftp = ["paramiko"]
 
 [[package]]
 name = "django-tellme"
@@ -360,7 +390,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "8ef7da704dc32320fe30c609aaf95438878f80146ba68adc3118093bbbfc841d"
+content-hash = "bb3e1508966217a190ae3843a0be1a5ae7862c839eccfc5fe467e235a725faaa"
 
 [metadata.files]
 asgiref = [
@@ -387,6 +417,10 @@ django-cas-ng = [
     {file = "django-cas-ng-4.3.0.tar.gz", hash = "sha256:6fcc9f52b9fb8765369e1a78e6abc1e7d4ed71fe01e604a304a3d1376a9dea19"},
     {file = "django_cas_ng-4.3.0-py2.py3-none-any.whl", hash = "sha256:d15a3a7934732fd8f602a449fc0e59631972d74d9bd8b98710d165e1cea1f5fc"},
 ]
+django-cors-headers = [
+    {file = "django-cors-headers-3.11.0.tar.gz", hash = "sha256:eb98389bf7a2afc5d374806af4a9149697e3a6955b5a2dc2bf049f7d33647456"},
+    {file = "django_cors_headers-3.11.0-py3-none-any.whl", hash = "sha256:a22be2befd4069c4fc174f11cf067351df5c061a3a5f94a01650b4e928b0372b"},
+]
 django-environ = [
     {file = "django-environ-0.8.1.tar.gz", hash = "sha256:6f0bc902b43891656b20486938cba0861dc62892784a44919170719572a534cb"},
     {file = "django_environ-0.8.1-py2.py3-none-any.whl", hash = "sha256:42593bee519a527602a467c7b682aee1a051c2597f98c45f4f4f44169ecdb6e5"},
@@ -398,6 +432,10 @@ django-markdownify = [
 django-sendgrid-v5 = [
     {file = "django-sendgrid-v5-1.2.0.tar.gz", hash = "sha256:c40d41f7379dac6a3543d6bbe9b745f4e72817bb984257f8c806200d50218157"},
     {file = "django_sendgrid_v5-1.2.0-py2.py3-none-any.whl", hash = "sha256:4476811e750e4cc922441e3f01ec534bb5832998f617898a3823a1bc974237dc"},
+]
+django-storages = [
+    {file = "django-storages-1.12.3.tar.gz", hash = "sha256:a475edb2f0f04c4f7e548919a751ecd50117270833956ed5bd585c0575d2a5e7"},
+    {file = "django_storages-1.12.3-py3-none-any.whl", hash = "sha256:204a99f218b747c46edbfeeb1310d357f83f90fa6a6024d8d0a3f422570cee84"},
 ]
 django-tellme = [
     {file = "django-tellme-0.7.2.zip", hash = "sha256:1d79a5f79e10a133f6fbeb56905c8c71991597ed1927fb347b85f10863acdee6"},

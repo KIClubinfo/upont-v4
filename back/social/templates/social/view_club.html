@@ -76,6 +76,7 @@
                                                 <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
                                                 <span>{{membership.role}}</span>
                                             </div>
+                                            <a href="{% url 'social:profile_viewed' membership.student.user.id %}" class="stretched-link"></a>
                                         </div>
                                     </div><!--End of Column-->
                                 {% endfor %}

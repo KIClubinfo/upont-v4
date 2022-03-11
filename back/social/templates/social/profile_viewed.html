@@ -71,6 +71,7 @@
                                         <div class="vignette-mini-title">
                                             <span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span>
                                             <span>{{membership.role.name}}</span>
+                                            <a href="{% url 'social:club_detail' membership.club.id %}" class="stretched-link"></a>
                                         </div>
                                     </div>
 

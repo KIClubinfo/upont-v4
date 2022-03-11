@@ -1,5 +1,6 @@
 from django import forms
-from social.models import Membership
+from django.shortcuts import get_object_or_404
+from social.models import Membership, Student
 
 from .models import Comment, Event, Post, Shotgun
 
@@ -18,7 +19,7 @@ class EditEvent(forms.ModelForm):
         )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
-            "description": forms.Textarea(attrs={"class": "profil-input"}),
+            "description": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "date": forms.TextInput(attrs={"class": "profil-input"}),
             "location": forms.TextInput(attrs={"class": "profil-input"}),
             "poster": forms.FileInput(attrs={"class": "profil-input"}),
@@ -32,6 +33,12 @@ class EditEvent(forms.ModelForm):
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
+        shotguns_choices_list = [("", "Pas de shotgun")]
+        student = get_object_or_404(Student, user__id=user_id)
+        for shotgun in Shotgun.objects.all():
+            if shotgun.club.is_member(student.id):
+                shotguns_choices_list.append((shotgun.id, shotgun.title))
+        self.fields["shotgun"].choices = shotguns_choices_list
 
 
 class EditPost(forms.ModelForm):
@@ -47,7 +54,7 @@ class EditPost(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={"class": "profil-input"}),
             "illustration": forms.FileInput(attrs={"class": "profil-input"}),
-            "content": forms.Textarea(attrs={"class": "profil-input"}),
+            "content": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "event": forms.Select(attrs={"class": "profil-select"}),
             "club": forms.Select(attrs={"class": "profil-select"}),
         }
@@ -78,7 +85,7 @@ class CommentForm(forms.ModelForm):
 
     def __init__(self, post_id, user_id, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
-        self.fields["club"].choices = [("-1", "Élève")] + [
+        self.fields["club"].choices = [("", "Élève")] + [
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
@@ -100,7 +107,7 @@ class AddShotgun(forms.ModelForm):
         widgets = {
             "club": forms.Select(attrs={"class": "profil-select"}),
             "title": forms.TextInput(attrs={"class": "profil-input"}),
-            "content": forms.TextInput(attrs={"class": "profil-input"}),
+            "content": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "starting_date": forms.TextInput(attrs={"class": "profil-input"}),
             "ending_date": forms.TextInput(attrs={"class": "profil-input"}),
             "size": forms.TextInput(attrs={"class": "profil-input"}),

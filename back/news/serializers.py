@@ -66,6 +66,14 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     def get_edit_url(self, obj):
         return reverse("news:post_edit", args=(obj.pk,))
 
+    author_url = serializers.SerializerMethodField()
+
+    def get_author_url(self, obj):
+        if obj.club:
+            return reverse("social:club_detail", args=(obj.club.pk,))
+        else:
+            return reverse("social:profile_viewed", args=(obj.author.user.pk,))
+
     like_url = serializers.SerializerMethodField()
 
     def get_like_url(self, obj):
@@ -125,6 +133,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "content",
             "event_url",
             "edit_url",
+            "author_url",
             "like_url",
             "dislike_url",
             "total_likes",
