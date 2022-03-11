@@ -15,14 +15,14 @@ const customStyles = {
 
 ReactDOM.render((<AsyncSelect
   styles={customStyles} cacheOptions defaultOptions name='student'
-  loadOptions={get_student}
+  loadOptions={getStudent}
                  />), document.getElementById('adding_student'))
 ReactDOM.render((<AsyncSelect
   styles={customStyles} cacheOptions defaultOptions name='role'
-  loadOptions={get_roles}
+  loadOptions={getRoles}
                  />), document.getElementById('adding_role'))
 
-function get_student (inputValue) {
+function getStudent (inputValue) {
   return new Promise((resolve, reject) => {
     fetch(`/api/search/students/?user=${inputValue}`)
       .then(response => response.json())
@@ -36,7 +36,7 @@ function get_student (inputValue) {
   })
 }
 
-function get_roles (query) {
+function getRoles (query) {
   return new Promise((resolve, reject) => {
     fetch(`/api/search/roles/?role=${query}`)
       .then(response => response.json())
