@@ -7,7 +7,8 @@ module.exports = (env) => {
     entry: {
       IndexUsers: './src/index_users.js',
       Posts: './src/posts.js',
-      CSRF: './src/csrf.js'
+      CSRF: './src/csrf.js',
+      MemberAdding: './src/adding_members.js',
     },
     resolve: {
       modules: [__dirname, 'node_modules'],

@@ -21,7 +21,13 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from news.views import PostViewSet
 from rest_framework import routers
-from social.views import CurrentStudentView, StudentCanPublishAs, StudentViewSet
+from social.views import (
+    CurrentStudentView,
+    SearchRole,
+    SearchStudent,
+    StudentCanPublishAs,
+    StudentViewSet,
+)
 
 from . import views
 
@@ -60,4 +66,6 @@ urlpatterns += [
     path("api/", include(router.urls)),
     path("api/current/", CurrentStudentView.as_view()),
     path("api/forms/publish/", StudentCanPublishAs.as_view()),
+    path("api/search/roles/", SearchRole.as_view()),
+    path("api/search/students/", SearchStudent.as_view()),
 ]
