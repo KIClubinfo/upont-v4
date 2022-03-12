@@ -108,18 +108,21 @@
                             {% csrf_token %}
                             {{AddMember.non_field_errors}}
                             Ajouter un membre au club:
-                            <br><br>
+                            <br>
+                            <strong style="color:red">{{error }}</strong><br>
+                            <br>
                             Elève: <br>
                             {{AddMember.student.errors}}
-                            {{AddMember.student}}
+                            <div id="adding_student"></div>
                             <br>
                             Rôle : <br>
                             {{AddMember.role.errors}}
-                            {{AddMember.role}}
+                            <div id="adding_role"></div>
                             <br>
-                            Administrateur du club sur Upont
+                            Administrateur du club sur uPont
                             {{AddMember.is_admin.errors}}
-                            {{AddMember.is_admin}} <br>
+                            {{AddMember.is_admin}}
+                            <br>
                             <button class="button green-button" type="submit" name="Ajouter-Membre">Ajouter un membre au club</button>
                         </form>
                     </div>
@@ -139,6 +142,7 @@
     <!--EndContent-->
 
     <!--Scripts-->
+    <script src="{% static 'react/MemberAdding.bundle.js' %}"></script>
     <script src="{% static 'js/sidenav.js' %}"></script>
 </body>
 </html>
