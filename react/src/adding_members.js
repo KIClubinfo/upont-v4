@@ -14,11 +14,13 @@ const customStyles = {
 }
 
 ReactDOM.render((<AsyncSelect
-  styles={customStyles} cacheOptions defaultOptions name='student'
+  styles={customStyles} cacheOptions defaultOptions name='student' loadingMessage={() => 'Chargement'}
+  placeholder='Selectionner un élève'
   loadOptions={getStudent}
                  />), document.getElementById('adding_student'))
 ReactDOM.render((<AsyncSelect
-  styles={customStyles} cacheOptions defaultOptions name='role'
+  styles={customStyles} cacheOptions defaultOptions name='role' loadingMessage={() => 'Chargement'}
+  placeholder='Selectionner un rôle'
   loadOptions={getRoles}
                  />), document.getElementById('adding_role'))
 
