@@ -1,11 +1,31 @@
-# Create your views here.
-
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils import timezone
-from social.models import Club
+from social.models import Club, Student
 from trade.forms import EditPrice
 
 from .forms import EditAlcohol
+from .models import Alcohol
+
+
+def home(request):
+    context = {}
+    club = get_object_or_404(Club, name="Foyer")
+    student = get_object_or_404(Student, user__pk=request.user.id)
+    context["admin"] = club.is_member(student.id)
+    return render(request, "pochtron/home.html", context)
+
+
+def admin_home_page(request):
+    club = get_object_or_404(Club, name="Foyer")
+    student = get_object_or_404(Student, user__pk=request.user.id)
+    if not club.is_member(student.id):
+        raise PermissionDenied
+    consommations = Alcohol.objects.filter(club=club)
+    context = {"consommations": consommations}
+    return render(request, "pochtron/admin.html", context)
 
 
 def manage_accounts(request):
@@ -18,33 +38,71 @@ def shop(request):
     return render(request, "pochtron/test.html", context)
 
 
-def create_consos(request):
-    context = {}
+def conso_create(request):
+    context = {"create": True}
+    club = get_object_or_404(Club, name="Foyer")
+    student = get_object_or_404(Student, user__pk=request.user.id)
+    if not club.is_member(student.id):
+        raise PermissionDenied
+
     if request.method == "POST":
-        if "Create" in request.POST:
-            conso_form = EditAlcohol(
-                request.user.id,
-                request.POST,
-                request.FILES,
+        conso_form = EditAlcohol(
+            {
+                "name": request.POST["name"],
+                "degree": request.POST["degree"],
+                "volume": request.POST["volume"],
+                "club": club,
+            },
+        )
+        if conso_form.is_valid():
+            conso = conso_form.save()
+            price_form = EditPrice(
+                {"price": request.POST["price"], "date": timezone.now(), "good": conso},
             )
-            if conso_form.is_valid():
-                conso = conso_form.save(commit=False)
-                conso.club = get_object_or_404(Club, name="Foyer")
-                conso.save()
-                price_form = EditPrice(
-                    request.user.id,
-                    request.POST,
-                    request.FILES,
-                )
-                if price_form.is_valid:
-                    price = price_form.save(commit=False)
-                    price.date = timezone.now()
-                    price.good = conso
-                    price.save()
-        return render(request, "pochtron/create_consos.html", context)
+            if price_form.is_valid:
+                price_form.save()
+                return HttpResponseRedirect(reverse("pochtron:admin"))
     else:
-        conso_form = EditAlcohol(get_object_or_404(Club, name="Foyer"))
+        conso_form = EditAlcohol()
         price_form = EditPrice()
+    context["EditAlcohol"] = conso_form
+    context["EditPrice"] = price_form
+    return render(request, "pochtron/create_consos.html", context)
+
+
+def conso_edit(request, conso_id):
+    context = {"edit": True}
+    club = get_object_or_404(Club, name="Foyer")
+    student = get_object_or_404(Student, user__pk=request.user.id)
+    conso = get_object_or_404(Alcohol, pk=conso_id)
+    if not club.is_member(student.id):
+        raise PermissionDenied
+
+    if request.method == "POST":
+        conso_form = EditAlcohol(
+            {
+                "name": request.POST["name"],
+                "degree": request.POST["degree"],
+                "volume": request.POST["volume"],
+                "club": club,
+            },
+            instance=conso,
+        )
+        if conso_form.is_valid():
+            conso = conso_form.save()
+            price_form = EditPrice(
+                {"price": request.POST["price"], "date": timezone.now(), "good": conso},
+            )
+            if price_form.is_valid:
+                price_form.save()
+                return HttpResponseRedirect(reverse("pochtron:admin"))
+    else:
+        conso_form = EditAlcohol()
+        price_form = EditPrice()
+        conso_form.fields["name"].initial = conso.name
+        conso_form.fields["degree"].initial = conso.degree
+        conso_form.fields["volume"].initial = conso.volume
+        price_form.fields["price"].initial = conso.price
     context["EditAlcohol"] = conso_form
     context["EditPrice"] = price_form
     return render(request, "pochtron/create_consos.html", context)

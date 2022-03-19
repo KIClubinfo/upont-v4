@@ -1,0 +1,59 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Pochtron" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            <a href="{% url 'pochtron:conso_create' %}" style="text-decoration: none"><button class="button blue-button">Créer une consommation</button></a>
+            <h1>Toutes les consommations :</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Consommation</td>
+                        <td>Volume (mL)</td>
+                        <td>Degré (%)</td>
+                        <td>Prix (centimes)</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conso in consommations %}
+                        <tr style="vertical-align: middle">
+                            <td>{{conso.name}}</td>
+                            <td>{{conso.volume}}</td>
+                            <td>{{conso.degree}}</td>
+                            <td>{{conso.price}}</td>
+                            <td><a href="{% url 'pochtron:conso_edit' conso.id %}" style="text-decoration: none"><button class="button blue-button">Modifier</button></a></td>
+                        </tr>
+                    {% empty %}
+                        <th colspan="5" style="text-align: center">Aucune consommation.</th>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+    <script src="{% static 'js/sidenav.js' %}"></script>
+</body>
+</html>

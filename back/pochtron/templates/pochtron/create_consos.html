@@ -1,14 +1,17 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Nom du profil" %}
-
+{%if create%}
+    {% include "header.html" with title="Créer une consommation" %}
+{%else%}
+    {% include "header.html" with title="Modifier une consommation" %}
+{%endif%}
 <!--Body-->
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
 
     <!--Sidenav-->
-    {% include "sidenav.html" with active_link="profile" %}
+    {% include "sidenav.html" with active_link="pochtron" %}
 
     <!--Content-->
     <div class="content">
@@ -23,38 +26,36 @@
             </div>
         </div>
         <div class="content-main">
-            <div class="row">
-                <h1> Créer une nouvelle consommation </h1>
-
-                <form action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-lg-3">
-                            {{EditAlcohol.name.errors}}
-                            Nom de la conso:
-                            {{EditAlcohol.name}}
-                        </div>
-                        <div class="col-lg-3">
-                            {{EditAlcohol.volume.errors}}
-                            Volume de la conso:
-                            {{EditAlcohol.volume}}
-                        </div>
-                        <div class="col-lg-3">
-                            {{EditAlcohol.degree.errors}}
-                            Taux d'alcool (%):
-                            {{EditAlcohol.degree}}
-                        </div>
-                        <div class="col-lg-3">
-                            {{EditPrice.price.errors}}
-                            Prix: <br>
-                            {{EditPrice.price}}
-                        </div>
-                        <div class="col-lg-3">
-                            <input class="button green-button" type="submit" name= "Create" value="Créer">
+            {%if create%}
+                <h3 class="page-title">Créer une nouvelle consommation</h3>
+            {%else%}
+                <h3 class="page-title">Modifier une consommation</h3>
+            {%endif%}
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="news-card">
+                    <div class="news-card-content">
+                        {{EditAlcohol.name.errors}}
+                        Nom :<br>
+                        {{EditAlcohol.name}}<br>
+                        {{EditAlcohol.volume.errors}}
+                        Volume (mL) :<br>
+                        {{EditAlcohol.volume}}<br>
+                        {{EditAlcohol.degree.errors}}
+                        Taux d'alcool (%) :<br>
+                        {{EditAlcohol.degree}}<br>
+                        {{EditPrice.price.errors}}
+                        Prix (centimes) :<br>
+                        {{EditPrice.price}}<br>
+                    </div>
+                    <div class="news-card-actions">
+                        <div class="news-card-popularity">
+                            <a href="{% url 'pochtron:admin' %}"><span class="button red-button">Annuler</span></a>
+                            <input class="button green-button" type="submit" name= "Valider" value="Valider">
                         </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
     <!--EndContent-->

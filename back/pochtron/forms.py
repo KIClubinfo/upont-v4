@@ -18,6 +18,5 @@ class EditAlcohol(forms.ModelForm):
             "volume": forms.TextInput(attrs={"class": "profil-input"}),
         }
 
-    def __init__(self, club, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(EditAlcohol, self).__init__(*args, **kwargs)
-        self.fields["club"].initial = club

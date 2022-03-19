@@ -14,6 +14,17 @@ class Good(models.Model):
     def __str__(self):
         return self.name
 
+    def price_object(self):
+        return Price.objects.filter(good=self).order_by("-date")[0]
+
+    def price(self):
+        return self.price_object().price
+
+    def price_at_date(self, date):
+        return (
+            Price.objects.filter(good=self, date__lte=date).order_by("-date")[0].price
+        )
+
 
 class Transaction(models.Model):
     good = models.ForeignKey("Good", on_delete=models.SET_NULL, null=True)
@@ -28,13 +39,7 @@ class Transaction(models.Model):
         return string_to_return
 
     def balance_change_for_student(self):
-        price = Price.objects.filter(good=self.good, date__lte=self.date).order_by(
-            "date"
-        )[0]
-        return -(self.quantity * price.price)
+        return -(self.quantity * self.good.price_at_date(self.date))
 
     def balance_change_for_club(self):
-        price = Price.objects.filter(good=self.good, date__lte=self.date).order_by(
-            "date"
-        )[0]
-        return self.quantity * price.price
+        return self.quantity * self.good.price_at_date(self.date)
