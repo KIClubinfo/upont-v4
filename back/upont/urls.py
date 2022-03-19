@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from news.views import PostViewSet
+from pochtron.views import SearchAlcohol
 from rest_framework import routers
 from social.views import (
     CurrentStudentView,
@@ -28,6 +29,7 @@ from social.views import (
     StudentCanPublishAs,
     StudentViewSet,
 )
+from trade.views import LastTransactions, add_transaction
 
 from . import views
 
@@ -66,7 +68,10 @@ router.register(r"posts", PostViewSet)
 urlpatterns += [
     path("api/", include(router.urls)),
     path("api/current/", CurrentStudentView.as_view()),
+    path("api/transactions/last/", LastTransactions.as_view()),
     path("api/forms/publish/", StudentCanPublishAs.as_view()),
+    path("api/forms/transactions/add/", add_transaction),
     path("api/search/roles/", SearchRole.as_view()),
     path("api/search/students/", SearchStudent.as_view()),
+    path("api/search/alcohols/", SearchAlcohol.as_view()),
 ]

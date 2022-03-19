@@ -8,7 +8,8 @@ module.exports = (env) => {
       IndexUsers: './src/index_users.js',
       Posts: './src/posts.js',
       CSRF: './src/csrf.js',
-      MemberAdding: './src/adding_members.js'
+      MemberAdding: './src/adding_members.js',
+      PochtronShop: './src/pochtron_shop.js'
     },
     resolve: {
       modules: [__dirname, 'node_modules'],
