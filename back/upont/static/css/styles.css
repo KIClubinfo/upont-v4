@@ -1281,3 +1281,14 @@ a.text-green:hover{
 .news-nav a:hover{
     color: #39cbfb;
 }
+
+/*-------------------------------------------------*/
+/*--------------------- POCHTRON ------------------*/
+/*-------------------------------------------------*/
+
+.white-input{
+    background-color: white;
+    color: black;
+    text-align: left;
+    font-family:'Neue Helvetica Light';
+}

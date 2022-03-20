@@ -1,0 +1,39 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Comptes" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            <div id="manager">
+                <!--Manager is render here with React-->
+            </div>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+    <script>
+        window.react_mount = document.getElementById("manager");
+    </script>
+    <script src="{% static 'react/PochtronManageAccounts.bundle.js' %}"></script>
+</body>
+</html>

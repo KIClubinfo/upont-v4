@@ -54,7 +54,7 @@ def admin_home_page(request):
 @login_required
 def manage_accounts(request):
     context = {}
-    return render(request, "pochtron/test.html", context)
+    return render(request, "pochtron/manage_accounts.html", context)
 
 
 @login_required

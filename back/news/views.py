@@ -33,7 +33,7 @@ def posts(request):
             new_comment.date = timezone.now()
             new_comment.save()
             return HttpResponse(status=201)
-        return HttpResponse(status=105)
+        return HttpResponse(status=500)
 
 
 class PostViewSet(viewsets.ModelViewSet):

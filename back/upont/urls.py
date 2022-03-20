@@ -29,7 +29,7 @@ from social.views import (
     StudentCanPublishAs,
     StudentViewSet,
 )
-from trade.views import LastTransactions, add_transaction
+from trade.views import LastTransactions, add_transaction, credit_account
 
 from . import views
 
@@ -71,6 +71,7 @@ urlpatterns += [
     path("api/transactions/last/", LastTransactions.as_view()),
     path("api/forms/publish/", StudentCanPublishAs.as_view()),
     path("api/forms/transactions/add/", add_transaction),
+    path("api/forms/transactions/credit/", credit_account),
     path("api/search/roles/", SearchRole.as_view()),
     path("api/search/students/", SearchStudent.as_view()),
     path("api/search/alcohols/", SearchAlcohol.as_view()),

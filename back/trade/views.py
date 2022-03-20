@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from social.models import Club, Student
 from trade.serializers import TransactionSerializer
 
-from .forms import AddTransaction
+from .forms import AddTransaction, EditGood, EditPrice
 from .models import Good, Transaction
 
 
@@ -71,12 +71,14 @@ def add_transaction(request):
                 return JsonResponse({"error": ""}, status=201)
             else:
                 return JsonResponse({"error": "Pas assez d'argent sur ce compte."})
-        return HttpResponse(status=105)
+        return JsonResponse(
+            {"error": "Merci de remplir le formulaire correctement."}, status=500
+        )
 
 
 class LastTransactions(APIView):
     """
-    API endpoint that returns the last 20 transactions of a club.
+    API endpoint that returns the last transactions of a club.
     """
 
     def get(self, request):
@@ -86,11 +88,59 @@ class LastTransactions(APIView):
             student = get_object_or_404(Student, user__pk=request.user.id)
             if not club.is_member(student.id):
                 raise PermissionDenied
-
-            transactions = Transaction.objects.filter(good__club=club).order_by(
-                "-date"
-            )[:20]
-            serializer = TransactionSerializer(transactions, many=True)
-            return Response({"transactions": serializer.data})
+            if "end" in request.GET and request.GET["end"].strip():
+                end = int(request.GET.get("end", 20))
+            else:
+                end = 20
+            if "start" in request.GET and request.GET["start"].strip():
+                start = int(request.GET.get("start", 0))
+            else:
+                start = 0
+            transactions = Transaction.objects.filter(good__club=club).order_by("-date")
+            serializer = TransactionSerializer(transactions[start:end], many=True)
+            has_more = end < len(transactions)
+            return Response({"transactions": serializer.data, "has_more": has_more})
         else:
             return HttpResponse(status=500)
+
+
+@login_required
+def credit_account(request):
+    student = get_object_or_404(Student, user__pk=request.user.id)
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        club = get_object_or_404(Club, pk=data["club"])
+        if not club.is_member(student.id):
+            raise PermissionDenied
+
+        good_form = EditGood(
+            {
+                "name": "Crédit",
+                "club": club,
+            },
+        )
+        if good_form.is_valid():
+            good = good_form.save()
+            price_form = EditPrice(
+                {
+                    "good": good,
+                    "price": -int(data["amount"]),
+                    "date": timezone.now(),
+                }
+            )
+            if price_form.is_valid:
+                price_form.save()
+                transaction_form = AddTransaction(
+                    {
+                        "student": get_object_or_404(Student, pk=data["student"]),
+                        "good": good,
+                        "date": timezone.now(),
+                        "quantity": 1,
+                    }
+                )
+                if transaction_form.is_valid():
+                    transaction_form.save()
+                    return JsonResponse({"error": ""}, status=201)
+    return JsonResponse(
+        {"error": "Merci de remplir le formulaire correctement."}, status=500
+    )
