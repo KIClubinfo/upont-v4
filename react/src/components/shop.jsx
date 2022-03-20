@@ -5,10 +5,69 @@ import {StudentsSearchBar, AlcoholsSearchBar} from './searchBars';
 class LastTransactions extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            "transactions": []
+        };
+    }
+
+    componentDidMount() {
+        fetch("/api/id/pochtron/")
+        .then(res => res.json())
+        .then(result => {this.setState({"pochtron_id": result.id})})
+        this.interval = setInterval(() => this.load(), 1000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+
+    load() {
+        fetch("/api/transactions/last/?club="+this.state.pochtron_id)
+        .then(res => res.json())
+        .then(
+            (result) => {
+                this.setState({
+                    "transactions": result.transactions,
+                })
+            },
+            (error) => {
+                this.setState({
+                    error
+                });
+            }
+        )
     }
 
     render() {
-        return <p></p>;
+        return (
+            <div>
+            <h4>Dernières transactions : </h4>
+            <table className="table">
+                <thead>
+                    <tr>
+                        <td>Élève</td>
+                        <td>Consommation</td>
+                        <td>Quantité</td>
+                        <td>Date</td>
+                    </tr>
+                </thead>
+                <tbody>
+                {
+                    this.state.transactions.map(function f(transaction) {
+                        return (
+                            <tr key={transaction.id}>
+                                <td>{transaction.student.user.first_name + " " + transaction.student.user.last_name}</td>
+                                <td>{transaction.good.name}</td>
+                                <td>{transaction.quantity}</td>
+                                <td>{transaction.date}</td>
+                            </tr>
+                        )
+                    })
+                }
+                </tbody>
+            </table>
+            </div>
+        )
     }
 }
 
@@ -51,4 +110,4 @@ class AddTransaction extends React.Component {
     }
 }
 
-export default AddTransaction;
+export {AddTransaction, LastTransactions};

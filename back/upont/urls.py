@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from news.views import PostViewSet
-from pochtron.views import SearchAlcohol
+from pochtron.views import PochtronId, SearchAlcohol
 from rest_framework import routers
 from social.views import (
     CurrentStudentView,
@@ -74,4 +74,5 @@ urlpatterns += [
     path("api/search/roles/", SearchRole.as_view()),
     path("api/search/students/", SearchStudent.as_view()),
     path("api/search/alcohols/", SearchAlcohol.as_view()),
+    path("api/id/pochtron/", PochtronId.as_view()),
 ]

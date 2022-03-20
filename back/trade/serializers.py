@@ -18,6 +18,7 @@ class GoodSerializer(serializers.HyperlinkedModelSerializer):
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
     good = GoodSerializer()
     student = StudentSerializer()
+    date = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S")
 
     class Meta:
         model = Transaction

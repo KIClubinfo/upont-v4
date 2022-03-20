@@ -143,3 +143,13 @@ def conso_edit(request, conso_id):
 def global_stats(request):
     context = {}
     return render(request, "pochtron/test.html", context)
+
+
+class PochtronId(APIView):
+    """
+    API endpoint that returns the id of the club "Foyer".
+    """
+
+    def get(self, request):
+        club = get_object_or_404(Club, name="Foyer")
+        return Response({"id": club.id})
