@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from rest_framework.response import Response
@@ -57,8 +57,20 @@ def add_transaction(request):
             },
         )
         if filled_form.is_valid():
-            filled_form.save()
-            return HttpResponse(status=201)
+            all_transactions_with_this_club = Transaction.objects.filter(
+                good__club=good.club, student__pk=data["student"]
+            )
+            balance = 0
+            for transaction in all_transactions_with_this_club:
+                balance += (
+                    transaction.quantity * transaction.balance_change_for_student()
+                )
+            balance -= good.price()
+            if balance >= 0:
+                filled_form.save()
+                return JsonResponse({"error": ""}, status=201)
+            else:
+                return JsonResponse({"error": "Pas assez d'argent sur ce compte."})
         return HttpResponse(status=105)
 
 

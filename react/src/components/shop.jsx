@@ -95,13 +95,15 @@ class AddTransaction extends React.Component {
                 "alcohol": '',
                 "student": ''
             }))
-            .then(response => console.log('Submitted successfully'))
+            .then(res => res.json())
+            .then(response => this.setState({"error": response.error}))
             .catch(error => console.log('Form submit error', error))
     }
 
     render() {
         return (
         <form method="post" onSubmit={this.handleSubmit.bind(this)}>
+            <div className="centered-div text-red"><p>{this.state.error}</p></div>
             <StudentsSearchBar parent={this}/>
             <p></p>
             <AlcoholsSearchBar parent={this}/>
