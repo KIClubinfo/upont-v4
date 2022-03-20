@@ -12,6 +12,11 @@ Refonte de uPont en python avec le framework django pour une meilleure accessibi
 
 # Installation
 
+Pour construire les images des conteneurs :
+```
+docker-compose build
+```
+
 Pour lancer le site en local (commandes docker-compose standard, version 1.29.2) :
 ```
 docker-compose up -d
@@ -147,7 +152,7 @@ git rebase feature
 Mettre les changements en ligne :
 ```
 git checkout dev
-git push
+git push --force-with-lease
 ```
 
 ### Méthode 2 :
