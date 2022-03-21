@@ -11,7 +11,7 @@ class LastTransactions extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/id/pochtron/")
+        fetch(Urls["pochtron_id"]())
         .then(res => res.json())
         .then(result => {this.setState({"pochtron_id": result.id})})
         this.interval = setInterval(() => this.load(), 1000);
@@ -22,7 +22,7 @@ class LastTransactions extends React.Component {
     }
 
     load() {
-        fetch("/api/transactions/last/?club="+this.state.pochtron_id)
+        fetch(Urls["last_transactions"]()+"?club="+this.state.pochtron_id)
         .then(res => res.json())
         .then(
             (result) => {
@@ -83,7 +83,7 @@ class AddTransaction extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        const url = '/api/forms/transactions/add/'
+        const url = Urls["add_transaction"]()
         const csrfmiddlewaretoken = getCookie('csrftoken');
         const requestOptions = {
             method: 'POST',

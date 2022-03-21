@@ -9,7 +9,7 @@ class StudentsSearchBar extends React.Component {
 
     getStudent(inputValue) {
         return new Promise((resolve, reject) => {
-          fetch(`/api/search/students/?user=${inputValue}`)
+          fetch(Urls["search_students"]()+`?user=${inputValue}`)
             .then(response => response.json())
             .then(({ students }) => {
               resolve(students.map(({ id, user, promo }) => ({
@@ -55,7 +55,7 @@ class AlcoholsSearchBar extends React.Component {
 
     getAlcohol(inputValue) {
         return new Promise((resolve, reject) => {
-          fetch(`/api/search/alcohols/?alcohol=${inputValue}`)
+          fetch(Urls["search_alcohols"]()+`?alcohol=${inputValue}`)
             .then(response => response.json())
             .then(({ alcohols }) => {
               resolve(alcohols.map(({ name, degree, volume, price, id }) => ({

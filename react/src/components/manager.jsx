@@ -15,7 +15,7 @@ class LastTransactionsScroll extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/id/pochtron/")
+        fetch(Urls["pochtron_id"]())
         .then(res => res.json())
         .then(result => {this.setState({"pochtron_id": result.id})})
         .then(() => this.loadMore())
@@ -23,7 +23,7 @@ class LastTransactionsScroll extends React.Component {
 
     loadMore() {
         if (this.state.has_more) {
-            fetch("/api/transactions/last/?club="+this.state.pochtron_id+"&start="+this.state.start+"&end="+this.state.end)
+            fetch(Urls["last_transactions"]()+"?club="+this.state.pochtron_id+"&start="+this.state.start+"&end="+this.state.end)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -103,7 +103,7 @@ class CreditAccount extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/id/pochtron/")
+        fetch(Urls["pochtron_id"]())
         .then(res => res.json())
         .then(result => {this.setState({"pochtron_id": result.id})})
     }
@@ -114,7 +114,7 @@ class CreditAccount extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        const url = '/api/forms/transactions/credit/'
+        const url = Urls["credit_account"]();
         const csrfmiddlewaretoken = getCookie('csrftoken');
         const requestOptions = {
             method: 'POST',
