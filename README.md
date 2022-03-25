@@ -97,6 +97,7 @@ Les variables d'environnement suivantes sont placées dans le fichier *.env* :
 | DEFAULT_FROM_EMAIL | Adresse envoyant les mails (avec Sendigrd, n'importe quelle adresse en @enpc.org fonctionne). | upont@enpc.org | upont@enpc.org |
 | SECRET_KEY | Clé secrète utilisée par Django. | ChangeThatPlease | SECRET |
 | DEBUG | Défini si le mode DEBUG est activé. | True | False |
+| DOMAIN_NAME | Nom de domaine utilisé en production. Toutes les requêtes ne provenant pas de ce domaine seront rejetées. | upont.enpc.org | upont.enpc.org |
 | GUNICORN_NB_WORKERS | Nombre de workers pour le WSGI gunicorn. |  | 10 |
 | SECURE_SSL_REDIRECT | Redirige automatiquement les requêtes non HTTPS vers des requêtes HTTPS. Laisser à False si un autre proxy fait déjà cete redirection. | False | False |
 | REMOTE_STATIC_STORAGE | Variable indiquant si le site utilise un serveur distant pour servir les fichiers statiques. | False | True |
