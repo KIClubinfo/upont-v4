@@ -87,9 +87,6 @@ class Student(models.Model):
     def __str__(self):
         return self.user.username
 
-    def complete_name(self):
-        return self.user.first_name + " " + self.user.last_name
-
 
 class Category(models.Model):
     name = models.CharField(max_length=30)

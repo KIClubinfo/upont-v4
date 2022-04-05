@@ -240,6 +240,7 @@ def profile_edit(request):
     context = {
         "student": student,
         "membership_club_list": membership_club_list,
+        "complete_name": student.user.first_name + " " + student.user.last_name,
     }
 
     if request.method == "POST":
