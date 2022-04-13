@@ -26,10 +26,18 @@
             {% if admin %}
                 <a href="{% url 'pochtron:admin' %}" style="text-decoration: none"><button class="button blue-button">Admin</button></a>
             {% endif %}
+            <div id="graph">
+                <!--The graph will be rendered here with React-->
+            </div>
         </div>
     </div>
     <!--EndContent-->
 
     <!--Scripts-->
+    <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+    <script>
+        window.react_mount = document.getElementById("graph");
+    </script>
+    <script src="{% static 'react/PochtronOverview.bundle.js' %}"></script>
 </body>
 </html>

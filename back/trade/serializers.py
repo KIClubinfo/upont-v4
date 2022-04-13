@@ -4,7 +4,7 @@ from social.serializers import StudentSerializer
 from .models import Good, Transaction
 
 
-class GoodSerializer(serializers.HyperlinkedModelSerializer):
+class GoodSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
 
     def get_price(self, obj):
@@ -15,7 +15,7 @@ class GoodSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["name", "price", "id"]
 
 
-class TransactionSerializer(serializers.HyperlinkedModelSerializer):
+class TransactionSerializer(serializers.ModelSerializer):
     good = GoodSerializer()
     student = StudentSerializer()
     date = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S")

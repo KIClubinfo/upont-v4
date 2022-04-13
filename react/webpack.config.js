@@ -10,7 +10,8 @@ module.exports = (env) => {
       CSRF: './src/csrf.js',
       MemberAdding: './src/adding_members.js',
       PochtronShop: './src/pochtron_shop.js',
-      PochtronManageAccounts: './src/pochtron_manage_accounts.js'
+      PochtronManageAccounts: './src/pochtron_manage_accounts.js',
+      PochtronOverview: './src/pochtron_overview.js'
     },
     resolve: {
       modules: [__dirname, 'node_modules'],
