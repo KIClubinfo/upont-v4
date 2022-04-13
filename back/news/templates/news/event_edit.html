@@ -55,14 +55,18 @@
 
                             {{EditEvent.club.errors}}
                             <div class="input-title">Club :</div>
-                            {{EditEvent.club}}
+                            {% if EditEvent.club|length > 1 %}
+                                {{EditEvent.club}}
+                            {% else %}
+                                {{EditEvent.club|first|default:"Vous n'êtes membre d'aucun club"}}
+                            {% endif %}
 
                             {{EditEvent.shotgun.errors}}
                             <div class="input-title">Shotgun :</div>
                             {{EditEvent.shotgun}}
                         </div>
                     </div>
-                    {%if event.poster%}
+                    {% if event.poster %}
                         <div class="news-card-images">
                             <!--All-Images-Linked-With-The-Event-->
                             <div class="news-card-carousel">
@@ -71,7 +75,7 @@
                                 </div>
                             </div>
                         </div>
-                    {%endif%}
+                    {% endif %}
                     <div class="centered-div">
                         <a href="{% if event %}{% url 'news:event_detail' event.id %}{% else %}{% url 'news:events' %}{% endif %}"><button type="button" class="button red-button">Annuler</button></a>
                         <button class="button green-button" type="submit" name="Valider">Valider</button>
