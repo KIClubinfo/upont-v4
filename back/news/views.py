@@ -168,7 +168,6 @@ def post_edit(request, post_id):
     else:
         form = EditPost(request.user.id, instance=post)
     context["EditPost"] = form
-    context["IsInClub"] = len(form.fields["club"].choices) > 1
     context["post"] = post
     context["Edit"] = True
     request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
@@ -197,7 +196,6 @@ def post_create(request, event_id=None):
             form.fields["event"].initial = get_object_or_404(Event, id=event_id)
     request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     context["EditPost"] = form
-    context["IsInClub"] = len(form.fields["club"].choices) > 1
     context["Edit"] = False
     return render(request, "news/post_edit.html", context)
 

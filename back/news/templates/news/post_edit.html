@@ -24,8 +24,8 @@
                     {% csrf_token %}
                     <div class="news-card-content">
                         <div class="centered-div">
-                            {% if IsInClub %}
-                                {{EditPost.club.errors}}
+                            {{EditPost.club.errors}}
+                            {% if EditPost.club|length > 1 %}
                                 <div class="input-title">Publier en tant que :</div>
                                 {{EditPost.club}}
                             {% endif %}
