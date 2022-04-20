@@ -42,7 +42,7 @@
                         </div>
                         <h5 class="section-title">{{student.user.first_name}} {{student.user.last_name}}</h5>
                         {% if student.phone_number is not None %}
-                            <div class="profil-information-box">{{student.phone_number}}</div>
+                            <div class="profil-information-box">{{phone_number}}</div>
                         {% else %}
                             <div class="profil-information-box">{{student.user.first_name}} n'a pas renseigné son numéro</div>
                         {% endif %}

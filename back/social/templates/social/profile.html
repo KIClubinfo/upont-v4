@@ -49,7 +49,7 @@
                             <!--Column-->
                             <div class="centered-div col-lg-5">
                                 <div class="profil-information-box">{% if student.user.first_name %}{{student.user.first_name}}{% else %}---Prénom---{% endif %}</div>
-                                <div class="profil-information-box">{% if student.phone_number %}{{student.phone_number}}{% else %}---Tel---{% endif %}</div>
+                                <div class="profil-information-box">{% if student.phone_number %}{{phone_number}}{% else %}---Tel---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.gender %}{{student.gender}}{% else %}------{% endif %}</div>
 
                                 <a href="{% url 'social:profile_edit' %}"><button class="button blue-button">Modifier mon profil</button></a>

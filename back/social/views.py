@@ -108,10 +108,17 @@ def profile(request, user_id=None):
     student = get_object_or_404(Student, user__pk=user_id)
     membership_club_list = Membership.objects.filter(student__user__pk=user_id)
     all_student_list = Student.objects.order_by("user__first_name")
+    phone_number = student.phone_number
+    phone_number_formatted = ""
+    if phone_number is not None:
+        phone_number_formatted = ".".join(
+            [phone_number[i : i + 2] for i in range(0, len(phone_number), 2)]
+        )
     context = {
         "all_student_list": all_student_list,
         "student": student,
         "membership_club_list": membership_club_list,
+        "phone_number": phone_number_formatted,
     }
     if user_id == request.user.id:
         return render(request, "social/profile.html", context)
