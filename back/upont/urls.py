@@ -36,6 +36,7 @@ from . import views
 urlpatterns = [
     path("social/", include("social.urls")),
     path("news/", include("news.urls")),
+    path("the_calendar/", include("the_calendar.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo/", views.add, name="add_promo"),
