@@ -62,7 +62,7 @@ else:
 router = routers.DefaultRouter()
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet)
-router.register(r"events", EventViewSet)
+router.register(r"events", EventViewSet, basename="API_events")
 
 urlpatterns += [
     path("api/", include(router.urls)),

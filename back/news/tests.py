@@ -6,9 +6,10 @@ from django.http import HttpRequest
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework.test import APITestCase
 from social.models import Club, Membership, Student
 
-from .models import Comment, Participation, Post, Shotgun
+from .models import Comment, Event, Participation, Post, Shotgun
 from .views import posts
 
 
@@ -498,3 +499,46 @@ class CommentViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 0)
+
+
+class EventAPITest(APITestCase):
+    def setUp(self):
+        self.username = "user"
+        self.email = "user@mail.com"
+        self.password = "Follow the white rabbit"
+
+        self.user = models.User.objects.create_user(
+            self.username, self.email, self.password
+        )
+
+    def test_events(self):
+        event = Event(
+            name="Event",
+            description="Event description",
+            date=timezone.now(),
+            location="Event location",
+        )
+        event.save()
+
+        self.client.login(username=self.username, password=self.password)
+        url = reverse("API_events-list")
+        response = self.client.get(url)
+
+        expected = [
+            {
+                "name": event.name,
+                "description": event.description,
+                "club": None,
+                "date": event.date.astimezone().isoformat(),
+                "location": event.location,
+                "participants": [],
+                "poster": None,
+                "shotgun": None,
+                "id": event.pk,
+            }
+        ]
+
+        # Check if the request was successful
+        self.assertEqual(response.status_code, 200)
+        # Check if the data are the same
+        self.assertEqual(response.json()["results"], expected)
