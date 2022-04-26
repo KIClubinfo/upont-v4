@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
-from news.views import PostViewSet
+from news.views import EventViewSet, PostViewSet
 from rest_framework import routers
 from social.views import (
     CurrentStudentView,
@@ -62,6 +62,7 @@ else:
 router = routers.DefaultRouter()
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet)
+router.register(r"events", EventViewSet)
 
 urlpatterns += [
     path("api/", include(router.urls)),
