@@ -2,19 +2,36 @@ import React, { Fragment, useMemo } from 'react'
 import { useAsync } from 'react-async'
 import PropTypes from 'prop-types'
 import moment from 'moment'
+import 'moment/locale/fr'
 
 import {
   Calendar,
-  Views,
   DateLocalizer,
   momentLocalizer
 } from 'react-big-calendar'
 
-import DemoLink from './calendar_example/DemoLink.component.js'
 import * as dates from './calendar_example/dates'
 
+// Set the calendar language to french
+moment.locale('fr')
 const mLocalizer = momentLocalizer(moment)
 
+const messages = {
+  allDay: 'journée',
+  previous: 'précédent',
+  next: 'suivant',
+  today: 'aujourd\'hui',
+  month: 'mois',
+  week: 'semaine',
+  day: 'jour',
+  agenda: 'Agenda',
+  date: 'date',
+  time: 'heure',
+  event: 'événement', // Or anything you want
+  showMore: total => `+ ${total} événement(s) supplémentaire(s)`
+}
+
+// Events fetching from back API
 async function getEvents () {
   const response = await fetch('/api/events')
     .then(
@@ -56,14 +73,9 @@ const ColoredDateCellWrapper = ({ children }) =>
     }
   })
 
-/**
- * We are defaulting the localizer here because we are using this same
- * example on the main 'About' page in Storybook
- */
-
 export default function Basic ({
   localizer = mLocalizer,
-  showDemoLink = true,
+  showDemoLink = false,
   ...props
 }) {
   const { components, defaultDate, max, views } = useMemo(
@@ -71,9 +83,12 @@ export default function Basic ({
       components: {
         timeSlotWrapper: ColoredDateCellWrapper
       },
-      defaultDate: new Date(2022, 3, 1),
-      max: dates.add(dates.endOf(new Date(2015, 17, 1), 'day'), -1, 'hours'),
-      views: Object.keys(Views).map((k) => Views[k])
+      defaultDate: new Date(Date.now()),
+      max: dates.add(dates.endOf(new Date(2024, 17, 1), 'day'), -1, 'hours'),
+      views: {
+        month: true,
+        week: true
+      }
     }),
     []
   )
@@ -82,12 +97,13 @@ export default function Basic ({
   if (error) {
     console.log(error.message)
   }
-
+  console.log('test et ouis')
   return (
     <>
       <div className='height600' {...props}>
         <Calendar
           components={components}
+          messages={messages}
           defaultDate={defaultDate}
           events={data}
           localizer={localizer}
