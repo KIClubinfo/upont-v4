@@ -66,6 +66,11 @@ async function getEvents () {
   return formattedEvents
 }
 
+function handleSelectedEvent (e) {
+  const serveurUrl = window.location.origin
+  window.open(serveurUrl + '/news/event/' + e.id + '/detail', '_blank')
+}
+
 const ColoredDateCellWrapper = ({ children }) =>
   React.cloneElement(React.Children.only(children), {
     style: {
@@ -111,6 +116,7 @@ export default function Basic ({
           showMultiDayTimes
           step={60}
           views={views}
+          onSelectEvent={(e) => handleSelectedEvent(e)}
         />
       </div>
     </>
