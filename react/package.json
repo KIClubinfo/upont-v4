@@ -39,5 +39,5 @@
   },
   "eslintConfig":  {
     "extends": ["plugin:import/recommended"]
-  },
+  }
 }
