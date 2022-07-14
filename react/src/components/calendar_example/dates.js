@@ -50,8 +50,8 @@ export function lastVisibleDay (date, localizer) {
 
 export function visibleDays (date, localizer) {
   let current = firstVisibleDay(date, localizer)
-  last = lastVisibleDay(date, localizer)
-  days = []
+  const last = lastVisibleDay(date, localizer)
+  const days = []
 
   while (dates.lte(current, last, 'day')) {
     days.push(current)
@@ -69,7 +69,7 @@ export function ceil (date, unit) {
 
 export function range (start, end, unit = 'day') {
   let current = start
-  days = []
+  const days = []
 
   while (dates.lte(current, end, unit)) {
     days.push(current)

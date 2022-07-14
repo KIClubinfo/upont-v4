@@ -36,5 +36,8 @@
     "sass-loader": "^12.6.0",
     "style-loader": "^3.3.1",
     "webpack-dev-server": "^4.7.4"
-  }
+  },
+  "eslintConfig":  {
+    "extends": ["plugin:import/recommended"]
+  },
 }

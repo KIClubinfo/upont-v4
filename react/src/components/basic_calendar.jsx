@@ -97,7 +97,7 @@ export default function Basic ({
   if (error) {
     console.log(error.message)
   }
-  console.log('test et ouis')
+
   return (
     <>
       <div className='height600' {...props}>
