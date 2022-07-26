@@ -17,6 +17,7 @@ services:
       - ./back:/src
       - ./media:/media
       - bundles:/src/upont/static/react:rw
+      - ./backups:/backups
     ports:
       - "$BACK_PORT:8000"
     depends_on:

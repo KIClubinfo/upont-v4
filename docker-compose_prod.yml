@@ -27,6 +27,7 @@ services:
       - static_volume:/src/static
       - media_volume:/src/media
       - bundles:/src/upont/static/react
+      - ./backups:/backups
     restart: always
     environment:
       DB_HOST: $DB_HOST
