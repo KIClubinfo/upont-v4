@@ -3,8 +3,6 @@
 # DB setting
 DB_USER=upont
 DB_NAME=upont
-DB_PASSWORD=upont
-
 
 # Settings
 DATE=$(date +"%Y%m%d%H%M")
@@ -20,7 +18,7 @@ fi
 
 # Dump the database with django-admin
 echo 'Backing up database...'
-docker-compose exec back /src/manage.py dumpdata -o "$CONTAINER_BACKUP_PATH/$DATE.json.gz"
+docker-compose exec db /bin/bash -c "pg_dump -U \"$DB_USER\" -Fc \"$DB_NAME\" --exclude-table=django_migrations > \"$CONTAINER_BACKUP_PATH/$DATE.dump\""
 
 # Clean the backup directory, saving only the last 3 backups.
 echo 'Cleaning old database backup'

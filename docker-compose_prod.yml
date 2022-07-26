@@ -5,6 +5,7 @@ services:
     image: postgres
     volumes:
       - ./database:/var/lib/postgresql/data
+      - ./backups:/backups
     restart: always
     environment:
       POSTGRES_DB: $DB_NAME
