@@ -72,42 +72,61 @@ python manage.py migrate
 
 Lancer le build :
 ```
-bash scripts/build.sh
+$ bash scripts/build.sh
 ```
 
 Lancer le serveur :
 ```
-bash scripts/start.sh
+$ bash scripts/start.sh
 ```
 
 Stopper le serveur :
 ```
-bash scripts/stop.sh
+$ bash scripts/stop.sh
 ```
+
+# Sauvegarde
+
+## Base de données
+### Réaliser une sauvegarde de la base de données
+
+`$ bash scripts/backup_database.sh`
+
+La sauvegarde se trouve dans le dossier `backups/database` sous le nom `AnnéeMoisJourHeureMinute.dump`.
+
+**Attention** bien vérifier que les valeurs de `DB_USER` et `DB_NAME` dans le script sont les bonnes !
+
+### Restorer une sauvegarde de la base de données
+Exécuter dans le container de la base de données :
+
+`$ pg_restore -d $DB_NAME --clean --create save.dump`
+
+**Attention** cette commande supprime le contenu actuel de la base de données pour le remplacer par celui de la
+sauvegarde
 
 # Variables d'environnement
 
 Les variables d'environnement suivantes sont placées dans le fichier *.env* :
 
-| Variable | Description | Dev | Prod |
-| -------- | -------------|----- | ------|
-| DB_HOST | Nom du host de la BDD. | db | db |
-| DB_PORT | Port de la BDD (interne au container). | 5432 | 5432 |
-| DB_USER | Utilisateur de la BDD. | upont | upont |
-| DB_NAME | Nom de la BDD. | upont | upont |
-| DB_PASSWORD | Mot de passe de la BDD. | upont | SECRET |
-| BACK_PORT | Port d'accès au site (externe). | 8000 | **** |
-| SENDGRID_API_KEY | Clé permettant d'envoyer des mails avec l'API sendgrid (à récupérer sur le site de Sendgrid). | key | SECRET |
-| ADMIN_EMAIL | Adressse recevant les mails d'administration de Django pour alertir de certaines actions (création d'un compte...). | upont@enpc.org | Autre |
-| DEFAULT_FROM_EMAIL | Adresse envoyant les mails (avec Sendigrd, n'importe quelle adresse en @enpc.org fonctionne). | upont@enpc.org | upont@enpc.org |
-| SECRET_KEY | Clé secrète utilisée par Django. | ChangeThatPlease | SECRET |
-| DEBUG | Défini si le mode DEBUG est activé. | True | False |
-| DOMAIN_NAME | Nom de domaine utilisé en production. Toutes les requêtes ne provenant pas de ce domaine seront rejetées. | upont.enpc.org | upont.enpc.org |
-| GUNICORN_NB_WORKERS | Nombre de workers pour le WSGI gunicorn. |  | 10 |
-| SECURE_SSL_REDIRECT | Redirige automatiquement les requêtes non HTTPS vers des requêtes HTTPS. Laisser à False si un autre proxy fait déjà cete redirection. | False | False |
-| REMOTE_STATIC_STORAGE | Variable indiquant si le site utilise un serveur distant pour servir les fichiers statiques. | False | True |
-| FTP_STORAGE_LOCATION | URL de connexion FTP au serveur de stockage distant pour y placer les fichiers statiques. | | ftp://\<user>:\<password>@\<host>:\<port> |
-| REMOTE_STATIC_URL | URL pour l'accès aux fichiers statiques distants (peut être différent de FTP_STORAGE_LOCATION). | | https://upont.cdn.enpc.org |
+| Variable              | Description                                                                                                                            | Dev              | Prod                                      |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------|------------------|-------------------------------------------|
+| DB_HOST               | Nom du host de la BDD.                                                                                                                 | db               | db                                        |
+| DB_PORT               | Port de la BDD (interne au container).                                                                                                 | 5432             | 5432                                      |
+| DB_USER               | Utilisateur de la BDD.                                                                                                                 | upont            | upont                                     |
+| DB_NAME               | Nom de la BDD.                                                                                                                         | upont            | upont                                     |
+| DB_PASSWORD           | Mot de passe de la BDD.                                                                                                                | upont            | SECRET                                    |
+| BACK_PORT             | Port d'accès au site (externe).                                                                                                        | 8000             | ****                                      |
+| SENDGRID_API_KEY      | Clé permettant d'envoyer des mails avec l'API sendgrid (à récupérer sur le site de Sendgrid).                                          | key              | SECRET                                    |
+| ADMIN_EMAIL           | Adressse recevant les mails d'administration de Django pour alertir de certaines actions (création d'un compte...).                    | upont@enpc.org   | Autre                                     |
+| DEFAULT_FROM_EMAIL    | Adresse envoyant les mails (avec Sendigrd, n'importe quelle adresse en @enpc.org fonctionne).                                          | upont@enpc.org   | upont@enpc.org                            |
+| SECRET_KEY            | Clé secrète utilisée par Django.                                                                                                       | ChangeThatPlease | SECRET                                    |
+| DEBUG                 | Défini si le mode DEBUG est activé.                                                                                                    | True             | False                                     |
+| DOMAIN_NAME           | Nom de domaine utilisé en production. Toutes les requêtes ne provenant pas de ce domaine seront rejetées.                              | upont.enpc.org   | upont.enpc.org                            |
+| GUNICORN_NB_WORKERS   | Nombre de workers pour le WSGI gunicorn.                                                                                               |                  | 10                                        |
+| SECURE_SSL_REDIRECT   | Redirige automatiquement les requêtes non HTTPS vers des requêtes HTTPS. Laisser à False si un autre proxy fait déjà cete redirection. | False            | False                                     |
+| REMOTE_STATIC_STORAGE | Variable indiquant si le site utilise un serveur distant pour servir les fichiers statiques.                                           | False            | True                                      |
+| FTP_STORAGE_LOCATION  | URL de connexion FTP au serveur de stockage distant pour y placer les fichiers statiques.                                              |                  | ftp://\<user>:\<password>@\<host>:\<port> |
+| REMOTE_STATIC_URL     | URL pour l'accès aux fichiers statiques distants (peut être différent de FTP_STORAGE_LOCATION).                                        |                  | https://upont.cdn.enpc.org                |
 
 
 Commande pour générer une clé secrète (vous devez avoir Django installé):
