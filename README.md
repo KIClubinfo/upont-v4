@@ -87,22 +87,51 @@ $ bash scripts/stop.sh
 
 # Sauvegarde
 
+Une sauvegarde du site consiste en une copie des données de la base données et une copie des médias (image de profil,
+images liées à des posts ou des events).
+
+
 ## Base de données
 ### Réaliser une sauvegarde de la base de données
 
-`$ bash scripts/backup_database.sh`
+`# bash scripts/backup_database.sh`
 
 La sauvegarde se trouve dans le dossier `backups/database` sous le nom `AnnéeMoisJourHeureMinute.dump`.
 
 **Attention** bien vérifier que les valeurs de `DB_USER` et `DB_NAME` dans le script sont les bonnes !
 
-### Restorer une sauvegarde de la base de données
-Exécuter dans le container de la base de données :
+### Restaurer une sauvegarde de la base de données
+On commence par renter dans le container de la base de données :
 
-`$ pg_restore -d $DB_NAME --clean --create save.dump`
+`$ docker-compose exec db /bin/bash`
+
+On restaure les données de la sauvegarde :
+
+`# pg_restore -d $DB_NAME -U $DB_USER --clean save.dump`
 
 **Attention** cette commande supprime le contenu actuel de la base de données pour le remplacer par celui de la
 sauvegarde
+
+## Medias
+### Réaliser une sauvegarde des médias
+
+`# bash scripts/backup_media.sh`
+
+La sauvegarde se trouve dans le dossier `backups/media` sous le nom `AnnéeMoisJourHeureMinute.tar.gz`.
+
+### Restaurer une sauvegarde des medias
+
+On commence par rentrer dans le container du back :
+
+`$ docker-compose exec bash /bin/bash`
+
+On supprime les anciens médias :
+
+`# rm -r /src/media/*`
+
+On extrait la sauvegarde :
+
+`# tar -xf save.tar.gz -C /src/media`
 
 # Variables d'environnement
 

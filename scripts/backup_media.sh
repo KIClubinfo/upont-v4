@@ -18,7 +18,7 @@ fi
 if [ -d "$LOCAL_BACKUP_PATH" ]; then
   # Backup media folder using tar
   echo 'Backing up media folder...'
-  docker-compose exec back tar -zcvf $CONTAINER_BACKUP_PATH/"$DATE".tar.gz "$APPLICATION_PATH"
+  docker-compose exec back tar -zcvf $CONTAINER_BACKUP_PATH/"$DATE".tar.gz -C "$APPLICATION_PATH" .
 
   # Clean the backup directory, saving only the last 3 backups
   echo 'Cleaning old media backup'
