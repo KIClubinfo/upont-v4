@@ -72,13 +72,6 @@ function handleSelectedEvent (e) {
   window.open(serveurUrl + '/news/event/' + e.id + '/detail', '_blank')
 }
 
-const ColoredDateCellWrapper = ({ children }) =>
-  React.cloneElement(React.Children.only(children), {
-    style: {
-      backgroundColor: 'lightblue'
-    }
-  })
-
 export default function Basic ({
   localizer = mLocalizer,
   showDemoLink = false,
@@ -86,14 +79,12 @@ export default function Basic ({
 }) {
   const { components, defaultDate, max, views } = useMemo(
     () => ({
-      components: {
-        timeSlotWrapper: ColoredDateCellWrapper
-      },
       defaultDate: new Date(Date.now()),
       max: dates.add(dates.endOf(new Date(2024, 17, 1), 'day'), -1, 'hours'),
       views: {
         month: true,
-        week: true
+        week: true,
+        day: true
       }
     }),
     []
@@ -126,7 +117,7 @@ export default function Basic ({
 
   return (
     <>
-      <div className='height600' {...props}>
+      <div className='calendar-box box' {...props}>
         <div align='center'>
           <button className='button green-button' ê id='participating_button' onClick={handleParticipating}>Évènements auxquels je ne participe pas</button>
         </div>
