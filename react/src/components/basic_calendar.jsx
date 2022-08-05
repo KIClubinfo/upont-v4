@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react'
+import React, { Fragment, useMemo, useState, useEffect } from 'react'
 import { useAsync } from 'react-async'
 import PropTypes from 'prop-types'
 import moment from 'moment'
@@ -27,7 +27,7 @@ const messages = {
   agenda: 'Agenda',
   date: 'date',
   time: 'heure',
-  event: 'événement', // Or anything you want
+  event: 'événement',
   showMore: total => `+ ${total} événement(s) supplémentaire(s)`
 }
 
@@ -57,6 +57,7 @@ async function getEvents () {
         id: e.id,
         title: e.name,
         desc: e.description,
+        participating: e.participating,
         start: new Date(e.date),
         end: addOneHour(new Date(e.date))
       }
@@ -103,14 +104,37 @@ export default function Basic ({
     console.log(error.message)
   }
 
+  const [showedEvents, setShowedEvents] = useState([])
+
+  // State for filters
+  const [onlyParticipating, setOnlyParticipating] = useState(false)
+
+  function handleParticipating () {
+    setOnlyParticipating(!onlyParticipating) // Swap the state
+  }
+
+  // Update showedEvents when data value change or a filter state is changed
+  useEffect(() => {
+    if (onlyParticipating) {
+      setShowedEvents(data.filter(e => e.participating))
+      document.getElementById('participating_button').className = 'button red-button'
+    } else {
+      setShowedEvents(data)
+      document.getElementById('participating_button').className = 'button green-button'
+    }
+  }, [data, onlyParticipating])
+
   return (
     <>
       <div className='height600' {...props}>
+        <div align='center'>
+          <button className='button green-button' ê id='participating_button' onClick={handleParticipating}>Évènements auxquels je ne participe pas</button>
+        </div>
         <Calendar
           components={components}
           messages={messages}
           defaultDate={defaultDate}
-          events={data}
+          events={showedEvents}
           localizer={localizer}
           max={max}
           showMultiDayTimes
