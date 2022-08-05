@@ -511,34 +511,58 @@ class EventAPITest(APITestCase):
             self.username, self.email, self.password
         )
 
-    def test_events(self):
-        event = Event(
-            name="Event",
-            description="Event description",
-            date=timezone.now(),
-            location="Event location",
+        self.student = Student(
+            user=self.user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
         )
-        event.save()
+        self.student.save()
+
+    def test_events(self):
+        event1 = Event(
+            name="Event 1",
+            description="Event 1 description",
+            date=timezone.now(),
+            location="Event 1 location",
+        )
+        event1.save()
+
+        event2 = Event(
+            name="Event 2",
+            description="Event 2 description",
+            date=timezone.now(),
+            location="Event 2 location",
+        )
+        event2.save()
+        event2.participants.add(self.student)
 
         self.client.login(username=self.username, password=self.password)
         url = reverse("API_events-list")
         response = self.client.get(url)
 
-        expected = [
-            {
-                "name": event.name,
-                "description": event.description,
-                "club": None,
-                "date": event.date.astimezone().isoformat(),
-                "location": event.location,
-                "participants": [],
-                "poster": None,
-                "shotgun": None,
-                "id": event.pk,
-            }
-        ]
-
         # Check if the request was successful
         self.assertEqual(response.status_code, 200)
-        # Check if the data are the same
-        self.assertEqual(response.json()["results"], expected)
+        # Check if all the events are send
+        self.assertEqual(response.data.get("count"), 2)
+        # Check events information
+        response_event1 = response.data.get("results")[1]
+        self.assertEqual(response_event1["id"], event1.pk)
+        self.assertEqual(response_event1["name"], event1.name)
+        self.assertEqual(response_event1["description"], event1.description)
+        self.assertEqual(response_event1["date"], event1.date.astimezone().isoformat())
+        self.assertEqual(response_event1["location"], event1.location)
+        self.assertEqual(response_event1["participants"], [])
+        self.assertEqual(response_event1["participating"], False)
+
+        response_event2 = response.data.get("results")[0]
+        self.assertEqual(response_event2["id"], event2.pk)
+        self.assertEqual(response_event2["name"], event2.name)
+        self.assertEqual(response_event2["description"], event2.description)
+        self.assertEqual(response_event2["date"], event2.date.astimezone().isoformat())
+        self.assertEqual(response_event2["location"], event2.location)
+        self.assertEqual(len(response_event2["participants"]), 1)
+        participant_id = int(response_event2["participants"][0].split("/")[-2])
+        self.assertEqual(participant_id, self.student.pk)
+        self.assertEqual(response_event2["participating"], True)
