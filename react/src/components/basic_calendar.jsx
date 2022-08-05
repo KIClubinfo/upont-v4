@@ -117,17 +117,18 @@ export default function Basic ({
   useEffect(() => {
     if (onlyParticipating) {
       setShowedEvents(data.filter(e => e.participating))
+      document.getElementById('participating_button').className = 'button red-button'
     } else {
       setShowedEvents(data)
+      document.getElementById('participating_button').className = 'button green-button'
     }
   }, [data, onlyParticipating])
 
   return (
     <>
       <div className='height600' {...props}>
-        <div>
-          <input type='checkbox' id='participating_events' onChange={handleParticipating} />
-          <label htmlFor='participating_events'>N'afficher que les évènements auxquels je participe</label>
+        <div align='center'>
+          <button className='button green-button' ê id='participating_button' onClick={handleParticipating}>Évènements auxquels je ne participe pas</button>
         </div>
         <Calendar
           components={components}
