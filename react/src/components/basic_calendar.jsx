@@ -115,11 +115,20 @@ export default function Basic ({
     }
   }, [data, onlyParticipating])
 
+  // Manage default calendar view for small monitor like smartphone
+  var defaultView
+  if (window.innerWidth < 700) {
+    defaultView = 'day'
+  }
+  else {
+    defaultView = 'week'
+  }
+
   return (
     <>
       <div className='calendar-box box' {...props}>
         <div align='center'>
-          <button className='button green-button' ê id='participating_button' onClick={handleParticipating}>Évènements auxquels je ne participe pas</button>
+          <button className='button green-button' id='participating_button' onClick={handleParticipating}>Évènements auxquels je ne participe pas</button>
         </div>
         <Calendar
           components={components}
@@ -130,6 +139,7 @@ export default function Basic ({
           max={max}
           showMultiDayTimes
           step={60}
+          defaultView={defaultView}
           views={views}
           onSelectEvent={(e) => handleSelectedEvent(e)}
         />
