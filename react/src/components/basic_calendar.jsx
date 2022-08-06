@@ -82,9 +82,10 @@ export default function Basic ({
       defaultDate: new Date(Date.now()),
       max: dates.add(dates.endOf(new Date(2024, 17, 1), 'day'), -1, 'hours'),
       views: {
+        agenda: true,
         month: true,
         week: true,
-        day: true
+        day: true,
       }
     }),
     []
