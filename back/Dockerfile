@@ -53,7 +53,6 @@ COPY poetry.lock pyproject.toml ./
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry install --no-dev
 
-
 # `development` image is used during development / testing
 FROM python-base as development
 ENV FASTAPI_ENV=development
@@ -64,7 +63,13 @@ COPY --from=builder-base $POETRY_HOME $POETRY_HOME
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 # quicker install as runtime deps are already installed
-RUN poetry install
+RUN poetry install \
+    # install sass
+    && apt-get update \
+    && apt-get install --no-install-recommends -y npm=7.5.2+ds-2 \
+    && npm install -g sass@1.54.3
+
+
 
 WORKDIR /src
 COPY . .
@@ -108,7 +113,11 @@ RUN apt-get update \
         # for checking when db is up
         netcat=1.10-46 \
         iputils-ping=3:20210202-1 \
-    && rm -rf /var/lib/apt/lists/*
+        # to install sass \
+        npm=7.5.2+ds-2 \
+    && rm -rf /var/lib/apt/lists/* \
+    # install sass
+    && npm install -g sass@1.54.3
 
 COPY ./entrypoint.dev.sh .
 RUN sed -i 's/\r$//g' /src/entrypoint.prod.sh \
