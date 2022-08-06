@@ -40,7 +40,11 @@ RUN apt-get update \
         curl=7.74.0-1.3+deb11u2 \
         # deps for building python deps
         build-essential=12.9 \
-    && rm -rf /var/lib/apt/lists/*
+        # deps for sass
+        npm=7.5.2+ds-2 \
+    && rm -rf /var/lib/apt/lists/* \
+    # install sass
+    && npm install -g sass@1.54.3
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -52,7 +56,6 @@ COPY poetry.lock pyproject.toml ./
 
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry install --no-dev
-
 
 # `development` image is used during development / testing
 FROM python-base as development
