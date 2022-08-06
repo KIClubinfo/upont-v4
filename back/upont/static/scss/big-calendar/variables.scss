@@ -1,7 +1,7 @@
 @use "sass:math";
 
-$out-of-range-color: lighten(#333, 40%) !default;
-$out-of-range-bg-color: lighten(#333, 70%) !default;
+$out-of-range-color: darken(#ffffff, 50%) !default;
+$out-of-range-bg-color: darken(#212227, 5%) !default;
 
 $calendar-border: #ddd !default;
 $cell-border: #ddd !default;
@@ -22,12 +22,12 @@ $event-border-radius: 3px !default;
 $event-padding: 2px 5px !default;
 $event-zindex: 4 !default;
 
-$btn-color: #373a3c !default;
-$btn-bg: #fff !default;
+$btn-color: #ffffff !default;
+$btn-bg: lighten(#212227, 20%) !default;
 $btn-border: #ccc !default;
 
 $current-time-color: #ca352b !default;
 
 $rbc-css-prefix: rbc-i !default;
 
-$today-highlight-bg: #393d4e !default;
+$today-highlight-bg: lighten(#212227, 10%) !default;
