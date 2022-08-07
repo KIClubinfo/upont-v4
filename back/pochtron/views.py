@@ -40,6 +40,18 @@ def home(request):
     club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
     context["admin"] = club.is_member(student.id)
+    context["user_balance"] = student.balance_in_euros(club)
+
+    context["transactions"] = [
+        {
+            "product": t.good.name,
+            "quantity": t.quantity,
+            "price": t.quantity * t.good.price_at_date(t.date) / 100,
+            "date": t.date,
+        }
+        for t in Transaction.objects.filter(student=student).filter(good__club=club)
+    ]
+
     return render(request, "pochtron/home.html", context)
 
 

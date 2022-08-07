@@ -48,17 +48,32 @@ class LastTransactions extends React.Component {
                         <td>Élève</td>
                         <td>Consommation</td>
                         <td>Quantité</td>
+                        <td>Coût (centimes)</td>
                         <td>Date</td>
                     </tr>
                 </thead>
                 <tbody>
                 {
                     this.state.transactions.map(function f(transaction) {
+                        const balance_change = transaction.quantity*transaction.good.price
+
+                        var balance_color;
+                        if (balance_change > 0) {
+                            balance_color = 'red'
+                        }
+                        else if (balance_change < 0) {
+                            balance_color = 'green'
+                        }
+                        else {
+                            balance_color = 'white'
+                        }
+
                         return (
                             <tr key={transaction.id}>
                                 <td>{transaction.student.user.first_name + " " + transaction.student.user.last_name}</td>
                                 <td>{transaction.good.name}</td>
                                 <td>{transaction.quantity}</td>
+                                <td><font color={balance_color}>{transaction.quantity*transaction.good.price}</font></td>
                                 <td>{transaction.date}</td>
                             </tr>
                         )

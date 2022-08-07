@@ -73,6 +73,24 @@ class StudentModelTest(TestCase):
         )
         transaction.save()
         self.assertEqual(-450, student.balance_in_cents())
+        self.assertEqual(-450, student.balance_in_cents(club))
+
+    def test_balance_in_cents_specified_club(self):
+        student = Student.objects.get(pk=1)
+        club1 = Club.objects.get(pk=1)
+        self.assertEqual(-500, student.balance_in_cents(club1))
+        club2 = Club(description="Un 2e Club", active=True, has_fee=True)
+        club2.save()
+        good = Good(name="test_provision_account", club=club2)
+        good.save()
+        price = Price(good=good, price=-50, date=timezone.now())
+        price.save()
+        transaction = Transaction(
+            good=good, quantity=1, student=student, date=timezone.now()
+        )
+        transaction.save()
+        self.assertEqual(-500, student.balance_in_cents(club1))
+        self.assertEqual(50, student.balance_in_cents(club2))
 
     def test_balance_in_euros(self):
         student = Student.objects.get(pk=1)
