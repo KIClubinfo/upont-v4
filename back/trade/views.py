@@ -68,9 +68,16 @@ def add_transaction(request):
             balance -= good.price()
             if balance >= 0:
                 filled_form.save()
-                return JsonResponse({"error": ""}, status=201)
+                return JsonResponse({"error": "", "new_balance": balance}, status=201)
             else:
-                return JsonResponse({"error": "Pas assez d'argent sur ce compte."})
+                return JsonResponse(
+                    {
+                        "error": "Pas assez d'argent sur ce compte.\
+                     Solde actuel : {} €".format(
+                            (balance + good.price()) / 100
+                        )
+                    }
+                )
         return JsonResponse(
             {"error": "Merci de remplir le formulaire correctement."}, status=500
         )
