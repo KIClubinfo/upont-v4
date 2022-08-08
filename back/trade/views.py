@@ -137,9 +137,10 @@ def credit_account(request):
             )
             if price_form.is_valid:
                 price_form.save()
+                beneficiary = get_object_or_404(Student, pk=data["student"])
                 transaction_form = AddTransaction(
                     {
-                        "student": get_object_or_404(Student, pk=data["student"]),
+                        "student": beneficiary,
                         "good": good,
                         "date": timezone.now(),
                         "quantity": 1,
@@ -147,7 +148,13 @@ def credit_account(request):
                 )
                 if transaction_form.is_valid():
                     transaction_form.save()
-                    return JsonResponse({"error": ""}, status=201)
+                    return JsonResponse(
+                        {
+                            "error": "",
+                            "new_balance": beneficiary.balance_in_euros(club),
+                        },
+                        status=201,
+                    )
     return JsonResponse(
         {"error": "Merci de remplir le formulaire correctement."}, status=500
     )

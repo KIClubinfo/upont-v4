@@ -67,17 +67,32 @@ class LastTransactionsScroll extends React.Component {
                         <td>Élève</td>
                         <td>Consommation</td>
                         <td>Quantité</td>
+                        <td>Coût (centimes)</td>
                         <td>Date</td>
                     </tr>
                 </thead>
                 <tbody>
                 {
                     this.state.transactions.map(function f(transaction) {
+                        const balance_change = transaction.quantity*transaction.good.price
+
+                        var balance_color;
+                        if (balance_change > 0) {
+                            balance_color = 'text-red'
+                        }
+                        else if (balance_change < 0) {
+                            balance_color = 'text-green'
+                        }
+                        else {
+                            balance_color = ''
+                        }
+
                         return (
                             <tr key={transaction.id}>
                                 <td>{transaction.student.user.first_name + " " + transaction.student.user.last_name}</td>
                                 <td>{transaction.good.name}</td>
                                 <td>{transaction.quantity}</td>
+                                <td className={balance_color}>{balance_change}</td>
                                 <td>{transaction.date}</td>
                             </tr>
                         )
@@ -124,21 +139,46 @@ class CreditAccount extends React.Component {
         fetch(url, requestOptions)
             .then(this.setState({
                 "student": '',
-                "amount": ''
+                "amount": '',
+                "last_student": this.state.student
             }))
             .then(res => res.json())
-            .then(response => this.setState({"error": response.error}))
-            .catch(error => console.log('Form submit error', error))
+            .then(response => {
+                this.setState({"error": response.error});
+
+                if ("new_balance" in response) {
+                    this.setState({"new_balance": response.new_balance});
+                }
+            }
+            ).catch(error => console.log('Form submit error', error))
         this.props.clear();
     }
 
     render() {
+        let last_transaction;
+        if ("last_student" in this.state && "error" in this.state) {
+            // A transaction has been made with the component
+            if (this.state.error.length == 0) {
+                // The last transaction was successful
+                last_transaction =
+                <div className="centered-div text-green">
+                    <p>Nouveau solde de {this.state.last_student.label} : {this.state.new_balance} €</p>
+                </div>;
+            } else {
+                // An error occurred
+                last_transaction =
+                <div className="centered-div text-red">
+                    <p>{this.state.error}</p>
+                </div>;
+            }
+        }
+
         return (
         <div>
             <hr></hr>
             <h4>Créditer un compte :</h4>
             <form method="post" onSubmit={this.handleSubmit.bind(this)}>
-                <div className="centered-div text-red"><p>{this.state.error}</p></div>
+                {last_transaction}
                 <p>Élève :</p>
                 <StudentsSearchBar parent={this}/>
                 <p></p>
