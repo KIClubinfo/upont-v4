@@ -49,7 +49,9 @@ def home(request):
             "price": t.quantity * t.good.price_at_date(t.date) / 100,
             "date": t.date,
         }
-        for t in Transaction.objects.filter(student=student).filter(good__club=club)
+        for t in Transaction.objects.filter(student=student)
+        .filter(good__club=club)
+        .order_by("-date")
     ]
 
     return render(request, "pochtron/home.html", context)
