@@ -175,44 +175,7 @@ class TransactionsView(APIView):
             :, dataframe.columns != "student"
         ]  # we don't need the student column
         dataframe["good_id"] = dataframe.good.apply(lambda x: x["id"])
-        data = []
-        for k, conso in enumerate(consos):
-            current_data = dataframe.loc[dataframe.good_id == conso.id]
-            if current_data.empty:
-                continue
-            split_date = current_data["date"].str.split(" ", expand=True)
-            current_data[["day", "month", "year"]] = split_date[0].str.split(
-                "-", expand=True
-            )
-            current_data[["hour", "minute", "second"]] = split_date[1].str.split(
-                ":", expand=True
-            )
-            groupby = [
-                current_data.year.rename("year"),
-                current_data.month.rename("month"),
-                current_data.day.rename("day"),
-                current_data.hour.rename("hour"),
-                current_data.minute.rename("minute"),
-            ]
-            if timeline == "hour":
-                groupby = groupby[:4]
-            if timeline == "day":
-                groupby = groupby[:3]
-            if timeline == "month":
-                groupby = groupby[:2]
-            if timeline == "year":
-                groupby = groupby[:1]
-            current_data = current_data.groupby(groupby).agg({"count"})
-            current_data = current_data.loc[:, "quantity"]
-            current_data["good_name"] = conso.name
-            data.append(current_data)
-            print(
-                "===================================================================="
-            )
-            print(k)
-            print(conso)
-            print(current_data)
-            print(
-                "===================================================================="
-            )
-        return Response(pandas.concat(data))
+        dataframe['Month'] = pandas.to_datetime(dataframe['date'], format="%d-%m-%Y %H:%M:%S").dt.month
+        series = dataframe['Month'].value_counts().sort_index()
+        new_series = series.reindex(range(1,13)).fillna(0).astype(int)
+        return Response({"index": new_series.index, "count": new_series.values})

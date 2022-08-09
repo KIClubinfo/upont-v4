@@ -9,18 +9,20 @@ class ConsumptionsGraph extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            "data": [],
+            data: {count: [], index: []},
             "timeline": "year",
             "timeline_id": 0,
             "timeline_name": "année"
-        }
-        this.changeTimeline = this.changeTimeline.bind(this)
+        };
+        this.changeTimeline = this.changeTimeline.bind(this);
+        this.fetch = this.fetch.bind(this);
+        this.data = this.data.bind(this);
     }
 
     fetch(timeline) {
         fetch(Urls["student_transactions_pochtron"]()+"?timeline="+timeline)
         .then(response => response.json())
-        .then(response => {this.setState({"data": response}); return response})
+        .then(response => {this.setState({data: response}); return response})
         .then(response => console.log(response))
     }
 
@@ -32,11 +34,6 @@ class ConsumptionsGraph extends React.Component {
         var labels = [];
         var values = [];
         var datasets = [];
-        for (entry of data) {
-            if (this.state.timeline == "year") {
-                labels.push(entry.year)
-            }
-        }
     }
 
     changeTimeline() {
@@ -47,15 +44,15 @@ class ConsumptionsGraph extends React.Component {
         this.fetch(timelines[new_id]);
     }
 
-    data = {
-        labels: ["Janvier", "Février"],
+    data = () => ({
+        labels: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Décembre"],
         datasets: [{
             label: "Dataset 1",
             borderColor: "white",
             backgroundColor: "green",
-            data: [5, 10],
+            data: this.state.data.count,
         }]
-    };
+    });
 
     scaleOpts = {
         grid: {
@@ -67,6 +64,7 @@ class ConsumptionsGraph extends React.Component {
             text: (ctx) => ctx.scale.axis + ' axis',
         }
     };
+
     scales = {
         x: {
             type: 'category',
@@ -80,7 +78,7 @@ class ConsumptionsGraph extends React.Component {
     };
 
     config = {
-        data: this.data,
+        data: this.data(),
         options: {
             scales: this.scales,
             plugins: {
