@@ -23,9 +23,17 @@
             </div>
         </div>
         <div class="content-main">
-            <a href="{% url 'pochtron:conso_create' %}" style="text-decoration: none"><button class="button blue-button">Créer une consommation</button></a>
+            {% if admin.alcohol %}
+                <a href="{% url 'pochtron:conso_create' %}" style="text-decoration: none"><button class="button blue-button">Créer une consommation</button></a>
+            {% else %}
+                <button class="button disabled-button">Créer une consommation</button>
+            {% endif %}
             <a href="{% url 'pochtron:shop' %}" style="text-decoration: none"><button class="button blue-button">Foyer</button></a>
-            <a href="{% url 'pochtron:manage_accounts' %}" style="text-decoration: none"><button class="button blue-button">Comptes</button></a>
+            {% if admin.credit %}
+                <a href="{% url 'pochtron:manage_accounts' %}" style="text-decoration: none"><button class="button blue-button">Comptes</button></a>
+            {% else %}
+                <button class="button disabled-button">Comptes</button>
+            {% endif %}
             <h1>Toutes les consommations :</h1>
             <table class="table">
                 <thead>
@@ -44,7 +52,13 @@
                             <td>{{conso.volume}}</td>
                             <td>{{conso.degree}}</td>
                             <td>{{conso.price}}</td>
-                            <td><a href="{% url 'pochtron:conso_edit' conso.id %}" style="text-decoration: none"><button class="button blue-button">Modifier</button></a></td>
+                            <td>
+                                {% if admin.alcohol %}
+                                    <a href="{% url 'pochtron:conso_edit' conso.id %}" style="text-decoration: none"><button class="button blue-button">Modifier</button></a>
+                                {% else %}
+                                    <button class="button disabled-button">Modifier</button>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% empty %}
                         <th colspan="5" style="text-align: center">Aucune consommation.</th>

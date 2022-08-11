@@ -13,7 +13,7 @@ from trade.models import Good, Transaction
 from trade.serializers import TransactionSerializer
 
 from .forms import EditAlcohol
-from .models import Alcohol
+from .models import Alcohol, PochtronAdmin
 from .serializers import AlcoholSerializer
 
 
@@ -39,7 +39,16 @@ def home(request):
     context = {}
     club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
-    context["admin"] = club.is_member(student.id)
+
+    if (
+        club.is_member(student.id)
+        and not PochtronAdmin.objects.filter(student=student).exists()
+    ):
+        # Add member of Foyer to Pochtron Admin
+        admin = PochtronAdmin(student=student)
+        admin.save()
+
+    context["admin"] = PochtronAdmin.objects.filter(student=student).exists()
     context["user_balance"] = student.balance_in_euros(club)
 
     context["transactions"] = [
@@ -61,15 +70,29 @@ def home(request):
 def admin_home_page(request):
     club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
-    if not club.is_member(student.id):
+
+    try:
+        admin = PochtronAdmin.objects.get(student=student)
+    except PochtronAdmin.DoesNotExist:
         raise PermissionDenied
+
     consommations = Alcohol.objects.filter(club=club)
-    context = {"consommations": consommations}
+    context = {"consommations": consommations, "admin": admin}
     return render(request, "pochtron/admin.html", context)
 
 
 @login_required
 def manage_accounts(request):
+    student = get_object_or_404(Student, user__pk=request.user.id)
+
+    try:
+        admin = PochtronAdmin.objects.get(student=student)
+    except PochtronAdmin.DoesNotExist:
+        raise PermissionDenied
+
+    if not admin.credit:
+        raise PermissionDenied
+
     context = {}
     return render(request, "pochtron/manage_accounts.html", context)
 
@@ -77,10 +100,13 @@ def manage_accounts(request):
 @login_required
 def shop(request):
     context = {}
-    club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
-    if not club.is_member(student.id):
+
+    try:
+        PochtronAdmin.objects.get(student=student)
+    except PochtronAdmin.DoesNotExist:
         raise PermissionDenied
+
     return render(request, "pochtron/shop.html", context)
 
 
@@ -89,7 +115,13 @@ def conso_create(request):
     context = {"create": True}
     club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
-    if not club.is_member(student.id):
+
+    try:
+        admin = PochtronAdmin.objects.get(student=student)
+    except PochtronAdmin.DoesNotExist:
+        raise PermissionDenied
+
+    if not admin.alcohol:
         raise PermissionDenied
 
     if request.method == "POST":
@@ -123,7 +155,13 @@ def conso_edit(request, conso_id):
     club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
     conso = get_object_or_404(Alcohol, pk=conso_id)
-    if not club.is_member(student.id):
+
+    try:
+        admin = PochtronAdmin.objects.get(student=student)
+    except PochtronAdmin.DoesNotExist:
+        raise PermissionDenied
+
+    if not admin.alcohol:
         raise PermissionDenied
 
     if request.method == "POST":
