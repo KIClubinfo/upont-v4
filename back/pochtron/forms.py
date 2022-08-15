@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Alcohol
+from .models import Alcohol, PochtronAdmin
 
 
 class EditAlcohol(forms.ModelForm):
@@ -20,3 +20,14 @@ class EditAlcohol(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EditAlcohol, self).__init__(*args, **kwargs)
+
+
+class EditPochtronAdmin(forms.ModelForm):
+    class Meta:
+        model = PochtronAdmin
+        fields = (
+            "student",
+            "alcohol",
+            "credit",
+            "manage_admins",
+        )

@@ -34,6 +34,9 @@
             {% else %}
                 <button class="button disabled-button">Comptes</button>
             {% endif %}
+            {% if admin.manage_admins %}
+                <a href="{% url 'pochtron:manage_admins' %}"><button class="button blue-button">Gestion des admins de Pochtron</button></a>
+            {% endif %}
             <h1>Toutes les consommations :</h1>
             <table class="table">
                 <thead>

@@ -12,8 +12,8 @@ class Alcohol(Good):
 
 
 class PochtronAdmin(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    asign = models.BooleanField(default=False)
+    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+    manage_admins = models.BooleanField(default=False)
     credit = models.BooleanField(default=False)
     alcohol = models.BooleanField(default=False)
 
