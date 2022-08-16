@@ -43,3 +43,20 @@ class Transaction(models.Model):
 
     def balance_change_for_club(self):
         return self.quantity * self.good.price_at_date(self.date)
+
+
+class TradeAdmin(models.Model):
+    student = models.ForeignKey("social.Student", on_delete=models.CASCADE)
+    club = models.ForeignKey("social.Club", on_delete=models.CASCADE)
+    manage_admins = models.BooleanField(default=False)
+    manage_goods = models.BooleanField(default=False)
+    manage_transactions = models.BooleanField(default=False)
+    manage_credits = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("student", "club")
+
+    def __str__(self):
+        return "TradeAdmin: {} for {}".format(
+            self.student.user.username, self.club.name
+        )

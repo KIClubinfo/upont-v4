@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Good, Price, Transaction
+from .models import Good, Price, TradeAdmin, Transaction
 
 
 class EditPrice(forms.ModelForm):
@@ -37,3 +37,16 @@ class EditGood(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EditGood, self).__init__(*args, **kwargs)
+
+
+class EditTradeAdmin(forms.ModelForm):
+    class Meta:
+        model = TradeAdmin
+        fields = (
+            "student",
+            "club",
+            "manage_goods",
+            "manage_transactions",
+            "manage_credits",
+            "manage_admins",
+        )

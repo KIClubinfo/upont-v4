@@ -1,6 +1,5 @@
 from django.contrib import admin
 
-from .models import Alcohol, PochtronAdmin
+from .models import Alcohol
 
 admin.site.register(Alcohol)
-admin.site.register(PochtronAdmin)

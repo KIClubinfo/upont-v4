@@ -47,6 +47,7 @@
                     <tr>
                         <td>Élèves</td>
                         <td>Peut créer/modifier les consommations</td>
+                        <td>Peut ajouter des transactions</td>
                         <td>Peut créditer les comptes</td>
                         <td>Peut gérer les administrateurs</td>
                         <td></td>
@@ -56,8 +57,9 @@
                     {% for admin in admins %}
                         <tr style="vertical-align: middle">
                             <td>{{admin.student.user.first_name}} {{admin.student.user.last_name}}</td>
-                            <td>{{ admin.alcohol|yesno }}</td>
-                            <td>{{ admin.credit|yesno }}</td>
+                            <td>{{ admin.manage_goods|yesno }}</td>
+                            <td>{{ admin.manage_transactions|yesno }}</td>
+                            <td>{{ admin.manage_credits|yesno }}</td>
                             <td>{{ admin.manage_admins|yesno }}</td>
                             <td>
                                 <a href={% url 'pochtron:admin_edit' admin.pk %} ><button class="button blue-button">Modifier</button></a>

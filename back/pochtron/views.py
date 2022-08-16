@@ -8,12 +8,12 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from social.models import Club, Student
-from trade.forms import EditPrice
-from trade.models import Good, Transaction
+from trade.forms import EditPrice, EditTradeAdmin
+from trade.models import Good, TradeAdmin, Transaction
 from trade.serializers import TransactionSerializer
 
-from .forms import EditAlcohol, EditPochtronAdmin
-from .models import Alcohol, PochtronAdmin
+from .forms import EditAlcohol
+from .models import Alcohol
 from .serializers import AlcoholSerializer
 
 
@@ -42,13 +42,13 @@ def home(request):
 
     if (
         club.is_member(student.id)
-        and not PochtronAdmin.objects.filter(student=student).exists()
+        and not TradeAdmin.objects.filter(student=student, club=club).exists()
     ):
         # Add member of Foyer to Pochtron Admin
-        admin = PochtronAdmin(student=student)
+        admin = TradeAdmin(student=student, club=club)
         admin.save()
 
-    context["admin"] = PochtronAdmin.objects.filter(student=student).exists()
+    context["admin"] = TradeAdmin.objects.filter(student=student, club=club).exists()
     context["user_balance"] = student.balance_in_euros(club)
 
     context["transactions"] = [
@@ -72,8 +72,8 @@ def admin_home_page(request):
     student = get_object_or_404(Student, user__pk=request.user.id)
 
     try:
-        admin = PochtronAdmin.objects.get(student=student)
-    except PochtronAdmin.DoesNotExist:
+        admin = TradeAdmin.objects.get(student=student, club=club)
+    except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 
     consommations = Alcohol.objects.filter(club=club)
@@ -83,11 +83,12 @@ def admin_home_page(request):
 
 @login_required
 def manage_accounts(request):
+    club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
 
     try:
-        PochtronAdmin.objects.get(student=student, credit=True)
-    except PochtronAdmin.DoesNotExist:
+        TradeAdmin.objects.get(student=student, club=club, manage_credits=True)
+    except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 
     context = {}
@@ -97,11 +98,12 @@ def manage_accounts(request):
 @login_required
 def shop(request):
     context = {}
+    club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
 
     try:
-        PochtronAdmin.objects.get(student=student)
-    except PochtronAdmin.DoesNotExist:
+        TradeAdmin.objects.get(student=student, club=club, manage_transactions=True)
+    except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 
     return render(request, "pochtron/shop.html", context)
@@ -114,8 +116,8 @@ def conso_create(request):
     student = get_object_or_404(Student, user__pk=request.user.id)
 
     try:
-        PochtronAdmin.objects.get(student=student, alcohol=True)
-    except PochtronAdmin.DoesNotExist:
+        TradeAdmin.objects.get(student=student, club=club, manage_goods=True)
+    except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 
     if request.method == "POST":
@@ -151,8 +153,8 @@ def conso_edit(request, conso_id):
     conso = get_object_or_404(Alcohol, pk=conso_id)
 
     try:
-        PochtronAdmin.objects.get(student=student, alcohol=True)
-    except PochtronAdmin.DoesNotExist:
+        TradeAdmin.objects.get(student=student, club=club, manage_goods=True)
+    except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 
     if request.method == "POST":
@@ -187,25 +189,27 @@ def conso_edit(request, conso_id):
 
 @login_required
 def manage_admins(request):
+    club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
 
     try:
-        PochtronAdmin.objects.get(student=student, manage_admins=True)
-    except PochtronAdmin.DoesNotExist:
+        TradeAdmin.objects.get(student=student, club=club, manage_admins=True)
+    except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 
-    context = {"admins": PochtronAdmin.objects.all()}
+    context = {"admins": TradeAdmin.objects.filter(club=club).all()}
     return render(request, "pochtron/manage_admins.html", context)
 
 
 @login_required
 def admin_edit(request, admin_id):
+    club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
-    admin = get_object_or_404(PochtronAdmin, pk=admin_id)
+    admin = get_object_or_404(TradeAdmin, pk=admin_id, club=club)
 
     try:
-        PochtronAdmin.objects.get(student=student, manage_admins=True)
-    except PochtronAdmin.DoesNotExist:
+        TradeAdmin.objects.get(student=student, club=club, manage_admins=True)
+    except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 
     if request.method == "POST":
@@ -214,55 +218,65 @@ def admin_edit(request, admin_id):
             return redirect("pochtron:manage_admins")
         elif "Valider" in request.POST:
             POST = request.POST.copy()
+            POST["club"] = club
             POST["student"] = admin.student
-            admin_form = EditPochtronAdmin(POST, instance=admin)
+            admin_form = EditTradeAdmin(POST, instance=admin)
             if admin_form.is_valid():
                 admin = admin_form.save()
                 return redirect("pochtron:manage_admins")
     else:
-        admin_form = EditPochtronAdmin()
+        admin_form = EditTradeAdmin()
+        admin_form.fields["club"].disabled = True
+        admin_form.fields["club"].initial = club
         admin_form.fields["student"].disabled = True
         admin_form.fields["student"].initial = admin.student
-        admin_form.fields["alcohol"].initial = admin.alcohol
-        admin_form.fields["credit"].initial = admin.credit
+        admin_form.fields["manage_goods"].initial = admin.manage_goods
+        admin_form.fields["manage_transactions"].initial = admin.manage_transactions
+        admin_form.fields["manage_credits"].initial = admin.manage_credits
         admin_form.fields["manage_admins"].initial = admin.manage_admins
 
         context = {
             "Edit": True,
             "admin": admin,
-            "EditPochtronAdmin": admin_form,
+            "EditTradeAdmin": admin_form,
         }
         return render(request, "pochtron/admin_edit.html", context)
 
 
 @login_required
 def admin_create(request):
+    club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
 
     try:
-        PochtronAdmin.objects.get(student=student, manage_admins=True)
-    except PochtronAdmin.DoesNotExist:
+        TradeAdmin.objects.get(student=student, club=club, manage_admins=True)
+    except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 
     if request.method == "POST":
         if "Valider" in request.POST:
-            # admin_student = None if the student is not yet related to a PochtronAdmin object
-            admin_student = PochtronAdmin.objects.filter(
-                student=request.POST["student"]
+            POST = request.POST.copy()
+            POST["club"] = club
+            # admin_student = None if the pair (student, club) is not yet related to a TradeAdmin object
+            admin_student = TradeAdmin.objects.filter(
+                club=club, student=POST["student"]
             ).first()
-            admin_form = EditPochtronAdmin(request.POST, instance=admin_student)
+            admin_form = EditTradeAdmin(POST, instance=admin_student)
             if admin_form.is_valid():
                 admin_form.save()
                 return redirect("pochtron:manage_admins")
     else:
-        admin_form = EditPochtronAdmin()
-        admin_form.fields["alcohol"].initial = False
-        admin_form.fields["credit"].initial = False
+        admin_form = EditTradeAdmin()
+        admin_form.fields["club"].disabled = True
+        admin_form.fields["club"].initial = club
+        admin_form.fields["manage_goods"].initial = False
+        admin_form.fields["manage_transactions"].initial = False
+        admin_form.fields["manage_credits"].initial = False
         admin_form.fields["manage_admins"].initial = False
 
         context = {
             "Edit": False,
-            "EditPochtronAdmin": admin_form,
+            "EditTradeAdmin": admin_form,
         }
         return render(request, "pochtron/admin_edit.html", context)
 

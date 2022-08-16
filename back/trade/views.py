@@ -11,7 +11,7 @@ from social.models import Club, Student
 from trade.serializers import TransactionSerializer
 
 from .forms import AddTransaction, EditGood, EditPrice
-from .models import Good, Transaction
+from .models import Good, TradeAdmin, Transaction
 
 
 @login_required
@@ -29,7 +29,10 @@ def student_transactions(request):
 def club_transactions(request, club_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     club = get_object_or_404(Club, pk=club_id)
-    if not club.is_member(student.id):
+    if (
+        not club.is_member(student.id)
+        and not TradeAdmin.objects.filter(student=student, club=club).exists()
+    ):
         raise PermissionDenied
     transactions = Transaction.objects.filter(good__club=club).order_by("-date")
     context = {
@@ -45,7 +48,11 @@ def add_transaction(request):
     if request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
         good = get_object_or_404(Good, pk=data["good"])
-        if not good.club.is_member(student.id):
+        try:
+            TradeAdmin.objects.get(
+                student=student, club=good.club, manage_transactions=True
+            )
+        except TradeAdmin.DoesNotExist:
             raise PermissionDenied
 
         filled_form = AddTransaction(
@@ -93,7 +100,10 @@ class LastTransactions(APIView):
             club_id = request.GET.get("club", None)
             club = Club.objects.get(pk=club_id)
             student = get_object_or_404(Student, user__pk=request.user.id)
-            if not club.is_member(student.id):
+            if (
+                not club.is_member(student.id)
+                and not TradeAdmin.objects.filter(student=student, club=club).exists()
+            ):
                 raise PermissionDenied
             if "end" in request.GET and request.GET["end"].strip():
                 end = int(request.GET.get("end", 20))
@@ -117,7 +127,9 @@ def credit_account(request):
     if request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
         club = get_object_or_404(Club, pk=data["club"])
-        if not club.is_member(student.id):
+        try:
+            TradeAdmin.objects.get(student=student, club=club, manage_credits=True)
+        except TradeAdmin.DoesNotExist:
             raise PermissionDenied
 
         good_form = EditGood(

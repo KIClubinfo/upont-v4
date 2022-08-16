@@ -32,7 +32,7 @@
                                 Droits de {{admin.student.user.first_name}} {{admin.student.user.last_name}}
                             </h4>
                         {% else %}
-                            {{EditPochtronAdmin.student.errors}}
+                            {{EditTradeAdmin.student.errors}}
                             <h4>Étudiant :</h4>
                             <div id="adding_student"></div>
                             <br>
@@ -40,16 +40,20 @@
                             <h4>Droits :</h4>
                         {% endif %}
                         <div class="centered-div">
-                            {{EditPochtronAdmin.alcohol.errors}}
-                            Modification des consommations : {{EditPochtronAdmin.alcohol}}
+                            {{EditTradeAdmin.manage_goods.errors}}
+                            Modification des consommations : {{EditTradeAdmin.manage_goods}}
                             <br>
                             <br>
-                            {{EditPochtronAdmin.credit.errors}}
-                            Modification des soldes des étudiants : {{EditPochtronAdmin.credit}}
+                            {{EditTradeAdmin.manage_transactions.errors}}
+                            Ajout de transactions (mode foyer) : {{EditTradeAdmin.manage_transactions}}
                             <br>
                             <br>
-                            {{EditPochtronAdmin.manage_admins.errors}}
-                            Modification des administrateurs de Pochtron : {{EditPochtronAdmin.manage_admins}}
+                            {{EditTradeAdmin.manage_credits.errors}}
+                            Modification des soldes des étudiants : {{EditTradeAdmin.manage_credits}}
+                            <br>
+                            <br>
+                            {{EditTradeAdmin.manage_admins.errors}}
+                            Modification des administrateurs de Pochtron : {{EditTradeAdmin.manage_admins}}
 
                             {% if Edit %}
                                 <br>
