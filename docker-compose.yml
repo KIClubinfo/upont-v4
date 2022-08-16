@@ -7,6 +7,8 @@ services:
       POSTGRES_DB: $DB_NAME
       POSTGRES_USER: $DB_USER
       POSTGRES_PASSWORD: $DB_PASSWORD
+    volumes:
+      - ./backups:/backups
   back:
     build:
       context: back
@@ -17,6 +19,7 @@ services:
       - ./back:/src
       - ./media:/media
       - bundles:/src/upont/static/react:rw
+      - ./backups:/backups
     ports:
       - "$BACK_PORT:8000"
     depends_on:

@@ -5,6 +5,7 @@ services:
     image: postgres
     volumes:
       - ./database:/var/lib/postgresql/data
+      - ./backups:/backups
     restart: always
     environment:
       POSTGRES_DB: $DB_NAME
@@ -27,6 +28,7 @@ services:
       - static_volume:/src/static
       - media_volume:/src/media
       - bundles:/src/upont/static/react
+      - ./backups:/backups
     restart: always
     environment:
       DB_HOST: $DB_HOST
