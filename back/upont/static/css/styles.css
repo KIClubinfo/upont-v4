@@ -598,6 +598,11 @@ a.text-green:hover{
     background-color: #008a22;
 }
 
+.disabled-button{
+    background-color: #212227;
+    margin:1rem;
+}
+
 .search-button{
     /* Sizing */
     margin-left: -3.2rem;
