@@ -1,10 +1,12 @@
 import pandas
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from social.models import Club, Student
@@ -23,7 +25,7 @@ class SearchAlcohol(APIView):
     """
 
     def get(self, request):
-        if "alcohol" in request.GET and request.GET["alcohol"].strip():
+        if "alcohol" in request.GET and not request.GET["alcohol"].isspace():
             query = request.GET.get("alcohol", None)
             alcohols = Alcohol.objects.filter(name__icontains=query).order_by("-name")[
                 :5
@@ -31,6 +33,40 @@ class SearchAlcohol(APIView):
         else:
             alcohols = Alcohol.objects.all().order_by("-name")[:5]
         serializer = AlcoholSerializer(alcohols, many=True)
+        return Response({"alcohols": serializer.data})
+
+
+class FavoriteAlcohol(APIView):
+    """
+    API endpoint that returns the most bought alcohols of a student during 
+    a given periode of time
+    """
+    
+    def get(self, request):
+        club = get_object_or_404(Club, name="Foyer")
+        alcohols_query = Alcohol.objects.filter(club=club)
+        
+        def in_request(field):
+            return (field in request.query_params 
+                    and not request.query_params[field].isspace())
+
+        # Dates (start and end) have to be in ISO format
+        if in_request("start"): 
+            start = parse_datetime(request.query_params.get("start", None))
+            alcohols_query = alcohols_query.filter(transaction__date__gte=start)
+            
+        if in_request("end"):
+            end = parse_datetime(request.query_params.get("end", None))
+            alcohols_query = alcohols_query.filter(transaction__date__lte=end)
+
+        if in_request("student"):
+            student_id = request.query_params.get("student", None)
+            student = Student.objects.get(pk=student_id)
+            alcohols_query = alcohols_query.filter(transaction__student=student)
+            
+        alcohols_query = alcohols_query.annotate(num_buy=Sum('transaction__quantity'))
+        favorites = alcohols_query.order_by('-num_buy')
+        serializer = AlcoholSerializer(favorites, many=True)
         return Response({"alcohols": serializer.data})
 
 
