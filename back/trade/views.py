@@ -96,7 +96,7 @@ class LastTransactions(APIView):
     """
 
     def get(self, request):
-        if "club" in request.GET and request.GET["club"].strip():
+        if "club" in request.GET and not request.GET["club"].isspace():
             club_id = request.GET.get("club", None)
             club = Club.objects.get(pk=club_id)
             student = get_object_or_404(Student, user__pk=request.user.id)
