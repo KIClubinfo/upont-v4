@@ -37,22 +37,30 @@
                             {{EditEvent.date.errors}}
                             <div class="input-title">Début de l'évènement :</div>
                             {{EditEvent.date}}
-                            <script>
-                                $(function () {
-                                    $("#id_date").datetimepicker({
-                                        format: 'd/m/Y H:i',
-                                    });
-                                });
-                            </script>
                             
                             {{EditEvent.end.errors}}
                             <div class="input-title">Fin de l'évènement :</div>
                             {{EditEvent.end}}
                             <script>
+                                // script to have pretty datetime picker
                                 $(function () {
-                                    $("#id_end").datetimepicker({
+                                    dateField = $("#id_date");
+                                    endField = $("#id_end");
+                                    
+                                    function endPicker (minDate) {
+                                        endField.datetimepicker({
+                                            format: 'd/m/Y H:i',
+                                            minDate: minDate, 
+                                        });
+                                    }
+
+                                    dateField.datetimepicker({
                                         format: 'd/m/Y H:i',
+                                        minDate: Date.now(),
+                                        onChangeDateTime: (dp, $input) => endPicker(dp),
                                     });
+                                    
+                                    endPicker(Date.now());
                                 });
                             </script>
 
