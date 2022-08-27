@@ -130,13 +130,20 @@ def conso_create(request):
             },
         )
         if conso_form.is_valid():
-            conso = conso_form.save()
+            conso = conso_form.save() 
             price_form = EditPrice(
-                {"price": request.POST["price"], "date": timezone.now(), "good": conso},
+                {
+                    "price": request.POST["price"], 
+                    "date": timezone.now(),
+                    "good": conso,
+                },
             )
-            if price_form.is_valid:
+            if price_form.is_valid():
                 price_form.save()
                 return HttpResponseRedirect(reverse("pochtron:admin"))
+            else:
+                # Prevent a good to exists without associated price
+                conso.delete()
     else:
         conso_form = EditAlcohol()
         price_form = EditPrice()
