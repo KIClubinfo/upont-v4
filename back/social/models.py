@@ -114,7 +114,7 @@ class Category(models.Model):
 
 class Club(models.Model):
     name = models.CharField(max_length=50, default="Club")
-    nickname = models.CharField(max_length=10, default="Club", null=True, blank=True)
+    nickname = models.CharField(max_length=10, default="", null=True, blank=True)
     logo = models.ImageField(upload_to="logos/", null=True, blank=True)
     background_picture = models.ImageField(
         upload_to="background_pictures/", null=True, blank=True

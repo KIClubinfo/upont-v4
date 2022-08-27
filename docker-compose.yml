@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: $DB_NAME
       POSTGRES_USER: $DB_USER
       POSTGRES_PASSWORD: $DB_PASSWORD
+    volumes:
+      - ./backups:/backups
   back:
     build:
       context: back
@@ -19,6 +21,7 @@ services:
       - ./back:/src
       - ./media:/media
       - bundles:/src/upont/static/react:rw
+      - ./backups:/backups
     ports:
       - "$BACK_PORT:8000"
     depends_on:
@@ -37,6 +40,7 @@ services:
       DEFAULT_FROM_EMAIL: $DEFAULT_FROM_EMAIL
       SECRET_KEY: $SECRET_KEY
       DEBUG: $DEBUG
+      DOMAIN_NAME: $DOMAIN_NAME
       REMOTE_STATIC_STORAGE: $REMOTE_STATIC_STORAGE
       FTP_STORAGE_LOCATION: $FTP_STORAGE_LOCATION
       REMOTE_STATIC_URL: $REMOTE_STATIC_URL

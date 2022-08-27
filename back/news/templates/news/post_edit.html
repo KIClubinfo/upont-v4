@@ -25,8 +25,10 @@
                     <div class="news-card-content">
                         <div class="centered-div">
                             {{EditPost.club.errors}}
-                            <div class="input-title">Publier en tant que :</div>
-                            {{EditPost.club}}
+                            {% if EditPost.club|length > 1 %}
+                                <div class="input-title">Publier en tant que :</div>
+                                {{EditPost.club}}
+                            {% endif %}
 
                             {{EditPost.event.errors}}
                             <div class="input-title">Est-ce que ce post est associé à un évènement ?</div>

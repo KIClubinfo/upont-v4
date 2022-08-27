@@ -112,6 +112,7 @@ def profile(request, user_id=None):
         "all_student_list": all_student_list,
         "student": student,
         "membership_club_list": membership_club_list,
+        "complete_name": student.user.first_name + " " + student.user.last_name,
     }
     if user_id == request.user.id:
         return render(request, "social/profile.html", context)

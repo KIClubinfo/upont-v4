@@ -5,7 +5,7 @@ on:
     branches:
       - master
 jobs:
-  test:
+  test-dev:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -13,5 +13,15 @@ jobs:
         run: docker-compose build
       - name: Start containers
         run: docker-compose up -d
+      - name: Run tests
+        run: docker-compose exec -T back python manage.py test
+  test-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build containers
+        run: bash scripts/build.sh
+      - name: Start containers
+        run: bash scripts/start.sh
       - name: Run tests
         run: docker-compose exec -T back python manage.py test
