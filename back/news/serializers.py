@@ -165,6 +165,7 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             "description",
             "club",
             "date",
+            "end",
             "location",
             "participants",
             "participating",

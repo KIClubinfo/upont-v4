@@ -59,7 +59,7 @@ async function getEvents () {
         desc: e.description,
         participating: e.participating,
         start: new Date(e.date),
-        end: addOneHour(new Date(e.date))
+        end: new Date(e.end),
       }
     )
   }
