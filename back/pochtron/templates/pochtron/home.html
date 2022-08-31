@@ -43,7 +43,7 @@
                             <tr>
                                 <td>Consommation</td>
                                 <td>Quantité</td>
-                                <td>Prix en euros</td>
+                                <td>Débit / Crédit</td>
                                 <td>Date</td>
                             </tr>
                         </thead>
@@ -52,7 +52,7 @@
                                 <tr style="vertical-align: middle">
                                     <td>{{t.product}}</td>
                                     <td>{{t.quantity}}</td>
-                                    <td>{{t.price}}</td>
+                                    <td>{{t.price}} €</td>
                                     <td>{{t.date}}</td>
                                 </tr>
                             {% empty %}
@@ -62,7 +62,7 @@
                     </table>
                 </div><!--End of Column-->
 
-
+                {% comment %}
                 <!--Column-->
                 <div class="col">
                     <h4 class="page-subtitle-3">Évolution de mon solde</h4>
@@ -70,6 +70,7 @@
                         <!--The graph will be rendered here with React-->
                     </div>
                 </div><!--End of Column-->
+                {% endcomment %}
 
             </div><!--End of Row-->
         </div><!--End of Main Content-->
@@ -79,9 +80,11 @@
 
     <!--Scripts-->
     <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+    {% comment %}
     <script>
         window.react_mount = document.getElementById("graph");
     </script>
     <script src="{% static 'react/PochtronOverview.bundle.js' %}"></script>
+    {% endcomment %}
 </body>
 </html>

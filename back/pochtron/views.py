@@ -55,7 +55,7 @@ def home(request):
         {
             "product": t.good.name,
             "quantity": t.quantity,
-            "price": t.quantity * t.good.price_at_date(t.date) / 100,
+            "price": -t.quantity * t.good.price_at_date(t.date) / 100,
             "date": t.date,
         }
         for t in Transaction.objects.filter(student=student)
@@ -77,6 +77,8 @@ def admin_home_page(request):
         raise PermissionDenied
 
     consommations = Alcohol.objects.filter(club=club)
+    for c in consommations:
+        c.price_euro = c.price()/100
     context = {"consommations": consommations, "admin": admin}
     return render(request, "pochtron/admin.html", context)
 

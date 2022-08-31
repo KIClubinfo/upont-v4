@@ -48,7 +48,7 @@ class LastTransactions extends React.Component {
                         <td>Élève</td>
                         <td>Consommation</td>
                         <td>Quantité</td>
-                        <td>Coût (centimes)</td>
+                        <td>Coût</td>
                         <td>Date</td>
                     </tr>
                 </thead>
@@ -59,10 +59,10 @@ class LastTransactions extends React.Component {
 
                         var balance_color;
                         if (balance_change > 0) {
-                            balance_color = 'text-red'
+                            balance_color = 'text-green'
                         }
                         else if (balance_change < 0) {
-                            balance_color = 'text-green'
+                            balance_color = 'text-red'
                         }
                         else {
                             balance_color = ''
@@ -73,7 +73,7 @@ class LastTransactions extends React.Component {
                                 <td>{transaction.student.user.first_name + " " + transaction.student.user.last_name}</td>
                                 <td>{transaction.good.name}</td>
                                 <td>{transaction.quantity}</td>
-                                <td className={balance_color}>{balance_change}</td>
+                                <td className={balance_color}>{(balance_change/100).toFixed(2)} €</td>
                                 <td>{transaction.date}</td>
                             </tr>
                         )

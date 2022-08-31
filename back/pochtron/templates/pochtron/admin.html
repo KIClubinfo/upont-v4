@@ -48,7 +48,7 @@
                         <td>Consommation</td>
                         <td>Volume (mL)</td>
                         <td>Degré (%)</td>
-                        <td>Prix (centimes)</td>
+                        <td>Prix</td>
                         <td></td>
                     </tr>
                 </thead>
@@ -58,7 +58,7 @@
                             <td>{{conso.name}}</td>
                             <td>{{conso.volume}}</td>
                             <td>{{conso.degree}}</td>
-                            <td>{{conso.price}}</td>
+                            <td>{{conso.price_euro|floatformat:2}} €</td>
                             <td>
                                 {% if admin.manage_goods %}
                                     <a href="{% url 'pochtron:conso_edit' conso.id %}" style="text-decoration: none"><button class="button blue-button">Modifier</button></a>

@@ -60,7 +60,7 @@ class AlcoholsSearchBar extends React.Component {
             .then(({ alcohols }) => {
               resolve(alcohols.map(({ name, degree, volume, price, id }) => ({
                 value: id,
-                label: `${name} (${volume}mL - ${degree}% - ${price} centimes)`
+                label: `${name} (${volume}mL - ${degree}% - ${(price/100).toFixed(2)} €})`
               })))
             })
             .catch(reject)
