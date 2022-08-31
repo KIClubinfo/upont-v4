@@ -1,0 +1,90 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Pochtron" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-main">
+            {% if admin %}
+                <a href="{% url 'pochtron:admin' %}" style="text-decoration: none"><button class="button blue-button">Admin</button></a>
+            {% endif %}
+
+
+            <h2 class="section-title">Mon solde actuel : {{ user_balance }} €</h2>
+
+            <!--Row-->
+            <div class="row">
+
+                <!--Column-->
+                <div class="col">
+                    <h4 class="page-subtitle-3">Mes transactions</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td>Consommation</td>
+                                <td>Quantité</td>
+                                <td>Débit / Crédit</td>
+                                <td>Date</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in transactions %}
+                                <tr style="vertical-align: middle">
+                                    <td>{{t.product}}</td>
+                                    <td>{{t.quantity}}</td>
+                                    <td>{{t.price}} €</td>
+                                    <td>{{t.date}}</td>
+                                </tr>
+                            {% empty %}
+                                <th colspan="4" style="text-align: center">Aucune transactions</th>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!--End of Column-->
+
+                {% comment %}
+                <!--Column-->
+                <div class="col">
+                    <h4 class="page-subtitle-3">Évolution de mon solde</h4>
+                    <div id="graph">
+                        <!--The graph will be rendered here with React-->
+                    </div>
+                </div><!--End of Column-->
+                {% endcomment %}
+
+            </div><!--End of Row-->
+        </div><!--End of Main Content-->
+
+    </div><!--End Of Content-->
+
+
+    <!--Scripts-->
+    <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+    {% comment %}
+    <script>
+        window.react_mount = document.getElementById("graph");
+    </script>
+    <script src="{% static 'react/PochtronOverview.bundle.js' %}"></script>
+    {% endcomment %}
+</body>
+</html>

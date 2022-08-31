@@ -41,7 +41,7 @@ class CommentForm extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/forms/publish/")
+        fetch(Urls["publish_comment"]())
             .then(res => res.json())
             .then(
                 (result) => {

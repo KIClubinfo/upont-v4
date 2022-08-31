@@ -66,6 +66,7 @@ THIRD_PARTY_APPS = [
     "markdownify.apps.MarkdownifyConfig",
     "rest_framework",
     "corsheaders",
+    "django_reverse_js",
 ]
 
 PROJECT_APPS = [

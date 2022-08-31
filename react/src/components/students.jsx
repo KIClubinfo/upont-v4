@@ -26,7 +26,7 @@ class Students extends React.Component {
         this.state = {
             error: null,
             students: [],
-            next_url: "/api/students/",
+            next_url: Urls["students"](),
             count: null,
             more_exist: true,
             loading: false,

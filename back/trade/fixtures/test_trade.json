@@ -1,0 +1,84 @@
+[
+    {
+        "model": "social.promotion",
+        "pk": 1,
+        "fields": {
+            "year": 23,
+            "name": "default",
+            "nickname": "023"
+        }
+    },
+    {
+        "model": "social.student",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "promo": 1,
+            "department": "1A",
+            "gender": "Autre",
+            "origin": "Concours Commun",
+            "phone_number": null,
+            "picture": "",
+            "nationality": null
+        }
+    },
+    {
+        "model": "social.club",
+        "pk": 1,
+        "fields": {
+            "name": "test_club",
+            "nickname": "test_club",
+            "logo": "",
+            "background_picture": "",
+            "description": "test",
+            "active": true,
+            "has_fee": false,
+            "category": []
+        }
+    },
+    {
+        "model": "trade.good",
+        "pk": 1,
+        "fields": {
+            "name": "test_good",
+            "club": 1
+        }
+    },
+    {
+        "model": "trade.price",
+        "pk": 1,
+        "fields": {
+            "price": 100,
+            "good": 1,
+            "date": "2022-01-31T16:10:30Z"
+        }
+    },
+    {
+        "model": "trade.transaction",
+        "pk": 1,
+        "fields": {
+            "good": 1,
+            "quantity": 5,
+            "student": 1,
+            "date": "2022-01-31T16:10:34Z"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$HDCEmX98SWKhIo4ChoOlDo$uplAN0jXRzIFof1CjoSqjG/n4eJM8V6ks+/kKyi0nt4=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "test_user",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-01-31T16:10:00.517Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+]

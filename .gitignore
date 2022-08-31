@@ -3,4 +3,5 @@
 .idea
 media
 populate.json
+.vscode/
 backups/

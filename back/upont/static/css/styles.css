@@ -598,6 +598,11 @@ a.text-green:hover{
     background-color: #008a22;
 }
 
+.disabled-button{
+    background-color: #212227;
+    margin:1rem;
+}
+
 .search-button{
     /* Sizing */
     margin-left: -3.2rem;
@@ -1280,4 +1285,15 @@ a.text-green:hover{
 
 .news-nav a:hover{
     color: #39cbfb;
+}
+
+/*-------------------------------------------------*/
+/*--------------------- POCHTRON ------------------*/
+/*-------------------------------------------------*/
+
+.white-input{
+    background-color: white;
+    color: black;
+    text-align: left;
+    font-family:'Neue Helvetica Light';
 }
