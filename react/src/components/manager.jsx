@@ -1,7 +1,7 @@
 import React from 'react'
 import {StudentsSearchBar} from './searchBars';
 import {BottomScrollListener} from 'react-bottom-scroll-listener';
-
+import InputMask from 'react-input-mask';
 
 class LastTransactionsScroll extends React.Component {
     constructor(props) {
@@ -124,7 +124,13 @@ class CreditAccount extends React.Component {
     }
 
     handleChange(event) {
-        this.setState({ [event.target.name]: event.target.value });
+        if (event.target.name == "amount") {
+            const cleanedValue = event.target.value.replaceAll("_", "0") // Remove the remaining maskChar
+            const euroAndCents = cleanedValue.split(/,|\s/); // Use regex to catch mutiple delimiters
+            this.setState({ "amount": euroAndCents[0] + euroAndCents[1]});       
+        } else {
+            this.setState({ [event.target.name]: event.target.value });
+        }
     }
 
     handleSubmit(event) {
@@ -182,8 +188,10 @@ class CreditAccount extends React.Component {
                 <p>Élève :</p>
                 <StudentsSearchBar parent={this}/>
                 <p></p>
-                <p>Montant à créditer (centimes) :</p><input className="centered-div text-input white-input" type="text" placeholder="Montant" name="amount" id="" value={this.state.amount} onChange={this.handleChange}></input>
+                <p>Montant à créditer (centimes) :</p>
+                <InputMask mask="999,99 €" className="centered-div text-input white-input" type="text" placeholder="Montant" name="amount" id="" value={this.state.amount} onChange={this.handleChange}/>
                 <div className="centered-div"><button className="button green-button" type="submit">Créditer</button></div>
+                <p></p>
             </form>
         </div>)
     }
