@@ -77,13 +77,15 @@ body{
     /* Sizing */
     padding-top: 1rem;
     padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     /* Styling */
     text-decoration: none;
     text-align: center;
     font-size: 1.5rem;
     color: var(--disabled-link-color);
     /* Animating */
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .sidenav-link.active{
@@ -96,7 +98,10 @@ body{
         /* Styling*/
         color: var(--hover-link-color);
         /* Animating */
-        transform: scale(1.2);
+        transform: scale(1.1);
+    }
+    .sidenav-link{
+        text-align: left;
     }
 }
 
