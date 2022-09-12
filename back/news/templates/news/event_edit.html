@@ -55,11 +55,7 @@
 
                             {{EditEvent.club.errors}}
                             <div class="input-title">Club :</div>
-                            {% if EditEvent.club|length > 1 %}
                             {{EditEvent.club}}
-                            {% else %}
-                                {{EditEvent.club|first|default:"Vous n'êtes membre d'aucun club"}}
-                            {% endif %}
 
                             {{EditEvent.shotgun.errors}}
                             <div class="input-title">Shotgun :</div>
