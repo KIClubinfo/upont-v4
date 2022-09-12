@@ -12,7 +12,7 @@
             <a href="{% url 'social:club_index' %}" class="sidenav-link {% if active_link == 'clubs' %} active {% endif %}"><i class="fas fa-gamepad logo-button"></i>Clubs</a>
             <a href="{% url 'social:profile' %}" class="sidenav-link {% if active_link == 'profile' %} active {% endif %}"><i class="fas fa-address-card logo-button"></i>Profil</a>
             <a href="{% url 'pochtron:home' %}" class="sidenav-link {% if active_link == 'pochtron' %} active {% endif %}"><i class="fas fa-beer logo-button"></i>Pochtron</a>
-            <a href="https://ponthe.enpc.org/" target="_blank" class="sidenav-link"><img class="logo-svg " src="../../static/assets/img/logo-ponthe.svg">Galeries</a>
+            <a href="https://ponthe.enpc.org/" target="_blank" class="sidenav-link"><img class="logo-svg " src="{% static 'assets/img/logo-ponthe.svg' %}">Galeries</a>
             {% if user.is_staff %}
                 <a href="{% url 'admin:index' %}" class="sidenav-link {% if active_link == 'admin' %} active {% endif %}"><i class="fas fa-user-edit logo-button"></i>Admin</a>
             {% endif %}
