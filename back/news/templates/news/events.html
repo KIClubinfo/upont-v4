@@ -35,11 +35,13 @@
             {% include "../news/newsnav.html" %}
             <!--End of News Navigation-->
 
+            {% if is_member %}
             <div class="centered-div mt-2">
                 <a href="{% url 'news:event_create' %}">
                     <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un évènement</button>
                 </a>                
             </div>
+            {% endif %}
 
             {% for event in all_events_list %}
                 <!--News Card-->
