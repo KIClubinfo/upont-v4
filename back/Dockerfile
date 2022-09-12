@@ -99,7 +99,7 @@ RUN poetry install
 
 WORKDIR /src
 COPY . .
-# to give the webinstxaller service access to this folder
+# to give the webinstaller service access to this folder
 RUN mkdir -p /src/upont/static/react \
     && chmod 777 /src/upont/static/react
 
