@@ -57,12 +57,12 @@ class LastTransactions extends React.Component {
                     this.state.transactions.map(function f(transaction) {
                         const balance_change = transaction.quantity*transaction.good.price
 
-                        var balance_color;
+                        var balance_color = 'text-bold';
                         if (balance_change > 0) {
-                            balance_color = 'text-green'
+                            balance_color += ' text-green'
                         }
                         else if (balance_change < 0) {
-                            balance_color = 'text-red'
+                            balance_color += ' text-red'
                         }
                         else {
                             balance_color = ''
@@ -124,12 +124,17 @@ class AddTransaction extends React.Component {
                 // The last transaction was successful
                 last_transaction =
                 <div className="centered-div text-green">
-                    <p>Nouveau solde de {this.state.last_student.label} : {this.state.new_balance/100} €</p>
+                    <p>
+                        Nouveau solde de {this.state.last_student.label} : 
+                        <div className="text-bold">
+                            {this.state.new_balance} €
+                        </div>
+                    </p>
                 </div>;
             } else {
                 // An error occurred
                 last_transaction =
-                <div className="centered-div text-red">
+                <div className="centered-div text-red text-bold">
                     <p>{this.state.error}</p>
                 </div>;
             }
