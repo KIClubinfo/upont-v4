@@ -29,13 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=False)
 
-ALLOWED_HOSTS = [
-    "upont.enpc.org",
-    "upont-dev.enpc.org",
-    "localhost",
-    "127.0.0.1",
-    "back",
-]
+if DEBUG:
+    ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1",
+        "back",
+    ]
+else:
+    ALLOWED_HOSTS = [env("DOMAIN_NAME", default="upont.enpc.org")]
 
 if DEBUG:
     # SECURITY WARNING: keep the secret key used in production secret!
@@ -65,6 +66,7 @@ THIRD_PARTY_APPS = [
     "markdownify.apps.MarkdownifyConfig",
     "rest_framework",
     "corsheaders",
+    "django_reverse_js",
 ]
 
 PROJECT_APPS = [

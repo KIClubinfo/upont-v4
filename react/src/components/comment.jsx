@@ -48,7 +48,7 @@ class Comment extends React.Component {
 
     delete(event) {
         event.preventDefault();
-        const url = this.state.comment.comment_delete_url;
+        const url = Urls["news:comment_delete"](this.state.comment.id);
         const csrfmiddlewaretoken = getCookie('csrftoken');
         const requestOptions = {
             method: 'POST',

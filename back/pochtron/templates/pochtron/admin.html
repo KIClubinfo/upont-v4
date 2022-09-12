@@ -1,0 +1,81 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Pochtron" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            {% if admin.manage_goods %}
+                <a href="{% url 'pochtron:conso_create' %}" style="text-decoration: none"><button class="button blue-button">Créer une consommation</button></a>
+            {% else %}
+                <button class="button disabled-button">Créer une consommation</button>
+            {% endif %}
+            {% if admin.manage_transactions %}
+                <a href="{% url 'pochtron:shop' %}" style="text-decoration: none"><button class="button blue-button">Foyer</button></a>
+            {% else %}
+                <button class="button disabled-button">Foyer</button>
+            {% endif %}
+            {% if admin.manage_credits %}
+                <a href="{% url 'pochtron:manage_accounts' %}" style="text-decoration: none"><button class="button blue-button">Comptes</button></a>
+            {% else %}
+                <button class="button disabled-button">Comptes</button>
+            {% endif %}
+            {% if admin.manage_admins %}
+                <a href="{% url 'pochtron:manage_admins' %}"><button class="button blue-button">Gestion des admins de Pochtron</button></a>
+            {% endif %}
+            <h1>Toutes les consommations :</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Consommation</td>
+                        <td>Volume (mL)</td>
+                        <td>Degré (%)</td>
+                        <td>Prix</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conso in consommations %}
+                        <tr style="vertical-align: middle">
+                            <td>{{conso.name}}</td>
+                            <td>{{conso.volume}}</td>
+                            <td>{{conso.degree}}</td>
+                            <td>{{conso.price_euro|floatformat:2}} €</td>
+                            <td>
+                                {% if admin.manage_goods %}
+                                    <a href="{% url 'pochtron:conso_edit' conso.id %}" style="text-decoration: none"><button class="button blue-button">Modifier</button></a>
+                                {% else %}
+                                    <button class="button disabled-button">Modifier</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <th colspan="5" style="text-align: center">Aucune consommation.</th>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+</body>
+</html>

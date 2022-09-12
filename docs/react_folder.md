@@ -40,3 +40,18 @@ Fichier de configuration de *babel* pour la transpilation javascript.
 ### Dossiers *node_modules* et *static*
 
 Dossiers générés à l'exécution, ne pas les ajouter au gestionnaire de versions.
+
+## Inverser les urls Django avec React
+
+On utilise le package python *django_reverse_js*. Dans un composant React on pourra utiliser :
+```
+Urls["namespace:view_name"](arg1, arg2, ...)
+```
+Ce qui donne le même résultat que la ligne python :
+```
+reverse("namespace:view_name", args=(arg1, arg2, ...))
+```
+Pour que cela fonctionne il faut importer le script suivant dans le template Django **avant** d'importer le script React :
+```
+<script src="{% url 'reverse_js' %}" type="text/javascript"></script>
+```

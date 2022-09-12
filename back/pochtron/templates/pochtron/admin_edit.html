@@ -1,0 +1,81 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Pochtron" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <!--Main Content-->
+        <div class="content-main">
+
+            {% if Edit %}
+                <h3 class="page-title">Modifier les droits d'administration de Pochtron</h3>
+            {% else %}
+                <h3 class="page-title">Ajouter un nouvel admin à Pochtron</h3>
+            {% endif %}
+
+            <!--News Card-->
+            <div class="news-card">
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="news-card-content">
+                        {% if Edit %}
+                            <h4>
+                                Droits de {{admin.student.user.first_name}} {{admin.student.user.last_name}}
+                            </h4>
+                        {% else %}
+                            {{EditTradeAdmin.student.errors}}
+                            <h4>Étudiant :</h4>
+                            <div id="adding_student"></div>
+                            <br>
+                            <br>
+                            <h4>Droits :</h4>
+                        {% endif %}
+                        <div class="centered-div">
+                            {{EditTradeAdmin.manage_goods.errors}}
+                            Modification des consommations : {{EditTradeAdmin.manage_goods}}
+                            <br>
+                            <br>
+                            {{EditTradeAdmin.manage_transactions.errors}}
+                            Ajout de transactions (mode foyer) : {{EditTradeAdmin.manage_transactions}}
+                            <br>
+                            <br>
+                            {{EditTradeAdmin.manage_credits.errors}}
+                            Modification des soldes des étudiants : {{EditTradeAdmin.manage_credits}}
+                            <br>
+                            <br>
+                            {{EditTradeAdmin.manage_admins.errors}}
+                            Modification des administrateurs de Pochtron : {{EditTradeAdmin.manage_admins}}
+
+                            {% if Edit %}
+                                <br>
+                                <br>
+                                <input class="button red-button" type="submit" name="Supprimer"
+                                    value="Retirer {{admin.student.user.first_name}} {{admin.student.user.last_name}} des admins de Pochtron">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="centered-div">
+                        <button type="button" class="button red-button" onclick="history.back()">Annuler</button>
+                        <input class="button green-button" type="submit" name="Valider" value="Valider">
+                    </div>
+                </form>
+            </div><!--End of News Card-->
+        </div><!--End of Main Content-->
+    </div><!--End of Content-->
+    <!--EndContent-->
+
+    <!--Scripts-->
+    {% if not Edit %}
+        <script src="{% static 'react/MemberAdding.bundle.js' %}"></script>
+    {% endif %}
+</body>
+</html>

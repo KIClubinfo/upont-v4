@@ -1,0 +1,43 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Pochtron" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+                <div class="col" align="right">
+                    <a href="{% url 'pochtron:admin' %}"><button class="button blue-button">Retourner sur la page d'administration</button></a>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            <div id="shop">
+                <!--The shop is rendered here with React-->
+            </div>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+    <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+    <script>
+        window.react_mount = document.getElementById("shop");
+    </script>
+    <script src="{% static 'react/PochtronShop.bundle.js' %}"></script>
+</body>
+</html>

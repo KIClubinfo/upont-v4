@@ -7,16 +7,17 @@
             <div class="toggle "><i class="fas fa-bars "></i></div>
         </div>
         <div class="sidenav-links">
-            <a href="{% url 'news:posts' %}" class="sidenav-link {% if active_link == 'news' %} active {% endif %}"><i class="fas fa-newspaper "></i></a>
-            <a href="{% url 'social:index_users' %}" class="sidenav-link {% if active_link  == 'users' %} active {% endif %}"><i class="fas fa-user-graduate "></i></a>
-            <a href="{% url 'social:club_index' %}" class="sidenav-link {% if active_link == 'clubs' %} active {% endif %}"><i class="fas fa-gamepad "></i></a>
-            <a href="{% url 'page_not_created' %}" class="sidenav-link {% if active_link == 'resources' %} active {% endif %}"><i class="fas fa-file-alt "></i></a>
-            <a href="{% url 'social:profile' %}" class="sidenav-link {% if active_link == 'profile' %} active {% endif %}"><i class="fas fa-address-card "></i></a>
+            <a href="{% url 'news:posts' %}" class="sidenav-link {% if active_link == 'news' %} active {% endif %}"><i class="fas fa-newspaper logo-button"></i>News</a>
+            <a href="{% url 'social:index_users' %}" class="sidenav-link {% if active_link  == 'users' %} active {% endif %}"><i class="fas fa-user-graduate logo-button"></i>Elèves</a>
+            <a href="{% url 'social:club_index' %}" class="sidenav-link {% if active_link == 'clubs' %} active {% endif %}"><i class="fas fa-gamepad logo-button"></i>Clubs</a>
+            <a href="{% url 'social:profile' %}" class="sidenav-link {% if active_link == 'profile' %} active {% endif %}"><i class="fas fa-address-card logo-button"></i>Profil</a>
+            <a href="{% url 'pochtron:home' %}" class="sidenav-link {% if active_link == 'pochtron' %} active {% endif %}"><i class="fas fa-beer logo-button"></i>Pochtron</a>
+            <a href="https://ponthe.enpc.org/" target="_blank" class="sidenav-link"><img class="logo-svg " src="../../static/assets/img/logo-ponthe.svg">Galeries</a>
             {% if user.is_staff %}
-                <a href="{% url 'admin:index' %}" class="sidenav-link {% if active_link == 'admin' %} active {% endif %}"><i class="fas fa-user-edit "></i></a>
+                <a href="{% url 'admin:index' %}" class="sidenav-link {% if active_link == 'admin' %} active {% endif %}"><i class="fas fa-user-edit logo-button"></i>Admin</a>
             {% endif %}
         </div>
-        <a href="{% url 'logout' %}" class="sidenav-last-link sidenav-link {% if active_link == 'log-out' %} active {% endif %}"><i class="fas fa-sign-out-alt "></i></a>
+        <a href="{% url 'logout' %}" class="sidenav-last-link sidenav-link {% if active_link == 'log-out' %} active {% endif %}" style="text-align: center;"><i class="fas fa-sign-out-alt "></i></a>
     </nav>
 </div>
 <script src="{% static 'js/sidenav.js' %}"></script>

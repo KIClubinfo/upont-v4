@@ -10,10 +10,6 @@ from .models import Comment, Post
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
     author = StudentSerializer()
     club = ClubSerializer()
-    comment_delete_url = serializers.SerializerMethodField()
-
-    def get_comment_delete_url(self, obj):
-        return reverse("news:comment_delete", args=(obj.id,))
 
     is_my_comment = serializers.SerializerMethodField()
 
@@ -36,7 +32,6 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
             "club",
             "date",
             "content",
-            "comment_delete_url",
             "is_my_comment",
             "id",
         ]

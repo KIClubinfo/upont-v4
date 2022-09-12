@@ -1,0 +1,65 @@
+{% load static %}
+<!--Header-->
+{%if create%}
+    {% include "header.html" with title="Créer une consommation" %}
+{%else%}
+    {% include "header.html" with title="Modifier une consommation" %}
+{%endif%}
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            {%if create%}
+                <h3 class="page-title">Créer une nouvelle consommation</h3>
+            {%else%}
+                <h3 class="page-title">Modifier une consommation</h3>
+            {%endif%}
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="news-card">
+                    <div class="news-card-content">
+                        {{EditAlcohol.name.errors}}
+                        Nom :<br>
+                        {{EditAlcohol.name}}<br>
+                        {{EditAlcohol.volume.errors}}
+                        Volume (mL) :<br>
+                        {{EditAlcohol.volume}}<br>
+                        {{EditAlcohol.degree.errors}}
+                        Taux d'alcool (%) :<br>
+                        {{EditAlcohol.degree}}<br>
+                        {{EditPrice.price.errors}}
+                        Prix (centimes) :<br>
+                        {{EditPrice.price}}<br>
+                    </div>
+                    <div class="news-card-actions">
+                        <div class="news-card-popularity">
+                            <a href="{% url 'pochtron:admin' %}"><span class="button red-button">Annuler</span></a>
+                            <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+</body>
+</html>

@@ -86,7 +86,7 @@ class Post extends React.Component {
     }
 
     refresh() {
-        fetch("/api/posts/"+this.state.post.id+"/")
+        fetch(Urls["post_detail"](this.state.post.id))
             .then(res => res.json())
             .then(
                 (result) => {
@@ -104,10 +104,10 @@ class Post extends React.Component {
         event.preventDefault();
         let url;
         if (this.state.post.user_liked) {
-            url = this.state.post.dislike_url;
+            url = Urls["news:post_like"](this.state.post.id, "Dislike");
         }
         else {
-            url = this.state.post.like_url;
+            url = Urls["news:post_like"](this.state.post.id, "Like");
         }
         const csrfmiddlewaretoken = getCookie('csrftoken');
         const requestOptions = {
@@ -220,7 +220,7 @@ class Posts extends React.Component {
         this.state = {
             error: null,
             posts: [],
-            next_url: "/api/posts/",
+            next_url: Urls["posts"](),
             count: null,
             more_exist: true,
             currentStudent: '',
@@ -228,7 +228,7 @@ class Posts extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/current/")
+        fetch(Urls["current_student"]())
             .then(res => res.json())
             .then(
                 (result) => {

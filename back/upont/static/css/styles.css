@@ -77,13 +77,15 @@ body{
     /* Sizing */
     padding-top: 1rem;
     padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     /* Styling */
     text-decoration: none;
     text-align: center;
     font-size: 1.5rem;
     color: var(--disabled-link-color);
     /* Animating */
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .sidenav-link.active{
@@ -96,7 +98,10 @@ body{
         /* Styling*/
         color: var(--hover-link-color);
         /* Animating */
-        transform: scale(1.2);
+        transform: scale(1.1);
+    }
+    .sidenav-link{
+        text-align: left;
     }
 }
 
@@ -113,6 +118,15 @@ img.logo{
     /* Sizing */
     height: 3rem;
     width: 3rem;
+}
+
+img.logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        height: 3rem;
+        width: 3rem;
 }
 
 .toggle{
@@ -192,6 +206,24 @@ img.logo{
         /* Sizing */
         height: 2rem;
         width: 2rem;
+    }
+
+    img.logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0rem;
+        padding-right: 0rem;
+        height: 0rem;
+        width: 0rem;
+    }
+
+    img.show-logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        height: 3rem;
+        width: 3rem;
     }
 
     .toggle{
@@ -557,12 +589,12 @@ a.text-green:hover{
     /* Sizing */
     padding: 0.75rem 1.5rem;
     /* Styling */
-    font-family:'Neue Helvetica Light';
+    font-family:'Neue Helvetica Bold';
     font-style: normal;
     font-size: 1rem;
     text-decoration: none;
     color: white;
-    border-radius: 0.5rem;
+    border-radius: 0.5rem;  
     background-color: rgba(255, 255, 255, 0.09);
     border-style: none;
     -webkit-user-select: none;
@@ -598,6 +630,11 @@ a.text-green:hover{
     background-color: #008a22;
 }
 
+.disabled-button{
+    background-color: #212227;
+    margin:1rem;
+}
+
 .search-button{
     /* Sizing */
     margin-left: -3.2rem;
@@ -606,6 +643,12 @@ a.text-green:hover{
     border-radius: 0rem;
     background-color: rgba(255, 255, 255, 0);
     border-left: solid var(--border-color) var(--border-width);
+}
+
+.logo-button {
+    vertical-align: middle;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
 .search-input-group {
@@ -1163,8 +1206,8 @@ a.text-green:hover{
 }
 
 .news-card-button{
-    font-size: 1.8rem;
-    margin: 0 0.5rem;
+    font-size: 1rem;
+    margin: 0 0rem;
 }
 
 .news-card-comments{
@@ -1280,4 +1323,15 @@ a.text-green:hover{
 
 .news-nav a:hover{
     color: #39cbfb;
+}
+
+/*-------------------------------------------------*/
+/*--------------------- POCHTRON ------------------*/
+/*-------------------------------------------------*/
+
+.white-input{
+    background-color: white;
+    color: black;
+    text-align: left;
+    font-family:'Neue Helvetica Light';
 }

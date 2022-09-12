@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, Student
-from .serializers import StudentSerializer
+from .models import Category, Club, Membership, Role, Student
+from .serializers import RoleSerializer, StudentSerializer
 
 
 @login_required
@@ -69,6 +69,38 @@ class StudentCanPublishAs(APIView):
         return []
 
 
+class SearchRole(APIView):
+    """
+    API endpoint that returns the roles whose name contains the query.
+    """
+
+    def get(self, request):
+        if "role" in request.GET and request.GET["role"].strip():
+            query = request.GET.get("role", None)
+            roles = Role.objects.filter(name__icontains=query).order_by("-name")[:3]
+        else:
+            roles = Role.objects.all().order_by("-name")[:3]
+        serializer = RoleSerializer(roles, many=True)
+        return Response({"roles": serializer.data})
+
+
+class SearchStudent(APIView):
+    """
+    API endpoint that returns the student whose username contains the query.
+    """
+
+    def get(self, request):
+        if "user" in request.GET and request.GET["user"].strip():
+            students, searched_expression = search_user(request)
+            students = students[:25]
+        else:
+            students = Student.objects.all().order_by(
+                "-promo__year", "user__first_name", "user__last_name"
+            )[:25]
+        serializer = StudentSerializer(students, many=True)
+        return Response({"students": serializer.data})
+
+
 @login_required
 def profile(request, user_id=None):
     if user_id is None:
@@ -80,6 +112,7 @@ def profile(request, user_id=None):
         "all_student_list": all_student_list,
         "student": student,
         "membership_club_list": membership_club_list,
+        "complete_name": student.user.first_name + " " + student.user.last_name,
     }
     if user_id == request.user.id:
         return render(request, "social/profile.html", context)
@@ -310,25 +343,38 @@ def club_edit(request, club_id):
                 return redirect("social:club_detail", club_id=club.id)
 
         elif "Ajouter-Membre" in request.POST:
-            try:
-                membership_added = Membership.objects.filter(
-                    student__id=request.POST["student"], club=club
-                )
-                if membership_added:
-                    membership_added = membership_added[0]
-                else:
-                    membership_added = Membership.objects.create(
-                        student=get_object_or_404(Student, pk=request.POST["student"]),
-                        club=club,
-                        role=None,
-                        is_admin=False,
+            if (
+                not request.POST["student"].isdigit()
+                or not request.POST["role"].isdigit()
+            ):
+                context[
+                    "error"
+                ] = "Fais bien attention à sélectionner l'élève ET le rôle"
+                context["AddMember"] = AddMember()
+                return render(request, "social/club_edit.html", context)
+
+            else:
+                try:
+                    membership_added = Membership.objects.filter(
+                        student__id=request.POST["student"], club=club
                     )
-                form_membership = AddMember(request.POST, instance=membership_added)
-                if form_membership.is_valid():
-                    form_membership.save()
-                return redirect("social:club_edit", club_id=club.id)
-            except Student.DoesNotExist:
-                return redirect("social:club_edit", club_id=club.id)
+                    if membership_added:
+                        membership_added = membership_added[0]
+                    else:
+                        membership_added = Membership.objects.create(
+                            student=get_object_or_404(
+                                Student, pk=request.POST["student"]
+                            ),
+                            club=club,
+                            role=None,
+                            is_admin=False,
+                        )
+                    form_membership = AddMember(request.POST, instance=membership_added)
+                    if form_membership.is_valid():
+                        form_membership.save()
+                    return redirect("social:club_edit", club_id=club.id)
+                except Student.DoesNotExist:
+                    return redirect("social:club_edit", club_id=club.id)
 
         elif "Supprimer" in request.POST:
             deleted_member = Membership.objects.get(

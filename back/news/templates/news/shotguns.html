@@ -15,7 +15,7 @@
     <!--Content-->
     <div class="content">
 
-        <!--Header Content-->
+        <!--Header Content
         <div class="content-header">
             <div class="row justify-content-between w-100">
                 <div class="col">
@@ -26,6 +26,7 @@
                 </div>
             </div>
         </div>
+        -->
 
         <!--Main Content-->
         <div class="content-main">
@@ -39,7 +40,9 @@
                 {% if display_admin_button %}
                     <a href="{% url 'news:shotguns_admin' %}" style="text-decoration: none"><button class="button blue-button">Administration des shotguns</button></a>
                     <br>
-                    <a href="{% url 'news:new_shotgun' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
+                    <a href="{% url 'news:new_shotgun' %}">
+                        <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un shotgun</button>
+                    </a> 
                 {% endif %}
             </div>
 
