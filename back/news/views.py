@@ -48,8 +48,10 @@ class PostViewSet(viewsets.ModelViewSet):
 
 @login_required
 def events(request):
+    student = get_object_or_404(Student, user__id=request.user.id)
     all_events_list = Event.objects.order_by("-date")
-    context = {"all_events_list": all_events_list}
+    is_member = Membership.objects.filter(student=student).exists()
+    context = {"all_events_list": all_events_list, "is_member": is_member}
     return render(request, "news/events.html", context)
 
 
