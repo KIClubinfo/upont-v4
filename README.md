@@ -72,17 +72,17 @@ python manage.py migrate
 
 Lancer le build :
 ```
-$ bash scripts/build.sh
+bash scripts/build.sh
 ```
 
 Lancer le serveur :
 ```
-$ bash scripts/start.sh
+bash scripts/start.sh
 ```
 
 Stopper le serveur :
 ```
-$ bash scripts/stop.sh
+bash scripts/stop.sh
 ```
 
 # Sauvegarde
@@ -201,7 +201,7 @@ git rebase feature
 Mettre les changements en ligne :
 ```
 git checkout dev
-git push --force-with-lease
+git push
 ```
 
 ### Méthode 2 :
