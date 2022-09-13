@@ -148,10 +148,10 @@ class Post extends React.Component {
             return <div></div>;
         }
         else if (this.state.numberOfCommentsShown < this.state.post.comments.length) {
-            return <div style={{textAlign: "center"}}><a onClick={this.show_more}>Voir plus de commentaires</a></div>;
+            return <div style={{textAlign: "center"}}><a href="javascript:void(0)" onClick={this.show_more}>Voir plus de commentaires</a></div>;
         }
         else {
-            return <div style={{textAlign: "center"}}><a onClick={this.show_less}>Voir moins de commentaires</a></div>;
+            return <div style={{textAlign: "center"}}><a href="javascript:void(0)" onClick={this.show_less}>Voir moins de commentaires</a></div>;
         }
     }
 

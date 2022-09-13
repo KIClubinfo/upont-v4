@@ -82,7 +82,7 @@ class CommentForm extends React.Component {
                 <select className="profil-select" name="club" id="id_club" required value={this.state.club} onChange={this.handleChange}>
                     {options}
                 </select>
-                <button className="button green-button news-card-button" type="submit"><i className="far fa-comment"></i></button>
+                <button className="button green-button" type="submit"><i class="fas fa-paper-plane"></i></button>
             </div>
 
             return (
