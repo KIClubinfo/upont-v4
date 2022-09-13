@@ -1208,8 +1208,8 @@ a.text-green:hover{
 
 .news-card-edit-comment{
     display: flex;
-    justify-content: left;
-    padding: 1rem 0rem;
+    justify-content: center;
+    padding: 0.5rem 0rem;
 }
 
 .news-card-edit-comment-input{

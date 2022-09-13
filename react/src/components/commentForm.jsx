@@ -96,7 +96,7 @@ class CommentForm extends React.Component {
         } else {
             const field2 =
             <div className="news-card-edit-comment">
-                <button className="button green-button news-card-button" type="submit"><i className="far fa-comment"></i></button>
+                <button className="button green-button" type="submit"><i className="fas fa-paper-plane"></i></button>
             </div>
 
             return (
