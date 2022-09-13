@@ -1170,6 +1170,7 @@ a.text-green:hover{
 .news-card-comments{
     min-height: 6rem;
     padding: 0 1rem;
+    background-color: #3a3b3f;
 }
 
 .news-card-comment-user-pic{
@@ -1197,7 +1198,7 @@ a.text-green:hover{
     padding: 0.5rem 1rem;
     width: 65%;
     /* Styling */
-    background-color: transparent;
+    background-color: var(--primary-bg-color);
     border: solid var(--border-color) var(--border-width);
     color: white;
     font-size: 1rem;
@@ -1210,6 +1211,10 @@ a.text-green:hover{
     display: flex;
     justify-content: center;
     padding: 0.5rem 0rem;
+}
+
+.news-card-edit-comment-container{
+    padding: 1rem;
 }
 
 .news-card-edit-comment-input{

@@ -70,8 +70,8 @@ class CommentForm extends React.Component {
 
         const field1 =
         <div className="news-card-edit-comment">
-            <div className="news-card-comment-user-pic"><img src={this.props.currentStudent.picture_url}></img></div>
             <textarea className="news-card-edit-comment-input" type="text" name="content" id="" value={this.state.content} onChange={this.handleChange}></textarea>
+            <button className="button green-button" type="submit"><i className="fas fa-paper-plane"></i></button>
         </div>
 
 
@@ -82,27 +82,20 @@ class CommentForm extends React.Component {
                 <select className="profil-select" name="club" id="id_club" required value={this.state.club} onChange={this.handleChange}>
                     {options}
                 </select>
-                <button className="button green-button" type="submit"><i class="fas fa-paper-plane"></i></button>
             </div>
 
             return (
-            <form method="post" onSubmit={this.handleSubmit.bind(this)}>
-                {field1}
+            <form className="news-card-edit-comment-container" method="post" onSubmit={this.handleSubmit.bind(this)}>
                 Publier en tant que :
                 {field2}
+                {field1}
                 <input type="hidden" name="post" value={this.state.post.id}></input>
             </form>
             );
         } else {
-            const field2 =
-            <div className="news-card-edit-comment">
-                <button className="button green-button" type="submit"><i className="fas fa-paper-plane"></i></button>
-            </div>
-
             return (
             <form method="post" onSubmit={this.handleSubmit.bind(this)}>
                 {field1}
-                {field2}
                 <input type="hidden" name="post" value={this.state.post.id}></input>
             </form>
             );
