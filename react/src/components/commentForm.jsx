@@ -59,7 +59,12 @@ class CommentForm extends React.Component {
         let options = []
         if (this.state.can_publish_as){
             for (const [key, value] of Object.entries(this.state.can_publish_as)) {
-                options.push(<option key={key} value={key}>{value}</option>);
+                if (value == "Élève") {
+                    // This is the option to publish as student
+                    options.push(<option selected="selected" key={key} value="">{value}</option>);
+                } else {
+                    options.push(<option key={key} value={key}>{value}</option>);
+                }
             }
         }
 
