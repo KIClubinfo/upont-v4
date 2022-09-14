@@ -188,7 +188,7 @@ class CreditAccount extends React.Component {
                 <p>Élève :</p>
                 <StudentsSearchBar parent={this}/>
                 <p></p>
-                <p>Montant à créditer (centimes) :</p>
+                <p>Montant à créditer :</p>
                 <InputMask mask="999,99 €" className="centered-div text-input white-input" type="text" placeholder="Montant" name="amount" id="" value={this.state.amount} onChange={this.handleChange}/>
                 <div className="centered-div"><button className="button green-button" type="submit">Créditer</button></div>
                 <p></p>
