@@ -78,7 +78,7 @@ class CommentForm extends React.Component {
         if (options.length > 1) {
             // The user is member of at least one club, he/she can choose to comment as a club
             const field2 =
-            <div className="news-card-edit-comment">
+            <div className="">
                 <select className="profil-select" name="club" id="id_club" required value={this.state.club} onChange={this.handleChange}>
                     {options}
                 </select>
@@ -86,7 +86,7 @@ class CommentForm extends React.Component {
 
             return (
             <form className="news-card-edit-comment-container" method="post" onSubmit={this.handleSubmit.bind(this)}>
-                Publier en tant que :
+                Commenter en tant que :
                 {field2}
                 {field1}
                 <input type="hidden" name="post" value={this.state.post.id}></input>

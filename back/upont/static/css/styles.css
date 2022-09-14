@@ -821,9 +821,9 @@ a.text-green:hover{
 }
 
 .profil-select{
-    width: 80%;
+    width: 100%;
     height: 2.5rem;
-    margin: 1rem auto;
+    margin-top: 0.5rem;
     padding: 0.5rem 1rem;
     font-size: 1rem;
     font-weight: 400;
