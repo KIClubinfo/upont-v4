@@ -47,6 +47,14 @@
                         {{EditPrice.price.errors}}
                         Prix (centimes) :<br>
                         {{EditPrice.price}}<br>
+                        <script>
+                            $(function () {
+                                $("#id_price").mask("000,00 \€", {
+                                    placeholder: "000,00 €",
+                                    reverse: true
+                                });
+                            });
+                        </script>
                     </div>
                     <div class="news-card-actions">
                         <div class="news-card-popularity">
