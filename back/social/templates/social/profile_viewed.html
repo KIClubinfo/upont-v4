@@ -70,6 +70,7 @@
                                         <img class="vignette-image-mini" src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
                                         <div class="vignette-mini-title">
                                             <span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span>
+                                            <br/>
                                             <span>{{membership.role.name}}</span>
                                             <a href="{% url 'social:club_detail' membership.club.id %}" class="stretched-link"></a>
                                         </div>

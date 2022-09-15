@@ -1061,7 +1061,7 @@ a.text-green:hover{
     min-height: 6rem;
     margin-left: auto;
     margin-right: auto;
-    width: 20rem;
+    width: 22rem;
     padding: 0.5rem;
     border-radius: 1rem;
     background: rgba(255, 255, 255, 0.05);
@@ -1071,7 +1071,7 @@ a.text-green:hover{
 
 @media(max-width:500px){
     .vignette-club-mini{
-        width: 17rem;
+        width: 20rem;
     }
 }
 
