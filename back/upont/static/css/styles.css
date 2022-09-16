@@ -1108,7 +1108,7 @@ a.text-green:hover{
 
 .news-card{
     margin: 1.5rem auto 1.5rem auto;
-    width: 32rem;
+    width: 40rem;
     min-height: 15rem;
 	background: rgba(255, 255, 255, 0.05);
 	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -1158,16 +1158,31 @@ a.text-green:hover{
     margin-bottom: 0.3rem;
 }
 
-.news-card-header-title{
+.news-card-header-date{
     font-family: 'Neue Helvetica Thin';
     font-weight: normal;
     font-size: 0.9rem;
+}
+
+.news-card-header-title{
+    font-family: 'Neue Helvetica Medium';
+    font-weight: normal;
+    font-size: 1.3rem;
 }
 
 .news-card-content{
     padding:1rem;
     border-bottom: 2px solid var(--primary-bg-color);
     word-wrap: break-word;
+}
+
+.news-card-poularity {
+    text-align: left;
+}
+
+.news-card-content-title {
+    text-align: center;
+    margin: 1rem;
 }
 
 .news-card-images{
@@ -1194,9 +1209,10 @@ a.text-green:hover{
     height: 4rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: right;
     padding: 0 1rem;
     border-bottom: 2px solid var(--primary-bg-color);
+    font-size: 1.3rem;
 }
 
 .news-card-buttons{

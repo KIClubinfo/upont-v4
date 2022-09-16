@@ -7,6 +7,14 @@ import {Comment} from './comment';
 import {CommentForm} from './commentForm';
 
 
+// auxilary functions
+function addZero(i) {
+    if (i < 10) {i = "0" + i}
+    return i;
+  }
+
+/////////////////////////////
+
 function post_logo(state) {
     if (state.post.club) {
         return (
@@ -42,16 +50,20 @@ function post_author(state) {
 }
 
 function post_title(state) {
-    if (state.post.event_url) {
+    return (
+        <span className="news-card-header-title">{state.post.title}</span>
+    )
+}
+
+function post_date(state) {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    var post_date = new Date(state.post.date);
+    let post_hour = addZero(post_date.getHours());
+    let post_minute = addZero(post_date.getMinutes());
+
         return (
-            <a href={state.post.event_url} className="news-card-header-title">{state.post.title}</a>
+            <span className="news-card-header-date">{post_date.toLocaleDateString("fr-FR", options)} - {post_hour}:{post_minute} </span>
         )
-    }
-    else {
-        return (
-            <span className="news-card-header-title">{state.post.title}</span>
-        )
-    }
 }
 
 function post_illustration(state) {
@@ -125,12 +137,12 @@ class Post extends React.Component {
     post_like_button() {
         if (this.state.post.user_liked) {
             return (
-                <a onClick={this.like} className="news-card-button"><i className="fas fa-heart"></i></a>
+                <a onClick={this.like} className=""><i className="fas fa-heart" style={{ color: 'red' }}></i></a>
             )
         }
         else {
             return (
-                <a onClick={this.like} className="news-card-button"><i className="far fa-heart"></i></a>
+                <a onClick={this.like} className=""><i className="far fa-heart"></i></a>
             )
         }
     }
@@ -176,26 +188,24 @@ class Post extends React.Component {
                         {post_logo(this.state)}
                         <div className="news-card-header-text">
                             {post_author(this.state)}
-                            {post_title(this.state)}
+                            {post_date(this.state)}
                         </div>
                     </div>
-
                     <div className="news-card-content">
-                        {this.edit_button()}
+                        <div className="news-card-content-title">
+                            {post_title(this.state)}
+                        </div>
                         <ReactMarkdown  remarkPlugins={[gfm,emoji]}>{this.state.post.content}</ReactMarkdown>
+                        {this.edit_button()}
                     </div>
 
                     {post_illustration(this.state)}
 
 
                     <div className="news-card-actions">
-                        <div className="news-card-buttons">
-                            {this.post_like_button()}
-                        </div>
-                        <div className="news-card-popularity">
-                            <span><i className="fas fa-heart" style={{ color: 'red' }}></i> {this.state.post.total_likes}</span>
-                            <span><i className="fas fa-comment" style={{ color: 'rgb(0, 153, 255)' }}></i> {this.state.post.total_comments}</span>
-                        </div>
+                        <span>{this.post_like_button()} {this.state.post.total_likes} </span>
+                        &ensp;
+                        <span><i className="fas fa-comment"></i> {this.state.post.total_comments}</span>
                     </div>
 
                     <div className="news-card-comments" style={{display: "block"}}>
