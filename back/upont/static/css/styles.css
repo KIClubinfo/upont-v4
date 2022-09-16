@@ -594,7 +594,7 @@ a.text-green:hover{
     font-size: 1rem;
     text-decoration: none;
     color: white;
-    border-radius: 0.5rem;  
+    border-radius: 0.5rem;
     background-color: rgba(255, 255, 255, 0.09);
     border-style: none;
     -webkit-user-select: none;
@@ -834,6 +834,20 @@ a.text-green:hover{
     /* Styling */
     background-color: var(--primary-bg-color);
     border: solid var(--border-color) var(--border-width);
+    color: white;
+    font-size: 1rem;
+    font-weight: 400;
+    text-align:center;
+    border-radius: 0.5rem;
+}
+
+.profil-upload{
+    /* Sizing */
+    margin: 1rem auto;
+    padding: 0.5rem 1rem;
+    height: 8 rem;
+    width: 80%;
+    /* Styling */
     color: white;
     font-size: 1rem;
     font-weight: 400;

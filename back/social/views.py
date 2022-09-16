@@ -250,10 +250,13 @@ def profile_edit(request):
             form = EditProfile(
                 request.POST,
                 request.FILES,
-                instance=Student.objects.get(user=request.user),
+                instance=student,
             )
             if form.is_valid():
                 form.save()
+                if not student.hasloggedin:
+                    student.hasloggedin = True
+                    student.save()
                 if "picture" in request.FILES:
                     student.picture.delete(save=False)
                 return redirect("social:profile")

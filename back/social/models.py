@@ -80,6 +80,8 @@ class Student(models.Model):
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
     )
 
+    hasloggedin = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         if self.picture:
             self.picture = compress_image(self.picture, 50, self.user.username)

@@ -5,7 +5,7 @@ from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from social.models import Promotion, Student
 
@@ -14,7 +14,12 @@ from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
 
 def root_redirect(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse(LOGIN_REDIRECT_URL))
+        user_id = request.user.id
+        student = get_object_or_404(Student, user__pk=user_id)
+        if student.hasloggedin:
+            return HttpResponseRedirect(reverse(LOGIN_REDIRECT_URL))
+        else:
+            return HttpResponseRedirect(reverse("social:profile_edit"))
     else:
         return HttpResponseRedirect(reverse(LOGIN_URL))
 
