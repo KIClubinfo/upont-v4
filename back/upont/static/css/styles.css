@@ -1118,7 +1118,7 @@ a.text-green:hover{
 	backdrop-filter: blur(10px);
 }
 
-@media(max-width:550px){
+@media(max-width:700px){
     .news-card{
         width: 100%;
     }
@@ -1149,6 +1149,18 @@ a.text-green:hover{
     margin-left: 1rem;
     display: flex;
     flex-direction: column;
+}
+
+.news-card-header-edit-button{
+    margin-left: auto;
+}
+
+@media(max-width:1175px){
+    /*TODO*/
+    .news-card-header-edit-button{
+        flex-direction: column;
+        margin-left: 0;
+    }
 }
 
 .news-card-header-name{

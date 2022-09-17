@@ -56,7 +56,7 @@ function post_title(state) {
 }
 
 function post_date(state) {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     var post_date = new Date(state.post.date);
     let post_hour = addZero(post_date.getHours());
     let post_minute = addZero(post_date.getMinutes());
@@ -170,13 +170,20 @@ class Post extends React.Component {
     edit_button() {
         if (this.state.post.can_edit) {
             return (
-                <div className="centered-div">
+                <div className="news-card-header-edit-button">
                     <a href={this.state.post.edit_url}><button className="button blue-button">Éditer</button></a>
                 </div>
             )
         }
-        else {
-            return <div></div>
+    }
+    
+    show_event_button() {
+        if (this.state.post.event_url) {
+            return (
+                <div className="centered-div">
+                    <a href={this.state.post.event_url}><button class="button green-button">Voir l'événement</button></a>
+                </div>
+            )
         }
     }
 
@@ -190,24 +197,21 @@ class Post extends React.Component {
                             {post_author(this.state)}
                             {post_date(this.state)}
                         </div>
+                        {this.edit_button()}
                     </div>
                     <div className="news-card-content">
                         <div className="news-card-content-title">
                             {post_title(this.state)}
                         </div>
                         <ReactMarkdown  remarkPlugins={[gfm,emoji]}>{this.state.post.content}</ReactMarkdown>
-                        {this.edit_button()}
+                        {this.show_event_button()}
                     </div>
-
                     {post_illustration(this.state)}
-
-
                     <div className="news-card-actions">
                         <span>{this.post_like_button()} {this.state.post.total_likes} </span>
                         &ensp;
                         <span><i className="fas fa-comment"></i> {this.state.post.total_comments}</span>
                     </div>
-
                     <div className="news-card-comments" style={{display: "block"}}>
                         {
                             this.state.post.comments.slice(0, this.state.numberOfCommentsShown).map(function f(comment) {
