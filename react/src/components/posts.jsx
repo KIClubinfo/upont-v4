@@ -171,7 +171,7 @@ class Post extends React.Component {
         if (this.state.post.can_edit) {
             return (
                 <div className="news-card-header-edit-button">
-                    <a href={this.state.post.edit_url}><button className="button blue-button">Éditer</button></a>
+                    <a href={this.state.post.edit_url}><i className="fas fa-edit"></i></a>
                 </div>
             )
         }

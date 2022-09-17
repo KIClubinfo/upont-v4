@@ -1155,14 +1155,6 @@ a.text-green:hover{
     margin-left: auto;
 }
 
-@media(max-width:1175px){
-    /*TODO*/
-    .news-card-header-edit-button{
-        flex-direction: column;
-        margin-left: 0;
-    }
-}
-
 .news-card-header-name{
     font-family: 'Neue Helvetica Medium';
     font-weight: normal;
