@@ -24,6 +24,14 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
             return True
         return False
 
+    author_url = serializers.SerializerMethodField()
+
+    def get_author_url(self, obj):
+        if obj.club:
+            return reverse("social:club_detail", args=(obj.club.pk,))
+        else:
+            return reverse("social:profile_viewed", args=(obj.author.user.pk,))
+
     class Meta:
         model = Comment
         fields = [
@@ -33,6 +41,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
             "date",
             "content",
             "is_my_comment",
+            "author_url",
             "id",
         ]
 

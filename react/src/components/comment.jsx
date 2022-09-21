@@ -1,5 +1,12 @@
 import React from 'react';
 
+// auxilary functions
+function addZero(i) {
+    if (i < 10) {i = "0" + i}
+    return i;
+  }
+
+/////////////////////////////
 
 function comment_logo(state) {
     if (state.comment.club) {
@@ -19,17 +26,37 @@ function comment_logo(state) {
 }
 
 function comment_content(state) {
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    var comment_date = new Date(state.comment.date);
+    let comment_hour = addZero(comment_date.getHours());
+    let comment_minute = addZero(comment_date.getMinutes());
     if (state.comment.club) {
         return (
             <div className="news-card-comment-box">
-                <span className="text-bold">{state.comment.club.name}</span><br></br>{state.comment.content}
+                <a className="text-bold" href={state.comment.author_url}>
+                    {state.comment.club.name}
+                </a>
+                <br/>
+                <span className="news-card-header-date">
+                    {comment_date.toLocaleDateString("fr-FR", options)} - {comment_hour}:{comment_minute}
+                </span>
+                <br/><br/>
+                {state.comment.content}
             </div>
         )
     }
     else {
         return (
             <div className="news-card-comment-box">
-                <span className="text-bold">{state.comment.author.user.first_name} {state.comment.author.user.last_name}</span><br></br>{state.comment.content}
+                <a className="text-bold" href={state.comment.author_url}>
+                    {state.comment.author.user.first_name} {state.comment.author.user.last_name}
+                </a>
+                <br/>
+                <span className="news-card-header-date">
+                    {comment_date.toLocaleDateString("fr-FR", options)} - {comment_hour}:{comment_minute}
+                </span>
+                <br/><br/>
+                {state.comment.content}
             </div>
         )
     }
