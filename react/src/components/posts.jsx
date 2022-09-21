@@ -160,10 +160,10 @@ class Post extends React.Component {
             return <div></div>;
         }
         else if (this.state.numberOfCommentsShown < this.state.post.comments.length) {
-            return <div style={{textAlign: "center"}}><a onClick={this.show_more}>Voir plus de commentaires</a></div>;
+            return <div className="news-card-edit-comment-container" style={{textAlign: "center"}}><a href="javascript:void(0)" onClick={this.show_more}>Voir plus de commentaires</a></div>;
         }
         else {
-            return <div style={{textAlign: "center"}}><a onClick={this.show_less}>Voir moins de commentaires</a></div>;
+            return <div className="news-card-edit-comment-container" style={{textAlign: "center"}}><a href="javascript:void(0)" onClick={this.show_less}>Voir moins de commentaires</a></div>;
         }
     }
 
@@ -212,7 +212,7 @@ class Post extends React.Component {
                         &ensp;
                         <span><i className="fas fa-comment"></i> {this.state.post.total_comments}</span>
                     </div>
-                    <div className="news-card-comments" style={{display: "block"}}>
+                    <div  style={{display: "block"}}>
                         {
                             this.state.post.comments.slice(0, this.state.numberOfCommentsShown).map(function f(comment) {
                                 return <Comment comment={comment} key={comment.id} refreshPost={this.refresh}/>
