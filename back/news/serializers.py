@@ -133,6 +133,11 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             return True
         return False
 
+    user_author_url = serializers.SerializerMethodField()
+
+    def get_user_author_url(self, obj):
+        return reverse("social:profile_viewed", args=(obj.author.user.pk,))
+
     class Meta:
         model = Post
         fields = [
@@ -153,4 +158,5 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "comments",
             "id",
             "can_edit",
+            "user_author_url",
         ]

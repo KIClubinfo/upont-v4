@@ -30,7 +30,29 @@ function comment_content(state) {
     var comment_date = new Date(state.comment.date);
     let comment_hour = addZero(comment_date.getHours());
     let comment_minute = addZero(comment_date.getMinutes());
-    if (state.comment.club) {
+    if (state.comment.club && state.comment.is_my_comment) {
+        return (
+            <div className="news-card-comment-box">
+                <a className="text-bold" href={state.comment.author_url}>
+                    {state.comment.club.name}
+                </a>
+                <br/>
+                <span className="news-card-header-date">
+                    Posté par&nbsp;
+                    <a href={state.comment.user_author_url}>
+                        {state.comment.author.user.first_name} {state.comment.author.user.last_name}
+                    </a>
+                </span>
+                <br/>
+                <span className="news-card-header-date">
+                    {comment_date.toLocaleDateString("fr-FR", options)} - {comment_hour}:{comment_minute}
+                </span>
+                <br/><br/>
+                {state.comment.content}
+            </div>
+        )
+    }
+    else if (state.comment.club) {
         return (
             <div className="news-card-comment-box">
                 <a className="text-bold" href={state.comment.author_url}>

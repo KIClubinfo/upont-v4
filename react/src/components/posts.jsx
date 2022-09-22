@@ -66,6 +66,19 @@ function post_date(state) {
         )
 }
 
+function post_club_author(state) {
+    if (state.post.club && state.post.can_edit) {
+        return (
+            <span className="news-card-header-date">
+                Posté par&nbsp;
+                <a href={state.post.user_author_url}>
+                    {state.post.author.user.first_name} {state.post.author.user.last_name}
+                </a>
+            </span>
+        )
+    }
+}
+
 function post_illustration(state) {
     if (state.post.illustration_url) {
         return (
@@ -195,6 +208,7 @@ class Post extends React.Component {
                         {post_logo(this.state)}
                         <div className="news-card-header-text">
                             {post_author(this.state)}
+                            {post_club_author(this.state)}
                             {post_date(this.state)}
                         </div>
                         {this.edit_button()}

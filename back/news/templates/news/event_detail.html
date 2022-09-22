@@ -116,6 +116,13 @@
                                             <a class="news-card-header-name" href="{% url 'social:club_detail' post.club.pk %}">
                                                 {{post.club.name}}
                                             </a>
+                                            {% if is_member %}
+                                            <span class="news-card-header-date">
+                                                Publié par <a href="{% url 'social:profile_viewed' post.author.user.pk %}">
+                                                    {{post.author.user.first_name}} {{post.author.user.last_name}}
+                                                </a>
+                                            </span>
+                                            {% endif %}
                                         {%else%}
                                             <a class="news-card-header-name" href="{% url 'social:profile_viewed' post.author.user.pk %}">
                                                 {{post.author.user.first_name}} {{post.author.user.last_name}}
@@ -198,6 +205,7 @@
                                         <div class="user-information">
                                             <span class="user-name">{{participant.user.first_name}} {{participant.user.last_name}}</span>
                                         </div>
+                                        <a href="{% url 'social:profile_viewed' participant.user.pk  %}" class="stretched-link"></a>
                                     </div>
                                 </div>
                             {% endfor %}
