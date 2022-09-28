@@ -568,14 +568,13 @@ a.text-green:hover{
     /* Sizing */
     margin: 0 auto;
     padding: 0.5rem 1rem;
-    width: 80%;
+    width: 90%;
     /* Styling */
     background-color: var(--primary-bg-color);
     border: solid var(--border-color) var(--border-width);
     color: white;
     font-size: 1rem;
     font-weight: 400;
-    text-align:center;
     border-radius: 0.5rem;
 }
 
@@ -864,9 +863,9 @@ a.text-green:hover{
 }
 
 .profil-select{
-    width: 100%;
+    width: 80%;
     height: 2.5rem;
-    margin-top: 0.5rem;
+    margin: 1rem auto 1.4rem;
     padding: 0.5rem 1rem;
     font-size: 1rem;
     font-weight: 400;
