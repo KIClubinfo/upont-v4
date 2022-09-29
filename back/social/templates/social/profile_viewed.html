@@ -1,6 +1,6 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Nom du profil" %}
+{% include "header.html" with title=complete_name %}
 
 <!--Body-->
 <body>
@@ -38,7 +38,7 @@
                     <div class="box profil-box">
 
                         <div class="profil-image">
-                            <img src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
+                            <img class="image-centered" src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
                         </div>
                         <h5 class="section-title">{{student.user.first_name}} {{student.user.last_name}}</h5>
                         {% if student.phone_number is not None %}
@@ -71,6 +71,7 @@
                                         <div class="vignette-mini-title">
                                             <span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}({{membership.club.nickname}}){% endif %}</span>
                                             <span>{{membership.role.name}}</span>
+                                            <a href="{% url 'social:club_detail' membership.club.id %}" class="stretched-link"></a>
                                         </div>
                                     </div>
 

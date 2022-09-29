@@ -17,9 +17,12 @@ urlpatterns = [
     ),
     path("post/<int:post_id>/edit", views.post_edit, name="post_edit"),
     path("post/create", views.post_create, name="post_create"),
+    path(
+        "post/create/<int:event_id>", views.post_create, name="post_create_with_origin"
+    ),
     path("post/<int:post_id>/<str:action>", views.post_like, name="post_like"),
     path(
-        "comment/delete/<int:comment_id>/<int:post_id>",
+        "comment/delete/<int:comment_id>/",
         views.delete_comment,
         name="comment_delete",
     ),

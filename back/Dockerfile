@@ -37,7 +37,7 @@ FROM python-base as builder-base
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         # deps for installing poetry
-        curl=7.74.0-1.3+deb11u1 \
+        curl=7.74.0-1.3+deb11u3 \
         # deps for building python deps
         build-essential=12.9 \
     && rm -rf /var/lib/apt/lists/*
@@ -68,6 +68,9 @@ RUN poetry install
 
 WORKDIR /src
 COPY . .
+# to give the webinstaller service access to this folder
+RUN mkdir -p /src/upont/static/react \
+    && chmod 777 /src/upont/static/react
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
@@ -96,11 +99,15 @@ RUN poetry install
 
 WORKDIR /src
 COPY . .
+# to give the webinstaller service access to this folder
+RUN mkdir -p /src/upont/static/react \
+    && chmod 777 /src/upont/static/react
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         # for checking when db is up
         netcat=1.10-46 \
+        iputils-ping=3:20210202-1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./entrypoint.dev.sh .

@@ -29,13 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=False)
 
-ALLOWED_HOSTS = [
-    "upont.enpc.org",
-    "upont-dev.enpc.org",
-    "localhost",
-    "127.0.0.1",
-    "back",
-]
+if DEBUG:
+    ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1",
+        "back",
+    ]
+else:
+    ALLOWED_HOSTS = [env("DOMAIN_NAME", default="upont.enpc.org")]
 
 if DEBUG:
     # SECURITY WARNING: keep the secret key used in production secret!
@@ -49,24 +50,37 @@ else:
 
 # Application definition
 
-INSTALLED_APPS = [
-    "news.apps.NewsConfig",
-    "pochtron.apps.PochtronConfig",
-    "social.apps.SocialConfig",
-    "trade.apps.TradeConfig",
+CORE_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "tellme",
     "django.contrib.postgres",
-    "django_cas_ng",
-    "markdownify.apps.MarkdownifyConfig",
 ]
 
+THIRD_PARTY_APPS = [
+    "tellme",
+    "django_cas_ng",
+    "markdownify.apps.MarkdownifyConfig",
+    "rest_framework",
+    "corsheaders",
+    "django_reverse_js",
+]
+
+PROJECT_APPS = [
+    "news.apps.NewsConfig",
+    "pochtron.apps.PochtronConfig",
+    "social.apps.SocialConfig",
+    "trade.apps.TradeConfig",
+]
+
+INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + PROJECT_APPS
+
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -160,11 +174,28 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+REMOTE_STATIC_STORAGE = env("REMOTE_STATIC_STORAGE", default=False)
+
+if REMOTE_STATIC_STORAGE:
+    REMOTE_STATIC_URL = env("REMOTE_STATIC_URL", default="/static")
+    FTP_STORAGE_LOCATION = env("FTP_STORAGE_LOCATION")
+    ENCODING = "utf-8"
+    STATICFILES_STORAGE = "upont.storage.StaticStorage"
+    STATIC_URL = REMOTE_STATIC_URL + "/"
+else:
+    STATIC_URL = "/static/"
+
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "upont/static"),
 ]
+
+# Allowed origins for Cross-Origin Ressource Sharing
+CORS_ALLOWED_ORIGINS = []
+if REMOTE_STATIC_STORAGE:
+    CORS_ALLOWED_ORIGINS += [
+        REMOTE_STATIC_URL,
+    ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -226,6 +257,7 @@ CAS_CHECK_NEXT = False
 CAS_REDIRECT_URL = "/"
 CAS_ADMIN_PREFIX = "admin/"
 
+# Markdown
 MARKDOWNIFY = {
     "default": {
         "MARKDOWN_EXTENSIONS": [
@@ -267,4 +299,17 @@ MARKDOWNIFY = {
             "text-decoration",
         ],
     }
+}
+
+# django_rest_framework
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }

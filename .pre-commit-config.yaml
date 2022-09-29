@@ -1,8 +1,10 @@
+---
 repos:
   - repo: https://github.com/ambv/black
-    rev: 21.12b0
+    rev: 22.3.0
     hooks:
       - id: black
+        additional_dependencies: ["click<8.1.0"]
         args:
           - --line-length=88
   - repo: https://github.com/pycqa/isort
@@ -38,3 +40,7 @@ repos:
         language: docker_image
         types: ["dockerfile"]
         entry: hadolint/hadolint:v2.8.0 hadolint
+  - repo: https://github.com/standard/standard
+    rev: v17.0.0-2
+    hooks:
+      - id: standard

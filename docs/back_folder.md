@@ -12,12 +12,12 @@ Pour ajouter un nouveau package il faut :
 
 Entrer dans le container :
 ```
-$ docker-compose exec back /bin/sh
+docker-compose exec back /bin/sh
 ```
 
 Installer le nouveau package **avec poetry** :
 ```
-$ poetry add "package~1.2.3"
+poetry add "package~1.2.3"
 ```
 En général il faut éviter de spécifier une version exacte car cela peut rendre impossible la résolution des dépendances.
 

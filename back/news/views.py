@@ -1,95 +1,60 @@
-from datetime import datetime
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework import viewsets
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
+from .serializers import PostSerializer
 
 
 @login_required
 def posts(request):
-    """
-    Fetches posts with associated empty forms to publish comments, as well as the user's posts and comments.
-    If invoked with POST request, validates the form's data and creates the corresponding comment.
-    """
-    student = get_object_or_404(Student, user__id=request.user.id)
-
     if request.method == "GET":
-        all_posts_list = Post.objects.order_by("-date")
+        return render(request, "news/posts.html")
 
-        membership_club_list = Membership.objects.filter(student__pk=student.id)
-        my_posts = Post.objects.filter(author__pk=student.id, club=None)
-        for membership in membership_club_list:
-            my_posts |= Post.objects.filter(club=membership.club)
-
-        all_posts_and_forms = [
-            (post, CommentForm(post.id, student.user.id)) for post in all_posts_list
-        ]
-
-        my_comments = Comment.objects.filter(author__pk=student.id, club=None)
-        for membership in membership_club_list:
-            my_comments |= Comment.objects.filter(club=membership.club)
-
-        context = {
-            "all_posts_and_forms": all_posts_and_forms,
-            "my_posts": my_posts,
-            "my_comments": my_comments,
-        }
-        return render(request, "news/posts.html", context)
-
-    if request.method == "POST":
-        commented_post_id = request.POST.get("post")
+    elif request.method == "POST":
+        student = get_object_or_404(Student, user__id=request.user.id)
+        data = json.loads(request.body.decode("utf-8"))
+        commented_post_id = data["post"]
         commented_post = get_object_or_404(Post, id=commented_post_id)
-        filled_form = CommentForm(commented_post_id, student.user.id, data=request.POST)
+        filled_form = CommentForm(commented_post_id, student.user.id, data=data)
 
         if filled_form.is_valid():
             new_comment = filled_form.save(commit=False)
             new_comment.post = commented_post
-            new_comment.author = request.user.student
+            new_comment.author = student
             new_comment.date = timezone.now()
             new_comment.save()
-            return redirect(reverse("news:posts") + f"#{commented_post_id}")
+            return HttpResponse(status=201)
+        return HttpResponse(status=500)
 
-        else:
-            all_posts_list = Post.objects.order_by("-date")
 
-            membership_club_list = Membership.objects.filter(student__pk=student.id)
-            my_posts = Post.objects.filter(author__pk=student.id, club=None)
-            for membership in membership_club_list:
-                my_posts |= Post.objects.filter(club=membership.club)
+class PostViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows posts to be viewed.
+    """
 
-            all_posts_and_forms = [
-                (post, CommentForm(post.id, student.user.id)) for post in all_posts_list
-            ]
-            commented_post_index = 0
-            for index, post in enumerate(all_posts_list):
-                if post.id == commented_post_id:
-                    commented_post_index = index + 1
-                    break
-            all_posts_and_forms[commented_post_index] = (commented_post, filled_form)
-
-            my_comments = Comment.objects.filter(author__pk=student.id, club=None)
-            for membership in membership_club_list:
-                my_comments |= Comment.objects.filter(club=membership.club)
-
-            context = {
-                "all_posts_and_forms": all_posts_and_forms,
-                "my_posts": my_posts,
-                "my_comments": my_comments,
-            }
-            return render(request, "news/posts.html", context)
+    queryset = Post.objects.all().order_by("-date", "title")
+    serializer_class = PostSerializer
+    http_method_names = ["get"]
 
 
 @login_required
 def events(request):
+    student = get_object_or_404(Student, user__id=request.user.id)
     all_events_list = Event.objects.order_by("-date")
-    context = {"all_events_list": all_events_list}
+    is_member = Membership.objects.filter(student=student).exists()
+    context = {
+        "all_events_list": all_events_list,
+        "is_member": is_member
+        }
     return render(request, "news/events.html", context)
 
 
@@ -141,6 +106,7 @@ def event_edit(request, event_id):
         form = EditEvent(request.user.id, instance=event)
     context["EditEvent"] = form
     context["event"] = event
+    context["Edit"] = True
     return render(request, "news/event_edit.html", context)
 
 
@@ -190,7 +156,7 @@ def post_edit(request, post_id):
     if request.method == "POST":
         if "Supprimer" in request.POST:
             post.delete()
-            return redirect("news:posts")
+            return HttpResponseRedirect(request.session["origin"])
         elif "Valider" in request.POST:
             form = EditPost(
                 request.user.id,
@@ -202,18 +168,19 @@ def post_edit(request, post_id):
                 if "illustration" in request.FILES:
                     post.illustration.delete()
                 form.save()
-                return redirect("news:posts")
+                return HttpResponseRedirect(request.session["origin"])
 
     else:
         form = EditPost(request.user.id, instance=post)
     context["EditPost"] = form
     context["post"] = post
     context["Edit"] = True
+    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     return render(request, "news/post_edit.html", context)
 
 
 @login_required
-def post_create(request):
+def post_create(request, event_id=None):
     context = {}
     if request.method == "POST":
         if "Valider" in request.POST:
@@ -225,11 +192,14 @@ def post_create(request):
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = Student.objects.get(user__id=request.user.id)
-                post.date = datetime.now()
+                post.date = timezone.now()
                 post.save()
-                return redirect("news:posts")
+                return HttpResponseRedirect(request.session["origin"])
     else:
         form = EditPost(request.user.id)
+        if event_id is not None:
+            form.fields["event"].initial = get_object_or_404(Event, id=event_id)
+    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     context["EditPost"] = form
     context["Edit"] = False
     return render(request, "news/post_edit.html", context)
@@ -243,17 +213,21 @@ def post_like(request, post_id, action):
         post.likes.remove(student)
     elif action == "Like":
         post.likes.add(student)
-    return redirect("news:posts")
+    else:
+        return HttpResponse(status=500)
+    return HttpResponse(status=200)
 
 
 @login_required
-def delete_comment(request, comment_id, post_id):
+def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     student = get_object_or_404(Student, user__id=request.user.id)
     student_clubs = student.clubs.all()
     if comment.author.pk == student.pk or (comment.club in student_clubs):
         comment.delete()
-    return redirect(reverse("news:posts") + f"#{post_id}")
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=403)
 
 
 @login_required
@@ -422,7 +396,7 @@ def new_shotgun(request):
             "has_clubs_admins": len(clubs) > 0,
             "form": form,
         }
-        return render(request, "news/shotgun_new.html", context)
+        return render(request, "news/shotgun_edit.html", context)
 
     if request.method == "POST":
         form = AddShotgun(
@@ -469,6 +443,7 @@ def edit_shotgun(request, shotgun_id):
             context = {
                 "shotgun": shotgun,
                 "form": form,
+                "edit": True,
             }
             return render(request, "news/shotgun_edit.html", context)
 

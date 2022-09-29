@@ -1,0 +1,80 @@
+
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Pochtron" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+                <div class="col" align="right">
+                    <a href="{% url 'pochtron:admin' %}"><button class="button blue-button">Retourner sur la page d'administration</button></a>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+
+            <!--Row-->
+            <div class="row">
+                <!--Col-->
+                <div class="col">
+                    <h1>Admins de Pochtron :</h1>
+                </div><!--End of Col-->
+
+                <!--Col-->
+                <div class="col" align="right">
+                    <a href={% url 'pochtron:admin_create' %}><button class="button blue-button">Ajouter un nouvel admin</button></a>
+                </div><!--End of Col-->
+
+            </div><!--End of Row-->
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Élèves</td>
+                        <td>Peut créer/modifier les consommations</td>
+                        <td>Peut ajouter des transactions</td>
+                        <td>Peut créditer les comptes</td>
+                        <td>Peut gérer les administrateurs</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for admin in admins %}
+                        <tr style="vertical-align: middle">
+                            <td>{{admin.student.user.first_name}} {{admin.student.user.last_name}}</td>
+                            <td>{{ admin.manage_goods|yesno }}</td>
+                            <td>{{ admin.manage_transactions|yesno }}</td>
+                            <td>{{ admin.manage_credits|yesno }}</td>
+                            <td>{{ admin.manage_admins|yesno }}</td>
+                            <td>
+                                <a href={% url 'pochtron:admin_edit' admin.pk %} ><button class="button blue-button">Modifier</button></a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <!--Normally this cannot happend-->
+                        <th colspan="5" style="text-align: center">Aucun administrateurs</th>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+</body>
+</html>

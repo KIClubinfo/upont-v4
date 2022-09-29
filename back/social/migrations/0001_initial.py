@@ -45,9 +45,7 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(default="Club", max_length=50)),
                 (
                     "nickname",
-                    models.CharField(
-                        blank=True, default="Club", max_length=10, null=True
-                    ),
+                    models.CharField(blank=True, default="", max_length=10, null=True),
                 ),
                 ("logo", models.ImageField(blank=True, null=True, upload_to="logos")),
                 (

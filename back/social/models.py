@@ -7,6 +7,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
+from trade.models import Transaction
 from unidecode import unidecode
 
 
@@ -87,6 +88,22 @@ class Student(models.Model):
     def __str__(self):
         return self.user.username
 
+    def balance_in_cents(self, club=None):
+        if club is None:
+            transactions = Transaction.objects.filter(student=self)
+        else:
+            transactions = Transaction.objects.filter(student=self).filter(
+                good__club=club
+            )
+
+        balance = 0
+        for transaction in transactions:
+            balance += transaction.balance_change_for_student()
+        return balance
+
+    def balance_in_euros(self, club=None):
+        return self.balance_in_cents(club) / 100
+
 
 class Category(models.Model):
     name = models.CharField(max_length=30)
@@ -97,7 +114,7 @@ class Category(models.Model):
 
 class Club(models.Model):
     name = models.CharField(max_length=50, default="Club")
-    nickname = models.CharField(max_length=10, default="Club", null=True, blank=True)
+    nickname = models.CharField(max_length=10, default="", null=True, blank=True)
     logo = models.ImageField(upload_to="logos/", null=True, blank=True)
     background_picture = models.ImageField(
         upload_to="background_pictures/", null=True, blank=True
@@ -140,6 +157,16 @@ class Club(models.Model):
         if len(membership) > 0 and membership[0].is_admin:
             return True
         return False
+
+    def balance_in_cents(self):
+        transactions = Transaction.objects.filter(good__club=self)
+        balance = 0
+        for transaction in transactions:
+            balance += transaction.balance_change_for_club()
+        return balance
+
+    def balance_in_euros(self):
+        return self.balance_in_cents() / 100
 
 
 class Membership(models.Model):

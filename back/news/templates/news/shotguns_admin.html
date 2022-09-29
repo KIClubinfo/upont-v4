@@ -28,10 +28,10 @@
         <!--Main Content-->
         <div class="content-main">
 
-            <h3 class="page-title">Administration des shotguns</h3>
-
             {% for club_and_shotguns in clubs_and_shotguns %}
-                <h2>{{club_and_shotguns.club}}</h2>
+
+                <h3 class="page-title">Administration des shotguns crées par {{club_and_shotguns.club}}</h3>
+
                 {% for shotgun in club_and_shotguns.shotguns %}
                     <!--Box-->
                     <div class="box small-box">
@@ -51,6 +51,9 @@
                     </div><!--End of Box-->
                 {% endfor %}
             {% empty %}
+
+                <h3 class="page-title">Administration des shotguns crées par {{club_and_shotguns.club}}</h3>
+
                 <!--Box-->
                 <div class="box small-box">
                     <h5 class="section-title">Tu n'as aucun shotgun à administrer !</h5>

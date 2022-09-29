@@ -77,13 +77,15 @@ body{
     /* Sizing */
     padding-top: 1rem;
     padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     /* Styling */
     text-decoration: none;
     text-align: center;
     font-size: 1.5rem;
     color: var(--disabled-link-color);
     /* Animating */
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .sidenav-link.active{
@@ -96,7 +98,10 @@ body{
         /* Styling*/
         color: var(--hover-link-color);
         /* Animating */
-        transform: scale(1.2);
+        transform: scale(1.1);
+    }
+    .sidenav-link{
+        text-align: left;
     }
 }
 
@@ -113,6 +118,15 @@ img.logo{
     /* Sizing */
     height: 3rem;
     width: 3rem;
+}
+
+img.logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        height: 3rem;
+        width: 3rem;
 }
 
 .toggle{
@@ -194,6 +208,24 @@ img.logo{
         width: 2rem;
     }
 
+    img.logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0rem;
+        padding-right: 0rem;
+        height: 0rem;
+        width: 0rem;
+    }
+
+    img.show-logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        height: 3rem;
+        width: 3rem;
+    }
+
     .toggle{
         /* Positioning */
         display: block;
@@ -256,7 +288,7 @@ img.logo{
     align-items: center;
     /* Sizing */
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     /* Z-Positioning */
     z-index: 1;
     /* Styling */
@@ -552,18 +584,23 @@ a.text-green:hover{
 }
 
 .button{
+    display: inline-block;
     cursor: pointer;
     /* Sizing */
-    padding: 1rem 1.2rem;
+    padding: 0.75rem 1.5rem;
     /* Styling */
-    font-family:'Neue Helvetica Light';
+    font-family:'Neue Helvetica Bold';
     font-style: normal;
     font-size: 1rem;
     text-decoration: none;
     color: white;
-    border-radius: 0.5rem;
+    border-radius: 0.5rem;  
     background-color: rgba(255, 255, 255, 0.09);
     border-style: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .blue-button{
@@ -593,6 +630,11 @@ a.text-green:hover{
     background-color: #008a22;
 }
 
+.disabled-button{
+    background-color: #212227;
+    margin:1rem;
+}
+
 .search-button{
     /* Sizing */
     margin-left: -3.2rem;
@@ -601,6 +643,12 @@ a.text-green:hover{
     border-radius: 0rem;
     background-color: rgba(255, 255, 255, 0);
     border-left: solid var(--border-color) var(--border-width);
+}
+
+.logo-button {
+    vertical-align: middle;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
 .search-input-group {
@@ -666,6 +714,10 @@ a.text-green:hover{
     border-bottom: solid var(--border-color) var(--border-width);
 }
 
+.image-centered{
+    height: 100%;
+}
+
 /*-------------------------------------------------*/
 /*-------------------- USER CARD ------------------*//*      A REVOIR      */
 /*-------------------------------------------------*/
@@ -686,10 +738,15 @@ a.text-green:hover{
 .user-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     height: 90px;
     width: 90px;
+    margin-left: auto;
+    margin-right: auto;
     /* Styling */
+    background-color: var(--primary-bg-color);
+    border: solid 2px rgba(255, 255, 255, 0.05);
     border-radius: 50%;
     overflow: hidden;
 }
@@ -735,6 +792,7 @@ a.text-green:hover{
 .profil-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     margin-top: -141px;
     margin-left: auto;
@@ -743,6 +801,7 @@ a.text-green:hover{
     width: 250px;
     /* Styling */
     border: 8px solid var(--primary-bg-color);
+    background-color: var(--primary-bg-color);
     border-radius: 50%;
     overflow: hidden;
 }
@@ -805,9 +864,9 @@ a.text-green:hover{
 }
 
 .profil-select{
-    width: 80%;
+    width: 100%;
     height: 2.5rem;
-    margin: 1rem auto;
+    margin-top: 0.5rem;
     padding: 0.5rem 1rem;
     font-size: 1rem;
     font-weight: 400;
@@ -840,7 +899,7 @@ a.text-green:hover{
     display: flex;
     flex-direction: column;
     color: white;
-    padding: 0rem 7rem;
+    padding: 0rem 5rem;
     border-radius: 0.5rem;
     background-color: hsla(0, 0%, 100%, 0.05);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -857,9 +916,8 @@ a.text-green:hover{
 .club-group-image-container{
     margin-top: -10rem;
     background: var(--primary-bg-color);
-    border: solid hsla(0, 0%, 100%, 0.05) 4px;
     border-radius: 0.5rem;
-    height: 60vh;
+    max-height: 60vh;
     overflow: hidden;
 }
 
@@ -872,6 +930,7 @@ a.text-green:hover{
 .club-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     margin-top: -6rem;
     margin-left: auto;
@@ -879,7 +938,7 @@ a.text-green:hover{
     height: 14rem;
     width: 14rem;
     /* Styling */
-    background-color: #26272b;
+    background-color: var(--primary-bg-color);
     border: 8px solid var(--primary-bg-color);
     border-radius: 50%;
     overflow: hidden;
@@ -896,25 +955,6 @@ a.text-green:hover{
     font-size: 1.5rem;
 
     border-bottom: solid var(--border-color) var(--border-width);
-}
-
-.club-description-content{
-    margin: 1rem 3rem;
-}
-
-.club-description-title{
-    text-decoration: underline;
-    text-align: left;
-    font-style: normal;
-    font-size: 1rem;
-}
-
-.club-description{
-    font-family:'Neue Helvetica Ultra Light';
-    font-weight:normal;
-    margin: 1rem 0rem;
-    text-align: justify;
-    font-size: 1rem;
 }
 
 @media(max-width:440px){
@@ -964,16 +1004,25 @@ a.text-green:hover{
 }
 
 .club-card .club-card-content {
+    transform: translateY(-40px);
 	transition: 0.5s;
 }
 
-.club-card:hover .club-card-content {
-	transform: translateY(-50px);
+@media(min-width:1200px){
+    .club-card .club-card-content {
+        transform: translateY(0px);
+        transition: 0.5s;
+    }
+
+    .club-card:hover .club-card-content {
+        transform: translateY(-40px);
+    }
 }
 
 .club-card .club-card-content .club-card-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     margin: 1rem auto;
     height: 11rem;
@@ -990,14 +1039,19 @@ a.text-green:hover{
     text-align: center;
 	bottom: 50px;
 	display: flex;
-	transform: translateY(40px);
-	transition: 0.5s;
-	opacity: 0;
 }
 
-.club-card:hover .club-card-title{
-	transform: translateY(0px);
-	opacity: 1;
+@media(min-width:1200px){
+    .club-card .club-card-title {
+        transform: translateY(40px);
+	    transition: 0.5s;
+	    opacity: 0;
+    }
+
+    .club-card:hover .club-card-title{
+        transform: translateY(0px);
+        opacity: 1;
+    }
 }
 
 .vignette-club-mini{
@@ -1024,6 +1078,7 @@ a.text-green:hover{
 .vignette-club-mini .vignette-image-mini{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     height: 5rem;
     width: 5rem;
@@ -1080,10 +1135,12 @@ a.text-green:hover{
 .news-card-header-image{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     height: 4rem;
     width: 4rem;
     /* Styling */
+    border: 2px solid var(--primary-bg-color);
     border-radius: 50%;
     overflow: hidden;
 }
@@ -1149,22 +1206,25 @@ a.text-green:hover{
 }
 
 .news-card-button{
-    font-size: 1.8rem;
-    margin: 0 0.5rem;
+    font-size: 1rem;
+    margin: 0 0rem;
 }
 
 .news-card-comments{
     min-height: 6rem;
     padding: 0 1rem;
+    background-color: #3a3b3f;
 }
 
 .news-card-comment-user-pic{
     /* Positioning */
     display: flex;
+    justify-content: center;
     /* Sizing */
     height: 3rem;
     width: 3rem;
     /* Styling */
+    border: 1px solid var(--primary-bg-color);
     border-radius: 50%;
     overflow: hidden;
 }
@@ -1181,7 +1241,7 @@ a.text-green:hover{
     padding: 0.5rem 1rem;
     width: 65%;
     /* Styling */
-    background-color: transparent;
+    background-color: var(--primary-bg-color);
     border: solid var(--border-color) var(--border-width);
     color: white;
     font-size: 1rem;
@@ -1192,8 +1252,12 @@ a.text-green:hover{
 
 .news-card-edit-comment{
     display: flex;
-    justify-content: left;
-    padding: 1rem 0rem;
+    justify-content: center;
+    padding: 0.5rem 0rem;
+}
+
+.news-card-edit-comment-container{
+    padding: 1rem;
 }
 
 .news-card-edit-comment-input{
@@ -1264,4 +1328,15 @@ a.text-green:hover{
 
 .news-nav a:hover{
     color: #39cbfb;
+}
+
+/*-------------------------------------------------*/
+/*--------------------- POCHTRON ------------------*/
+/*-------------------------------------------------*/
+
+.white-input{
+    background-color: white;
+    color: black;
+    text-align: left;
+    font-family:'Neue Helvetica Light';
 }

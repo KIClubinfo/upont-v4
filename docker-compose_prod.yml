@@ -5,11 +5,14 @@ services:
     image: postgres
     volumes:
       - ./database:/var/lib/postgresql/data
+      - ./backups:/backups
     restart: always
     environment:
       POSTGRES_DB: $DB_NAME
       POSTGRES_USER: $DB_USER
       POSTGRES_PASSWORD: $DB_PASSWORD
+    networks:
+      - db_link
   back:
     build:
       context: back
@@ -17,14 +20,15 @@ services:
       target: production
     command: gunicorn upont.wsgi:application --bind 0.0.0.0:8000
     expose:
-    - 8000
+      - 8000
     depends_on:
       - db
-    links:
-      - db
+      - webinstaller
     volumes:
       - static_volume:/src/static
       - media_volume:/src/media
+      - bundles:/src/upont/static/react
+      - ./backups:/backups
     restart: always
     environment:
       DB_HOST: $DB_HOST
@@ -37,8 +41,16 @@ services:
       DEFAULT_FROM_EMAIL: $DEFAULT_FROM_EMAIL
       SECRET_KEY: $SECRET_KEY
       DEBUG: $DEBUG
+      DOMAIN_NAME: $DOMAIN_NAME
       GUNICORN_NB_WORKERS: $GUNICORN_NB_WORKERS
       SECURE_SSL_REDIRECT: $SECURE_SSL_REDIRECT
+      REMOTE_STATIC_STORAGE: $REMOTE_STATIC_STORAGE
+      FTP_STORAGE_LOCATION: $FTP_STORAGE_LOCATION
+      REMOTE_STATIC_URL: $REMOTE_STATIC_URL
+    networks:
+      - ping
+      - db_link
+      - nginx_link
   nginx:
     build: ./nginx
     ports:
@@ -49,8 +61,27 @@ services:
       - static_volume:/src/static
       - media_volume:/src/media
     restart: always
-
+    networks:
+      - nginx_link
+  webinstaller:
+    build:
+      context: ./
+      dockerfile: ./webinstaller/Dockerfile
+      target: production
+    volumes:
+      - bundles:/src/upont/static/react
+    networks:
+      - ping
 volumes:
   static_volume:
   media_volume:
   database:
+  bundles:
+    driver: local
+networks:
+  ping:
+    driver: bridge
+  db_link:
+    driver: bridge
+  nginx_link:
+    driver: bridge

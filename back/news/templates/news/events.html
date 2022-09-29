@@ -13,7 +13,7 @@
     <!--Content-->
     <div class="content">
 
-        <!--Header Content-->
+        <!--Header Content
         <div class="content-header">
             <div class="row justify-content-between w-100">
                 <div class="col">
@@ -24,6 +24,7 @@
                 </div>
             </div>
         </div>
+        -->
 
         <!--Main Content-->
         <div class="content-main">
@@ -34,18 +35,23 @@
             {% include "../news/newsnav.html" %}
             <!--End of News Navigation-->
 
+            {% if is_member %}
             <div class="centered-div mt-2">
-                <h5 class="text-bold mb-2">Ajouter un évènement</h5>
-                <a href="{% url 'news:event_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
+                <a href="{% url 'news:event_create' %}">
+                    <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un évènement</button>
+                </a>                
             </div>
+            {% endif %}
 
             {% for event in all_events_list %}
                 <!--News Card-->
                 <div class="news-card">
                     <div class="news-card-header">
-                        <div class="news-card-header-image"><img src="{% static 'assets/img/logo_default.png' %}" alt=""></div>
+                        <div class="news-card-header-image">
+                            <img class="image-centered" src="{% if event.club.logo %}{{event.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                        </div>
                         <div class="news-card-header-text">
-                            <span class="news-card-header-name">{{event.club}}</span>
+                            <span class="news-card-header-name">{{event.club.name}}</span>
                             <span class="news-card-header-title">{{event.name}}</span>
                         </div>
                     </div>

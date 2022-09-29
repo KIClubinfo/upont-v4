@@ -19,7 +19,7 @@ class EditEvent(forms.ModelForm):
         )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
-            "description": forms.Textarea(attrs={"class": "profil-input"}),
+            "description": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "date": forms.TextInput(attrs={"class": "profil-input"}),
             "location": forms.TextInput(attrs={"class": "profil-input"}),
             "poster": forms.FileInput(attrs={"class": "profil-input"}),
@@ -54,7 +54,7 @@ class EditPost(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={"class": "profil-input"}),
             "illustration": forms.FileInput(attrs={"class": "profil-input"}),
-            "content": forms.Textarea(attrs={"class": "profil-input"}),
+            "content": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "event": forms.Select(attrs={"class": "profil-select"}),
             "club": forms.Select(attrs={"class": "profil-select"}),
         }
@@ -107,7 +107,7 @@ class AddShotgun(forms.ModelForm):
         widgets = {
             "club": forms.Select(attrs={"class": "profil-select"}),
             "title": forms.TextInput(attrs={"class": "profil-input"}),
-            "content": forms.TextInput(attrs={"class": "profil-input"}),
+            "content": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "starting_date": forms.TextInput(attrs={"class": "profil-input"}),
             "ending_date": forms.TextInput(attrs={"class": "profil-input"}),
             "size": forms.TextInput(attrs={"class": "profil-input"}),

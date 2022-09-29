@@ -43,7 +43,7 @@
                             <!--Column-->
                             <div class="col-lg-5">
                                 <div class="profil-image">
-                                    <img src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
+                                    <img class="image-centered" src="{% if student.picture %}{{student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
                                 </div>
                             </div><!--End of Column-->
 
@@ -79,8 +79,8 @@
                                     {{ EditProfile.department }}
                                     {{ EditProfile.picture }}
                                     <div class="centered-div">
-                                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
-                                        <input class="button red-button" type="submit" name="Annuler" value="Annuler">
+                                        <button class="button green-button" type="submit" name="Valider">Valider</button>
+                                        <button class="button red-button" type="submit" name="Annuler">Annuler</button>
                                     </div>
                                 </div><!--End of Column-->
 
@@ -99,7 +99,7 @@
                             {% for membership in membership_club_list %}
                                 <div class="user-card">
                                     <div class="user-image">
-                                        <img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}https://i.imgur.com/hczKIze.jpg{% endif %}" alt="">
+                                        <img src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
                                     </div>
                                     <div class="user-information">
                                         <span class="user-name">{{membership.club.name}} {% if membership.club.nickname %}{{membership.club.nickname}}{% endif %}</span>

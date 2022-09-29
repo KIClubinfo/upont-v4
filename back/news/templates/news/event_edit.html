@@ -16,7 +16,7 @@
         <!--Main Content-->
         <div class="content-main">
 
-            <h3 class="page-title">{% if Edit %}Éditer{% else %}Créer{% endif %} un event</h3>
+            <h3 class="page-title">{% if Edit %}Éditer{% else %}Créer{% endif %} un évènement</h3>
 
             <!--News Card-->
             <div class="news-card">
@@ -31,8 +31,8 @@
 
                             {{EditEvent.description.errors}}
                             <div class="input-title">Description de l'évènement :</div>
-                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</p>
                             {{EditEvent.description}}
+                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</p>
 
                             {{EditEvent.date.errors}}
                             <div class="input-title">Date de l'évènement :</div>
@@ -62,7 +62,7 @@
                             {{EditEvent.shotgun}}
                         </div>
                     </div>
-                    {%if event.poster%}
+                    {% if event.poster %}
                         <div class="news-card-images">
                             <!--All-Images-Linked-With-The-Event-->
                             <div class="news-card-carousel">
@@ -71,12 +71,12 @@
                                 </div>
                             </div>
                         </div>
-                    {%endif%}
+                    {% endif %}
                     <div class="centered-div">
                         <a href="{% if event %}{% url 'news:event_detail' event.id %}{% else %}{% url 'news:events' %}{% endif %}"><button type="button" class="button red-button">Annuler</button></a>
-                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                        <button class="button green-button" type="submit" name="Valider">Valider</button>
                         {% if Edit %}
-                            <input class="button red-button" type="submit" name="Supprimer" value="Supprimer l'event">
+                            <button class="button red-button" type="submit" name="Supprimer">Supprimer l'event</button>
                         {% endif %}
                     </div>
                 </form>

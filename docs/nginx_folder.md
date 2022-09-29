@@ -12,6 +12,8 @@ Ce fichier contient la configuration de nginx.
 
 **/protected/** : permet d'accéder aux fichiers *media*, comme les images uploadées par les utilisateurs, qu'on veut donc protéger par authentification. C'est pour cela que ce pattern est *internal* : on ne peut y accéder que par redirection interne de django, après authentification.
 
+**/api/** : permet d'accéder aux end-points de l'API créée avec *django-rest-framework*.
+
 **/** : toutes les autres URL sont redirigées vers le service **back**.
 
 ## Dockerfile

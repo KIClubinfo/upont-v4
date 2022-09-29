@@ -1,6 +1,10 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Modification du shotgun" %}
+{% if edit %}
+    {% include "header.html" with title="Modification du shotgun" %}
+{% else %}
+    {% include "header.html" with title="Nouveau shotgun" %}
+{% endif %}
 
 <!--Body-->
 <body>
@@ -16,12 +20,21 @@
         <!--Main Content-->
         <div class="content-main">
 
-            <h3 class="page-title">Édition d'un shotgun</h3>
+            {% if edit %}
+                <h3 class="page-title">Édition d'un shotgun</h3>
+            {% else %}
+                <h3 class="page-title">Nouveau Shotgun</h3>
+            {% endif %}
 
             <!--News Card-->
             <div class="news-card">
                 <div class="news-card-content">
-                    <form class="centered-div" action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" id="1">
+                    {% if has_clubs_admins  or edit %}
+                        {% if edit %}
+                            <form class="centered-div" action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" id="1">
+                        {% else %}
+                            <form class="centered-div" action="{% url 'news:new_shotgun' %}" method="post" id="1">
+                        {% endif %}
                         {% csrf_token %}
 
                         {{ form.non_field_errors }}
@@ -36,7 +49,7 @@
 
                         {{form.content.errors}}
                         <div class="input-title">Description :</div>
-                        <div class="input-title">Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</div>
+                        <div class="input-title">Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</div>
                         {{form.content}}
 
                         {{form.starting_date.errors}}
@@ -70,10 +83,19 @@
                         {{form.requires_motivation}}
 
                         <div class="centered-div">
-                            <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
-                            <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}"><button class="button red-button">Annuler</button></a>
+                            {% if edit %}
+                                <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les modifications</button>
+                                <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}"><button class="button red-button">Annuler</button></a>
+                            {% else %}
+                                <button form=1 type="submit" value="Créer" class="button green-button">Créer</button>
+                                <a href="{% url 'news:shotguns' %}"><button type="button" class="button red-button">Annuler</button></a>
+                            {% endif %}
+
                         </div>
-                    </form>
+                        </form>
+                    {% else %}
+                        <p class="text-bold text-center mt-2">Tu dois être administrateur d'un club pour créer de nouveaux shotguns.</p>
+                    {% endif %}
                 </div>
             </div><!--End of News Card-->
 

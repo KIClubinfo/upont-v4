@@ -20,19 +20,15 @@
 
             <!--News Card-->
             <div class="news-card">
-                <div class="news-card-header">
-                    <div class="news-card-header-image"><img src="{% static 'assets/img/logo_default.png' %}" alt=""></div>
-                    <div class="news-card-header-text">
-                        <span class="news-card-header-name">Nom de la personne</span>
-                    </div>
-                </div>
                 <form action="{% if Edit %}{% url 'news:post_edit' post.id %}{% else %}{% url 'news:post_create' %}{% endif %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="news-card-content">
                         <div class="centered-div">
                             {{EditPost.club.errors}}
-                            <div class="input-title">Publier en tant que :</div>
-                            {{EditPost.club}}
+                            {% if EditPost.club|length > 1 %}
+                                <div class="input-title">Publier en tant que :</div>
+                                {{EditPost.club}}
+                            {% endif %}
 
                             {{EditPost.event.errors}}
                             <div class="input-title">Est-ce que ce post est associé à un évènement ?</div>
@@ -45,7 +41,7 @@
                             {{EditPost.content.errors}}
                             <div class="input-title">Description :</div>
                             {{EditPost.content}}<br>
-                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</p>
+                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</p>
 
                             {{EditPost.illustration.errors}}
                             <div class="input-title">Ajouter/modifier une image :</div>
@@ -63,7 +59,7 @@
                         </div>
                     {%endif%}
                     <div class="centered-div">
-                        <a href="{% url 'news:posts' %}"><button type="button" class="button red-button">Annuler</button></a>
+                        <button type="button" class="button red-button" onclick="history.back()">Annuler</button>
                         <input class="button green-button" type="submit" name= "Valider" value="Valider">
                         {% if Edit %}
                             <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">

@@ -18,19 +18,20 @@
                     {% csrf_token %}
                     <div class="club-group-image-container">
                         {% if club.background_picture %}
-                            <img class="club-card-image" src={{club.background_picture.url}} height="100%" width="100%" alt="">
+                            <img class="club-group-image" src={{club.background_picture.url}} alt="">
                         {% else %}
-                            <img class="club-card-image" src="" alt="">
-                        {% endif %}</div>
+                            <img class="club-group-image" src="{% static 'assets/img/equipe.jpg' %}" alt="">
+                        {% endif %}
+                    </div>
                     <div class="row">
                         {% csrf_token %}
                         {{ EditClub.non_field_errors }}
                         <div class="col-lg-4">
                             <div class="club-image">
                                 {% if club.logo %}
-                                    <img class="club-card-image" src={{club.logo.url}} height="100%" width="100%" alt="">
+                                    <img class="image-centered" src={{club.logo.url}} alt="">
                                 {% else %}
-                                    <img class="club-card-image" src="{% static 'assets/img/logo_default.png' %}" alt="">
+                                    <img class="image-centered" src="{% static 'assets/img/logo_default.png' %}" alt="">
                                 {% endif %}
                             </div>
                         </div>
@@ -69,8 +70,8 @@
                             {{ EditClub.category.errors }}
                             {{ EditClub.category }}
                             <div style="text-align: center;">
-                                <input class="button red-button" type="submit" name="Annuler" value="Annuler">
-                                <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                                <button class="button red-button" type="submit" name="Annuler">Annuler</button>
+                                <button class="button green-button" type="submit" name="Valider">Valider</button>
                             </div>
                         </div>
                     </div>
@@ -108,28 +109,31 @@
                             {% csrf_token %}
                             {{AddMember.non_field_errors}}
                             Ajouter un membre au club:
-                            <br><br>
-                            Elève: <br>
+                            <br>
+                            <strong style="color:red">{{error }}</strong><br>
+                            <br>
+                            Élève : <br>
                             {{AddMember.student.errors}}
-                            {{AddMember.student}}
+                            <div id="adding_student"></div>
                             <br>
-                            Rôle : <br>
+                            Rôle : <br>
                             {{AddMember.role.errors}}
-                            {{AddMember.role}}
+                            <div id="adding_role"></div>
                             <br>
-                            Administrateur du club sur Upont
+                            Administrateur du club sur uPont
                             {{AddMember.is_admin.errors}}
-                            {{AddMember.is_admin}} <br>
-                            <input class="button green-button" type="submit" name="Ajouter-Membre" value="Ajouter un membre au club">
+                            {{AddMember.is_admin}}
+                            <br>
+                            <button class="button green-button" type="submit" name="Ajouter-Membre">Ajouter un membre au club</button>
                         </form>
                     </div>
                     <div class="col-lg-6">
                         <form action="" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-                            Créez un rôle si aucun ne vous convient: <br>
+                            Créez un rôle si aucun ne vous convient : <br>
                             {{AddRole.name.errors}}
                             {{AddRole.name}}<br>
-                            <input class="button green-button" type="submit" name="Ajouter-Role" value="Créer">
+                            <button class="button green-button" type="submit" name="Ajouter-Role">Créer</button>
                         </form>
                     </div>
                 </div>
@@ -167,6 +171,7 @@
     <!--EndContent-->
 
     <!--Scripts-->
+    <script src="{% static 'react/MemberAdding.bundle.js' %}"></script>
     <script src="{% static 'js/sidenav.js' %}"></script>
 </body>
 </html>
