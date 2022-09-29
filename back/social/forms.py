@@ -78,7 +78,7 @@ class AddRole(forms.ModelForm):
         model = Role
         fields = ("name",)
         widgets = {
-            "name": forms.TextInput(attrs={"class": "profil-input"}),
+            "name": forms.TextInput(attrs={"class": "profil-input profil-member-create"}),
         }
 
     def __init__(self, *args, **kwargs):

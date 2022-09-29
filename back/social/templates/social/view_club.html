@@ -49,7 +49,11 @@
 
                     <!--Column-->
                     <div class="col-lg-8">
-                        <div class="club-title">{{club.name}}{% if club.nickname %} - ({{club.nickname}}){% endif %}</div>
+                        <div class="club-title">
+                            {{club.name}}{% if club.nickname %} - ({{club.nickname}}){% endif %}
+                            <a href="{% url 'social:club_index' %}" style="margin-left: auto;"><button class="button green-button">Retour à l'index</button></a>
+                        </div>
+                        
                     </div><!--End of Column-->
 
                     <!--Column-->
@@ -90,7 +94,6 @@
 
 
                         <div class="centered-div">
-                            <a href="{% url 'social:club_index' %}"><button class="button green-button">Retour à l'index</button></a>
                             {% if is_admin %}
                                 <a href="{% url 'social:club_edit' club.id %}">
                                     <button class="button blue-button">Modifier les informations du club</button>
