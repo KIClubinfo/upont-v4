@@ -29,7 +29,7 @@ class Nationality(models.Model):
 
 
 class Role(models.Model):
-    name = models.CharField(max_length=30, default="Membre")
+    name = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name

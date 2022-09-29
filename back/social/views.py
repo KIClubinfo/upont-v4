@@ -437,7 +437,8 @@ def club_edit(request, club_id):
 
         elif "Ajouter-Role" in request.POST:
             form_role = AddRole(request.POST)
-            if form_role.is_valid():
+            existing_role_names = list(Role.objects.all().values_list('name', flat=True))
+            if form_role.is_valid() and (form_role["name"].value() not in existing_role_names):
                 form_role.save()
             return redirect("social:club_edit", club_id=club.id)
 
