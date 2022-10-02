@@ -593,7 +593,7 @@ a.text-green:hover{
     font-size: 1rem;
     text-decoration: none;
     color: white;
-    border-radius: 0.5rem;  
+    border-radius: 0.5rem;
     background-color: rgba(255, 255, 255, 0.09);
     border-style: none;
     -webkit-user-select: none;
@@ -1180,7 +1180,7 @@ a.text-green:hover{
     word-wrap: break-word;
 }
 
-.news-card-poularity {
+.news-card-popularity {
     text-align: left;
 }
 

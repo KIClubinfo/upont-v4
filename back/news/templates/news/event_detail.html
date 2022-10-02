@@ -90,11 +90,11 @@
                 <div class="col-detail-lg-6">
                     <h4 class="page-title">Posts liés à cet évènement</h4>
                     {% if is_member %}
-                    <div class="centered-div mt-2">
-                        <a href="{% url 'news:post_create_with_origin' event.id%}">
-                            <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un post</button>
-                        </a>                
-                    </div>
+                        <div class="centered-div mt-2">
+                            <a href="{% url 'news:post_create_with_origin' event.id%}">
+                                <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un post</button>
+                            </a>
+                        </div>
                     {% endif %}
 
                     {% if event_posts %}
@@ -117,11 +117,11 @@
                                                 {{post.club.name}}
                                             </a>
                                             {% if is_member %}
-                                            <span class="news-card-header-date">
-                                                Publié par <a href="{% url 'social:profile_viewed' post.author.user.pk %}">
-                                                    {{post.author.user.first_name}} {{post.author.user.last_name}}
-                                                </a>
-                                            </span>
+                                                <span class="news-card-header-date">
+                                                    Publié par <a href="{% url 'social:profile_viewed' post.author.user.pk %}">
+                                                        {{post.author.user.first_name}} {{post.author.user.last_name}}
+                                                    </a>
+                                                </span>
                                             {% endif %}
                                         {%else%}
                                             <a class="news-card-header-name" href="{% url 'social:profile_viewed' post.author.user.pk %}">
@@ -133,9 +133,9 @@
                                         </span>
                                     </div>
                                     {% if is_member %}
-                                    <div class="news-card-header-edit-button">
-                                        <a href="{% url 'news:post_edit' post.id %}"><i class="fas fa-edit"></i></a>
-                                    </div>
+                                        <div class="news-card-header-edit-button">
+                                            <a href="{% url 'news:post_edit' post.id %}"><i class="fas fa-edit"></i></a>
+                                        </div>
                                     {% endif %}
                                 </div>
                                 <div class="news-card-content">
@@ -220,7 +220,7 @@
         </div><!--End of Main Content-->
 
     </div><!--End of Content-->
-    <script src="{% static 'js/like_button.js' %}"></script> 
+    <script src="{% static 'js/like_button.js' %}"></script>
 </body><!--End of Body-->
 
 </html><!--End of Document-->
