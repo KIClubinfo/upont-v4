@@ -1,7 +1,7 @@
 import pandas
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
 from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from social.models import Club, Student
 from trade.forms import EditPrice, EditTradeAdmin
-from trade.models import Good, TradeAdmin, Transaction
+from trade.models import TradeAdmin, Transaction
 from trade.serializers import TransactionSerializer
 
 from .forms import EditAlcohol
@@ -38,23 +38,25 @@ class SearchAlcohol(APIView):
 
 class FavoriteAlcohol(APIView):
     """
-    API endpoint that returns the most bought alcohols of a student during 
+    API endpoint that returns the most bought alcohols of a student during
     a given periode of time
     """
-    
+
     def get(self, request):
         club = get_object_or_404(Club, name="Foyer")
         alcohols_query = Alcohol.objects.filter(club=club)
-        
+
         def in_request(field):
-            return (field in request.query_params 
-                    and not request.query_params[field].isspace())
+            return (
+                field in request.query_params
+                and not request.query_params[field].isspace()
+            )
 
         # Dates (start and end) have to be in ISO format
-        if in_request("start"): 
+        if in_request("start"):
             start = parse_datetime(request.query_params.get("start", None))
             alcohols_query = alcohols_query.filter(transaction__date__gte=start)
-            
+
         if in_request("end"):
             end = parse_datetime(request.query_params.get("end", None))
             alcohols_query = alcohols_query.filter(transaction__date__lte=end)
@@ -63,11 +65,22 @@ class FavoriteAlcohol(APIView):
             student_id = request.query_params.get("student", None)
             student = Student.objects.get(pk=student_id)
             alcohols_query = alcohols_query.filter(transaction__student=student)
-            
-        alcohols_query = alcohols_query.annotate(num_buy=Sum('transaction__quantity'))
-        favorites = alcohols_query.order_by('-num_buy')
-        serializer = AlcoholSerializer(favorites, many=True)
-        return Response({"alcohols": serializer.data})
+
+        alcohols_query = alcohols_query.annotate(num_buy=Sum("transaction__quantity"))
+        favorites = alcohols_query.order_by("-num_buy")
+        return Response(
+            {
+                "alcohols": [
+                    {
+                        "id": a.pk,
+                        "name": a.name,
+                        "num_buy": a.num_buy,
+                    }
+                    for a in favorites
+                    if a.num_buy is not None
+                ]
+            }
+        )
 
 
 @login_required
@@ -103,6 +116,11 @@ def home(request):
 
 
 @login_required
+def user_stats(request):
+    return render(request, "pochtron/user_stats.html")
+
+
+@login_required
 def admin_home_page(request):
     club = get_object_or_404(Club, name="Foyer")
     student = get_object_or_404(Student, user__pk=request.user.id)
@@ -114,7 +132,7 @@ def admin_home_page(request):
 
     consommations = Alcohol.objects.filter(club=club)
     for c in consommations:
-        c.price_euro = c.price()/100
+        c.price_euro = c.price() / 100
     context = {"consommations": consommations, "admin": admin}
     return render(request, "pochtron/admin.html", context)
 
@@ -168,10 +186,10 @@ def conso_create(request):
             },
         )
         if conso_form.is_valid():
-            conso = conso_form.save() 
+            conso = conso_form.save()
             price_form = EditPrice(
                 {
-                    "price": request.POST["price"], 
+                    "price": request.POST["price"],
                     "date": timezone.now(),
                     "good": conso,
                 },
@@ -350,16 +368,18 @@ class TransactionsView(APIView):
         )
         print(dataframe)
 
-        if "timeline" in self.request.GET and self.request.GET["timeline"].strip():
-            timeline = self.request.GET.get("timeline", "year")
-        else:
-            timeline = "year"
-        consos = Good.objects.filter(club=club)
+        # if "timeline" in self.request.GET and self.request.GET["timeline"].strip():
+        #     timeline = self.request.GET.get("timeline", "year")
+        # else:
+        #     timeline = "year"
+        # consos = Good.objects.filter(club=club)
         dataframe = dataframe.loc[
             :, dataframe.columns != "student"
         ]  # we don't need the student column
         dataframe["good_id"] = dataframe.good.apply(lambda x: x["id"])
-        dataframe['Month'] = pandas.to_datetime(dataframe['date'], format="%d-%m-%Y %H:%M:%S").dt.month
-        series = dataframe['Month'].value_counts().sort_index()
-        new_series = series.reindex(range(1,13)).fillna(0).astype(int)
+        dataframe["Month"] = pandas.to_datetime(
+            dataframe["date"], format="%d-%m-%Y %H:%M:%S"
+        ).dt.month
+        series = dataframe["Month"].value_counts().sort_index()
+        new_series = series.reindex(range(1, 13)).fillna(0).astype(int)
         return Response({"index": new_series.index, "count": new_series.values})

@@ -1,0 +1,37 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Pochtron" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="pochtron" %}
+
+    <!--Content-->
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col" align="right">
+                    <a href="{% url 'pochtron:admin' %}"><button class="button blue-button">Retourner sur l'accueil de Pochtron</button></a>
+                </div>
+            </div>
+        </div>
+        <div class="content-main">
+            <div id="charts" style="height=100%; width=100%">
+                <!--Charts are rendered here using React-->
+            </div>
+        </div>
+    </div>
+    <!--EndContent-->
+
+    <!--Scripts-->
+    <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+    <script>
+        window.react_mount = document.getElementById("charts");
+    </script>
+    <script src="{% static 'react/PochtronUserStats.bundle.js' %}"></script>
+</body>
+</html>

@@ -11,7 +11,8 @@ module.exports = (env) => {
       MemberAdding: './src/adding_members.js',
       PochtronShop: './src/pochtron_shop.js',
       PochtronManageAccounts: './src/pochtron_manage_accounts.js',
-      PochtronOverview: './src/pochtron_overview.js'
+      PochtronOverview: './src/pochtron_overview.js',
+      PochtronUserStats: './src/pochtron_user_stats.js'
     },
     resolve: {
       modules: [__dirname, 'node_modules'],
