@@ -1,4 +1,5 @@
 import re  # Regular expressions
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -115,7 +116,7 @@ def remove_price_mask(price):
     Remove the mask '000,00 €' of price input and return the price in cents
     """
     # The last element of the spliting is the € symbole
-    euro_and_cents = re.split(",|\s", price)[:-1]
+    euro_and_cents = re.split(",| ", price)[:-1]
     if len(euro_and_cents) == 1:
         # the price has no cents
         euro_and_cents.append("00")
