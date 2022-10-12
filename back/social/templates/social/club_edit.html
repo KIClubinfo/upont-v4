@@ -1,8 +1,10 @@
 {% load static %}
 <!--Header-->
-{% if club.nickname %}{% include "header.html" with title=club.nickname%}{% else %}{% include "header.html" with title=club.name %}{% endif %}
+{% if club.nickname %}{% include "header.html" with title=club.nickname%}{% else %}{% include "header.html" with
+    title=club.name %}{% endif %}
 
 <!--Body-->
+
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
@@ -37,8 +39,10 @@
                         </div>
                         <!--Column-->
                         <div class="col-lg-8">
-                            <div class="club-title">{{club.name}}{% if club.nickname %} - ({{club.nickname}}){% endif %}</div>
-                        </div><!--End of Column-->
+                            <div class="club-title">{{club.name}}{% if club.nickname %} - ({{club.nickname}}){% endif %}
+                            </div>
+                        </div>
+                        <!--End of Column-->
                     </div>
                     <h5 class="section-title text-bold">Paramètres généraux</h5>
                     <div class="row border-bottom mt-2">
@@ -54,7 +58,8 @@
                             Description du club : <br>
                             {{ EditClub.description.errors }}
                             {{ EditClub.description }}
-                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</p>
+                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en
+                                savoir plus.</p>
                             <br>
                             Modifier la photo d'arrière plan du club :<br>
                             {{ EditClub.background_picture }}
@@ -93,7 +98,7 @@
                                 Elève :
                                 {{AddMember.student.errors}}
                                 <div id="adding_student" style="margin-top: 1rem;"></div>
-                                
+
                                 <br>
                                 Rôle : <br>
                                 {{AddMember.role.errors}}
@@ -103,11 +108,12 @@
                                 {{AddMember.is_admin.errors}}
                                 {{AddMember.is_admin}}
                                 <br>
-                                <button class="button green-button" type="submit" name="Ajouter-Membre">Ajouter ce membre au club</button>
+                                <button class="button green-button" type="submit" name="Ajouter-Membre">Ajouter ce
+                                    membre au club</button>
                             </form>
                             <br>
                         </div>
-                        <div class="col-lg-6"> 
+                        <div class="col-lg-6">
                             <form action="" method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 Créez un rôle si aucun ne vous convient : <br>
@@ -124,9 +130,12 @@
                         {% for membership in all_active_club_memberships %}
                             <div class="col-xxl-2 col-xxl-3 col-lg-4">
                                 <div class="user-card">
-                                    <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
+                                    <div class="user-image"><img
+                                        src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"
+                                        alt=""></div>
                                     <div class="user-information">
-                                        <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
+                                        <span class="user-name">{{membership.student.user.first_name}}
+                                            {{membership.student.user.last_name}}</span>
                                         <span>{{membership.role}}</span>
                                         {% if membership.is_admin %}
                                             <span>(admin)</span>
@@ -146,7 +155,7 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {% if all_active_club_memberships %}
+                {% if all_old_club_memberships %}
                     <h5 class="section-title text-bold mt-2">Gestion des membres inactifs</h5>
                     {% for promo,members in all_old_club_memberships.items %}
                         <h6 class="text-bold mt-4">Promo {{promo}}' :</h6>
@@ -154,9 +163,12 @@
                             {% for membership in members %}
                                 <div class="col-xxl-2 col-xxl-3 col-lg-4">
                                     <div class="user-card">
-                                        <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
+                                        <div class="user-image"><img
+                                            src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"
+                                            alt=""></div>
                                         <div class="user-information">
-                                            <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
+                                            <span class="user-name">{{membership.student.user.first_name}}
+                                                {{membership.student.user.last_name}}</span>
                                             <span>{{membership.role}}</span>
                                             {% if membership.is_admin %}
                                                 <span>(admin)</span>
@@ -186,4 +198,5 @@
     <script src="{% static 'react/MemberAdding.bundle.js' %}"></script>
     <script src="{% static 'js/sidenav.js' %}"></script>
 </body>
+
 </html>
