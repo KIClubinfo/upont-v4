@@ -27,9 +27,7 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          FILTER_REGEX_EXCLUDE:
-            - docker-compose.yml
-            - docker-compose_prod.yml
+          FILTER_REGEX_EXCLUDE: (docker-compose.yml)|(docker-compose_prod.yml)
           VALIDATE_HTML: false
           VALIDATE_JSCPD: false
           VALIDATE_CSS: false

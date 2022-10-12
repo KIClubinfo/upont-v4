@@ -49,7 +49,11 @@
 
                     <!--Column-->
                     <div class="col-lg-8">
-                        <div class="club-title">{{club.name}}{% if club.nickname %} - ({{club.nickname}}){% endif %}</div>
+                        <div class="club-title">
+                            {{club.name}}{% if club.nickname %} - ({{club.nickname}}){% endif %}
+                            <a href="{% url 'social:club_index' %}" style="margin-left: auto;"><button class="button green-button">Retour à l'index</button></a>
+                        </div>
+                        
                     </div><!--End of Column-->
 
                     <!--Column-->
@@ -61,11 +65,11 @@
 
                         <h5 class="section-title text-bold mt-4">Membres du club :</h5>
 
-                        {% if members %}
+                        {% if active_members %}
                             <!--End of Row-->
                             <div class="row" style="margin: 1rem -4rem;">
 
-                                {% for membership in members %}
+                                {% for membership in active_members %}
                                     <!--Column-->
                                     <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                                         <div class="user-card">
@@ -90,13 +94,36 @@
 
 
                         <div class="centered-div">
-                            <a href="{% url 'social:club_index' %}"><button class="button green-button">Retour à l'index</button></a>
                             {% if is_admin %}
                                 <a href="{% url 'social:club_edit' club.id %}">
                                     <button class="button blue-button">Modifier les informations du club</button>
                                 </a>
                             {% endif %}
                         </div>
+
+
+                        {% if old_members %}
+                            <h5 class="section-title text-bold mt-4">Anciens membres du club :</h5>
+                            {% for promo,members in old_members.items %}
+                                <h6 class="text-bold mt-4">Promo {{promo}}' :</h6>
+                                <div class="row" style="margin: 1rem -4rem;">
+                                    {% for member in members %}
+                                        <!--Column-->
+                                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                            <div class="user-card">
+                                                <div class="user-image">
+                                                    <img src="{% if member.student.picture %}{{member.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt="">
+                                                </div>
+                                                <div class="user-information">
+                                                    <span class="user-name">{{member.student.user.first_name}} {{member.student.user.last_name}}</span>
+                                                    <span>{{member.role}}</span>
+                                                </div>
+                                            </div>
+                                        </div><!--End of Column-->
+                                    {% endfor %}
+                                </div><!--End of Row-->
+                            {% endfor %}
+                        {% endif %}
 
                     </div><!--End of Column-->
 
