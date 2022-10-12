@@ -3,6 +3,7 @@ import { StudentsSearchBar } from './searchBars'
 import { BottomScrollListener } from 'react-bottom-scroll-listener'
 import CurrencyInput from './currencyInput'
 
+
 class LastTransactionsScroll extends React.Component {
   constructor (props) {
     super(props)
@@ -90,7 +91,11 @@ class LastTransactionsScroll extends React.Component {
                           <td>{transaction.student.user.first_name + ' ' + transaction.student.user.last_name}</td>
                           <td>{transaction.good.name}</td>
                           <td>{transaction.quantity}</td>
-                          <td className={balanceColor}>{(balanceChange / 100).toFixed(2)} €</td>
+                          <td className={balanceColor}>{(balanceChange / 100).toLocaleString('fr-FR', {
+                            style: 'currency',
+                            currency: 'EUR'
+                          })}
+                          </td>
                           <td>{transaction.date}</td>
                         </tr>
                       )
@@ -168,7 +173,10 @@ class CreditAccount extends React.Component {
             <p>
               Nouveau solde de {this.state.last_student.label} :
               <div className='text-bold'>
-                {this.state.new_balance} €
+                {(this.state.new_balance / 100).toLocaleString('fr-FR', {
+                  style: 'currency',
+                  currency: 'EUR'
+                })}
               </div>
             </p>
           </div>

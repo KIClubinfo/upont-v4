@@ -51,8 +51,6 @@
                                 <div class="profil-information-box">{% if student.user.first_name %}{{student.user.first_name}}{% else %}---Prénom---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.phone_number %}{{student.phone_number}}{% else %}---Tel---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.gender %}{{student.gender}}{% else %}------{% endif %}</div>
-
-                                <a href="{% url 'social:profile_edit' %}"><button class="button blue-button">Modifier mon profil</button></a>
                             </div><!--End of Column-->
 
                             <!--Column-->
@@ -60,8 +58,6 @@
                                 <div class="profil-information-box">{% if student.user.last_name %}{{student.user.last_name}}{% else %}---Nom---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.department %}{{student.department}}{% else %}-------{% endif %}</div>
                                 <div class="profil-information-box">{% if student.origin %}{{student.origin}}{% else %}-------{% endif %}</div>
-
-                                <a href="{% url 'password_change' %}"><button class="button blue-button">Changer mon mot de passe</button></a>
                             </div><!--End of Column-->
 
                         </div><!--End of Row-->
@@ -89,7 +85,8 @@
                         {% else %}
                             <div class="text-bold text-center mt-2">Je ne suis pas membre d'un club.</div>
                         {% endif %}
-
+                        <a href="{% url 'social:profile_edit' %}"><button class="button blue-button">Modifier mon profil</button></a>
+                        <a href="{% url 'password_change' %}"><button class="button blue-button">Changer mon mot de passe</button></a>
                     </div><!--End of Column-->
 
                 </div><!--End of Row-->

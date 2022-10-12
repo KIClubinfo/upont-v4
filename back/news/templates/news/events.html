@@ -57,13 +57,11 @@
                     </div>
                     <div class="news-card-content">
                         <ul>
-                            <li><div class="text-bold mt-1">Date de l'évènement : <strong class="text-thin">{{event.date}}</strong></div></li>
-                            <li><div class="text-bold mt-1">Où se déroulera l'évènement ? <strong class="text-thin">{{event.location}}</strong></div></li>
-                        </ul>
-                    </div>
-                    <div class="news-card-actions">
-                        <div class="news-card-popularity">
-                            <span><i class="fas fa-users" style="color: red;"></i>
+                            <li><div class="text-bold mt-1"><i class="fas fa-calendar-alt"></i>  Date de l'évènement : <strong class="text-thin">{{event.date}}</strong></div></li>
+                            <li><div class="text-bold mt-1"><i class="fas fa-map-marker-alt"></i> Lieu de l'évènement : <strong class="text-thin">{{event.location}}</strong></div></li>
+                            <li><div class="text-bold mt-1">
+                                <i class="fas fa-users"></i> Nombre de participants :
+                                <strong class="text-thin">
                                 {% if event.shotgun %}
                                     {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
                                         0
@@ -73,8 +71,9 @@
                                 {% else %}
                                     {{event.participants.count}}
                                 {% endif %}
-                            </span>
-                        </div>
+                                </strong>
+                            </div></li>
+                        </ul>
                     </div>
                     <div class="centered-div">
                         <a href="{% url 'news:event_detail' event.pk %}"><button class="button green-button">Voir plus</button></a>
