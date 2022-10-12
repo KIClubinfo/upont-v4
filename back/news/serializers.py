@@ -19,9 +19,9 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
         if request and hasattr(request, "user"):
             user = request.user
         student = get_object_or_404(Student, user__id=user.id)
-        if (
-            obj.club and obj.club.is_member(student.id)
-        ) or (not obj.club and obj.author.user.id == user.id):
+        if (obj.club and obj.club.is_member(student.id)) or (
+            not obj.club and obj.author.user.id == user.id
+        ):
             return True
         return False
 
@@ -69,6 +69,14 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     def get_event_url(self, obj):
         if obj.event:
             return reverse("news:event_detail", args=(obj.event.pk,))
+        else:
+            return False
+
+    event_name = serializers.SerializerMethodField()
+
+    def get_event_name(self, obj):
+        if obj.event:
+            return obj.event.name
         else:
             return False
 
@@ -147,6 +155,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "date",
             "illustration_url",
             "content",
+            "event_name",
             "event_url",
             "edit_url",
             "author_url",
