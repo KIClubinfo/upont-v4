@@ -1,3 +1,4 @@
+import re  # Regular expressions
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -109,6 +110,19 @@ def shop(request):
     return render(request, "pochtron/shop.html", context)
 
 
+def remove_price_mask(price):
+    """
+    Remove the mask '000,00 €' of price input and return the price in cents
+    """
+    # The last element of the spliting is the € symbole
+    euro_and_cents = re.split(",|\s", price)[:-1]
+    if len(euro_and_cents) == 1:
+        # the price has no cents
+        euro_and_cents.append("00")
+
+    return "".join(euro_and_cents)
+
+
 @login_required
 def conso_create(request):
     context = {"create": True}
@@ -133,7 +147,8 @@ def conso_create(request):
             conso = conso_form.save()
             price_form = EditPrice(
                 {
-                    "price": request.POST["price"],
+                    "price": remove_price_mask(request.POST["price"]),
+
                     "date": timezone.now(),
                     "good": conso,
                 },
@@ -177,7 +192,11 @@ def conso_edit(request, conso_id):
         if conso_form.is_valid():
             conso = conso_form.save()
             price_form = EditPrice(
-                {"price": request.POST["price"], "date": timezone.now(), "good": conso},
+                {
+                    "price": remove_price_mask(request.POST["price"]),
+                    "date": timezone.now(),
+                    "good": conso,
+                },
             )
             if price_form.is_valid:
                 price_form.save()

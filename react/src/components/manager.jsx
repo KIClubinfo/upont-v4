@@ -1,6 +1,8 @@
 import React from 'react'
 import { StudentsSearchBar } from './searchBars'
 import { BottomScrollListener } from 'react-bottom-scroll-listener'
+import CurrencyInput from './currencyInput'
+
 
 class LastTransactionsScroll extends React.Component {
   constructor (props) {
@@ -110,7 +112,7 @@ class CreditAccount extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      amount: '',
+      amount: 0,
       student: ''
     }
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -127,6 +129,12 @@ class CreditAccount extends React.Component {
     this.setState({ [event.target.name]: event.target.value })
   }
 
+  handleAmountChange (newAmount) {
+    if (typeof newAmount !== 'undefined') {
+      this.setState({ amount: newAmount })
+    }
+  }
+
   handleSubmit (event) {
     event.preventDefault()
     const url = Urls.credit_account()
@@ -139,7 +147,7 @@ class CreditAccount extends React.Component {
     fetch(url, requestOptions)
       .then(this.setState({
         student: '',
-        amount: '',
+        amount: 0,
         last_student: this.state.student
       }))
       .then(res => res.json())
@@ -192,8 +200,17 @@ class CreditAccount extends React.Component {
           <p>Élève :</p>
           <StudentsSearchBar parent={this} />
           <p />
-          <p>Montant à créditer (centimes) :</p><input className='centered-div text-input white-input' type='text' placeholder='Montant' name='amount' id='' value={this.state.amount} onChange={this.handleChange} />
+          <p>Montant à créditer :</p>
+          <CurrencyInput
+            className='centered-div text-input white-input'
+            type='text'
+            name='amount'
+            id=''
+            value={this.state.amount}
+            onValueChange={(v) => { this.handleAmountChange(v) }}
+          />
           <div className='centered-div'><button className='button green-button' type='submit'>Créditer</button></div>
+          <p />
         </form>
       </div>
     )
