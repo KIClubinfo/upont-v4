@@ -1,4 +1,3 @@
-import pandas
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -9,8 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from social.models import Club, Student
 from trade.forms import EditPrice, EditTradeAdmin
-from trade.models import Good, TradeAdmin, Transaction
-from trade.serializers import TransactionSerializer
+from trade.models import TradeAdmin, Transaction
 
 from .forms import EditAlcohol
 from .models import Alcohol
@@ -298,34 +296,3 @@ class PochtronId(APIView):
     def get(self, request):
         club = get_object_or_404(Club, name="Foyer")
         return Response({"id": club.id})
-
-
-class TransactionsView(APIView):
-    """
-    API endpoint that returns the transactions data to display on a graph.
-    """
-
-    def get(self, request):
-        student = get_object_or_404(Student, user__pk=request.user.id)
-        club = get_object_or_404(Club, name="Foyer")
-        transactions = Transaction.objects.filter(student=student, good__club=club)
-        dataframe = pandas.DataFrame.from_records(
-            TransactionSerializer(transactions, many=True).data, index="id"
-        )
-        print(dataframe)
-
-        if "timeline" in self.request.GET and self.request.GET["timeline"].strip():
-            timeline = self.request.GET.get("timeline", "year")
-        else:
-            timeline = "year"
-        consos = Good.objects.filter(club=club)
-        dataframe = dataframe.loc[
-            :, dataframe.columns != "student"
-        ]  # we don't need the student column
-        dataframe["good_id"] = dataframe.good.apply(lambda x: x["id"])
-        dataframe["Month"] = pandas.to_datetime(
-            dataframe["date"], format="%d-%m-%Y %H:%M:%S"
-        ).dt.month
-        series = dataframe["Month"].value_counts().sort_index()
-        new_series = series.reindex(range(1, 13)).fillna(0).astype(int)
-        return Response({"index": new_series.index, "count": new_series.values})
