@@ -163,7 +163,7 @@ def credit_account(request):
                     return JsonResponse(
                         {
                             "error": "",
-                            "new_balance": beneficiary.balance_in_euros(club),
+                            "new_balance": beneficiary.balance_in_cents(club),
                         },
                         status=201,
                     )
