@@ -72,8 +72,8 @@ class LastTransactions extends React.Component {
                           <td>{transaction.quantity}</td>
                           <td className={balanceColor}>{(balanceChange / 100).toLocaleString('fr-FR', {
                             style: 'currency',
-                            currency: 'EUR',
-                            })}
+                            currency: 'EUR'
+                          })}
                           </td>
                           <td>{transaction.date}</td>
                         </tr>
