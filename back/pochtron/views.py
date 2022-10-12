@@ -1,5 +1,6 @@
+import re  # Regular expressions
+
 import pandas
-import re # Regular expressions
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -79,7 +80,7 @@ def admin_home_page(request):
 
     consommations = Alcohol.objects.filter(club=club)
     for c in consommations:
-        c.price_euro = c.price()/100
+        c.price_euro = c.price() / 100
     context = {"consommations": consommations, "admin": admin}
     return render(request, "pochtron/admin.html", context)
 
@@ -118,11 +119,12 @@ def remove_price_mask(price):
     """
     # The last element of the spliting is the € symbole
     euro_and_cents = re.split(",|\s", price)[:-1]
-    if (len(euro_and_cents) == 1):
+    if len(euro_and_cents) == 1:
         # the price has no cents
         euro_and_cents.append("00")
 
-    return ''.join(euro_and_cents)
+    return "".join(euro_and_cents)
+
 
 @login_required
 def conso_create(request):
@@ -145,10 +147,10 @@ def conso_create(request):
             },
         )
         if conso_form.is_valid():
-            conso = conso_form.save() 
+            conso = conso_form.save()
             price_form = EditPrice(
                 {
-                    "price": remove_price_mask(request.POST["price"]), 
+                    "price": remove_price_mask(request.POST["price"]),
                     "date": timezone.now(),
                     "good": conso,
                 },
@@ -193,8 +195,8 @@ def conso_edit(request, conso_id):
             conso = conso_form.save()
             price_form = EditPrice(
                 {
-                    "price": remove_price_mask(request.POST["price"]), 
-                    "date": timezone.now(), 
+                    "price": remove_price_mask(request.POST["price"]),
+                    "date": timezone.now(),
                     "good": conso,
                 },
             )
@@ -340,7 +342,9 @@ class TransactionsView(APIView):
             :, dataframe.columns != "student"
         ]  # we don't need the student column
         dataframe["good_id"] = dataframe.good.apply(lambda x: x["id"])
-        dataframe['Month'] = pandas.to_datetime(dataframe['date'], format="%d-%m-%Y %H:%M:%S").dt.month
-        series = dataframe['Month'].value_counts().sort_index()
-        new_series = series.reindex(range(1,13)).fillna(0).astype(int)
+        dataframe["Month"] = pandas.to_datetime(
+            dataframe["date"], format="%d-%m-%Y %H:%M:%S"
+        ).dt.month
+        series = dataframe["Month"].value_counts().sort_index()
+        new_series = series.reindex(range(1, 13)).fillna(0).astype(int)
         return Response({"index": new_series.index, "count": new_series.values})

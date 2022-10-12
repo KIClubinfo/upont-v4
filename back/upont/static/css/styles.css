@@ -77,13 +77,15 @@ body{
     /* Sizing */
     padding-top: 1rem;
     padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     /* Styling */
     text-decoration: none;
     text-align: center;
     font-size: 1.5rem;
     color: var(--disabled-link-color);
     /* Animating */
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .sidenav-link.active{
@@ -96,7 +98,10 @@ body{
         /* Styling*/
         color: var(--hover-link-color);
         /* Animating */
-        transform: scale(1.2);
+        transform: scale(1.1);
+    }
+    .sidenav-link{
+        text-align: left;
     }
 }
 
@@ -113,6 +118,15 @@ img.logo{
     /* Sizing */
     height: 3rem;
     width: 3rem;
+}
+
+img.logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        height: 3rem;
+        width: 3rem;
 }
 
 .toggle{
@@ -192,6 +206,24 @@ img.logo{
         /* Sizing */
         height: 2rem;
         width: 2rem;
+    }
+
+    img.logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0rem;
+        padding-right: 0rem;
+        height: 0rem;
+        width: 0rem;
+    }
+
+    img.show-logo-svg{
+        /* Sizing */
+        vertical-align: middle;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        height: 3rem;
+        width: 3rem;
     }
 
     .toggle{
@@ -557,12 +589,12 @@ a.text-green:hover{
     /* Sizing */
     padding: 0.75rem 1.5rem;
     /* Styling */
-    font-family:'Neue Helvetica Light';
+    font-family:'Neue Helvetica Bold';
     font-style: normal;
     font-size: 1rem;
     text-decoration: none;
     color: white;
-    border-radius: 0.5rem;
+    border-radius: 0.5rem;  
     background-color: rgba(255, 255, 255, 0.09);
     border-style: none;
     -webkit-user-select: none;
@@ -611,6 +643,12 @@ a.text-green:hover{
     border-radius: 0rem;
     background-color: rgba(255, 255, 255, 0);
     border-left: solid var(--border-color) var(--border-width);
+}
+
+.logo-button {
+    vertical-align: middle;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
 .search-input-group {
@@ -826,9 +864,9 @@ a.text-green:hover{
 }
 
 .profil-select{
-    width: 80%;
+    width: 100%;
     height: 2.5rem;
-    margin: 1rem auto;
+    margin-top: 0.5rem;
     padding: 0.5rem 1rem;
     font-size: 1rem;
     font-weight: 400;
@@ -1168,13 +1206,14 @@ a.text-green:hover{
 }
 
 .news-card-button{
-    font-size: 1.8rem;
-    margin: 0 0.5rem;
+    font-size: 1rem;
+    margin: 0 0rem;
 }
 
 .news-card-comments{
     min-height: 6rem;
     padding: 0 1rem;
+    background-color: #3a3b3f;
 }
 
 .news-card-comment-user-pic{
@@ -1202,7 +1241,7 @@ a.text-green:hover{
     padding: 0.5rem 1rem;
     width: 65%;
     /* Styling */
-    background-color: transparent;
+    background-color: var(--primary-bg-color);
     border: solid var(--border-color) var(--border-width);
     color: white;
     font-size: 1rem;
@@ -1213,8 +1252,12 @@ a.text-green:hover{
 
 .news-card-edit-comment{
     display: flex;
-    justify-content: left;
-    padding: 1rem 0rem;
+    justify-content: center;
+    padding: 0.5rem 0rem;
+}
+
+.news-card-edit-comment-container{
+    padding: 1rem;
 }
 
 .news-card-edit-comment-input{

@@ -15,7 +15,7 @@
     <!--Content-->
     <div class="content">
 
-        <!--Header Content-->
+        <!--Header Content
         <div class="content-header">
             <div class="row justify-content-between w-100">
                 <div class="col">
@@ -26,6 +26,7 @@
                 </div>
             </div>
         </div>
+        -->
 
         <!--Main Content-->
         <div class="content-main">
@@ -37,8 +38,9 @@
             <!--End of News Navigation-->
 
             <div class="centered-div mt-2">
-                <h5 class="text-bold mb-2">Ajouter un post</h5>
-                <a href="{% url 'news:post_create' %}"><i class="fas fa-plus-circle fa-5x"></i></a>
+                <a href="{% url 'news:post_create' %}">
+                    <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un post</button>
+                </a>                
             </div>
 
             <!--News Card-->

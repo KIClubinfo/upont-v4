@@ -59,45 +59,43 @@ class CommentForm extends React.Component {
         let options = []
         if (this.state.can_publish_as){
             for (const [key, value] of Object.entries(this.state.can_publish_as)) {
-                options.push(<option key={key} value={key}>{value}</option>);
+                if (value == "Élève") {
+                    // This is the option to publish as student
+                    options.push(<option selected="selected" key={key} value="">{value}</option>);
+                } else {
+                    options.push(<option key={key} value={key}>{value}</option>);
+                }
             }
         }
 
         const field1 =
         <div className="news-card-edit-comment">
-            <div className="news-card-comment-user-pic"><img src={this.props.currentStudent.picture_url}></img></div>
             <textarea className="news-card-edit-comment-input" type="text" name="content" id="" value={this.state.content} onChange={this.handleChange}></textarea>
+            <button className="button green-button" type="submit"><i className="fas fa-paper-plane"></i></button>
         </div>
 
 
         if (options.length > 1) {
             // The user is member of at least one club, he/she can choose to comment as a club
             const field2 =
-            <div className="news-card-edit-comment">
+            <div className="">
                 <select className="profil-select" name="club" id="id_club" required value={this.state.club} onChange={this.handleChange}>
                     {options}
                 </select>
-                <button className="button green-button news-card-button" type="submit"><i className="far fa-comment"></i></button>
             </div>
 
             return (
-            <form method="post" onSubmit={this.handleSubmit.bind(this)}>
-                {field1}
-                Publier en tant que :
+            <form className="news-card-edit-comment-container" method="post" onSubmit={this.handleSubmit.bind(this)}>
+                Commenter en tant que :
                 {field2}
+                {field1}
                 <input type="hidden" name="post" value={this.state.post.id}></input>
             </form>
             );
         } else {
-            const field2 =
-            <div className="news-card-edit-comment">
-                <button className="button green-button news-card-button" type="submit"><i className="far fa-comment"></i></button>
-            </div>
-
             return (
             <form method="post" onSubmit={this.handleSubmit.bind(this)}>
                 {field1}
-                {field2}
                 <input type="hidden" name="post" value={this.state.post.id}></input>
             </form>
             );
