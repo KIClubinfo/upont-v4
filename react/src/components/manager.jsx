@@ -89,7 +89,11 @@ class LastTransactionsScroll extends React.Component {
                           <td>{transaction.student.user.first_name + ' ' + transaction.student.user.last_name}</td>
                           <td>{transaction.good.name}</td>
                           <td>{transaction.quantity}</td>
-                          <td className={balanceColor}>{(balanceChange / 100).toFixed(2)} €</td>
+                          <td className={balanceColor}>{(balanceChange / 100).toLocaleString('fr-FR', {
+                            style: 'currency',
+                            currency: 'EUR',
+                            })}
+                          </td>
                           <td>{transaction.date}</td>
                         </tr>
                       )
