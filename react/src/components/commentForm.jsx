@@ -70,7 +70,7 @@ class CommentForm extends React.Component {
 
         const field1 =
         <div className="news-card-edit-comment">
-            <textarea className="news-card-edit-comment-input" type="text" name="content" id="" value={this.state.content} onChange={this.handleChange}></textarea>
+            <textarea className="news-card-edit-comment-input" placeholder="Écris un commentaire..." type="text" name="content" id="" value={this.state.content} onChange={this.handleChange}></textarea>
             <button className="button green-button" type="submit"><i className="fas fa-paper-plane"></i></button>
         </div>
 

@@ -49,8 +49,8 @@
 
                         {{form.content.errors}}
                         <div class="input-title">Description :</div>
-                        <div class="input-title">Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</div>
-                        {{form.content}}
+                        {{form.content}}<br><br>
+                        <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</p>
 
                         {{form.starting_date.errors}}
                         <div class="input-title">Date de début :</div>
@@ -79,8 +79,7 @@
                         {{form.size}}
 
                         {{form.requires_motivation.errors}}
-                        <div class="input-title">Requiert une motivation :</div>
-                        {{form.requires_motivation}}
+                        <div class="input-title">Requiert une motivation : {{form.requires_motivation}}</div>
 
                         <div class="centered-div">
                             {% if edit %}
