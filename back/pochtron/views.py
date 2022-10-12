@@ -78,7 +78,7 @@ def admin_home_page(request):
 
     consommations = Alcohol.objects.filter(club=club)
     for c in consommations:
-        c.price_euro = c.price()/100
+        c.price_euro = c.price() / 100
     context = {"consommations": consommations, "admin": admin}
     return render(request, "pochtron/admin.html", context)
 
@@ -132,10 +132,10 @@ def conso_create(request):
             },
         )
         if conso_form.is_valid():
-            conso = conso_form.save() 
+            conso = conso_form.save()
             price_form = EditPrice(
                 {
-                    "price": request.POST["price"], 
+                    "price": request.POST["price"],
                     "date": timezone.now(),
                     "good": conso,
                 },
@@ -323,7 +323,9 @@ class TransactionsView(APIView):
             :, dataframe.columns != "student"
         ]  # we don't need the student column
         dataframe["good_id"] = dataframe.good.apply(lambda x: x["id"])
-        dataframe['Month'] = pandas.to_datetime(dataframe['date'], format="%d-%m-%Y %H:%M:%S").dt.month
-        series = dataframe['Month'].value_counts().sort_index()
-        new_series = series.reindex(range(1,13)).fillna(0).astype(int)
+        dataframe["Month"] = pandas.to_datetime(
+            dataframe["date"], format="%d-%m-%Y %H:%M:%S"
+        ).dt.month
+        series = dataframe["Month"].value_counts().sort_index()
+        new_series = series.reindex(range(1, 13)).fillna(0).astype(int)
         return Response({"index": new_series.index, "count": new_series.values})
