@@ -1,8 +1,10 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Édition du club" %}
+{% if club.nickname %}{% include "header.html" with title=club.nickname%}{% else %}{% include "header.html" with
+    title=club.name %}{% endif %}
 
 <!--Body-->
+
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
@@ -35,8 +37,15 @@
                                 {% endif %}
                             </div>
                         </div>
+                        <!--Column-->
+                        <div class="col-lg-8">
+                            <div class="club-title">{{club.name}}{% if club.nickname %} - ({{club.nickname}}){% endif %}
+                            </div>
+                        </div>
+                        <!--End of Column-->
                     </div>
-                    <div class="row border-bottom">
+                    <h5 class="section-title text-bold">Paramètres généraux</h5>
+                    <div class="row border-bottom mt-2">
                         <div class="col-lg-6">
                             Nom du club:<br>
                             {{ EditClub.name.errors }}
@@ -49,7 +58,8 @@
                             Description du club : <br>
                             {{ EditClub.description.errors }}
                             {{ EditClub.description }}
-                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en savoir plus.</p>
+                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}">ici</a> pour en
+                                savoir plus.</p>
                             <br>
                             Modifier la photo d'arrière plan du club :<br>
                             {{ EditClub.background_picture }}
@@ -69,73 +79,116 @@
                             Modifier les catégories du club :
                             {{ EditClub.category.errors }}
                             {{ EditClub.category }}
-                            <div style="text-align: center;">
-                                <button class="button red-button" type="submit" name="Annuler">Annuler</button>
-                                <button class="button green-button" type="submit" name="Valider">Valider</button>
-                            </div>
+                        </div>
+                        <div style="text-align: center;">
+                            <button class="button red-button" type="submit" name="Annuler">Annuler</button>
+                            <button class="button green-button" type="submit" name="Valider">Valider</button>
                         </div>
                     </div>
                 </form>
-                <br>
-                {% if all_club_memberships %}
-                    Supprimer des membres du club : <br>
+                <h5 class="section-title text-bold mt-4">Ajouter un membre</h5>
+                <div class="row" style="margin-top: 1rem;">
                     <div class="row">
-                        {% for membership in all_club_memberships %}
-                            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                        <div class="col-lg-6">
+                            <form action="" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {{AddMember.non_field_errors}}
+                                <strong style="color:red">{{error}}</strong>
+
+                                Elève :
+                                {{AddMember.student.errors}}
+                                <div id="adding_student" style="margin-top: 1rem;"></div>
+
+                                <br>
+                                Rôle : <br>
+                                {{AddMember.role.errors}}
+                                <div id="adding_role" style="margin-top: 1rem;"></div>
+                                <br>
+                                Administrateur du club sur uPont
+                                {{AddMember.is_admin.errors}}
+                                {{AddMember.is_admin}}
+                                <br>
+                                <button class="button green-button" type="submit" name="Ajouter-Membre">Ajouter ce
+                                    membre au club</button>
+                            </form>
+                            <br>
+                        </div>
+                        <div class="col-lg-6">
+                            <form action="" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                Créez un rôle si aucun ne vous convient : <br>
+                                {{AddRole.name.errors}}
+                                {{AddRole.name}}
+                                <button class="button green-button" type="submit" name="Ajouter-Role">Créer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="section-title text-bold mt-2">Gestion des membres actifs</h5>
+                {% if all_active_club_memberships %}
+                    <div class="row">
+                        {% for membership in all_active_club_memberships %}
+                            <div class="col-xxl-2 col-xxl-3 col-lg-4">
                                 <div class="user-card">
-                                    <div class="user-image"><img src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}" alt=""></div>
+                                    <div class="user-image"><img
+                                        src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"
+                                        alt=""></div>
                                     <div class="user-information">
-                                        <span class="user-name">{{membership.student.user.first_name}} {{membership.student.user.last_name}}</span>
+                                        <span class="user-name">{{membership.student.user.first_name}}
+                                            {{membership.student.user.last_name}}</span>
                                         <span>{{membership.role}}</span>
                                         {% if membership.is_admin %}
                                             <span>(admin)</span>
                                         {% endif %}
-                                        <form action="" method="post" enctype="multipart/form-data">
-                                            {% csrf_token %}
-                                            <input type="hidden" value="{{membership.student.id}}" name="student_id">
-                                            <input class="button red-button" type="submit" name="Supprimer" value="Supprimer">
-                                        </form>
                                     </div>
                                 </div>
+                                <div class="centered-div">
+                                    <form action="" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{membership.student.id}}" name="student_id">
+                                        <input class="button blue-button" type="submit" name="Vieux" value="Inactif">
+                                        <input class="button red-button" type="submit" name="Supprimer" value="Supprimer">
+                                    </form>
+                                </div>
+                                <br><br>
                             </div>
                         {% endfor %}
                     </div>
                 {% endif %}
-                <br>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <form action="" method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {{AddMember.non_field_errors}}
-                            Ajouter un membre au club:
-                            <br>
-                            <strong style="color:red">{{error }}</strong><br>
-                            <br>
-                            Élève : <br>
-                            {{AddMember.student.errors}}
-                            <div id="adding_student"></div>
-                            <br>
-                            Rôle : <br>
-                            {{AddMember.role.errors}}
-                            <div id="adding_role"></div>
-                            <br>
-                            Administrateur du club sur uPont
-                            {{AddMember.is_admin.errors}}
-                            {{AddMember.is_admin}}
-                            <br>
-                            <button class="button green-button" type="submit" name="Ajouter-Membre">Ajouter un membre au club</button>
-                        </form>
-                    </div>
-                    <div class="col-lg-6">
-                        <form action="" method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            Créez un rôle si aucun ne vous convient : <br>
-                            {{AddRole.name.errors}}
-                            {{AddRole.name}}<br>
-                            <button class="button green-button" type="submit" name="Ajouter-Role">Créer</button>
-                        </form>
-                    </div>
-                </div>
+                {% if all_old_club_memberships %}
+                    <h5 class="section-title text-bold mt-2">Gestion des membres inactifs</h5>
+                    {% for promo,members in all_old_club_memberships.items %}
+                        <h6 class="text-bold mt-4">Promo {{promo}}' :</h6>
+                        <div class="row">
+                            {% for membership in members %}
+                                <div class="col-xxl-2 col-xxl-3 col-lg-4">
+                                    <div class="user-card">
+                                        <div class="user-image"><img
+                                            src="{% if membership.student.picture %}{{membership.student.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"
+                                            alt=""></div>
+                                        <div class="user-information">
+                                            <span class="user-name">{{membership.student.user.first_name}}
+                                                {{membership.student.user.last_name}}</span>
+                                            <span>{{membership.role}}</span>
+                                            {% if membership.is_admin %}
+                                                <span>(admin)</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="centered-div">
+                                        <form action="" method="post" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{membership.student.id}}" name="student_id">
+                                            <input class="button blue-button" type="submit" name="Actif" value="Actif">
+                                            <input class="button red-button" type="submit" name="Supprimer" value="Supprimer">
+                                        </form>
+                                    </div>
+                                    <br><br>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -145,4 +198,5 @@
     <script src="{% static 'react/MemberAdding.bundle.js' %}"></script>
     <script src="{% static 'js/sidenav.js' %}"></script>
 </body>
+
 </html>

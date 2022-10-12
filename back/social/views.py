@@ -286,21 +286,43 @@ def index_clubs(request):
     return render(request, "social/index_clubs.html", context)
 
 
+def get_old_members(club_id):  # Grouping old members of club_id by promos in a dict
+    old_members = {}
+    promos = (
+        Membership.objects.filter(club__id=club_id, is_old=True)
+        .values("student__promo__nickname")
+        .distinct()
+        .order_by("-student__promo__year")
+    )  # Getting every promo nickname with old members
+    for promo in promos:
+        promo_nickname = promo["student__promo__nickname"]
+        promo_members = Membership.objects.filter(
+            club__id=club_id, is_old=True, student__promo__nickname=promo_nickname
+        )
+        old_members[promo_nickname] = promo_members
+    return old_members
+
+
 @login_required
 def view_club(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
-    members = Membership.objects.filter(club__id=club_id)
+    active_members = Membership.objects.filter(club__id=club_id, is_old=False)
+    old_members = get_old_members(club_id)
     membership_club_list = Membership.objects.filter(
         student__user__id=request.user.id, club__pk=club_id
     )
-
     if not membership_club_list:  # If no match is found
         is_admin = False
     elif not membership_club_list[0].is_admin:  # If the user does not have the rights
         is_admin = False
     else:
         is_admin = True
-    context = {"club": club, "members": members, "is_admin": is_admin}
+    context = {
+        "club": club,
+        "active_members": active_members,
+        "old_members": old_members,
+        "is_admin": is_admin,
+    }
     return render(request, "social/view_club.html", context)
 
 
@@ -308,20 +330,23 @@ def view_club(request, club_id):
 def club_edit(request, club_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     club = get_object_or_404(Club, pk=club_id)
-    membership_club_list = Membership.objects.filter(
+    student_membership_club = Membership.objects.filter(
         student__pk=student.id, club__pk=club_id
     )
-    all_club_memberships = Membership.objects.filter(club__pk=club_id)
-    if not membership_club_list:  # If no match is found
+    all_active_club_memberships = Membership.objects.filter(
+        club__pk=club_id, is_old=False
+    )
+    all_old_club_memberships = get_old_members(club_id)
+    if not student_membership_club:  # If no match is found
         raise PermissionDenied
-    if not membership_club_list[0].is_admin:  # If the user does not have the rights
+    if not student_membership_club[0].is_admin:  # If the user does not have the rights
         raise PermissionDenied
 
     context = {
         "student": student,
-        "membership_club_list": membership_club_list,
         "club": club,
-        "all_club_memberships": all_club_memberships,
+        "all_active_club_memberships": all_active_club_memberships,
+        "all_old_club_memberships": all_old_club_memberships,
     }
 
     if request.method == "POST":
@@ -376,6 +401,28 @@ def club_edit(request, club_id):
                 except Student.DoesNotExist:
                     return redirect("social:club_edit", club_id=club.id)
 
+        elif "Vieux" in request.POST:
+            old_member = Membership.objects.get(
+                club=club, student__id=request.POST["student_id"]
+            )
+            old_member.is_admin = False
+            old_member.is_old = True
+            old_member.save()
+            if student.id == int(
+                request.POST["student_id"]
+            ):  # If the user commits sudoku
+                return redirect("social:club_detail", club_id=club.id)
+            else:
+                return redirect("social:club_edit", club_id=club.id)
+
+        elif "Actif" in request.POST:
+            not_old_member = Membership.objects.get(
+                club=club, student__id=request.POST["student_id"]
+            )
+            not_old_member.is_old = False
+            not_old_member.save()
+            return redirect("social:club_edit", club_id=club.id)
+
         elif "Supprimer" in request.POST:
             deleted_member = Membership.objects.get(
                 club=club, student__id=request.POST["student_id"]
@@ -390,7 +437,12 @@ def club_edit(request, club_id):
 
         elif "Ajouter-Role" in request.POST:
             form_role = AddRole(request.POST)
-            if form_role.is_valid():
+            existing_role_names = list(
+                Role.objects.all().values_list("name", flat=True)
+            )
+            if form_role.is_valid() and (
+                form_role["name"].value() not in existing_role_names
+            ):
                 form_role.save()
             return redirect("social:club_edit", club_id=club.id)
 

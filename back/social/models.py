@@ -29,7 +29,7 @@ class Nationality(models.Model):
 
 
 class Role(models.Model):
-    name = models.CharField(max_length=30, default="Membre")
+    name = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name
@@ -171,6 +171,7 @@ class Club(models.Model):
 
 class Membership(models.Model):
     is_admin = models.BooleanField()
+    is_old = models.BooleanField(default=False)
     role = models.ForeignKey("Role", on_delete=models.SET_NULL, null=True)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)

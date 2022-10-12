@@ -840,6 +840,11 @@ a.text-green:hover{
     border-radius: 0.5rem;
 }
 
+.profil-member-create{
+    text-align:left;
+    width: 50%;
+}
+
 .profil-input[type="file"]{
     color: rgb(156, 156, 156);
 }
