@@ -3,7 +3,7 @@ import { PieChart, Pie, ResponsiveContainer } from 'recharts'
 import { useAsync } from 'react-async'
 
 async function fetchAlcohols () {
-  const response = await fetch(Urls.favorite_alcohols())
+  const response = await fetch(Urls.student_stats())
     .then(
       result => {
         return result.json()
@@ -15,7 +15,7 @@ async function fetchAlcohols () {
   return response.alcohols
 }
 
-export default function Example () {
+export default function StudentStats () {
   const { data, error } = useAsync({ promiseFn: fetchAlcohols })
   if (error) {
     console.error(error)

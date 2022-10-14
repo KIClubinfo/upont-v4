@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
-import Example from './components/user_stats'
+import StudentStats from './components/student_stats'
 
 ReactDOM.render((
-  <Example />
+  <StudentStats />
 ), window.react_mount)

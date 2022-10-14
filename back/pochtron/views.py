@@ -36,34 +36,41 @@ class SearchAlcohol(APIView):
         return Response({"alcohols": serializer.data})
 
 
-class FavoriteAlcohol(APIView):
+class StudentStats(APIView):
     """
-    API endpoint that returns the most bought alcohols of a student during
-    a given periode of time
+    API endpoint that statistic of consumption of a student, if the student is
+    unspecified, it returns stats about all students
     """
 
     def get(self, request):
         club = get_object_or_404(Club, name="Foyer")
+        logged_in_student = get_object_or_404(Student, user__pk=request.user.id)
         alcohols_query = Alcohol.objects.filter(club=club)
 
-        def in_request(field):
+        def in_request(field, request):
             return (
                 field in request.query_params
                 and not request.query_params[field].isspace()
             )
 
         # Dates (start and end) have to be in ISO format
-        if in_request("start"):
+        if in_request("start", request):
             start = parse_datetime(request.query_params.get("start", None))
             alcohols_query = alcohols_query.filter(transaction__date__gte=start)
 
-        if in_request("end"):
+        if in_request("end", request):
             end = parse_datetime(request.query_params.get("end", None))
             alcohols_query = alcohols_query.filter(transaction__date__lte=end)
 
-        if in_request("student"):
+        if in_request("student", request):
             student_id = request.query_params.get("student", None)
             student = Student.objects.get(pk=student_id)
+            if student != logged_in_student:
+                # Only Pochtron admins can access to stats of an other student
+                try:
+                    TradeAdmin.objects.get(student=logged_in_student, club=club)
+                except TradeAdmin.DoesNotExist:
+                    raise PermissionDenied
             alcohols_query = alcohols_query.filter(transaction__student=student)
 
         alcohols_query = alcohols_query.annotate(num_buy=Sum("transaction__quantity"))

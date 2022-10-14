@@ -12,7 +12,7 @@ module.exports = (env) => {
       PochtronShop: './src/pochtron_shop.js',
       PochtronManageAccounts: './src/pochtron_manage_accounts.js',
       PochtronOverview: './src/pochtron_overview.js',
-      PochtronUserStats: './src/pochtron_user_stats.js'
+      PochtronUserStats: './src/pochtron_student_stats.js'
     },
     resolve: {
       modules: [__dirname, 'node_modules'],

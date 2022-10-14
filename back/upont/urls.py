@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django_reverse_js.views import urls_js
 from news.views import PostViewSet
-from pochtron.views import PochtronId, SearchAlcohol, TransactionsView, FavoriteAlcohol
+from pochtron.views import PochtronId, SearchAlcohol, StudentStats, TransactionsView
 from social.views import (
     CurrentStudentView,
     SearchRole,
@@ -89,8 +89,8 @@ urlpatterns += [
         name="student_transactions_pochtron",
     ),
     path(
-        "api/pochtron/favorite_alcohols", 
-        FavoriteAlcohol.as_view(), 
-        name="favorite_alcohols",
+        "api/pochtron/student_stats",
+        StudentStats.as_view(),
+        name="student_stats",
     ),
 ]
