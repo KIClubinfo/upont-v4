@@ -1,7 +1,7 @@
 import pandas
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Sum
+from django.db.models import F, Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -38,14 +38,14 @@ class SearchAlcohol(APIView):
 
 class StudentStats(APIView):
     """
-    API endpoint that statistic of consumption of a student, if the student is
+    API endpoint that statistics of consumption of a student, if the student is
     unspecified, it returns stats about all students
     """
 
     def get(self, request):
         club = get_object_or_404(Club, name="Foyer")
         logged_in_student = get_object_or_404(Student, user__pk=request.user.id)
-        alcohols_query = Alcohol.objects.filter(club=club)
+        alcohols_query = Alcohol.objects.all()
 
         def in_request(field, request):
             return (
@@ -74,9 +74,13 @@ class StudentStats(APIView):
             alcohols_query = alcohols_query.filter(transaction__student=student)
 
         alcohols_query = alcohols_query.annotate(num_buy=Sum("transaction__quantity"))
+        total_volume = alcohols_query.aggregate(total=Sum(F("num_buy") * F("volume")))[
+            "total"
+        ]
         favorites = alcohols_query.order_by("-num_buy")
         return Response(
             {
+                "total_volume": total_volume,
                 "alcohols": [
                     {
                         "id": a.pk,
@@ -85,7 +89,7 @@ class StudentStats(APIView):
                     }
                     for a in favorites
                     if a.num_buy is not None
-                ]
+                ],
             }
         )
 
