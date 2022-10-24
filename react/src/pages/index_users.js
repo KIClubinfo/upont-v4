@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
-import {ConsumptionsGraph} from './components/overview'
+import Students from '../components/students'
 
 ReactDOM.render((
-    <ConsumptionsGraph />
+  <Students />
 ), window.react_mount)

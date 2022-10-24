@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
-import Students from './components/students'
+import Posts from '../components/posts'
 
 ReactDOM.render((
-  <Students />
+  <Posts />
 ), window.react_mount)
