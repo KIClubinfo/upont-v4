@@ -1,15 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { PieChart, Pie, ResponsiveContainer } from 'recharts'
-import { useAsync } from 'react-async'
 import DatePicker from 'react-datepicker'
 
-// import required react-datepicker styling file
-// import 'react-datepicker/dist/react-datepicker.css';
-// CSS Modules, react-datepicker-cssmodules.css
-// import 'react-datepicker/dist/react-datepicker-cssmodules.css';
-async function fetchStats ({ studentId }) {
+async function fetchStats (studentId, startDate, endDate) {
   const requestUrl = new URL(window.location.origin + Urls.student_stats())
   requestUrl.searchParams.set('student', studentId)
+  if (startDate) {
+    requestUrl.searchParams.set('start', startDate.toISOString())
+  }
+  if (endDate) {
+    requestUrl.searchParams.set('end', endDate.toISOString())
+  }
+
   const response = await fetch(requestUrl)
     .then(
       result => {
@@ -39,14 +41,43 @@ function AlcoholsPieChart (props) {
   )
 }
 
+function StatsViewer (props) {
+  const { data } = props
+
+  return (
+    <>
+      <p>Volume total ingéré : {(data.total_volume / 1000).toLocaleString(
+        'fr-FR',
+        {
+          style: 'unit',
+          unit: 'liter',
+          maximumFractionDigits: 3,
+          minimumFractionDigits: 3
+        }
+      )}
+      </p>
+      <div style={{ width: '100%', height: 300 }}>
+        <AlcoholsPieChart data={data.alcohols} />
+      </div>
+    </>
+  )
+}
+
 export default function StudentStats (props) {
   const [dateRange, setDateRange] = useState([null, null])
   const [startDate, endDate] = dateRange
 
-  const { data, error } = useAsync({ promiseFn: fetchStats, studentId: props.studentId })
-  if (error) {
-    console.error(error)
-  }
+  const [data, setData] = useState()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const newData = await fetchStats(props.studentId, startDate, endDate)
+
+      setData(newData)
+    }
+
+    void fetchData()
+  }, [endDate])
 
   if (data) {
     return (
@@ -60,23 +91,11 @@ export default function StudentStats (props) {
           }}
           withPortal
         />
-        <p>Volume total ingéré : {(data.total_volume / 1000).toLocaleString(
-          'fr-FR',
-          {
-            style: 'unit',
-            unit: 'liter',
-            maximumFractionDigits: 3,
-            minimumFractionDigits: 3
-          }
-        )}
-        </p>
-        <div style={{ width: '100%', height: 300 }}>
-          <AlcoholsPieChart data={data.alcohols} />
-        </div>
+        <StatsViewer data={data} />
       </>
     )
   } else {
-    // Render nothing while the data are not yed fetch
+    // Render nothing while the data are not yet fetch
     return (<></>)
   }
 }

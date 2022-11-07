@@ -2,7 +2,7 @@ import pandas
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import F, Sum
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -39,45 +39,72 @@ class SearchAlcohol(APIView):
 class StudentStats(APIView):
     """
     API endpoint that statistics of consumption of a student, if the student is
-    unspecified, it returns stats about all students
+    unspecified, it returns stats about all students, the logged in user has to be
+    an admin of Pochtron to access to stats about another student.
+    The start and end date have to be is ISO format.
     """
 
     def get(self, request):
         club = get_object_or_404(Club, name="Foyer")
         logged_in_student = get_object_or_404(Student, user__pk=request.user.id)
-        alcohols_query = Alcohol.objects.all()
+        start = request.query_params.get("start", None)
+        end = request.query_params.get("end", None)
+        student_id = request.query_params.get("student", None)
 
-        def in_request(field, request):
-            return (
-                field in request.query_params
-                and not request.query_params[field].isspace()
-            )
+        filters = {}
 
-        # Dates (start and end) have to be in ISO format
-        if in_request("start", request):
-            start = parse_datetime(request.query_params.get("start", None))
-            alcohols_query = alcohols_query.filter(transaction__date__gte=start)
+        if student_id is not None:
+            try:
+                student = Student.objects.get(pk=student_id)
+                filters["transaction__student"] = student
+            except Student.DoesNotExist:
+                return HttpResponseBadRequest(
+                    "User with id {} not found".format(student_id)
+                )
 
-        if in_request("end", request):
-            end = parse_datetime(request.query_params.get("end", None))
-            alcohols_query = alcohols_query.filter(transaction__date__lte=end)
-
-        if in_request("student", request):
-            student_id = request.query_params.get("student", None)
-            student = Student.objects.get(pk=student_id)
             if student != logged_in_student:
                 # Only Pochtron admins can access to stats of an other student
                 try:
                     TradeAdmin.objects.get(student=logged_in_student, club=club)
                 except TradeAdmin.DoesNotExist:
                     raise PermissionDenied
-            alcohols_query = alcohols_query.filter(transaction__student=student)
 
-        alcohols_query = alcohols_query.annotate(num_buy=Sum("transaction__quantity"))
+        if start is not None:
+            try:
+                filters["transaction__date__gte"] = parse_datetime(start)
+            except ValueError as error:
+                return HttpResponseBadRequest(
+                    "Error in parsing start date: {}".format(error)
+                )
+
+            if filters["transaction__date__gte"] is None:
+                return HttpResponseBadRequest(
+                    "Start date format is not valid, must be in ISO format"
+                )
+
+        if end is not None:
+            try:
+                filters["transaction__date__lte"] = parse_datetime(end)
+            except ValueError as error:
+                return HttpResponseBadRequest(
+                    "Error in parsing end date: {}".format(error)
+                )
+
+            if filters["transaction__date__lte"] is None:
+                return HttpResponseBadRequest(
+                    "End date format is not valid, must be in ISO format"
+                )
+
+        alcohols_query = (
+            Alcohol.objects.filter(**filters)
+            .annotate(num_buy=Sum("transaction__quantity"))
+            .order_by("-num_buy")
+        )
+
         total_volume = alcohols_query.aggregate(total=Sum(F("num_buy") * F("volume")))[
             "total"
         ]
-        favorites = alcohols_query.order_by("-num_buy")
+
         return Response(
             {
                 "total_volume": total_volume,
@@ -87,7 +114,7 @@ class StudentStats(APIView):
                         "name": a.name,
                         "num_buy": a.num_buy,
                     }
-                    for a in favorites
+                    for a in alcohols_query
                     if a.num_buy is not None
                 ],
             }
