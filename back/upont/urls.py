@@ -66,21 +66,13 @@ else:
 router = routers.DefaultRouter()
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet)
-router.register(r"events", EventViewSet, basename="API_events")
+router.register(r"events", EventViewSet)
 
 urlpatterns += [
     path(
         "reverse.js", urls_js, name="reverse_js"
     ),  # for reversing django urls in JavaScript
     path("api/", include(router.urls)),
-    path("api/students/", StudentViewSet.as_view({"get": "list"}), name="students"),
-    path("api/posts/", PostViewSet.as_view({"get": "list"}), name="posts"),
-    path(
-        "api/posts/<int:pk>/",
-        PostViewSet.as_view({"get": "retrieve"}),
-        name="post_detail",
-    ),
-    # path("api/events/", EventViewSet.as_view({"get": "list"}, name="API_events")),
     path("api/current/", CurrentStudentView.as_view(), name="current_student"),
     path(
         "api/transactions/last/", LastTransactions.as_view(), name="last_transactions"
