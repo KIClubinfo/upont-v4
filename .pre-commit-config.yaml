@@ -44,6 +44,7 @@ repos:
     rev: 'v8.27.0' # Use the sha / tag you want to point at
     hooks:
       - id: eslint
+        files: react/
         additional_dependencies:
           - eslint@latest
           - eslint-config-airbnb@latest
@@ -54,3 +55,4 @@ repos:
     rev: 'v2.7.1' # Use the sha or tag you want to point at
     hooks:
       - id: prettier
+        files: react/
