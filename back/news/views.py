@@ -11,7 +11,7 @@ from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
-from .serializers import PostSerializer
+from .serializers import EventSerializer, PostSerializer
 
 
 @login_required
@@ -43,6 +43,16 @@ class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all().order_by("-date", "title")
     serializer_class = PostSerializer
+    http_method_names = ["get"]
+
+
+class EventViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows events to be viewed
+    """
+
+    queryset = Event.objects.all().order_by("-date", "name")
+    serializer_class = EventSerializer
     http_method_names = ["get"]
 
 
