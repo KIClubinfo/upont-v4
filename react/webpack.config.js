@@ -1,22 +1,24 @@
 'use strict'
 
+// entryMap is an object containing all entrypoints (files under ./src/pages)
+const fs = require('fs')
+const entryMap = {}
+fs.readdirSync('./src/pages/')
+  .filter(file => {
+    return file.match(/.*\.(j|t)sx?$/)
+  })
+  .forEach(file => {
+    entryMap[file.replace(/\.(j|t)sx?$/, '')] = './src/pages/' + file
+  })
+
 module.exports = (env) => {
   return {
     devtool: 'eval-source-map',
     mode: env.mode,
-    entry: {
-      IndexUsers: './src/index_users.js',
-      Posts: './src/posts.js',
-      CSRF: './src/csrf.js',
-      MemberAdding: './src/adding_members.js',
-      PochtronShop: './src/pochtron_shop.js',
-      PochtronManageAccounts: './src/pochtron_manage_accounts.js',
-      PochtronOverview: './src/pochtron_overview.js',
-      BigCalendar: './src/calendar.js'
-    },
+    entry: entryMap,
     resolve: {
       modules: [__dirname, 'node_modules'],
-      extensions: ['.js', '.jsx', '.scss', '.css']
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
     },
     output: {
       path: '/src/upont/static/react/',
@@ -24,15 +26,8 @@ module.exports = (env) => {
     },
     module: {
       rules: [
-        {
-          test: /\.jsx?$/,
-          exclude: /node_modules/,
-          loader: 'babel-loader'
-        },
-        {
-          test: /\.css/,
-          use: ['style-loader', 'css-loader', 'sass-loader']
-        }
+        { test: /\.tsx?$/, loader: 'ts-loader' },
+        { test: /\.jsx?$/, loader: 'babel-loader' }
       ]
     }
   }
