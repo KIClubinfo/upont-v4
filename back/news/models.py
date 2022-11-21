@@ -11,6 +11,7 @@ class Event(models.Model):
     description = models.TextField()
     club = models.ForeignKey("social.Club", on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField()
+    end = models.DateTimeField()
     location = models.CharField(max_length=50)
     participants = models.ManyToManyField(
         Student,

@@ -1,0 +1,36 @@
+{% load static %}
+
+<!--Header-->
+{% include "header.html" with title="Calendrier" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="the_calendar" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <!--Header Content-->
+        {% include "../social/searchbar.html" with all_student_list=all_student_list %}
+
+        <!--Main Content-->
+        <div class="content-main">
+
+            <div id="Basic"></div>
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+    <script>
+        window.react_mount = document.getElementById('Basic');
+    </script>
+    <script src="{% static 'react/calendar.bundle.js' %}"></script>
+
+</body><!--End of Body-->
+
+</html><!--End of Document-->

@@ -74,6 +74,7 @@ PROJECT_APPS = [
     "pochtron.apps.PochtronConfig",
     "social.apps.SocialConfig",
     "trade.apps.TradeConfig",
+    "the_calendar.apps.CalendarConfig",
 ]
 
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + PROJECT_APPS
