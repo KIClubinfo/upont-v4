@@ -6,9 +6,10 @@ from django.http import HttpRequest
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework.test import APITestCase
 from social.models import Club, Membership, Student
 
-from .models import Comment, Participation, Post, Shotgun
+from .models import Comment, Event, Participation, Post, Shotgun
 from .views import posts
 
 
@@ -498,3 +499,72 @@ class CommentViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 0)
+
+
+class EventAPITest(APITestCase):
+    def setUp(self):
+        self.username = "user"
+        self.email = "user@mail.com"
+        self.password = "Follow the white rabbit"
+
+        self.user = models.User.objects.create_user(
+            self.username, self.email, self.password
+        )
+
+        self.student = Student(
+            user=self.user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+        )
+        self.student.save()
+
+    def test_events(self):
+        event1 = Event(
+            name="Event 1",
+            description="Event 1 description",
+            date=timezone.now(),
+            end=timezone.now() + datetime.timedelta(hours=1),
+            location="Event 1 location",
+        )
+        event1.save()
+
+        event2 = Event(
+            name="Event 2",
+            description="Event 2 description",
+            date=timezone.now(),
+            end=timezone.now() + datetime.timedelta(hours=1),
+            location="Event 2 location",
+        )
+        event2.save()
+        event2.participants.add(self.student)
+
+        self.client.login(username=self.username, password=self.password)
+        url = reverse("event-list")
+        response = self.client.get(url)
+
+        # Check if the request was successful
+        self.assertEqual(response.status_code, 200)
+        # Check if all the events are send
+        self.assertEqual(response.data.get("count"), 2)
+        # Check events information
+        response_event1 = response.data.get("results")[1]
+        self.assertEqual(response_event1["id"], event1.pk)
+        self.assertEqual(response_event1["name"], event1.name)
+        self.assertEqual(response_event1["description"], event1.description)
+        self.assertEqual(response_event1["date"], event1.date.astimezone().isoformat())
+        self.assertEqual(response_event1["location"], event1.location)
+        self.assertEqual(response_event1["participants"], [])
+        self.assertEqual(response_event1["participating"], False)
+
+        response_event2 = response.data.get("results")[0]
+        self.assertEqual(response_event2["id"], event2.pk)
+        self.assertEqual(response_event2["name"], event2.name)
+        self.assertEqual(response_event2["description"], event2.description)
+        self.assertEqual(response_event2["date"], event2.date.astimezone().isoformat())
+        self.assertEqual(response_event2["location"], event2.location)
+        self.assertEqual(len(response_event2["participants"]), 1)
+        participant_id = int(response_event2["participants"][0].split("/")[-2])
+        self.assertEqual(participant_id, self.student.pk)
+        self.assertEqual(response_event2["participating"], True)

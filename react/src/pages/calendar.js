@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
-import {ConsumptionsGraph} from './components/overview'
+import Basic from '../components/basic_calendar'
 
 ReactDOM.render((
-    <ConsumptionsGraph />
+  <Basic />
 ), window.react_mount)

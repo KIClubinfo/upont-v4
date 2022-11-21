@@ -20,8 +20,9 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django_reverse_js.views import urls_js
-from news.views import PostViewSet
+from news.views import EventViewSet, PostViewSet
 from pochtron.views import PochtronId, SearchAlcohol
+from rest_framework import routers
 from social.views import (
     CurrentStudentView,
     SearchRole,
@@ -39,6 +40,7 @@ urlpatterns = [
     path("social/", include("social.urls")),
     path("news/", include("news.urls")),
     path("pochtron/", include("pochtron.urls")),
+    path("the_calendar/", include("the_calendar.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo/", views.add, name="add_promo"),
@@ -61,17 +63,16 @@ else:
 
 # ---- API URLS ----#
 
+router = routers.DefaultRouter()
+router.register(r"students", StudentViewSet)
+router.register(r"posts", PostViewSet)
+router.register(r"events", EventViewSet)
+
 urlpatterns += [
     path(
         "reverse.js", urls_js, name="reverse_js"
     ),  # for reversing django urls in JavaScript
-    path("api/students/", StudentViewSet.as_view({"get": "list"}), name="students"),
-    path("api/posts/", PostViewSet.as_view({"get": "list"}), name="posts"),
-    path(
-        "api/posts/<int:pk>/",
-        PostViewSet.as_view({"get": "retrieve"}),
-        name="post_detail",
-    ),
+    path("api/", include(router.urls)),
     path("api/current/", CurrentStudentView.as_view(), name="current_student"),
     path(
         "api/transactions/last/", LastTransactions.as_view(), name="last_transactions"
