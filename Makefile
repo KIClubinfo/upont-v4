@@ -25,6 +25,8 @@ install-linters: install-linters-back install-linters-front
 
 lint: lint-back lint-front
 
+format: format-back format-front
+
 ##
 ## ~ Backend
 install-linters-back:
@@ -34,6 +36,9 @@ lint-back:
 	black back/ --check
 	flake8 back/
 
+format-back:
+	black back/
+
 ##
 ## ~ Frontend
 install-linters-front:
@@ -42,3 +47,6 @@ install-linters-front:
 lint-front:
 	npx prettier --check react/src
 	npx eslint react/src
+
+format-front:
+	npx prettier react/src
