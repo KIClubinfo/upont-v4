@@ -45,12 +45,16 @@ class Post(models.Model):
         related_name="posts",
         blank=True,
     )
+    dislikes = models.ManyToManyField(
+        Student,
+        blank=True,
+    )
 
     def __str__(self):
         return self.title
 
     def total_likes(self):
-        return self.likes.count()
+        return self.likes.count() - self.dislikes.count()
 
     def total_comments(self):
         return self.comments.count()

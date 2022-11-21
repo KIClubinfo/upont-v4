@@ -98,10 +98,20 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     def get_like_url(self, obj):
         return reverse("news:post_like", args=(obj.pk, "Like"))
 
+    unlike_url = serializers.SerializerMethodField()
+
+    def get_unlike_url(self, obj):
+        return reverse("news:post_like", args=(obj.pk, "Unlike"))
+
     dislike_url = serializers.SerializerMethodField()
 
     def get_dislike_url(self, obj):
         return reverse("news:post_like", args=(obj.pk, "Dislike"))
+
+    undislike_url = serializers.SerializerMethodField()
+
+    def get_undislike_url(self, obj):
+        return reverse("news:post_like", args=(obj.pk, "Undislike"))
 
     total_likes = serializers.SerializerMethodField()
 
@@ -160,7 +170,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "edit_url",
             "author_url",
             "like_url",
-            "dislike_url",
+            "unlike_url",
             "total_likes",
             "total_comments",
             "user_liked",
