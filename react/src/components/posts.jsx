@@ -251,7 +251,7 @@ class Posts extends React.Component {
     this.state = {
       error: null,
       posts: [],
-      next_url: Urls.postList(),
+      next_url: Urls['post-list'](),
       count: null,
       more_exist: true,
       currentStudent: ''
