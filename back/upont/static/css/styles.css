@@ -1365,3 +1365,10 @@ a.text-green:hover{
     text-align: left;
     font-family:'Neue Helvetica Light';
 }
+
+/*-------------------------------------------------*/
+/*--------------- CALENDAR COMPONENTS -------------*/
+/*-------------------------------------------------*/
+.calendar-box {
+    width: 80%;
+}

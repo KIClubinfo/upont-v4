@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
-import Posts from './components/posts'
+import {Manager} from '../components/manager'
 
 ReactDOM.render((
-  <Posts />
+    <Manager />
 ), window.react_mount)

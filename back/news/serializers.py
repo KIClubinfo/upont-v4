@@ -4,7 +4,7 @@ from rest_framework import serializers
 from social.models import Student
 from social.serializers import ClubSerializer, StudentSerializer
 
-from .models import Comment, Post
+from .models import Comment, Event, Post
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -168,4 +168,34 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "can_edit",
             "user_author_url",
+        ]
+
+
+class EventSerializer(serializers.HyperlinkedModelSerializer):
+    club = ClubSerializer()
+
+    def get_participating(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        student = get_object_or_404(Student, user__id=user.id)
+        return student in obj.participants.all()
+
+    participating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Event
+        fields = [
+            "name",
+            "description",
+            "club",
+            "date",
+            "end",
+            "location",
+            "participants",
+            "participating",
+            "poster",
+            "shotgun",
+            "id",
         ]
