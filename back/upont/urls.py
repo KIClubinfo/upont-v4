@@ -40,6 +40,7 @@ urlpatterns = [
     path("social/", include("social.urls")),
     path("news/", include("news.urls")),
     path("pochtron/", include("pochtron.urls")),
+    path("courses/", include("courses.urls")),
     path("the_calendar/", include("the_calendar.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
