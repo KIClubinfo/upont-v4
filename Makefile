@@ -36,7 +36,7 @@ install-linters-back:
 
 lint-back:
 	black back/ --check
-	flake8 back/
+	flake8 back/ --config .github/linters/.flake8
 
 format-back:
 	black back/
