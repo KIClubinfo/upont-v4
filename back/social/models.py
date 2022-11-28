@@ -196,3 +196,4 @@ def compress_image(image, quality, name):
     im.save(im_io, "JPEG", quality=quality, optimize=True)
     new_image = File(im_io, name=name + "_" + uuid4().hex + ".jpg")
     return new_image
+

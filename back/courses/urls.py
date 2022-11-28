@@ -1,3 +1,10 @@
 app_name = "course"
 
-urlpatterns = []
+from django.urls import path
+
+from . import views
+
+
+urlpatterns = [
+       path("course/<int:course_id>/details", views.view_course, name="course_detail"),
+]
