@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -171,7 +170,10 @@ class Migration(migrations.Migration):
                         null=True,
                         validators=[
                             django.core.validators.RegexValidator(
-                                message="Le numéro doit être entré au format: '+999999999'. Jusqu'à 16 chiffres sont autorisés.",
+                                message=(
+                                    "Le numéro doit être entré au format: '+999999999'."
+                                    " Jusqu'à 16 chiffres sont autorisés."
+                                ),
                                 regex="^\\+?\\d{9,16}$",
                             )
                         ],

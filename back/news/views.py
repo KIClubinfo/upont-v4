@@ -292,7 +292,7 @@ def shotgun_participate(request, shotgun_id):
     if shotgun.requires_motivation:
         try:
             motivation = request.POST["motivation"]
-        except (KeyError):
+        except KeyError:
             error_message = "Tu n'as pas fourni de motivation !"
             return HttpResponseRedirect(
                 reverse(
