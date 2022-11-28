@@ -17,6 +17,8 @@ stop:
 stop-prod:
 	./scripts/stop.sh
 
+install: install-pre-commit install-linters
+
 install-pre-commit:
 	pip install pre-commit
 	pre-commit install
