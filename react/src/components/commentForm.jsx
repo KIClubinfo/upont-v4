@@ -1,5 +1,5 @@
 import React from 'react';
-import { getCookie } from '/src/csrf';
+import { getCookie } from './utils/csrf';
 
 function timeout(delay) {
   return new Promise((res) => setTimeout(res, delay));
