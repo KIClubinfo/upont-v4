@@ -51,4 +51,4 @@ lint-front:
 	npx eslint react/src
 
 format-front:
-	npx prettier react/src
+	npx prettier --write react/src
