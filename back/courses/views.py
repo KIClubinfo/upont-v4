@@ -13,6 +13,7 @@ from .models import Course
 
 
 @login_required
+
 def view_course(request, course):
     course = get_object_or_404(Course, pk=course_id)
     context = {
