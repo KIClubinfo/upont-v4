@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import ReactMarkdown from 'react-markdown';
@@ -9,7 +10,7 @@ import { CommentForm } from './commentForm';
 // auxilary functions
 function addZero(i) {
   if (i < 10) {
-    i = '0' + i;
+    i = `0${i}`;
   }
   return i;
 }
@@ -23,13 +24,12 @@ function post_logo(state) {
         <img className="image-centered" src={state.post.club.logo_url} />
       </div>
     );
-  } else {
-    return (
-      <div className="news-card-header-image">
-        <img className="image-centered" src={state.post.author.picture_url} />
-      </div>
-    );
   }
+  return (
+    <div className="news-card-header-image">
+      <img className="image-centered" src={state.post.author.picture_url} />
+    </div>
+  );
 }
 
 function post_author(state) {
@@ -39,13 +39,12 @@ function post_author(state) {
         {state.post.club.name}
       </a>
     );
-  } else {
-    return (
-      <a className="news-card-header-name" href={state.post.author_url}>
-        {state.post.author.user.first_name} {state.post.author.user.last_name}
-      </a>
-    );
   }
+  return (
+    <a className="news-card-header-name" href={state.post.author_url}>
+      {state.post.author.user.first_name} {state.post.author.user.last_name}
+    </a>
+  );
 }
 
 function post_title(state) {
@@ -163,13 +162,12 @@ class Post extends React.Component {
           <i className="fas fa-heart" style={{ color: 'red' }} />
         </a>
       );
-    } else {
-      return (
-        <a onClick={this.like} className="">
-          <i className="far fa-heart" />
-        </a>
-      );
     }
+    return (
+      <a onClick={this.like} className="">
+        <i className="far fa-heart" />
+      </a>
+    );
   }
 
   show_more() {
@@ -185,9 +183,8 @@ class Post extends React.Component {
   show_comments_button() {
     if (this.state.post.comments.length <= 1) {
       return <div />;
-    } else if (
-      this.state.numberOfCommentsShown < this.state.post.comments.length
-    ) {
+    }
+    if (this.state.numberOfCommentsShown < this.state.post.comments.length) {
       return (
         <div
           className="news-card-edit-comment-container"
@@ -198,18 +195,17 @@ class Post extends React.Component {
           </a>
         </div>
       );
-    } else {
-      return (
-        <div
-          className="news-card-edit-comment-container"
-          style={{ textAlign: 'center' }}
-        >
-          <a href="javascript:void(0)" onClick={this.show_less}>
-            Voir moins de commentaires
-          </a>
-        </div>
-      );
     }
+    return (
+      <div
+        className="news-card-edit-comment-container"
+        style={{ textAlign: 'center' }}
+      >
+        <a href="javascript:void(0)" onClick={this.show_less}>
+          Voir moins de commentaires
+        </a>
+      </div>
+    );
   }
 
   edit_button() {
@@ -229,7 +225,7 @@ class Post extends React.Component {
       return (
         <div className="centered-div">
           <a href={this.state.post.event_url}>
-            <button class="button green-button">Voir l'événement</button>
+            <button className="button green-button">Voir l'événement</button>
           </a>
         </div>
       );
@@ -240,7 +236,8 @@ class Post extends React.Component {
     if (this.state.post.event_url) {
       return (
         <p>
-          <i class="fas fa-calendar-alt" /> Ce post est associé à l'événement{' '}
+          <i className="fas fa-calendar-alt" /> Ce post est associé à
+          l'événement{' '}
           <a href={this.state.post.event_url}>{this.state.post.event_name}</a>
         </p>
       );
@@ -283,20 +280,16 @@ class Post extends React.Component {
           <div style={{ display: 'block' }}>
             {this.state.post.comments
               .slice(0, this.state.numberOfCommentsShown)
-              .map(
-                function f(comment) {
-                  return (
-                    <Comment
-                      comment={comment}
-                      key={comment.id}
-                      refreshPost={this.refresh}
-                    />
-                  );
-                }.bind(this),
-              )}
+              .map((comment) => (
+                <Comment
+                  comment={comment}
+                  key={comment.id}
+                  refreshPost={this.refresh}
+                />
+              ))}
             {this.show_comments_button()}
             <CommentForm
-              post={this.state.post}
+              post_id={this.state.post.id}
               currentStudent={this.props.currentStudent}
               refreshPost={this.refresh}
             />
@@ -348,7 +341,7 @@ class Posts extends React.Component {
             result.next = '';
           }
           this.setState({
-            next_url: '/' + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''),
+            next_url: `/${result.next.replace(/^(?:\/\/|[^/]+)*\//, '')}`,
             posts: this.state.posts.concat(result.results),
             more_exist: has_more,
           });
@@ -373,17 +366,13 @@ class Posts extends React.Component {
         }
       >
         <div className="row" key="-2">
-          {this.state.posts.map(
-            function f(post) {
-              return (
-                <Post
-                  post={post}
-                  key={post.id}
-                  currentStudent={this.state.currentStudent}
-                />
-              );
-            }.bind(this),
-          )}
+          {this.state.posts.map((post) => (
+            <Post
+              post={post}
+              key={post.id}
+              currentStudent={this.state.currentStudent}
+            />
+          ))}
         </div>
       </InfiniteScroll>
     );

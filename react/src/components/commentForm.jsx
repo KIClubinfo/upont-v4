@@ -1,20 +1,32 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { getCookie } from './utils/csrf';
 
-function timeout(delay) {
-  return new Promise((res) => setTimeout(res, delay));
-}
-
-class CommentForm extends React.Component {
+export default class CommentForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       content: '',
-      post: props.post,
+      post_id: props.post_id,
       club: '',
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    // eslint-disable-next-line no-undef
+    fetch(Urls.publish_comment())
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          this.setState({ can_publish_as: result.can_publish_as });
+        },
+        (error) => {
+          // eslint-disable-next-line no-console
+          console.error(error);
+        },
+      );
   }
 
   handleChange(event) {
@@ -34,7 +46,7 @@ class CommentForm extends React.Component {
       body: JSON.stringify({
         content: this.state.content,
         club: this.state.club,
-        post: this.state.post.id,
+        post: this.state.post_id,
       }),
     };
     fetch(url, requestOptions)
@@ -44,31 +56,18 @@ class CommentForm extends React.Component {
           club: '',
         }),
       )
-      .then((response) => console.log('Submitted successfully'))
+      // eslint-disable-next-line no-console
+      .then(() => console.log('Submitted successfully'))
+      // eslint-disable-next-line no-console
       .catch((error) => console.log('Form submit error', error));
     setTimeout(() => this.props.refreshPost(), 300);
   }
 
-  componentDidMount() {
-    fetch(Urls['publish_comment']())
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          this.setState({ can_publish_as: result.can_publish_as });
-        },
-        (error) => {
-          this.setState({
-            error,
-          });
-        },
-      );
-  }
-
   render() {
-    let options = [];
+    const options = [];
     if (this.state.can_publish_as) {
       for (const [key, value] of Object.entries(this.state.can_publish_as)) {
-        if (value == 'Élève') {
+        if (value === 'Élève') {
           // This is the option to publish as student
           options.push(
             <option selected="selected" key={key} value="">
@@ -95,9 +94,9 @@ class CommentForm extends React.Component {
           id=""
           value={this.state.content}
           onChange={this.handleChange}
-        ></textarea>
+        />
         <button className="button green-button" type="submit">
-          <i className="fas fa-paper-plane"></i>
+          <i className="fas fa-paper-plane" />
         </button>
       </div>
     );
@@ -127,18 +126,21 @@ class CommentForm extends React.Component {
         >
           Commenter en tant que :{field2}
           {field1}
-          <input type="hidden" name="post" value={this.state.post.id}></input>
-        </form>
-      );
-    } else {
-      return (
-        <form method="post" onSubmit={this.handleSubmit.bind(this)}>
-          {field1}
-          <input type="hidden" name="post" value={this.state.post.id}></input>
+          <input type="hidden" name="post" value={this.state.post_id} />
         </form>
       );
     }
+    return (
+      <form method="post" onSubmit={this.handleSubmit.bind(this)}>
+        {field1}
+        <input type="hidden" name="post" value={this.state.post_id} />
+      </form>
+    );
   }
 }
+CommentForm.propTypes = {
+  post_id: PropTypes.number.isRequired,
+  refreshPost: PropTypes.func.isRequired,
+};
 
 export { CommentForm };
