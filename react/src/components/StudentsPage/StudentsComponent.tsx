@@ -1,12 +1,11 @@
-import 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import { Student } from './StudentComponent';
 
 export const Students: React.FC = () => {
   const [students, setStudents] = useState([]);
-  //@ts-ignore Urls is declared in the django template
-  const [nextUrl, setNextUrl] = useState(Urls['students']());
+  // @ts-ignore Urls is declared in the django template
+  const [nextUrl, setNextUrl] = useState(Urls.students());
   const [moreExists, setMoreExists] = useState(true);
 
   const fetchData = () => {
@@ -14,14 +13,15 @@ export const Students: React.FC = () => {
     fetch(nextUrl)
       .then((res) => res.json())
       .then((result) => {
+        let { next } = result;
         let hasMore = false;
-        if (result.next) {
+        if (next) {
           hasMore = true;
         } else {
-          result.next = '';
+          next = '';
         }
         setStudents(students.concat(result.results));
-        setNextUrl('/' + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''));
+        setNextUrl(`/${next.replace(/^(?:\/\/|[^/]+)*\//, '')}`);
         setMoreExists(hasMore);
       });
   };
@@ -32,7 +32,7 @@ export const Students: React.FC = () => {
       hasMore={moreExists}
       loader={
         <div key="-1" style={{ textAlign: 'center', marginTop: '10%' }}>
-          <i className="fa fa-lg fa-spinner fa-spin"></i>
+          <i className="fa fa-lg fa-spinner fa-spin" />
         </div>
       }
     >
