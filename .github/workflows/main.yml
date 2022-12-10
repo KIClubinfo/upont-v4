@@ -25,3 +25,13 @@ jobs:
         run: bash scripts/start.sh
       - name: Run tests
         run: docker-compose exec -T back python manage.py test
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependancies
+        run: make install-linters
+      - name: Lint Back
+        run: make lint-back
+      - name: Lint front
+        run: make lint-front
