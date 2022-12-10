@@ -142,5 +142,3 @@ CommentForm.propTypes = {
   post_id: PropTypes.number.isRequired,
   refreshPost: PropTypes.func.isRequired,
 };
-
-export { CommentForm };

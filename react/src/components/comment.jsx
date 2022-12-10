@@ -1,16 +1,6 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
-// auxilary functions
-function addZero(i) {
-  let res = i;
-  if (i < 10) {
-    res = `0${i}`;
-  }
-  return res;
-}
-
-/// //////////////////////////
+import { addZero } from './utils/utils';
 
 function commentLogo(state) {
   if (state.comment.club) {
@@ -170,5 +160,3 @@ Comment.propTypes = {
   }).isRequired,
   refreshPost: PropTypes.func.isRequired,
 };
-
-export { Comment };

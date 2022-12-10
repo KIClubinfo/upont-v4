@@ -1,38 +1,38 @@
+/* eslint-disable no-script-url */
+/* eslint-disable react/jsx-no-script-url */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable max-classes-per-file */
+/* eslint-disable react/prop-types */
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 import emoji from 'remark-emoji';
-import { Comment } from './comment';
-import { CommentForm } from './commentForm';
+import Comment from './comment';
+import CommentForm from './commentForm';
+import { addZero } from './utils/utils';
+import { getCookie } from './utils/csrf';
 
-// auxilary functions
-function addZero(i) {
-  if (i < 10) {
-    i = `0${i}`;
-  }
-  return i;
-}
-
-/// //////////////////////////
-
-function post_logo(state) {
+function postLogo(state) {
   if (state.post.club) {
     return (
       <div className="news-card-header-image">
-        <img className="image-centered" src={state.post.club.logo_url} />
+        <img className="image-centered" src={state.post.club.logo_url} alt="" />
       </div>
     );
   }
   return (
     <div className="news-card-header-image">
-      <img className="image-centered" src={state.post.author.picture_url} />
+      <img
+        className="image-centered"
+        src={state.post.author.picture_url}
+        alt=""
+      />
     </div>
   );
 }
 
-function post_author(state) {
+function postAuthor(state) {
   if (state.post.club) {
     return (
       <a className="news-card-header-name" href={state.post.author_url}>
@@ -47,30 +47,29 @@ function post_author(state) {
   );
 }
 
-function post_title(state) {
+function postTitle(state) {
   return <span className="news-card-header-title">{state.post.title}</span>;
 }
 
-function post_date(state) {
+function postDate(state) {
   const options = {
     weekday: 'short',
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   };
-  const post_date = new Date(state.post.date);
-  const post_hour = addZero(post_date.getHours());
-  const post_minute = addZero(post_date.getMinutes());
+  const date = new Date(state.post.date);
+  const hour = addZero(date.getHours());
+  const minute = addZero(date.getMinutes());
 
   return (
     <span className="news-card-header-date">
-      {post_date.toLocaleDateString('fr-FR', options)} - {post_hour}:
-      {post_minute}{' '}
+      {date.toLocaleDateString('fr-FR', options)} - {hour}:{minute}{' '}
     </span>
   );
 }
 
-function post_club_author(state) {
+function postClubAuthor(state) {
   if (state.post.club && state.post.can_edit) {
     return (
       <span className="news-card-header-date">
@@ -81,9 +80,11 @@ function post_club_author(state) {
       </span>
     );
   }
+
+  return null;
 }
 
-function post_illustration(state) {
+function postIllustration(state) {
   if (state.post.illustration_url) {
     return (
       <div className="news-card-images">
@@ -99,6 +100,8 @@ function post_illustration(state) {
       </div>
     );
   }
+
+  return null;
 }
 
 class Post extends React.Component {
@@ -118,6 +121,7 @@ class Post extends React.Component {
   }
 
   refresh() {
+    // eslint-disable-next-line no-undef
     fetch(Urls.post_detail(this.state.post.id))
       .then((res) => res.json())
       .then(
@@ -136,8 +140,10 @@ class Post extends React.Component {
     event.preventDefault();
     let url;
     if (this.state.post.user_liked) {
+      // eslint-disable-next-line no-undef
       url = Urls['news:post_like'](this.state.post.id, 'Dislike');
     } else {
+      // eslint-disable-next-line no-undef
       url = Urls['news:post_like'](this.state.post.id, 'Like');
     }
     const csrfmiddlewaretoken = getCookie('csrftoken');
@@ -150,30 +156,33 @@ class Post extends React.Component {
     };
     fetch(url, requestOptions)
       .then(this.setState({}))
-      .then((response) => console.log('Liked / Disliked successfully'))
+      // eslint-disable-next-line no-console
+      .then(() => console.log('Liked / Disliked successfully'))
+      // eslint-disable-next-line no-console
       .catch((error) => console.log('Submit error', error));
     setTimeout(() => this.refresh(), 200);
   }
 
   post_like_button() {
+    let heart;
     if (this.state.post.user_liked) {
-      return (
-        <a onClick={this.like} className="">
-          <i className="fas fa-heart" style={{ color: 'red' }} />
-        </a>
-      );
+      heart = <i className="fas fa-heart" style={{ color: 'red' }} />;
+    } else {
+      heart = <i className="far fa-heart" />;
     }
+
     return (
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
       <a onClick={this.like} className="">
-        <i className="far fa-heart" />
+        {heart}
       </a>
     );
   }
 
   show_more() {
-    this.setState({
-      numberOfCommentsShown: this.state.numberOfCommentsShown + 5,
-    });
+    this.setState((prevState) => ({
+      numberOfCommentsShown: prevState.numberOfCommentsShown + 5,
+    }));
   }
 
   show_less() {
@@ -218,6 +227,8 @@ class Post extends React.Component {
         </div>
       );
     }
+
+    return null;
   }
 
   show_event_button() {
@@ -225,11 +236,15 @@ class Post extends React.Component {
       return (
         <div className="centered-div">
           <a href={this.state.post.event_url}>
-            <button className="button green-button">Voir l'événement</button>
+            <button className="button green-button" type="button">
+              Voir l'événement
+            </button>
           </a>
         </div>
       );
     }
+
+    return null;
   }
 
   show_event_name() {
@@ -242,6 +257,8 @@ class Post extends React.Component {
         </p>
       );
     }
+
+    return null;
   }
 
   render() {
@@ -249,25 +266,25 @@ class Post extends React.Component {
       <div>
         <div className="news-card" id={this.state.post.id}>
           <div className="news-card-header">
-            {post_logo(this.state)}
+            {postLogo(this.state)}
             <div className="news-card-header-text">
-              {post_author(this.state)}
-              {post_club_author(this.state)}
-              {post_date(this.state)}
+              {postAuthor(this.state)}
+              {postClubAuthor(this.state)}
+              {postDate(this.state)}
             </div>
             {this.edit_button()}
           </div>
           <div className="news-card-content">
             {this.show_event_name()}
             <div className="news-card-content-title">
-              {post_title(this.state)}
+              {postTitle(this.state)}
             </div>
             <ReactMarkdown remarkPlugins={[gfm, emoji]}>
               {this.state.post.content}
             </ReactMarkdown>
             {this.show_event_button()}
           </div>
-          {post_illustration(this.state)}
+          {postIllustration(this.state)}
           <div className="news-card-actions">
             <span>
               {this.post_like_button()} {this.state.post.total_likes}{' '}
@@ -304,16 +321,16 @@ class Posts extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      error: null,
       posts: [],
+      // eslint-disable-next-line no-undef
       next_url: Urls.posts(),
-      count: null,
       more_exist: true,
       currentStudent: '',
     };
   }
 
   componentDidMount() {
+    // eslint-disable-next-line no-undef
     fetch(Urls.current_student())
       .then((res) => res.json())
       .then(
@@ -321,9 +338,8 @@ class Posts extends React.Component {
           this.setState({ currentStudent: result.student });
         },
         (error) => {
-          this.setState({
-            error,
-          });
+          // eslint-disable-next-line no-console
+          console.error(error);
         },
       );
   }
@@ -334,22 +350,22 @@ class Posts extends React.Component {
       .then((res) => res.json())
       .then(
         (result) => {
-          let has_more = false;
-          if (result.next) {
-            has_more = true;
+          let { next } = result;
+          let hasMore = false;
+          if (next) {
+            hasMore = true;
           } else {
-            result.next = '';
+            next = '';
           }
-          this.setState({
-            next_url: `/${result.next.replace(/^(?:\/\/|[^/]+)*\//, '')}`,
-            posts: this.state.posts.concat(result.results),
-            more_exist: has_more,
-          });
+          this.setState((prevState) => ({
+            next_url: `/${next.replace(/^(?:\/\/|[^/]+)*\//, '')}`,
+            posts: prevState.posts.concat(result.results),
+            more_exist: hasMore,
+          }));
         },
         (error) => {
-          this.setState({
-            error,
-          });
+          // eslint-disable-next-line no-console
+          console.log(error);
         },
       );
   };
