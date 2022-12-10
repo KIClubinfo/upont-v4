@@ -13,31 +13,6 @@ const customStyles = {
   }),
 };
 
-ReactDOM.render(
-  <AsyncSelect
-    styles={customStyles}
-    cacheOptions
-    defaultOptions
-    name="student"
-    loadingMessage={() => 'Chargement'}
-    placeholder="Sélectionner un élève"
-    loadOptions={getStudent}
-  />,
-  document.getElementById('adding_student'),
-);
-ReactDOM.render(
-  <AsyncSelect
-    styles={customStyles}
-    cacheOptions
-    defaultOptions
-    name="role"
-    loadingMessage={() => 'Chargement'}
-    placeholder="Sélectionner un rôle"
-    loadOptions={getRoles}
-  />,
-  document.getElementById('adding_role'),
-);
-
 function getStudent(inputValue) {
   return new Promise((resolve, reject) => {
     fetch(`/api/search/students/?user=${inputValue}`)
@@ -64,3 +39,29 @@ function getRoles(query) {
       .catch(reject);
   });
 }
+
+ReactDOM.render(
+  <AsyncSelect
+    styles={customStyles}
+    cacheOptions
+    defaultOptions
+    name="student"
+    loadingMessage={() => 'Chargement'}
+    placeholder="Sélectionner un élève"
+    loadOptions={getStudent}
+  />,
+  document.getElementById('adding_student'),
+);
+
+ReactDOM.render(
+  <AsyncSelect
+    styles={customStyles}
+    cacheOptions
+    defaultOptions
+    name="role"
+    loadingMessage={() => 'Chargement'}
+    placeholder="Sélectionner un rôle"
+    loadOptions={getRoles}
+  />,
+  document.getElementById('adding_role'),
+);

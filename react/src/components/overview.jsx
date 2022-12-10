@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/no-access-state-in-setstate */

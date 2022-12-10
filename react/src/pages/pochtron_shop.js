@@ -4,8 +4,8 @@ import { AddTransaction, LastTransactions } from '../components/shop';
 
 ReactDOM.render(
   <>
-    <AddTransaction></AddTransaction>
-    <LastTransactions></LastTransactions>
+    <AddTransaction />
+    <LastTransactions />
   </>,
   window.react_mount,
 );
