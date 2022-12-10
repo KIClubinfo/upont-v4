@@ -1,17 +1,19 @@
 import React, { useCallback } from 'react';
+import PropTypes from 'prop-types';
 
 const VALID_FIRST = /^[1-9]{1}$/;
 const VALID_NEXT = /^[0-9]{1}$/;
 const DELETE_KEY_CODE = 8;
 
 export default function CurrencyInput({
-  className = '',
-  max = Number.MAX_SAFE_INTEGER,
+  className,
+  max,
   onValueChange,
-  style = {},
+  style,
   name,
   value,
-  ...props
+  id,
+  type,
 }) {
   const valueAbsTrunc = Math.trunc(Math.abs(value));
   if (
@@ -66,7 +68,28 @@ export default function CurrencyInput({
       onKeyDown={handleKeyDown}
       style={style}
       value={valueDisplay}
-      {...props}
+      type={type}
+      name={name}
+      id={id}
     />
   );
 }
+CurrencyInput.propTypes = {
+  className: PropTypes.string,
+  max: PropTypes.number,
+  onValueChange: PropTypes.func.isRequired,
+  style: PropTypes.shape({}),
+  name: PropTypes.string,
+  value: PropTypes.number.isRequired,
+  id: PropTypes.string,
+  type: PropTypes.string,
+};
+
+CurrencyInput.defaultProps = {
+  className: '',
+  max: Number.MAX_SAFE_INTEGER,
+  style: {},
+  name: '',
+  id: '',
+  type: '',
+};
