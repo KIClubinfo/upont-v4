@@ -1,5 +1,7 @@
+// eslint-disable-next-line max-classes-per-file
 import React from 'react';
 import { StudentsSearchBar, AlcoholsSearchBar } from './searchBars';
+import { getCookie } from './utils/csrf';
 
 class LastTransactions extends React.Component {
   constructor(props) {
@@ -10,6 +12,7 @@ class LastTransactions extends React.Component {
   }
 
   componentDidMount() {
+    // eslint-disable-next-line no-undef
     fetch(Urls.pochtron_id())
       .then((res) => res.json())
       .then((result) => {
@@ -23,7 +26,8 @@ class LastTransactions extends React.Component {
   }
 
   load() {
-    fetch(Urls.last_transactions() + '?club=' + this.state.pochtron_id)
+    // eslint-disable-next-line no-undef
+    fetch(`${Urls.last_transactions()}?club=${this.state.pochtron_id}`)
       .then((res) => res.json())
       .then(
         (result) => {
@@ -32,9 +36,8 @@ class LastTransactions extends React.Component {
           });
         },
         (error) => {
-          this.setState({
-            error,
-          });
+          // eslint-disable-next-line no-console
+          console.error(error);
         },
       );
   }
@@ -54,7 +57,7 @@ class LastTransactions extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.transactions.map(function f(transaction) {
+            {this.state.transactions.map((transaction) => {
               const balanceChange =
                 transaction.quantity * transaction.good.price;
 
@@ -70,9 +73,7 @@ class LastTransactions extends React.Component {
               return (
                 <tr key={transaction.id}>
                   <td>
-                    {transaction.student.user.first_name +
-                      ' ' +
-                      transaction.student.user.last_name}
+                    {`${transaction.student.user.first_name} ${transaction.student.user.last_name}`}
                   </td>
                   <td>{transaction.good.name}</td>
                   <td>{transaction.quantity}</td>
@@ -105,6 +106,7 @@ class AddTransaction extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    // eslint-disable-next-line no-undef
     const url = Urls.add_transaction();
     const csrfmiddlewaretoken = getCookie('csrftoken');
     const requestOptions = {
@@ -120,11 +122,11 @@ class AddTransaction extends React.Component {
     };
     fetch(url, requestOptions)
       .then(
-        this.setState({
+        this.setState((prevState) => ({
           alcohol: '',
           student: '',
-          last_student: this.state.student,
-        }),
+          last_student: prevState.student,
+        })),
       )
       .then((res) => res.json())
       .then((response) =>
@@ -133,6 +135,7 @@ class AddTransaction extends React.Component {
           new_balance: response.new_balance,
         }),
       )
+      // eslint-disable-next-line no-console
       .catch((error) => console.log('Form submit error', error));
   }
 
