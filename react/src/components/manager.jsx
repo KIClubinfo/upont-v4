@@ -1,7 +1,10 @@
+/* eslint-disable max-classes-per-file */
 import React from 'react';
-import { StudentsSearchBar } from './searchBars';
 import { BottomScrollListener } from 'react-bottom-scroll-listener';
+import PropTypes from 'prop-types';
+import { StudentsSearchBar } from './searchBars';
 import CurrencyInput from './currencyInput';
+import { getCookie } from './utils/csrf';
 
 class LastTransactionsScroll extends React.Component {
   constructor(props) {
@@ -15,6 +18,7 @@ class LastTransactionsScroll extends React.Component {
   }
 
   componentDidMount() {
+    // eslint-disable-next-line no-undef
     fetch(Urls.pochtron_id())
       .then((res) => res.json())
       .then((result) => {
@@ -26,33 +30,31 @@ class LastTransactionsScroll extends React.Component {
   loadMore() {
     if (this.state.has_more) {
       fetch(
-        Urls.last_transactions() +
-          '?club=' +
-          this.state.pochtron_id +
-          '&start=' +
-          this.state.start +
-          '&end=' +
-          this.state.end,
+        // eslint-disable-next-line no-undef
+        `${Urls.last_transactions()}?club=${this.state.pochtron_id}&start=${
+          this.state.start
+        }&end=${this.state.end}`,
       )
         .then((res) => res.json())
         .then(
           (result) => {
-            this.setState({
-              transactions: this.state.transactions.concat(result.transactions),
-              start: this.state.start + 20,
-              end: this.state.end + 20,
+            this.setState((prevState) => ({
+              transactions: prevState.transactions.concat(result.transactions),
+              start: prevState.start + 20,
+              end: prevState.end + 20,
               has_more: result.has_more,
-            });
+            }));
           },
           (error) => {
-            this.setState({
-              error,
-            });
+            // eslint-disable-next-line no-console
+            console.error(error);
           },
         );
     }
   }
 
+  // clear is used in Manager class
+  // eslint-disable-next-line react/no-unused-class-component-methods
   clear() {
     setTimeout(
       () =>
@@ -86,7 +88,7 @@ class LastTransactionsScroll extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.transactions.map(function f(transaction) {
+            {this.state.transactions.map((transaction) => {
               const balanceChange =
                 transaction.quantity * transaction.good.price;
 
@@ -102,9 +104,7 @@ class LastTransactionsScroll extends React.Component {
               return (
                 <tr key={transaction.id}>
                   <td>
-                    {transaction.student.user.first_name +
-                      ' ' +
-                      transaction.student.user.last_name}
+                    {`${transaction.student.user.first_name} ${transaction.student.user.last_name}`}
                   </td>
                   <td>{transaction.good.name}</td>
                   <td>{transaction.quantity}</td>
@@ -137,6 +137,7 @@ class CreditAccount extends React.Component {
   }
 
   componentDidMount() {
+    // eslint-disable-next-line no-undef
     fetch(Urls.pochtron_id())
       .then((res) => res.json())
       .then((result) => {
@@ -156,6 +157,7 @@ class CreditAccount extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    // eslint-disable-next-line no-undef
     const url = Urls.credit_account();
     const csrfmiddlewaretoken = getCookie('csrftoken');
     const requestOptions = {
@@ -172,11 +174,11 @@ class CreditAccount extends React.Component {
     };
     fetch(url, requestOptions)
       .then(
-        this.setState({
+        this.setState((prevState) => ({
           student: '',
           amount: 0,
-          last_student: this.state.student,
-        }),
+          last_student: prevState.student,
+        })),
       )
       .then((res) => res.json())
       .then((response) => {
@@ -186,6 +188,7 @@ class CreditAccount extends React.Component {
           this.setState({ new_balance: response.new_balance });
         }
       })
+      // eslint-disable-next-line no-console
       .catch((error) => console.log('Form submit error', error));
     this.props.clear();
   }
@@ -250,6 +253,9 @@ class CreditAccount extends React.Component {
     );
   }
 }
+CreditAccount.propTypes = {
+  clear: PropTypes.func.isRequired,
+};
 
 class Manager extends React.Component {
   constructor(props) {
@@ -279,4 +285,4 @@ class Manager extends React.Component {
   }
 }
 
-export { Manager };
+export default Manager;
