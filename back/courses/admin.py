@@ -27,7 +27,7 @@ class GroupAdmin(admin.ModelAdmin):
 class EnrolmentAdmin(admin.ModelAdmin):
     list_display = (
         "student",
-        "course",
+        "group",
     )
 
 
