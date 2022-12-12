@@ -72,7 +72,7 @@ class Group(models.Model):
     )
 
     def __str__(self):
-        return self.course.name + " : " + self.teacher
+        return self.course.name + " : " + self.teacher.name
 
 
 class Enrolment(models.Model):
