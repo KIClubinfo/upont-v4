@@ -30,11 +30,11 @@ class Course(models.Model):
     department = models.CharField(
         max_length=8, choices=CourseDepartment.choices, default=CourseDepartment.AHE
     )
-    head = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     description = models.TextField()
     old_courses = models.ManyToManyField(
         "self",
-        through="Update",
+        through="CourseUpdate",
         symmetrical=False,
         related_name="new_courses",
         blank=True,
@@ -46,7 +46,7 @@ class Course(models.Model):
     )
 
 
-class Update(models.Model):
+class CourseUpdate(models.Model):
     date = models.DateTimeField()
     old_course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="old")
     new_course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="new")
@@ -68,8 +68,8 @@ class Group(models.Model):
 
 class Enrolment(models.Model):
     is_old = models.BooleanField(default=False)
-    course = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.course.name + " : " + self.student.user.username
+        return self.group.course.name + " : " + self.student.user.username
