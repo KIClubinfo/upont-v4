@@ -7,6 +7,9 @@ from social.models import Student
 class Teacher(models.Model):
     name = models.CharField(max_length=100, default="Professeur anonyme")
 
+    def __str__(self):
+        return self.name
+
 
 class CourseDepartment(models.TextChoices):
     IMI = "IMI", _("Ingénierie mathématique et informatique")
@@ -45,6 +48,9 @@ class Course(models.Model):
         blank=True,
     )
 
+    def __str__(self):
+        return self.name
+
 
 class CourseUpdate(models.Model):
     date = models.DateTimeField()
@@ -64,6 +70,9 @@ class Group(models.Model):
         related_name="course",
         blank=True,
     )
+
+    def __str__(self):
+        return self.course + " : " + self.teacher
 
 
 class Enrolment(models.Model):
