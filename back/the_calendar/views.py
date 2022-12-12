@@ -4,4 +4,4 @@ from django.shortcuts import render
 
 @login_required
 def view_calendar(request):
-    return render(request, "calendar/big_calendar.html")
+    return render(request, "calendar/calendar.html")
