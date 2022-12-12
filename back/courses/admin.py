@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Course, Enrolment, Group, Teacher, Update
+from .models import Course, CourseUpdate, Enrolment, Group, Teacher
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -8,7 +8,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ("department",)
 
 
-class UpdateAdmin(admin.ModelAdmin):
+class CourseUpdateAdmin(admin.ModelAdmin):
     list_display = (
         "date",
         "old_course",
@@ -32,7 +32,7 @@ class EnrolmentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Course, CourseAdmin)
-admin.site.register(Update, UpdateAdmin)
+admin.site.register(CourseUpdate, CourseUpdateAdmin)
 admin.site.register(Teacher)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Enrolment, EnrolmentAdmin)
