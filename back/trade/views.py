@@ -79,9 +79,11 @@ def add_transaction(request):
             else:
                 return JsonResponse(
                     {
-                        "error": "Pas assez d'argent sur ce compte.\
-                     Solde actuel : {} €".format(
-                            (balance + good.price()) / 100
+                        "error": (
+                            "Pas assez d'argent sur ce compte.                    "
+                            " Solde actuel : {} €".format(
+                                (balance + good.price()) / 100
+                            )
                         )
                     }
                 )
