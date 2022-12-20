@@ -1,26 +1,22 @@
-import React, { Fragment, useMemo, useState, useEffect } from 'react'
-import { useAsync } from 'react-async'
-import PropTypes from 'prop-types'
-import moment from 'moment'
-import 'moment/locale/fr'
+import React, { useMemo, useState, useEffect } from 'react';
+import { useAsync } from 'react-async';
+import PropTypes from 'prop-types';
+import moment from 'moment';
+import 'moment/locale/fr';
 
-import {
-  Calendar,
-  DateLocalizer,
-  momentLocalizer
-} from 'react-big-calendar'
+import { Calendar, DateLocalizer, momentLocalizer } from 'react-big-calendar';
 
-import * as dates from './utils/dates'
+import * as dates from './utils/dates';
 
 // Set the calendar language to french
-moment.locale('fr')
-const mLocalizer = momentLocalizer(moment)
+moment.locale('fr');
+const mLocalizer = momentLocalizer(moment);
 
 const messages = {
   allDay: 'journée',
   previous: 'précédent',
   next: 'suivant',
-  today: 'aujourd\'hui',
+  today: "aujourd'hui",
   month: 'mois',
   week: 'semaine',
   day: 'jour',
@@ -28,49 +24,42 @@ const messages = {
   date: 'date',
   time: 'heure',
   event: 'événement',
-  showMore: total => `+ ${total} événement(s) supplémentaire(s)`
-}
+  showMore: (total) => `+ ${total} événement(s) supplémentaire(s)`,
+};
 
 // Events fetching from back API
-async function getEvents () {
-  const response = await fetch('/api/events')
-    .then(
-      result => {
-        return result.json()
-      },
-      error => {
-        console.error('Error getting the events: ' + error)
-      }
-    )
+async function getEvents() {
+  const response = await fetch('/api/events').then(
+    (result) => result.json(),
+    (error) => {
+      // eslint-disable-next-line no-console
+      console.error(`Error getting the events: ${error}`);
+    },
+  );
 
-  const rawEvents = response.results
+  const rawEvents = response.results;
 
-  const formattedEvents = [] // Events formatted for BigCalendar
+  const formattedEvents = []; // Events formatted for BigCalendar
   for (const e of rawEvents) {
-    formattedEvents.push(
-      {
-        id: e.id,
-        title: e.name,
-        desc: e.description,
-        participating: e.participating,
-        start: new Date(e.date),
-        end: new Date(e.end)
-      }
-    )
+    formattedEvents.push({
+      id: e.id,
+      title: e.name,
+      desc: e.description,
+      participating: e.participating,
+      start: new Date(e.date),
+      end: new Date(e.end),
+    });
   }
 
-  return formattedEvents
+  return formattedEvents;
 }
 
-function handleSelectedEvent (e) {
-  const serveurUrl = window.location.origin
-  window.open(serveurUrl + '/news/event/' + e.id + '/detail', '_blank')
+function handleSelectedEvent(e) {
+  const serveurUrl = window.location.origin;
+  window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
 }
 
-export default function EventCalendar ({
-  localizer = mLocalizer,
-  ...props
-}) {
+export default function EventCalendar({ localizer }) {
   const { components, defaultDate, max, views } = useMemo(
     () => ({
       defaultDate: new Date(Date.now()),
@@ -79,68 +68,80 @@ export default function EventCalendar ({
         agenda: true,
         month: true,
         week: true,
-        day: true
-      }
+        day: true,
+      },
     }),
-    []
-  )
+    [],
+  );
 
-  const { data, error } = useAsync({ promiseFn: getEvents })
+  const { data, error } = useAsync({ promiseFn: getEvents });
   if (error) {
-    console.log(error.message)
+    // eslint-disable-next-line no-console
+    console.log(error.message);
   }
 
-  const [showedEvents, setShowedEvents] = useState([])
+  const [showedEvents, setShowedEvents] = useState([]);
 
   // State for filters
-  const [onlyParticipating, setOnlyParticipating] = useState(false)
+  const [onlyParticipating, setOnlyParticipating] = useState(false);
 
-  function handleParticipating () {
-    setOnlyParticipating(!onlyParticipating) // Swap the state
+  function handleParticipating() {
+    setOnlyParticipating(!onlyParticipating); // Swap the state
   }
 
   // Update showedEvents when data value change or a filter state is changed
   useEffect(() => {
     if (onlyParticipating) {
-      setShowedEvents(data.filter(e => e.participating))
-      document.getElementById('participating_button').className = 'button red-button'
+      setShowedEvents(data.filter((e) => e.participating));
+      document.getElementById('participating_button').className =
+        'button red-button';
     } else {
-      setShowedEvents(data)
-      document.getElementById('participating_button').className = 'button green-button'
+      setShowedEvents(data);
+      document.getElementById('participating_button').className =
+        'button green-button';
     }
-  }, [data, onlyParticipating])
+  }, [data, onlyParticipating]);
 
   // Manage default calendar view for small monitor like smartphones
-  let defaultView
+  let defaultView;
   if (window.innerWidth < 700) {
-    defaultView = 'day'
+    defaultView = 'day';
   } else {
-    defaultView = 'week'
+    defaultView = 'week';
   }
 
   return (
-    <>
-      <div className='calendar-box box' {...props}>
-        <div align='center'>
-          <button className='button green-button' id='participating_button' onClick={handleParticipating}>Évènements auxquels je ne participe pas</button>
-        </div>
-        <Calendar
-          components={components}
-          messages={messages}
-          defaultDate={defaultDate}
-          events={showedEvents}
-          localizer={localizer}
-          max={max}
-          showMultiDayTimes
-          step={60}
-          defaultView={defaultView}
-          views={views}
-          onSelectEvent={(e) => handleSelectedEvent(e)}
-        />
-      </div>
-    </>
-  )
+    <div className="calendar-box box">
+      <center>
+        <button
+          className="button green-button"
+          id="participating_button"
+          onClick={handleParticipating}
+          type="button"
+        >
+          Évènements auxquels je ne participe pas
+        </button>
+      </center>
+      <Calendar
+        components={components}
+        messages={messages}
+        defaultDate={defaultDate}
+        events={showedEvents}
+        localizer={localizer}
+        max={max}
+        showMultiDayTimes
+        step={60}
+        defaultView={defaultView}
+        views={views}
+        onSelectEvent={(e) => handleSelectedEvent(e)}
+      />
+    </div>
+  );
 }
 EventCalendar.propTypes = {
-  localizer: PropTypes.instanceOf(DateLocalizer)
-}
+  localizer: PropTypes.instanceOf(DateLocalizer),
+};
+
+EventCalendar.defaultProps = {
+  localizer: mLocalizer,
+};
