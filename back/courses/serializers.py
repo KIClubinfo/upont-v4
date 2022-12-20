@@ -24,4 +24,6 @@ class CourseSerializer(serializers.HyperlinkedModelSerializer):
             "department",
             "teacher",
             "description",
+            "old_courses",
+            "posts",
         ]
