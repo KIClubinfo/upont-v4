@@ -1367,6 +1367,39 @@ a.text-green:hover{
 }
 
 /*-------------------------------------------------*/
+/*--------------- COURSES COMPONENTS --------------*/
+/*-------------------------------------------------*/
+.course-card{
+    /* Positioning */
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    /* Sizing */
+    width: auto;
+    padding: 1rem 0rem;
+    margin: 2rem;
+    margin-left: 1rem;
+    /* Styling */
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+}
+
+.course-information{
+    /* Positionning */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Sizing */
+    margin-left: 1rem;
+}
+
+.course-name{
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+/*-------------------------------------------------*/
 /*--------------- CALENDAR COMPONENTS -------------*/
 /*-------------------------------------------------*/
 .calendar-box {
