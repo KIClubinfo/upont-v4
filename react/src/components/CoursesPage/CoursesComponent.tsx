@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
+import { fetchPaginatedData } from '../utils/utils'
 import { Course } from './CourseComponent';
 
 export const Courses: React.FC = () => {
@@ -8,25 +9,7 @@ export const Courses: React.FC = () => {
     const [nextUrl, setNextUrl] = useState(Urls.courseList());
     const [moreExists, setMoreExists] = useState(true);
 
-    const fetchData = () => {
-        setMoreExists(false);
-        fetch(nextUrl)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    let hasMore = false;
-                    if (result.next) {
-                        hasMore = true;
-                    }
-                    else {
-                        result.next = "";
-                    }
-                    setCourses(courses.concat(result.results));
-                    setNextUrl("/" + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''));
-                    setMoreExists(hasMore);
-                }
-            )
-    }
+    const fetchData = fetchPaginatedData(courses, setCourses, setMoreExists, nextUrl, setNextUrl);
 
     return (
         // <>
