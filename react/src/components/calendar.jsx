@@ -10,7 +10,7 @@ import {
   momentLocalizer
 } from 'react-big-calendar'
 
-import * as dates from './calendar_example/dates'
+import * as dates from './utils/dates'
 
 // Set the calendar language to french
 moment.locale('fr')
@@ -45,11 +45,6 @@ async function getEvents () {
 
   const rawEvents = response.results
 
-  const addOneHour = d => {
-    d.setHours(d.getHours() + 1)
-    return d
-  }
-
   const formattedEvents = [] // Events formatted for BigCalendar
   for (const e of rawEvents) {
     formattedEvents.push(
@@ -59,7 +54,7 @@ async function getEvents () {
         desc: e.description,
         participating: e.participating,
         start: new Date(e.date),
-        end: new Date(e.end),
+        end: new Date(e.end)
       }
     )
   }
@@ -72,9 +67,8 @@ function handleSelectedEvent (e) {
   window.open(serveurUrl + '/news/event/' + e.id + '/detail', '_blank')
 }
 
-export default function Basic ({
+export default function EventCalendar ({
   localizer = mLocalizer,
-  showDemoLink = false,
   ...props
 }) {
   const { components, defaultDate, max, views } = useMemo(
@@ -85,7 +79,7 @@ export default function Basic ({
         agenda: true,
         month: true,
         week: true,
-        day: true,
+        day: true
       }
     }),
     []
@@ -116,12 +110,11 @@ export default function Basic ({
     }
   }, [data, onlyParticipating])
 
-  // Manage default calendar view for small monitor like smartphone
-  var defaultView
+  // Manage default calendar view for small monitor like smartphones
+  let defaultView
   if (window.innerWidth < 700) {
     defaultView = 'day'
-  }
-  else {
+  } else {
     defaultView = 'week'
   }
 
@@ -148,7 +141,6 @@ export default function Basic ({
     </>
   )
 }
-Basic.propTypes = {
-  localizer: PropTypes.instanceOf(DateLocalizer),
-  showDemoLink: PropTypes.bool
+EventCalendar.propTypes = {
+  localizer: PropTypes.instanceOf(DateLocalizer)
 }
