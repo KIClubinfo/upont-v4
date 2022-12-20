@@ -324,7 +324,6 @@ class Posts extends React.Component {
       posts: [],
       // eslint-disable-next-line no-undef
       next_url: Urls.postList(),
-      count: null,
       more_exist: true,
       currentStudent: '',
     };
