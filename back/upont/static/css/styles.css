@@ -1405,3 +1405,37 @@ a.text-green:hover{
 .calendar-box {
     width: 80%;
 }
+
+/*-------------------------------------------------*/
+/*---------------------- TABS ---------------------*/
+/*-------------------------------------------------*/
+.tab {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  overflow: hidden;
+  color: white;
+  background-color: var(--primary-bg-color);
+}
+
+.tab button {
+  background-color: inherit;
+  float: center;
+  width: 100%;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 400;
+  padding: 1.3rem 1.3rem;
+  transition: 0.3s;
+}
+
+.tab button:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab button.active {
+    border-bottom: 3px solid #3DC1F3;
+}
