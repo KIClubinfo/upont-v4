@@ -1,0 +1,76 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% if course.nickname %}{% include "header.html" with title=club.course %}{% else %}{% include "header.html" with title=course.name %}{% endif %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="course" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <!--Header Content-->
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Main Content-->
+        <div class="content-main">
+
+            <!--Club Box-->
+            <div class="course-box">
+
+                </div>
+
+                <!--Row-->
+                <div class="row">
+
+                    <!--Column-->
+                    <div class="col-lg-4">
+                        <div class="course-image">
+                            <img class="image-centered" src="{% if course.logo %}{{course.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                        </div>
+                    </div><!--End of Column-->
+
+                    <!--Column-->
+                    <div class="col-lg-8">
+                        <div class="club-title">
+                            {{course.name}}{% if course.acronym %} - ({{club.acronym}}){% endif %}
+                            <a href="{% url 'social:club_index' %}" style="margin-left: auto;"><button class="button green-button">Retour à l'index</button></a>
+                        </div>
+                        
+                    </div><!--End of Column-->
+
+                    <!--Column-->
+                    <div class="col-12">
+
+                        <h5 class="section-title text-bold mt-2">Description du cours</h5>
+
+                        <p class="text-thin text-justified mt-2" style="font-size: medium;">{{course.description|markdownify}}</p>
+
+                   </div><!--End of Column-->
+
+                </div><!--End of Row-->
+
+            </div><!--End of Club Bow-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+
+</html><!--End of Document-->
