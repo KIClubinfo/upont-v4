@@ -28,6 +28,10 @@ class CourseViewSet(viewsets.ModelViewSet):
                     detail="is_enrolled must be either 'true' or 'false'"
                 )
 
+        departments = self.request.GET.get("department").split(",")
+        if departments is not None:
+            queryset = queryset.filter(department__in=departments)
+
         return queryset.order_by("department", "name")
 
 
