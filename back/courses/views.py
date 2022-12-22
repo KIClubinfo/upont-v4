@@ -1,11 +1,21 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import views, viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 from social.models import Student
 
-from .models import Course
+from .models import Course, CourseDepartment
 from .serializers import CourseSerializer
+
+
+class ListCourseDepartments(views.APIView):
+    """
+    View to list all the department a course can belong to
+    """
+
+    def get(self, request):
+        return Response(CourseDepartment.values)
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -28,9 +38,9 @@ class CourseViewSet(viewsets.ModelViewSet):
                     detail="is_enrolled must be either 'true' or 'false'"
                 )
 
-        departments = self.request.GET.get("department").split(",")
+        departments = self.request.GET.get("department")
         if departments is not None:
-            queryset = queryset.filter(department__in=departments)
+            queryset = queryset.filter(department__in=departments.split(","))
 
         return queryset.order_by("department", "name")
 
