@@ -1,4 +1,3 @@
-from django.contrib.auth import models as models2
 from django.core.files import File
 from django.db import models
 
@@ -13,3 +12,6 @@ class Ressources(models.Model):
     file= FileField(
         "Fichier",upload_to='ressources', null=TRUE,blank=TRUE
         )
+    post = models.ForeignKey(
+        "news.Post", verbose_name="post", on_delete=models.SET_NULL, null=True
+    )
