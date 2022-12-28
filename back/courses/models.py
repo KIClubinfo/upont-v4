@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Ressources(models.Model):
+class Resources(models.Model):
     name = models.CharField(max_length=50, default="Ressource")
     author = models.ForeignKey(
         "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
