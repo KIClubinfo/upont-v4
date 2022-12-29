@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from rest_framework import views, viewsets
+from rest_framework import filters, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from social.models import Student
@@ -22,6 +22,8 @@ class CourseViewSet(viewsets.ModelViewSet):
     # queryset = Course.objects.all().order_by("name")
     serializer_class = CourseSerializer
     http_method_names = ["get"]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name", "acronym"]
 
     def get_queryset(self):
         queryset = Course.objects.all()

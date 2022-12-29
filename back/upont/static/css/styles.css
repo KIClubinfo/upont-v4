@@ -1399,6 +1399,21 @@ a.text-green:hover{
     font-size: 1.3rem;
 }
 
+.course-searchbar{
+    /* Positionning */
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    /* Sizing */
+    margin: 0.3rem 0;
+    width: 100%;
+    height: 2.5rem;
+    font-size: 1rem;
+    text-indent: 0.5rem;
+    /* Styling */
+    border-radius: 5px;
+}
+
 /*-------------------------------------------------*/
 /*--------------- CALENDAR COMPONENTS -------------*/
 /*-------------------------------------------------*/

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import AsyncSelect from 'react-select/async';
+import { isNamespaceExportDeclaration } from 'typescript';
 import { fetchPaginatedData } from '../utils/utils'
 import { Course } from './CourseComponent';
 
@@ -66,6 +67,20 @@ export const Courses: React.FC = () => {
         }
     }
 
+    const handleSearch = (event) => {
+        if (event.target.value) {
+            setUrlParams((prev) => {
+                prev.set('search', event.target.value);
+                return new URLSearchParams(prev);
+            });
+        } else {
+            setUrlParams((prev) => {
+                prev.delete('search');
+                return new URLSearchParams(prev);
+            });
+        }
+    }
+
     const handleDepartmentFilter = (selectedDepartment) => {
         if (selectedDepartment.length > 0) {
             setUrlParams((prev) => {
@@ -82,6 +97,12 @@ export const Courses: React.FC = () => {
 
     return (
         <>
+            <input
+                className="course-searchbar"
+                type="search"
+                placeholder="Rechercher un cours"
+                onChange={handleSearch}
+            />
             <AsyncSelect
                 isMulti
                 isClearable
