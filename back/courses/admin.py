@@ -47,4 +47,5 @@ admin.site.register(CourseUpdate, CourseUpdateAdmin)
 admin.site.register(Teacher)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Enrolment, EnrolmentAdmin)
+admin.site.register(Resources, ResourcesAdmin)
 
