@@ -1,3 +1,7 @@
-app_name = "course"
+from django.urls import path
 
-urlpatterns = []
+from . import views
+
+app_name = "courses"
+
+urlpatterns = [path("courses/", views.index_courses, name="courses_index")]
