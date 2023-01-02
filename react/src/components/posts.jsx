@@ -99,7 +99,9 @@ class Post extends React.Component {
     }
     this.refresh = this.refresh.bind(this)
     this.like = this.like.bind(this)
+    this.dislike = this.dislike.bind(this)
     this.post_like_button = this.post_like_button.bind(this)
+    this.post_dislike_button = this.post_dislike_button.bind(this)
     this.show_more = this.show_more.bind(this)
     this.show_less = this.show_less.bind(this)
     this.show_comments_button = this.show_comments_button.bind(this)
@@ -125,7 +127,7 @@ class Post extends React.Component {
     event.preventDefault()
     let url
     if (this.state.post.user_liked) {
-      url = Urls['news:post_like'](this.state.post.id, 'Dislike')
+      url = Urls['news:post_like'](this.state.post.id, 'Unlike')
     } else {
       url = Urls['news:post_like'](this.state.post.id, 'Like')
     }
@@ -137,7 +139,28 @@ class Post extends React.Component {
     fetch(url, requestOptions)
       .then(this.setState({
       }))
-      .then(response => console.log('Liked / Disliked successfully'))
+      .then(response => console.log('Liked / Unliked successfully'))
+      .catch(error => console.log('Submit error', error))
+    setTimeout(() => this.refresh(), 200)
+  }
+
+  dislike (event) {
+    event.preventDefault()
+    let url
+    if (this.state.post.user_disliked) {
+      url = Urls['news:post_like'](this.state.post.id, 'Undislike')
+    } else {
+      url = Urls['news:post_like'](this.state.post.id, 'Dislike')
+    }
+    const csrfmiddlewaretoken = getCookie('csrftoken')
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/html', 'X-CSRFToken': csrfmiddlewaretoken }
+    }
+    fetch(url, requestOptions)
+      .then(this.setState({
+      }))
+      .then(response => console.log('Disliked / Undisliked successfully'))
       .catch(error => console.log('Submit error', error))
     setTimeout(() => this.refresh(), 200)
   }
@@ -150,6 +173,18 @@ class Post extends React.Component {
     } else {
       return (
         <a onClick={this.like} className=''><i className='far fa-heart' /></a>
+      )
+    }
+  }
+
+  post_dislike_button () {
+    if (this.state.post.user_disliked) {
+      return (
+        <a onClick={this.dislike} className=''><i className='fas fa-heart' style={{ color: 'blue' }} /></a>
+      )
+    } else {
+      return (
+        <a onClick={this.dislike} className=''><i className='far fa-heart' /></a>
       )
     }
   }
@@ -226,6 +261,8 @@ class Post extends React.Component {
           {post_illustration(this.state)}
           <div className='news-card-actions'>
             <span>{this.post_like_button()} {this.state.post.total_likes} </span>
+                        &ensp;
+            <span>{this.post_dislike_button()} {this.state.post.total_dislikes} </span>
                         &ensp;
             <span><i className='fas fa-comment' /> {this.state.post.total_comments}</span>
           </div>

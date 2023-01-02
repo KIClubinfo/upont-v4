@@ -48,7 +48,7 @@ class Post(models.Model):
     )
     dislikes = models.ManyToManyField(
         Student,
-        related_name="post_dislike",
+        related_name="post_dislikes",
         blank=True,
     )
 
