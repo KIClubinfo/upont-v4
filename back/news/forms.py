@@ -44,10 +44,10 @@ class EditEvent(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(EditEvent, self).clean()
-        date = cleaned_data.get('date')
-        end = cleaned_data.get('end')
+        date = cleaned_data.get("date")
+        end = cleaned_data.get("end")
 
-        if date and end: # check if the inputs are valid
+        if date and end:  # check if the inputs are valid
             if end <= date:
                 self.add_error(
                     "end",
@@ -55,6 +55,7 @@ class EditEvent(forms.ModelForm):
                 )
 
         return cleaned_data
+
 
 class EditPost(forms.ModelForm):
     class Meta:

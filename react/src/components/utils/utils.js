@@ -1,20 +1,29 @@
 // Return a function to fetch more data from a paginated API end point
 const fetchPaginatedData =
   (data, setData, setMoreExists, nextUrl, setNextUrl) => () => {
-    setMoreExists(false)
+    setMoreExists(false);
     fetch(nextUrl)
       .then((res) => res.json())
       .then((result) => {
-        let hasMore = false
-        if (result.next) {
-          hasMore = true
+        let hasMore = false;
+        let { next } = result;
+        if (next) {
+          hasMore = true;
         } else {
-          result.next = ''
+          next = '';
         }
-        setData(data.concat(result.results))
-        setNextUrl('/' + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''))
-        setMoreExists(hasMore)
-      })
-  }
+        setData(data.concat(result.results));
+        setNextUrl(`/${next.replace(/^(?:\/\/|[^/]+)*\//, '')}`);
+        setMoreExists(hasMore);
+      });
+  };
 
-export { fetchPaginatedData }
+function addZero(i) {
+  let res = i;
+  if (i < 10) {
+    res = `0${i}`;
+  }
+  return res;
+}
+
+export { fetchPaginatedData, addZero };
