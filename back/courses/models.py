@@ -84,6 +84,13 @@ class Enrolment(models.Model):
         return self.group.course.name + " : " + self.student.user.username
 
 
+class Timeslot(models.Model):
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    course_groups = models.ManyToManyField(Group, related_name="timeslot", blank=True)
+    place = models.CharField(max_length=50, blank=True)
+
+
 class Resources(models.Model):
     name = models.CharField(max_length=50, default="Ressource")
     author = models.ForeignKey(
