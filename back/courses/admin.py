@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Course, CourseUpdate, Enrolment, Group, Teacher, Resources
+from .models import Course, CourseUpdate, Enrolment, Group, Resource, Teacher
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -30,16 +30,14 @@ class EnrolmentAdmin(admin.ModelAdmin):
         "group",
     )
 
-class RessourcesAdmin(admin.ModelAdmin):
-    list_display=(
+
+class ResourceAdmin(admin.ModelAdmin):
+    list_display = (
         "name",
         "author",
         "date",
-        "file"
+        "post",
     )
-    list_filter = ("course",)
-
-
 
 
 admin.site.register(Course, CourseAdmin)
@@ -47,5 +45,4 @@ admin.site.register(CourseUpdate, CourseUpdateAdmin)
 admin.site.register(Teacher)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Enrolment, EnrolmentAdmin)
-admin.site.register(Resources, ResourcesAdmin)
-
+admin.site.register(Resource, ResourceAdmin)
