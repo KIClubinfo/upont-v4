@@ -30,7 +30,7 @@ class EnrolmentAdmin(admin.ModelAdmin):
         "group",
     )
 
-class RessourcesAdmin(admin.ModelAdmin):
+class ResourcesAdmin(admin.ModelAdmin):
     list_display=(
         "name",
         "author",
