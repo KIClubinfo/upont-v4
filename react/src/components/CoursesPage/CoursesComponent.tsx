@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import AsyncSelect from 'react-select/async';
-import { isNamespaceExportDeclaration } from 'typescript';
 import { fetchPaginatedData } from '../utils/utils';
 import { Course } from './CourseComponent';
 
@@ -60,8 +59,8 @@ export const Courses: React.FC = () => {
   }, [urlParams]);
 
   const handleChangeTab = (tab) => () => {
-    if (tab != activeTab) {
-      if (tab == tabs.ONLY_ENROLLED) {
+    if (tab !== activeTab) {
+      if (tab === tabs.ONLY_ENROLLED) {
         setUrlParams((prev) => {
           prev.set('is_enrolled', 'true');
           return new URLSearchParams(prev);
@@ -129,7 +128,7 @@ export const Courses: React.FC = () => {
       <div className="row tab">
         <div className="col">
           <button
-            className={activeTab == tabs.ALL_COURSE ? 'active' : ''}
+            className={activeTab === tabs.ALL_COURSE ? 'active' : ''}
             onClick={handleChangeTab(tabs.ALL_COURSE)}
             type="button"
           >
@@ -138,7 +137,7 @@ export const Courses: React.FC = () => {
         </div>
         <div className="col">
           <button
-            className={activeTab == tabs.ONLY_ENROLLED ? 'active' : ''}
+            className={activeTab === tabs.ONLY_ENROLLED ? 'active' : ''}
             onClick={handleChangeTab(tabs.ONLY_ENROLLED)}
             type="button"
           >
