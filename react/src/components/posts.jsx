@@ -168,11 +168,11 @@ class Post extends React.Component {
   post_like_button () {
     if (this.state.post.user_liked) {
       return (
-        <a onClick={this.like} className=''><i className='fas fa-heart' style={{ color: 'red' }} /></a>
+        <a onClick={this.like} className=''><i className='fas fa-arrow-up' style={{ color: '#F33D3D' }} /></a>
       )
     } else {
       return (
-        <a onClick={this.like} className=''><i className='far fa-heart' /></a>
+        <a onClick={this.like} className=''><i className='fas fa-arrow-up' /></a>
       )
     }
   }
@@ -180,11 +180,11 @@ class Post extends React.Component {
   post_dislike_button () {
     if (this.state.post.user_disliked) {
       return (
-        <a onClick={this.dislike} className=''><i className='fas fa-heart' style={{ color: 'blue' }} /></a>
+        <a onClick={this.dislike} className=''><i className='fas fa-arrow-down' style={{ color: '#3DC1F3' }} /></a>
       )
     } else {
       return (
-        <a onClick={this.dislike} className=''><i className='far fa-heart' /></a>
+        <a onClick={this.dislike} className=''><i className='fas fa-arrow-down' /></a>
       )
     }
   }
