@@ -7,7 +7,38 @@ from django.utils import timezone
 from news.models import Post
 from social.models import Student
 
-from .models import Resources
+from .models import Course, Group, Resources, Teacher, Timeslot
+
+
+class TimeslotModelTest(TestCase):
+    def test_timeslot_saves_in_database(self):
+        teacher = Teacher(name="Bob")
+        teacher.save()
+
+        course = Course(
+            name="Cours",
+            acronym="ABC",
+            department="GMM",
+            teacher=teacher,
+        )
+        course.save()
+
+        group = Group(
+            course=course,
+            teacher=teacher,
+        )
+        group.save()
+
+        timeslot = Timeslot(
+            start=timezone.now(),
+            end=timezone.now(),
+            place="Emplacement",
+        )
+        timeslot.save()
+        timeslot.course_groups.add(group)
+
+        retrieved_timeslot = Timeslot.objects.get(pk=timeslot.pk)
+        self.assertEqual(retrieved_timeslot, timeslot)
 
 
 class ResourcesModelTest(TestCase):
