@@ -37,7 +37,7 @@ class ResourcesAdmin(admin.ModelAdmin):
         "date",
         "file"
     )
-    list_filter = ("course",)
+
 
 
 
