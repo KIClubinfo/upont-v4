@@ -103,7 +103,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     def get_unlike_url(self, obj):
         return reverse("news:post_like", args=(obj.pk, "Unlike"))
 
-    total_likes = serializers.SerializerMethodField()
+    undislike_url = serializers.SerializerMethodField()
 
     def get_total_likes(self, obj):
         return obj.total_likes()

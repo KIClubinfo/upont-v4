@@ -56,7 +56,7 @@ class Post(models.Model):
         return self.title
 
     def total_likes(self):
-        return self.likes.count()
+        return self.likes.count() - self.dislikes.count()
 
     def total_dislikes(self):
         return self.dislikes.count()
