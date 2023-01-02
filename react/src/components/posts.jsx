@@ -1,321 +1,398 @@
-import React from 'react'
-import InfiniteScroll from 'react-infinite-scroller'
-import ReactMarkdown from 'react-markdown'
-import gfm from 'remark-gfm'
-import emoji from 'remark-emoji'
-import { Comment } from './comment'
-import { CommentForm } from './commentForm'
+/* eslint-disable no-script-url */
+/* eslint-disable react/jsx-no-script-url */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable max-classes-per-file */
+/* eslint-disable react/prop-types */
+import React from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import ReactMarkdown from 'react-markdown';
+import gfm from 'remark-gfm';
+import emoji from 'remark-emoji';
+import Comment from './comment';
+import CommentForm from './commentForm';
+import { addZero } from './utils/utils';
+import { getCookie } from './utils/csrf';
 
-// auxilary functions
-function addZero (i) {
-  if (i < 10) { i = '0' + i }
-  return i
-}
-
-/// //////////////////////////
-
-function post_logo (state) {
+function postLogo(state) {
   if (state.post.club) {
     return (
-      <div className='news-card-header-image'>
-        <img className='image-centered' src={state.post.club.logo_url} />
+      <div className="news-card-header-image">
+        <img className="image-centered" src={state.post.club.logo_url} alt="" />
       </div>
-    )
-  } else {
-    return (
-      <div className='news-card-header-image'>
-        <img className='image-centered' src={state.post.author.picture_url} />
-      </div>
-    )
+    );
   }
+  return (
+    <div className="news-card-header-image">
+      <img
+        className="image-centered"
+        src={state.post.author.picture_url}
+        alt=""
+      />
+    </div>
+  );
 }
 
-function post_author (state) {
+function postAuthor(state) {
   if (state.post.club) {
     return (
-      <a className='news-card-header-name' href={state.post.author_url}>
+      <a className="news-card-header-name" href={state.post.author_url}>
         {state.post.club.name}
       </a>
-    )
-  } else {
-    return (
-      <a className='news-card-header-name' href={state.post.author_url}>
-        {state.post.author.user.first_name} {state.post.author.user.last_name}
-      </a>
-    )
+    );
   }
-}
-
-function post_title (state) {
   return (
-    <span className='news-card-header-title'>{state.post.title}</span>
-  )
+    <a className="news-card-header-name" href={state.post.author_url}>
+      {state.post.author.user.first_name} {state.post.author.user.last_name}
+    </a>
+  );
 }
 
-function post_date (state) {
-  const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }
-  const post_date = new Date(state.post.date)
-  const post_hour = addZero(post_date.getHours())
-  const post_minute = addZero(post_date.getMinutes())
+function postTitle(state) {
+  return <span className="news-card-header-title">{state.post.title}</span>;
+}
+
+function postDate(state) {
+  const options = {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  };
+  const date = new Date(state.post.date);
+  const hour = addZero(date.getHours());
+  const minute = addZero(date.getMinutes());
 
   return (
-    <span className='news-card-header-date'>{post_date.toLocaleDateString('fr-FR', options)} - {post_hour}:{post_minute} </span>
-  )
+    <span className="news-card-header-date">
+      {date.toLocaleDateString('fr-FR', options)} - {hour}:{minute}{' '}
+    </span>
+  );
 }
 
-function post_club_author (state) {
+function postClubAuthor(state) {
   if (state.post.club && state.post.can_edit) {
     return (
-      <span className='news-card-header-date'>
+      <span className="news-card-header-date">
         Posté par&nbsp;
         <a href={state.post.user_author_url}>
           {state.post.author.user.first_name} {state.post.author.user.last_name}
         </a>
       </span>
-    )
+    );
   }
+
+  return null;
 }
 
-function post_illustration (state) {
+function postIllustration(state) {
   if (state.post.illustration_url) {
     return (
-      <div className='news-card-images'>
-        <div className='news-card-carousel'>
-          <div className='carousel-cell'>
-            <img className='news-card_image_sized' src={state.post.illustration_url} alt='' />
+      <div className="news-card-images">
+        <div className="news-card-carousel">
+          <div className="carousel-cell">
+            <img
+              className="news-card_image_sized"
+              src={state.post.illustration_url}
+              alt=""
+            />
           </div>
         </div>
       </div>
-    )
+    );
   }
+
+  return null;
 }
 
 class Post extends React.Component {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
       post: props.post,
-      numberOfCommentsShown: 1
-    }
-    this.refresh = this.refresh.bind(this)
-    this.like = this.like.bind(this)
-    this.post_like_button = this.post_like_button.bind(this)
-    this.show_more = this.show_more.bind(this)
-    this.show_less = this.show_less.bind(this)
-    this.show_comments_button = this.show_comments_button.bind(this)
-    this.edit_button = this.edit_button.bind(this)
+      numberOfCommentsShown: 1,
+    };
+    this.refresh = this.refresh.bind(this);
+    this.like = this.like.bind(this);
+    this.post_like_button = this.post_like_button.bind(this);
+    this.show_more = this.show_more.bind(this);
+    this.show_less = this.show_less.bind(this);
+    this.show_comments_button = this.show_comments_button.bind(this);
+    this.edit_button = this.edit_button.bind(this);
   }
 
-  refresh () {
+  refresh() {
+    // eslint-disable-next-line no-undef
     fetch(Urls.post_detail(this.state.post.id))
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(
         (result) => {
-          this.setState({ post: result })
+          this.setState({ post: result });
         },
         (error) => {
           this.setState({
-            error
-          })
-        }
-      )
+            error,
+          });
+        },
+      );
   }
 
-  like (event) {
-    event.preventDefault()
-    let url
+  like(event) {
+    event.preventDefault();
+    let url;
     if (this.state.post.user_liked) {
-      url = Urls['news:post_like'](this.state.post.id, 'Dislike')
+      // eslint-disable-next-line no-undef
+      url = Urls['news:post_like'](this.state.post.id, 'Dislike');
     } else {
-      url = Urls['news:post_like'](this.state.post.id, 'Like')
+      // eslint-disable-next-line no-undef
+      url = Urls['news:post_like'](this.state.post.id, 'Like');
     }
-    const csrfmiddlewaretoken = getCookie('csrftoken')
+    const csrfmiddlewaretoken = getCookie('csrftoken');
     const requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'text/html', 'X-CSRFToken': csrfmiddlewaretoken }
-    }
+      headers: {
+        'Content-Type': 'text/html',
+        'X-CSRFToken': csrfmiddlewaretoken,
+      },
+    };
     fetch(url, requestOptions)
-      .then(this.setState({
-      }))
-      .then(response => console.log('Liked / Disliked successfully'))
-      .catch(error => console.log('Submit error', error))
-    setTimeout(() => this.refresh(), 200)
+      .then(this.setState({}))
+      // eslint-disable-next-line no-console
+      .then(() => console.log('Liked / Disliked successfully'))
+      // eslint-disable-next-line no-console
+      .catch((error) => console.log('Submit error', error));
+    setTimeout(() => this.refresh(), 200);
   }
 
-  post_like_button () {
+  post_like_button() {
+    let heart;
     if (this.state.post.user_liked) {
-      return (
-        <a onClick={this.like} className=''><i className='fas fa-heart' style={{ color: 'red' }} /></a>
-      )
+      heart = <i className="fas fa-heart" style={{ color: 'red' }} />;
     } else {
-      return (
-        <a onClick={this.like} className=''><i className='far fa-heart' /></a>
-      )
+      heart = <i className="far fa-heart" />;
     }
+
+    return (
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+      <a onClick={this.like} className="">
+        {heart}
+      </a>
+    );
   }
 
-  show_more () {
-    this.setState({ numberOfCommentsShown: this.state.numberOfCommentsShown + 5 })
+  show_more() {
+    this.setState((prevState) => ({
+      numberOfCommentsShown: prevState.numberOfCommentsShown + 5,
+    }));
   }
 
-  show_less () {
-    this.setState({ numberOfCommentsShown: 1 })
+  show_less() {
+    this.setState({ numberOfCommentsShown: 1 });
   }
 
-  show_comments_button () {
+  show_comments_button() {
     if (this.state.post.comments.length <= 1) {
-      return <div />
-    } else if (this.state.numberOfCommentsShown < this.state.post.comments.length) {
-      return <div className='news-card-edit-comment-container' style={{ textAlign: 'center' }}><a href='javascript:void(0)' onClick={this.show_more}>Voir plus de commentaires</a></div>
-    } else {
-      return <div className='news-card-edit-comment-container' style={{ textAlign: 'center' }}><a href='javascript:void(0)' onClick={this.show_less}>Voir moins de commentaires</a></div>
+      return <div />;
     }
+    if (this.state.numberOfCommentsShown < this.state.post.comments.length) {
+      return (
+        <div
+          className="news-card-edit-comment-container"
+          style={{ textAlign: 'center' }}
+        >
+          <a href="javascript:void(0)" onClick={this.show_more}>
+            Voir plus de commentaires
+          </a>
+        </div>
+      );
+    }
+    return (
+      <div
+        className="news-card-edit-comment-container"
+        style={{ textAlign: 'center' }}
+      >
+        <a href="javascript:void(0)" onClick={this.show_less}>
+          Voir moins de commentaires
+        </a>
+      </div>
+    );
   }
 
-  edit_button () {
+  edit_button() {
     if (this.state.post.can_edit) {
       return (
-        <div className='news-card-header-edit-button'>
-          <a href={this.state.post.edit_url}><i className='fas fa-edit' /></a>
+        <div className="news-card-header-edit-button">
+          <a href={this.state.post.edit_url}>
+            <i className="fas fa-edit" />
+          </a>
         </div>
-      )
+      );
     }
+
+    return null;
   }
 
-  show_event_button () {
+  show_event_button() {
     if (this.state.post.event_url) {
       return (
-        <div className='centered-div'>
-          <a href={this.state.post.event_url}><button class='button green-button'>Voir l'événement</button></a>
+        <div className="centered-div">
+          <a href={this.state.post.event_url}>
+            <button className="button green-button" type="button">
+              Voir l'événement
+            </button>
+          </a>
         </div>
-      )
+      );
     }
+
+    return null;
   }
 
-  show_event_name () {
+  show_event_name() {
     if (this.state.post.event_url) {
       return (
         <p>
-          <i class='fas fa-calendar-alt' />  Ce post est associé à l'événement <a href={this.state.post.event_url}>{this.state.post.event_name}</a>
+          <i className="fas fa-calendar-alt" /> Ce post est associé à
+          l'événement{' '}
+          <a href={this.state.post.event_url}>{this.state.post.event_name}</a>
         </p>
-      )
+      );
     }
+
+    return null;
   }
 
-  render () {
+  render() {
     return (
       <div>
-        <div className='news-card' id={this.state.post.id}>
-          <div className='news-card-header'>
-            {post_logo(this.state)}
-            <div className='news-card-header-text'>
-              {post_author(this.state)}
-              {post_club_author(this.state)}
-              {post_date(this.state)}
+        <div className="news-card" id={this.state.post.id}>
+          <div className="news-card-header">
+            {postLogo(this.state)}
+            <div className="news-card-header-text">
+              {postAuthor(this.state)}
+              {postClubAuthor(this.state)}
+              {postDate(this.state)}
             </div>
             {this.edit_button()}
           </div>
-          <div className='news-card-content'>
+          <div className="news-card-content">
             {this.show_event_name()}
-            <div className='news-card-content-title'>
-              {post_title(this.state)}
+            <div className="news-card-content-title">
+              {postTitle(this.state)}
             </div>
-            <ReactMarkdown remarkPlugins={[gfm, emoji]}>{this.state.post.content}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[gfm, emoji]}>
+              {this.state.post.content}
+            </ReactMarkdown>
             {this.show_event_button()}
           </div>
-          {post_illustration(this.state)}
-          <div className='news-card-actions'>
-            <span>{this.post_like_button()} {this.state.post.total_likes} </span>
-                        &ensp;
-            <span><i className='fas fa-comment' /> {this.state.post.total_comments}</span>
+          {postIllustration(this.state)}
+          <div className="news-card-actions">
+            <span>
+              {this.post_like_button()} {this.state.post.total_likes}{' '}
+            </span>
+            &ensp;
+            <span>
+              <i className="fas fa-comment" /> {this.state.post.total_comments}
+            </span>
           </div>
           <div style={{ display: 'block' }}>
-            {
-                            this.state.post.comments.slice(0, this.state.numberOfCommentsShown).map(function f (comment) {
-                              return <Comment comment={comment} key={comment.id} refreshPost={this.refresh} />
-                            }.bind(this))
-                        }
+            {this.state.post.comments
+              .slice(0, this.state.numberOfCommentsShown)
+              .map((comment) => (
+                <Comment
+                  comment={comment}
+                  key={comment.id}
+                  refreshPost={this.refresh}
+                />
+              ))}
             {this.show_comments_button()}
-            <CommentForm post={this.state.post} currentStudent={this.props.currentStudent} refreshPost={this.refresh} />
+            <CommentForm
+              post_id={this.state.post.id}
+              currentStudent={this.props.currentStudent}
+              refreshPost={this.refresh}
+            />
           </div>
-
         </div>
       </div>
-    )
+    );
   }
 }
 
 class Posts extends React.Component {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
-      error: null,
       posts: [],
+      // eslint-disable-next-line no-undef
       next_url: Urls.postList(),
-      count: null,
       more_exist: true,
-      currentStudent: ''
-    }
+      currentStudent: '',
+    };
   }
 
-  componentDidMount () {
+  componentDidMount() {
+    // eslint-disable-next-line no-undef
     fetch(Urls.current_student())
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(
         (result) => {
-          this.setState({ currentStudent: result.student })
+          this.setState({ currentStudent: result.student });
         },
         (error) => {
-          this.setState({
-            error
-          })
-        }
-      )
+          // eslint-disable-next-line no-console
+          console.error(error);
+        },
+      );
   }
 
   fetchData = () => {
-    this.setState({ more_exist: false })
+    this.setState({ more_exist: false });
     fetch(this.state.next_url)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(
         (result) => {
-          let has_more = false
-          if (result.next) {
-            has_more = true
+          let { next } = result;
+          let hasMore = false;
+          if (next) {
+            hasMore = true;
           } else {
-            result.next = ''
+            next = '';
           }
-          this.setState({
-            next_url: '/' + result.next.replace(/^(?:\/\/|[^/]+)*\//, ''),
-            posts: this.state.posts.concat(result.results),
-            more_exist: has_more
-          })
+          this.setState((prevState) => ({
+            next_url: `/${next.replace(/^(?:\/\/|[^/]+)*\//, '')}`,
+            posts: prevState.posts.concat(result.results),
+            more_exist: hasMore,
+          }));
         },
         (error) => {
-          this.setState({
-            error
-          })
-        }
-      )
-  }
+          // eslint-disable-next-line no-console
+          console.log(error);
+        },
+      );
+  };
 
-  render () {
+  render() {
     return (
       <InfiniteScroll
         loadMore={this.fetchData}
         hasMore={this.state.more_exist}
-        loader={<div key='-1' style={{ textAlign: 'center', marginTop: '10%' }}><i className='fa fa-lg fa-spinner fa-spin' /></div>}
+        loader={
+          <div key="-1" style={{ textAlign: 'center', marginTop: '10%' }}>
+            <i className="fa fa-lg fa-spinner fa-spin" />
+          </div>
+        }
       >
-        <div className='row' key='-2'>
-          {
-                        this.state.posts.map(function f (post) {
-                          return <Post post={post} key={post.id} currentStudent={this.state.currentStudent} />
-                        }.bind(this))
-                    }
+        <div className="row" key="-2">
+          {this.state.posts.map((post) => (
+            <Post
+              post={post}
+              key={post.id}
+              currentStudent={this.state.currentStudent}
+            />
+          ))}
         </div>
       </InfiniteScroll>
-    )
+    );
   }
 }
 
-export default Posts
+export default Posts;

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pochtron", "0003_rename_asign_pochtronadmin_manage_admin"),
     ]
