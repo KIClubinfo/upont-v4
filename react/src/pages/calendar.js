@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
-import Basic from '../components/basic_calendar'
+import EventCalendar from '../components/calendar'
 
 ReactDOM.render((
-  <Basic />
+  <EventCalendar />
 ), window.react_mount)
