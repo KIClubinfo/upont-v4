@@ -46,6 +46,7 @@ class Post(models.Model):
         related_name="posts",
         blank=True,
     )
+    
 
     def __str__(self):
         return self.title
