@@ -67,6 +67,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
     "django_reverse_js",
+    "background_task",
 ]
 
 PROJECT_APPS = [
