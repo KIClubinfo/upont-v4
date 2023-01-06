@@ -31,16 +31,12 @@ def get_schedule(date):
 
     entry = soup.find_all("tr", attrs={"height": "30"})
 
-    Timeslot.objects.filter(
-        start__range=[
-            timezone.make_aware(
-                datetime.datetime(date.year, date.month, date.day, 0, 0)
-            ),
-            timezone.make_aware(
-                datetime.datetime(date.year, date.month, date.day, 23, 59)
-            ),
-        ]
-    ).delete()
+    today_range = [
+        timezone.make_aware(datetime.datetime(date.year, date.month, date.day, 0, 0)),
+        timezone.make_aware(datetime.datetime(date.year, date.month, date.day, 23, 59)),
+    ]
+
+    Timeslot.objects.filter(start__range=today_range).delete()
 
     for course_entry in entry:
         infos = course_entry.find_all("td")
@@ -62,41 +58,48 @@ def get_schedule(date):
             if course_query.exists():
                 course = course_query.first()
 
-                timeslot = Timeslot(
-                    start=start,
-                    end=end,
-                    place=emplacement,
-                )
-                timeslot.save()
+                if (group_number is not None) or (
+                    group_number is None
+                    and not Timeslot.objects.filter(
+                        start__range=today_range, course_groups__course=course
+                    ).exists()
+                ):
 
-                if group_number is not None:
-                    group_query = Group.objects.filter(
-                        course=course,
-                        number=group,
+                    timeslot = Timeslot(
+                        start=start,
+                        end=end,
+                        place=emplacement,
                     )
+                    timeslot.save()
 
-                    if group_query.exists():
-                        group = group_query.first()
-                    else:
-                        group = Group(
+                    if group_number is not None:
+                        group_query = Group.objects.filter(
                             course=course,
-                            teacher=course.teacher,
                             number=group_number,
                         )
-                        group.save()
 
-                    timeslot.course_groups.add(group)
-                else:
-                    group_query = Group.objects.filter(
-                        course=course,
-                    )
+                        if group_query.exists():
+                            group = group_query.first()
+                        else:
+                            group = Group(
+                                course=course,
+                                teacher=course.teacher,
+                                number=group_number,
+                            )
+                            group.save()
 
-                    if group_query.exists():
-                        timeslot.course_groups.add(*group)
-                    else:
-                        group = Group(course=course, teacher=course.teacher)
-                        group.save()
                         timeslot.course_groups.add(group)
+                    else:
+                        group_query = Group.objects.filter(
+                            course=course,
+                        )
+
+                        if group_query.exists():
+                            timeslot.course_groups.add(*group_query)
+                        else:
+                            group = Group(course=course, teacher=course.teacher)
+                            group.save()
+                            timeslot.course_groups.add(group)
         else:
             # Gérer les cours de DLC ici si on passe par emploidutemps
             pass
