@@ -46,6 +46,7 @@ format-back:
 install-linters-front:
 	npm i eslint eslint-config-prettier eslint-config-airbnb @babel/eslint-parser @typescript-eslint/parser @typescript-eslint/eslint-plugin typescript prettier eslint-plugin-import eslint-plugin-react
 
+
 lint-front:
 	npx prettier --check react/src
 	npx eslint react/src

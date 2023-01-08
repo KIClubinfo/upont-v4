@@ -83,8 +83,7 @@ class Enrolment(models.Model):
     def __str__(self):
         return self.group.course.name + " : " + self.student.user.username
 
-
-class Resources(models.Model):
+class Resource(models.Model):
     name = models.CharField(max_length=50, default="Ressource")
     author = models.ForeignKey(
         "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True

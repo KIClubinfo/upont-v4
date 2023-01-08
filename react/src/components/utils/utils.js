@@ -1,3 +1,23 @@
+// Return a function to fetch more data from a paginated API end point
+const fetchPaginatedData =
+  (data, setData, setMoreExists, nextUrl, setNextUrl) => () => {
+    setMoreExists(false);
+    fetch(nextUrl)
+      .then((res) => res.json())
+      .then((result) => {
+        let hasMore = false;
+        let { next } = result;
+        if (next) {
+          hasMore = true;
+        } else {
+          next = '';
+        }
+        setData(data.concat(result.results));
+        setNextUrl(`/${next.replace(/^(?:\/\/|[^/]+)*\//, '')}`);
+        setMoreExists(hasMore);
+      });
+  };
+
 function addZero(i) {
   let res = i;
   if (i < 10) {
@@ -6,6 +26,4 @@ function addZero(i) {
   return res;
 }
 
-// This file aimed to contain several functions
-// eslint-disable-next-line import/prefer-default-export
-export { addZero };
+export { fetchPaginatedData, addZero };
