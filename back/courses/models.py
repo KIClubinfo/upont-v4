@@ -83,6 +83,7 @@ class Enrolment(models.Model):
     def __str__(self):
         return self.group.course.name + " : " + self.student.user.username
 
+
 class Resource(models.Model):
     name = models.CharField(max_length=50, default="Ressource")
     author = models.ForeignKey(

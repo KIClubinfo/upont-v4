@@ -31,7 +31,6 @@ class EnrolmentAdmin(admin.ModelAdmin):
     )
 
 
-
 class ResourceAdmin(admin.ModelAdmin):
     list_display = (
         "name",
@@ -39,6 +38,7 @@ class ResourceAdmin(admin.ModelAdmin):
         "date",
         "post",
     )
+
 
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CourseUpdate, CourseUpdateAdmin)
