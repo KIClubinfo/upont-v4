@@ -143,7 +143,6 @@ class Post extends React.Component {
     let url;
     if (this.state.post.user_liked) {
       // eslint-disable-next-line no-undef
-
       url = Urls['news:post_like'](this.state.post.id, 'Unlike');
     } else {
       // eslint-disable-next-line no-undef
