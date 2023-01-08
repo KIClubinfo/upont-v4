@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("social", "0004_auto_20220811_2021"),
         ("pochtron", "0001_initial"),

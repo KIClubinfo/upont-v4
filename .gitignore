@@ -6,3 +6,4 @@ populate.json
 .vscode/
 backups/
 back/fixtures
+database/

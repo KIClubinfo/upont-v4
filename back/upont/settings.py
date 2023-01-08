@@ -75,6 +75,7 @@ PROJECT_APPS = [
     "social.apps.SocialConfig",
     "trade.apps.TradeConfig",
     "the_calendar.apps.CalendarConfig",
+    "courses.apps.CoursesConfig",
 ]
 
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + PROJECT_APPS
@@ -139,7 +140,9 @@ LOGIN_REDIRECT_URL = "news:posts"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        ),
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",

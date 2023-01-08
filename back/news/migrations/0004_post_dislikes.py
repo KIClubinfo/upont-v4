@@ -6,14 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('social', '0007_merge_0004_auto_20220826_1123_0006_alter_role_name'),
-        ('news', '0003_auto_20220827_1112'),
+        ("social", "0007_merge_0004_auto_20220826_1123_0006_alter_role_name"),
+        ("news", "0003_auto_20220827_1112"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='post',
-            name='dislikes',
-            field=models.ManyToManyField(blank=True, related_name='post_dislike', to='social.Student'),
+            model_name="post",
+            name="dislikes",
+            field=models.ManyToManyField(
+                blank=True, related_name="post_dislike", to="social.Student"
+            ),
         ),
     ]
