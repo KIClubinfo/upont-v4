@@ -7,11 +7,12 @@ from django.utils import timezone
 from news.models import Post
 from social.models import Student
 
-from .models import Resources
+
+from .models import Resource
 
 
-class ResourcesModelTest(TestCase):
-    def test_ressource_saves_in_database(self):
+class ResourceModelTest(TestCase):
+    def test_resource_saves_in_database(self):
         test_user = models.User()
         test_user.save()
         student = Student(
@@ -34,15 +35,15 @@ class ResourcesModelTest(TestCase):
         file_mock = MagicMock(spec=File)
         file_mock.name = "filename.txt"
 
-        resources = Resources(
+        resource = Resource(
             name="Name",
             author=student,
             date=timezone.now(),
             post=post,
             file=file_mock,
         )
-        resources.save()
+        resource.save()
 
-        retrieved_resources = Resources.objects.get(pk=resources.pk)
+        retrieved_resource = Resource.objects.get(pk=resource.pk)
 
-        self.assertEqual(retrieved_resources, resources)
+        self.assertEqual(retrieved_resource, resource)

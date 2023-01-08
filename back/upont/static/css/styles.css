@@ -1367,8 +1367,90 @@ a.text-green:hover{
 }
 
 /*-------------------------------------------------*/
+/*--------------- COURSES COMPONENTS --------------*/
+/*-------------------------------------------------*/
+.course-card{
+    /* Positioning */
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    /* Sizing */
+    width: auto;
+    padding: 1rem 0rem;
+    margin: 1rem 2rem;
+    margin-left: 1rem;
+    /* Styling */
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+}
+
+.course-information{
+    /* Positionning */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Sizing */
+    margin-left: 1rem;
+}
+
+.course-name{
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.course-searchbar{
+    /* Positionning */
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    /* Sizing */
+    margin: 0.3rem 0;
+    width: 100%;
+    height: 2.5rem;
+    font-size: 1rem;
+    text-indent: 0.5rem;
+    /* Styling */
+    border-radius: 5px;
+}
+
+/*-------------------------------------------------*/
 /*--------------- CALENDAR COMPONENTS -------------*/
 /*-------------------------------------------------*/
 .calendar-box {
     width: 80%;
+}
+
+/*-------------------------------------------------*/
+/*---------------------- TABS ---------------------*/
+/*-------------------------------------------------*/
+.tab {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  overflow: hidden;
+  color: white;
+  background-color: var(--primary-bg-color);
+}
+
+.tab button {
+  background-color: inherit;
+  float: center;
+  width: 100%;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 400;
+  padding: 1.3rem 1.3rem;
+  transition: 0.3s;
+}
+
+.tab button:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab button.active {
+    border-bottom: 3px solid #3DC1F3;
 }
