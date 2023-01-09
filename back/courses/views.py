@@ -44,22 +44,21 @@ def add(request):
     next(io_string)
     course_not_added = []
     for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
+        Course, created = models.User.objects.get_or_create(
         name=column[1],
         teachers=map(lambda teacher: teacher.strip(), column[2].split(","))
         department=column[3],
         acronym=column[3],
+        )
         if  (name="") or (teachers="") or (department="") or (acronym=""):
             course_not_added.append(column),
         if not department in models.CourseDepartment.values:
-            course_not_added.append(column),
+            department=="AHE"
             
-        courses, created3 = Courses.objects.get_or_create(
-            year=column[0], nickname="0" + str(column[0])
+        courses, created3 = teacher.objects.get_or_create(
+            name=teachers,
         )   
-        student, created2 = Student.objects.get_or_create(
-            user=user,
-        )
-        if not created or not created2:
+        if not created:
             students_not_added.append(
                 (column[2] + "." + column[1]).replace(" ", "-").lower()
             )
