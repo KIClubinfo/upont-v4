@@ -55,7 +55,7 @@ class CourseUpdateModelTest(TestCase):
         )
         test_old_course.save()
         test_new_course = Course(
-            name="Nouveu cours",
+            name="Nouveau cours",
             acronym="DEF",
             department=CourseDepartment.AHE,
             teacher=test_teacher,
