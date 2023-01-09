@@ -41,7 +41,7 @@ class PostViewSet(viewsets.ModelViewSet):
     API endpoint that allows posts to be viewed.
     """
 
-    queryset = Post.objects.all().order_by("-date", "title")
+    queryset = Post.objects.filter(course__isnull=True).order_by("-date", "title")
     serializer_class = PostSerializer
     http_method_names = ["get"]
 
