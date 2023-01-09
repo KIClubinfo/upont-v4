@@ -41,7 +41,7 @@ class PostViewSet(viewsets.ModelViewSet):
     API endpoint that allows posts to be viewed.
     """
 
-    queryset = Post.objects.all().order_by("-date", "title")
+    queryset = Post.objects.filter(course__isnull=True).order_by("-date", "title")
     serializer_class = PostSerializer
     http_method_names = ["get"]
 
@@ -216,10 +216,16 @@ def post_create(request, event_id=None):
 def post_like(request, post_id, action):
     post = get_object_or_404(Post, id=post_id)
     student = get_object_or_404(Student, user__id=request.user.id)
-    if action == "Dislike":
+    if action == "Unlike":
         post.likes.remove(student)
     elif action == "Like":
         post.likes.add(student)
+        post.dislikes.remove(student)
+    elif action == "Dislike":
+        post.dislikes.add(student)
+        post.likes.remove(student)
+    elif action == "Undislike":
+        post.dislikes.remove(student)
     else:
         return HttpResponse(status=500)
     return HttpResponse(status=200)
