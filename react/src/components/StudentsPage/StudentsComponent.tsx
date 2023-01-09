@@ -8,7 +8,6 @@ export const Students: React.FC = () => {
   // @ts-ignore Urls is declared in the django template
   const [nextUrl, setNextUrl] = useState(Urls.studentList());
   const [moreExists, setMoreExists] = useState(true);
-
   const fetchData = fetchPaginatedData(
     students,
     setStudents,
