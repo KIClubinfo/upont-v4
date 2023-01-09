@@ -73,7 +73,12 @@ class Group(models.Model):
     )
 
     def __str__(self):
-        return self.course.name + " : " + self.teacher.name
+        if self.number is None:
+            return "{} : {}".format(self.course.name, self.teacher.name)
+        else:
+            return "{} ({}) : {}".format(
+                self.course.name, self.number, self.teacher.name
+            )
 
 
 class Enrolment(models.Model):
