@@ -45,11 +45,13 @@ class Post(models.Model):
         Student,
         related_name="posts",
         blank=True,
+        editable=False,
     )
     dislikes = models.ManyToManyField(
         Student,
         related_name="post_dislikes",
         blank=True,
+        editable=False,
     )
 
     def __str__(self):

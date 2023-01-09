@@ -12,10 +12,6 @@ class EventsAdmin(admin.ModelAdmin):
 class PostsAdmin(admin.ModelAdmin):
     list_display = ("title", "author", "date")
     ordering = ("date",)
-    exclude = (
-        "like",
-        "dislike",
-    )
 
 
 class ParticipationAdmin(admin.ModelAdmin):
