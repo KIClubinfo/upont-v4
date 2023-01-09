@@ -33,7 +33,13 @@ class Course(models.Model):
     department = models.CharField(
         max_length=8, choices=CourseDepartment.choices, default=CourseDepartment.AHE
     )
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    teacher = models.ManyToManyField(
+        Teacher, 
+        on_delete=models.CASCADE,
+        related_name="courses",
+        blank=True,
+        )
+        
     description = models.TextField()
     old_courses = models.ManyToManyField(
         "self",
