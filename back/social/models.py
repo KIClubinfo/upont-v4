@@ -70,7 +70,10 @@ class Student(models.Model):
 
     phone_regex = RegexValidator(
         regex=r"^\+?\d{9,16}$",
-        message="Le numéro doit être entré au format: '+999999999'. Jusqu'à 16 chiffres sont autorisés.",
+        message=(
+            "Le numéro doit être entré au format: '+999999999'. Jusqu'à 16 chiffres"
+            " sont autorisés."
+        ),
     )
     phone_number = models.CharField(
         validators=[phone_regex], max_length=17, null=True, blank=True
@@ -196,4 +199,3 @@ def compress_image(image, quality, name):
     im.save(im_io, "JPEG", quality=quality, optimize=True)
     new_image = File(im_io, name=name + "_" + uuid4().hex + ".jpg")
     return new_image
-
