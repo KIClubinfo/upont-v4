@@ -74,7 +74,7 @@ def get_schedule(date):
                 if (group_number is not None) or (
                     group_number is None
                     and not Timeslot.objects.filter(
-                        start__range=today_range, course_groups__course=course
+                        start__range=[start, end], course_groups__course=course
                     ).exists()
                 ):
 
