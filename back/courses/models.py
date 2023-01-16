@@ -64,6 +64,7 @@ class CourseUpdate(models.Model):
 class Group(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    number = models.IntegerField(blank=True, null=True)
     students = models.ManyToManyField(
         Student,
         through="Enrolment",
@@ -72,7 +73,12 @@ class Group(models.Model):
     )
 
     def __str__(self):
-        return self.course.name + " : " + self.teacher.name
+        if self.number is None:
+            return "{} : {}".format(self.course.name, self.teacher.name)
+        else:
+            return "{} ({}) : {}".format(
+                self.course.name, self.number, self.teacher.name
+            )
 
 
 class Enrolment(models.Model):
@@ -82,6 +88,13 @@ class Enrolment(models.Model):
 
     def __str__(self):
         return self.group.course.name + " : " + self.student.user.username
+
+
+class Timeslot(models.Model):
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    course_groups = models.ManyToManyField(Group, related_name="timeslot", blank=True)
+    place = models.CharField(max_length=50, blank=True)
 
 
 class Resource(models.Model):

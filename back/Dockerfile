@@ -36,10 +36,10 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 FROM python-base as builder-base
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
-        # deps for installing poetry
-        curl=7.74.0-1.3+deb11u3 \
-        # deps for building python deps
-        build-essential=12.9 \
+    # deps for installing poetry
+    curl=7.74.0-1.3+deb11u3 \
+    # deps for building python deps
+    build-essential=12.9 \
     && rm -rf /var/lib/apt/lists/*
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
@@ -68,8 +68,9 @@ RUN poetry install \
     # install sass
     && apt-get update \
     && apt-get install --no-install-recommends -y npm=7.5.2+ds-2 \
-    && npm install -g sass@1.54.3
-
+    && npm install -g sass@1.54.3 \
+    # install redis
+    && apt-get install --no-install-recommends -y redis=5:6.0.16-1+deb11u2
 
 
 WORKDIR /src
@@ -80,8 +81,8 @@ RUN mkdir -p /src/upont/static/react \
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
-        # for checking when db is up
-        netcat=1.10-46 \
+    # for checking when db is up
+    netcat=1.10-46 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./entrypoint.dev.sh .
@@ -111,11 +112,13 @@ RUN mkdir -p /src/upont/static/react \
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
-        # for checking when db is up
-        netcat=1.10-46 \
-        iputils-ping=3:20210202-1 \
-        # to install sass \
-        npm=7.5.2+ds-2 \
+    # for checking when db is up
+    netcat=1.10-46 \
+    iputils-ping=3:20210202-1 \
+    # redis is used as message brocker for Celery
+    redis=5:6.0.16-1+deb11u2 \
+    # to install sass \
+    npm=7.5.2+ds-2 \
     && rm -rf /var/lib/apt/lists/* \
     # install sass
     && npm install -g sass@1.54.3
