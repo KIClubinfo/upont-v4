@@ -39,6 +39,9 @@ def get_schedule(date):
     Timeslot.objects.filter(start__range=today_range).delete()
 
     for course_entry in entry:
+        # --------------------------------------------------
+        # Scrapping the data from the website page
+        # --------------------------------------------------
         infos = course_entry.find_all("td")
         start, end = map(
             lambda h: parse_hours(date, h), infos[0].text.strip().split("-")
@@ -53,11 +56,21 @@ def get_schedule(date):
         else:
             acronym, _ = map(lambda s: s.strip(), infos[4].text.split("-", maxsplit=1))
 
+        # --------------------------------------------------
+        # Inserting the data in the database
+        # --------------------------------------------------
+
+        # The courses for the DLC department have no accronym so they should be identify
+        # by name (and sometime the name on the website is not fully written)
+        # therefore we have to handle them separately
         if acronym and department != "DLC":
             course_query = Course.objects.filter(acronym=acronym)
             if course_query.exists():
                 course = course_query.first()
 
+                # Sometimes there are several timeslot for the same course but
+                # the group number is not specify, this is handle by the second
+                # condition of "or" operator
                 if (group_number is not None) or (
                     group_number is None
                     and not Timeslot.objects.filter(
@@ -100,6 +113,3 @@ def get_schedule(date):
                             group = Group(course=course, teacher=course.teacher)
                             group.save()
                             timeslot.course_groups.add(group)
-        else:
-            # Gérer les cours de DLC ici si on passe par emploidutemps
-            pass
