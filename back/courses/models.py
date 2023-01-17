@@ -62,8 +62,10 @@ class CourseUpdate(models.Model):
 
 
 class Group(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="groups")
+    teacher = models.ForeignKey(
+        Teacher, on_delete=models.CASCADE, related_name="groups"
+    )
     number = models.IntegerField(blank=True, null=True)
     students = models.ManyToManyField(
         Student,
