@@ -2,15 +2,15 @@ import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework import filters, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from social.models import Student
 
-from .models import Course, CourseDepartment
+from .models import Course, CourseDepartment, Group, Timeslot
 from .scrapper import get_schedule
-from .serializers import CourseSerializer
+from .serializers import CourseSerializer, GroupSerializer, TimeslotSerializer
 
 
 class ListCourseDepartments(views.APIView):
@@ -23,7 +23,6 @@ class ListCourseDepartments(views.APIView):
 
 
 class CourseViewSet(viewsets.ModelViewSet):
-    # queryset = Course.objects.all().order_by("name")
     serializer_class = CourseSerializer
     http_method_names = ["get"]
     filter_backends = [filters.SearchFilter]
@@ -34,7 +33,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         is_enrolled = self.request.GET.get("is_enrolled")
         if is_enrolled is not None:
-            student = Student.objects.get(user__id=self.request.user.id)
+            student = get_object_or_404(Student, user__id=self.request.user.id)
             if is_enrolled == "true":
                 queryset = queryset.filter(group__enrolment__student=student)
             elif is_enrolled == "false":
@@ -49,6 +48,34 @@ class CourseViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(department__in=departments.split(","))
 
         return queryset.order_by("department", "name")
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    http_method_names = ["get"]
+
+
+class TimeslotViewSet(viewsets.ModelViewSet):
+    serializer_class = TimeslotSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Timeslot.objects.all()
+
+        is_enrolled = self.request.GET.get("is_enrolled")
+        if is_enrolled is not None:
+            student = get_object_or_404(Student, user__id=self.request.user.id)
+            if is_enrolled == "true":
+                queryset = queryset.filter(course_groups__enrolment__student=student)
+            elif is_enrolled == "false":
+                queryset = queryset.exclude(course_groups__enrolment__student=student)
+            else:
+                raise ValidationError(
+                    detail="is_enrolled must be either 'true' or 'false'"
+                )
+
+        return queryset
 
 
 @login_required

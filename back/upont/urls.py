@@ -14,7 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import django_cas_ng.views
-from courses.views import CourseViewSet, ListCourseDepartments
+from courses.views import (
+    CourseViewSet,
+    GroupViewSet,
+    ListCourseDepartments,
+    TimeslotViewSet,
+)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -70,6 +75,8 @@ router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet)
 router.register(r"events", EventViewSet)
 router.register(r"courses", CourseViewSet, basename="course")
+router.register(r"groups", GroupViewSet, basename="group")
+router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 
 urlpatterns += [
     path(
