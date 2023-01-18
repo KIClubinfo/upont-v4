@@ -27,13 +27,18 @@ const messages = {
   showMore: (total) => `+ ${total} événement(s) supplémentaire(s)`,
 };
 
-// Events fetching from back API
+// Data fetching from back API
+const eventType = {
+  EVENT: 1,
+  COURSE: 2,
+};
+
 async function getEvents() {
   const response = await fetch('/api/events').then(
     (result) => result.json(),
     (error) => {
       // eslint-disable-next-line no-console
-      console.error(`Error getting the events: ${error}`);
+      console.error(`Error fetching the events: ${error}`);
     },
   );
 
@@ -43,9 +48,9 @@ async function getEvents() {
   for (const e of rawEvents) {
     formattedEvents.push({
       id: e.id,
+      type: eventType.EVENT,
       title: e.name,
       desc: e.description,
-      participating: e.participating,
       start: new Date(e.date),
       end: new Date(e.end),
     });
@@ -54,9 +59,37 @@ async function getEvents() {
   return formattedEvents;
 }
 
+async function getCourses() {
+  // eslint-disable-next-line no-undef
+  const response = await fetch(`${Urls.timeslotList()}?is_enrolled=true`).then(
+    (result) => result.json(),
+    (error) => {
+      // eslint-disable-next-line no-console
+      console.error(`Error fetching the courses: ${error}`);
+    },
+  );
+
+  const rawCourses = response.results;
+
+  const formattedCourses = []; // Courses formatted for BigCalendar
+  for (const c of rawCourses) {
+    formattedCourses.push({
+      id: c.id,
+      type: eventType.COURSE,
+      title: c.course_name,
+      start: new Date(c.start),
+      end: new Date(c.end),
+    });
+  }
+
+  return formattedCourses;
+}
+
 function handleSelectedEvent(e) {
-  const serveurUrl = window.location.origin;
-  window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
+  if (e.type === eventType.EVENT) {
+    const serveurUrl = window.location.origin;
+    window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
+  }
 }
 
 export default function EventCalendar({ localizer }) {
@@ -74,33 +107,28 @@ export default function EventCalendar({ localizer }) {
     [],
   );
 
-  const { data, error } = useAsync({ promiseFn: getEvents });
-  if (error) {
-    // eslint-disable-next-line no-console
-    console.log(error.message);
-  }
+  const [events, setEvents] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [shownOnCalendar, setShownOnCalendar] = useState([]);
 
-  const [showedEvents, setShowedEvents] = useState([]);
+  useEffect(() => {
+    (async () => {
+      const fetchedEvents = await getEvents();
+      setEvents(fetchedEvents);
+    })();
+  }, []);
 
-  // State for filters
-  const [onlyParticipating, setOnlyParticipating] = useState(false);
-
-  function handleParticipating() {
-    setOnlyParticipating(!onlyParticipating); // Swap the state
-  }
+  useEffect(() => {
+    (async () => {
+      const fetchedCourses = await getCourses();
+      setCourses(fetchedCourses);
+    })();
+  }, []);
 
   // Update showedEvents when data value change or a filter state is changed
   useEffect(() => {
-    if (onlyParticipating) {
-      setShowedEvents(data.filter((e) => e.participating));
-      document.getElementById('participating_button').className =
-        'button red-button';
-    } else {
-      setShowedEvents(data);
-      document.getElementById('participating_button').className =
-        'button green-button';
-    }
-  }, [data, onlyParticipating]);
+    setShownOnCalendar([].concat(events, courses));
+  }, [events, courses]);
 
   // Manage default calendar view for small monitor like smartphones
   let defaultView;
@@ -112,21 +140,11 @@ export default function EventCalendar({ localizer }) {
 
   return (
     <div className="calendar-box box">
-      <center>
-        <button
-          className="button green-button"
-          id="participating_button"
-          onClick={handleParticipating}
-          type="button"
-        >
-          Évènements auxquels je ne participe pas
-        </button>
-      </center>
       <Calendar
         components={components}
         messages={messages}
         defaultDate={defaultDate}
-        events={showedEvents}
+        events={shownOnCalendar}
         localizer={localizer}
         max={max}
         showMultiDayTimes

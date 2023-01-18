@@ -26,6 +26,7 @@
 
     </div><!--End of Content-->
 
+    <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
     <script>
         window.react_mount = document.getElementById('Basic');
     </script>
