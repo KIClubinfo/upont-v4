@@ -1,12 +1,11 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { useAsync } from 'react-async';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/locale/fr';
 
 import { Calendar, DateLocalizer, momentLocalizer } from 'react-big-calendar';
 
-import * as dates from './utils/dates';
+import * as dates from 'date-arithmetic';
 
 // Set the calendar language to french
 moment.locale('fr');
@@ -33,8 +32,15 @@ const eventType = {
   COURSE: 2,
 };
 
-async function getEvents() {
-  const response = await fetch('/api/events').then(
+async function getEvents(events, start, end) {
+  const params = new URLSearchParams();
+  params.set('start', start.toISOString());
+  params.set('end', end.toISOString());
+  params.set('no_page', 1);
+  const rawEvents = await fetch(
+    // eslint-disable-next-line no-undef
+    `${Urls.eventList()}?${params.toString()}`,
+  ).then(
     (result) => result.json(),
     (error) => {
       // eslint-disable-next-line no-console
@@ -42,26 +48,32 @@ async function getEvents() {
     },
   );
 
-  const rawEvents = response.results;
-
   const formattedEvents = []; // Events formatted for BigCalendar
   for (const e of rawEvents) {
-    formattedEvents.push({
-      id: e.id,
-      type: eventType.EVENT,
-      title: e.name,
-      desc: e.description,
-      start: new Date(e.date),
-      end: new Date(e.end),
-    });
+    if (!events.some((x) => x.id === e.id)) {
+      formattedEvents.push({
+        id: e.id,
+        type: eventType.EVENT,
+        title: e.name,
+        start: new Date(e.date),
+        end: new Date(e.end),
+      });
+    }
   }
 
   return formattedEvents;
 }
 
-async function getCourses() {
-  // eslint-disable-next-line no-undef
-  const response = await fetch(`${Urls.timeslotList()}?is_enrolled=true`).then(
+async function getCourses(courses, start, end) {
+  const params = new URLSearchParams();
+  params.set('start', start.toISOString());
+  params.set('end', end.toISOString());
+  params.set('no_page', 1);
+  params.set('is_enrolled', 'true');
+  const rawCourses = await fetch(
+    // eslint-disable-next-line no-undef
+    `${Urls.timeslotList()}?${params.toString()}`,
+  ).then(
     (result) => result.json(),
     (error) => {
       // eslint-disable-next-line no-console
@@ -69,17 +81,17 @@ async function getCourses() {
     },
   );
 
-  const rawCourses = response.results;
-
   const formattedCourses = []; // Courses formatted for BigCalendar
   for (const c of rawCourses) {
-    formattedCourses.push({
-      id: c.id,
-      type: eventType.COURSE,
-      title: c.course_name,
-      start: new Date(c.start),
-      end: new Date(c.end),
-    });
+    if (!courses.some((x) => x.id === c.id)) {
+      formattedCourses.push({
+        id: c.id,
+        type: eventType.COURSE,
+        title: c.course_name,
+        start: new Date(c.start),
+        end: new Date(c.end),
+      });
+    }
   }
 
   return formattedCourses;
@@ -107,29 +119,6 @@ export default function EventCalendar({ localizer }) {
     [],
   );
 
-  const [events, setEvents] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [shownOnCalendar, setShownOnCalendar] = useState([]);
-
-  useEffect(() => {
-    (async () => {
-      const fetchedEvents = await getEvents();
-      setEvents(fetchedEvents);
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const fetchedCourses = await getCourses();
-      setCourses(fetchedCourses);
-    })();
-  }, []);
-
-  // Update showedEvents when data value change or a filter state is changed
-  useEffect(() => {
-    setShownOnCalendar([].concat(events, courses));
-  }, [events, courses]);
-
   // Manage default calendar view for small monitor like smartphones
   let defaultView;
   if (window.innerWidth < 700) {
@@ -137,6 +126,113 @@ export default function EventCalendar({ localizer }) {
   } else {
     defaultView = 'week';
   }
+
+  const [view, setView] = useState(defaultView);
+  const [events, setEvents] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [fetchedRange, setFetchedRange] = useState({
+    start: dates.add(dates.startOf(new Date(), 'day'), -10, 'day'),
+    end: dates.add(dates.endOf(new Date(), 'day'), 10, 'day'),
+  });
+  const [shownOnCalendar, setShownOnCalendar] = useState([]);
+
+  useEffect(() => {
+    if (events.length === 0) {
+      (async () => {
+        const fetchedEvents = await getEvents(
+          events,
+          fetchedRange.start,
+          fetchedRange.end,
+        );
+        setEvents(fetchedEvents);
+      })();
+
+      (async () => {
+        const fetchedCourses = await getCourses(
+          courses,
+          fetchedRange.start,
+          fetchedRange.end,
+        );
+        setCourses(fetchedCourses);
+      })();
+    }
+  }, []);
+
+  // Update showedEvents when data value change or a filter state is changed
+  useEffect(() => {
+    setShownOnCalendar([].concat(events, courses));
+  }, [events, courses]);
+
+  const onRangeChange = useCallback(
+    (range) => {
+      let start;
+      let end;
+      console.log(view);
+      if (view === 'week') {
+        [start] = range;
+        end = dates.add(range[6], 1, 'day');
+      } else if (view === 'day') {
+        [start] = range;
+        end = dates.add(range[0], 1, 'day');
+      } else if (view === 'month' || view === 'agenda') {
+        start = range.start;
+        end = range.end;
+      }
+
+      if (start && end) {
+        if (dates.lt(start, fetchedRange.start)) {
+          (async () => {
+            const fetchedCourses = await getCourses(
+              courses,
+              start,
+              fetchedRange.start,
+            );
+            setCourses((prev) => fetchedCourses.concat(prev));
+          })();
+          (async () => {
+            const fetchedEvents = await getEvents(
+              events,
+              start,
+              fetchedRange.start,
+            );
+            setEvents((prev) => fetchedEvents.concat(prev));
+          })();
+          setFetchedRange((prev) => ({ start, end: prev.end }));
+        }
+
+        if (dates.gt(end, fetchedRange.end)) {
+          (async () => {
+            const fetchedCourses = await getCourses(
+              courses,
+              fetchedRange.end,
+              end,
+            );
+            setCourses((prev) => fetchedCourses.concat(prev));
+          })();
+          (async () => {
+            const fetchedEvents = await getEvents(
+              events,
+              fetchedRange.end,
+              end,
+            );
+            setEvents((prev) => fetchedEvents.concat(prev));
+          })();
+          setFetchedRange((prev) => ({ start: prev.start, end }));
+        }
+      }
+    },
+    [
+      view,
+      courses,
+      setCourses,
+      events,
+      setEvents,
+      fetchedRange,
+      setFetchedRange,
+    ],
+  );
+
+  const onView = useCallback((newView) => setView(newView), [setView]);
 
   return (
     <div className="calendar-box box">
@@ -149,9 +245,11 @@ export default function EventCalendar({ localizer }) {
         max={max}
         showMultiDayTimes
         step={60}
-        defaultView={defaultView}
+        onView={onView}
+        view={view}
         views={views}
         onSelectEvent={(e) => handleSelectedEvent(e)}
+        onRangeChange={onRangeChange}
       />
     </div>
   );
