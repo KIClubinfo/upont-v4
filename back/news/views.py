@@ -55,6 +55,17 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     http_method_names = ["get"]
 
+    @property
+    def paginator(self):
+        """
+        A parameter no_page is added to disable pagination because we want to
+        avoid it for the calendar
+        """
+        self._paginator = super(EventViewSet, self).paginator
+        if "no_page" in self.request.query_params:
+            self._paginator = None
+        return self._paginator
+
 
 @login_required
 def events(request):
