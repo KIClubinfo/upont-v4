@@ -7,3 +7,4 @@ populate.json
 backups/
 back/fixtures
 database/
+dump.rdb

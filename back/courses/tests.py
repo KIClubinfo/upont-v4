@@ -15,6 +15,7 @@ from .models import (
     Group,
     Resource,
     Teacher,
+    Timeslot,
 )
 
 
@@ -130,6 +131,37 @@ class EnrolmentModelTest(TestCase):
         enrolment.save()
         retrieved_enrolment = Enrolment.objects.get(pk=enrolment.pk)
         self.assertEqual(retrieved_enrolment.pk, enrolment.pk)
+
+
+class TimeslotModelTest(TestCase):
+    def test_timeslot_saves_in_database(self):
+        teacher = Teacher(name="Bob")
+        teacher.save()
+
+        course = Course(
+            name="Cours",
+            acronym="ABC",
+            department="GMM",
+            teacher=teacher,
+        )
+        course.save()
+
+        group = Group(
+            course=course,
+            teacher=teacher,
+        )
+        group.save()
+
+        timeslot = Timeslot(
+            start=timezone.now(),
+            end=timezone.now(),
+            place="Emplacement",
+        )
+        timeslot.save()
+        timeslot.course_groups.add(group)
+
+        retrieved_timeslot = Timeslot.objects.get(pk=timeslot.pk)
+        self.assertEqual(retrieved_timeslot, timeslot)
 
 
 class ResourceModelTest(TestCase):
