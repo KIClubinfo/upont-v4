@@ -1,3 +1,4 @@
+import { url } from 'inspector';
 import React from 'react';
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export const Course: React.FC<Props> = (props) => (
-  <div>
+  <a href={Urls['courses:course_detail'](props.course.id)}>
     <div className="course-card">
       <div className="course-information">
         <span className="course-name">
@@ -18,5 +19,5 @@ export const Course: React.FC<Props> = (props) => (
         <span className="course-departement">{props.course.department}</span>
       </div>
     </div>
-  </div>
+  </a>
 );

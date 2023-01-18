@@ -1,0 +1,71 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% if course.acronym %}{% include "header.html" with title=course.acronym %}{% else %}{% include "header.html" with title=course.name %}{% endif %}
+
+<!--Body-->
+<body>
+    {% comment %} <!--Feedback Button-->
+    {% include "feedback.html" %} {% endcomment %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="courses" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <!--Header Content-->
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Main Content-->
+        <div class="content-main">
+
+            <!--Club Box-->
+            <div class="course-box">
+
+                <!--Row-->
+                <div class="row">
+
+                    <!--Column-->
+                    <div class="col-lg-8">
+                        <div class="course-title">
+                            {{course.name}} - ({{course.acronym}})
+                            <a href="{% url 'courses:courses_index' %}" style="margin-left: auto;"><button class="button green-button">Retour à l'index</button></a>
+                        </div>
+
+                    </div><!--End of Column-->
+
+                    <!--Column-->
+                    <div class="col-12">
+
+                        <h5 class="text-bold mt-4">Enseignant : {{course.teacher}}</h5>
+                        <h5 class="text-bold mt-4">Département : {{course.department}}</h5>
+
+
+                        <h5 class="text-bold mt-4">Description du cours :</h5>
+
+                        <p class="text-thin text-justified mt-2" style="font-size: medium;">{{course.description|markdownify}}</p>
+
+                    </div><!--End of Column-->
+
+                </div><!--End of Row-->
+
+            </div><!--End of Club Bow-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+
+</html><!--End of Document-->
