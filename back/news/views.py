@@ -76,7 +76,6 @@ class EventViewSet(viewsets.ModelViewSet):
               given date
     """
 
-    queryset = Event.objects.all().order_by("-date", "name")
     serializer_class = EventSerializer
     http_method_names = ["get"]
 
@@ -121,7 +120,7 @@ class EventViewSet(viewsets.ModelViewSet):
                     detail="is_enrolled must be either 'true' or 'false'"
                 )
 
-        return queryset
+        return queryset.order_by("-date", "name")
 
 
 @login_required
