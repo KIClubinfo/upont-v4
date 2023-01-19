@@ -31,79 +31,37 @@ const messages = {
   showMore: (total) => `+ ${total} événement(s) supplémentaire(s)`,
 };
 
-// Data fetching from back API
-const eventType = {
-  EVENT: 1,
-  COURSE: 2,
-};
-
-async function getEvents(events, start, end) {
-  const params = new URLSearchParams();
-  params.set('start', start.toISOString());
-  params.set('end', end.toISOString());
-  params.set('no_page', 1);
+async function getSchedule(schedule, urlParams) {
   const rawEvents = await fetch(
     // eslint-disable-next-line no-undef
-    `${Urls.eventList()}?${params.toString()}`,
+    `${Urls.calendarData()}?${urlParams.toString()}`,
   ).then(
     (result) => result.json(),
-    (error) => {
-      // eslint-disable-next-line no-console
-      console.error(`Error fetching the events: ${error}`);
-    },
+    // eslint-disable-next-line no-console
+    (error) => console.log(error),
   );
 
-  const formattedEvents = []; // Events formatted for BigCalendar
+  const isNew = (e) =>
+    !schedule.some((x) => x.id === e.id && x.type === e.type);
+
+  const newEvents = [];
   for (const e of rawEvents) {
-    if (!events.some((x) => x.id === e.id)) {
-      formattedEvents.push({
+    if (isNew(e)) {
+      newEvents.push({
         id: e.id,
-        type: eventType.EVENT,
-        title: e.name,
-        start: new Date(e.date),
+        type: e.type,
+        title: e.title,
+        start: new Date(e.start),
         end: new Date(e.end),
       });
     }
   }
 
-  return formattedEvents;
-}
-
-async function getCourses(courses, start, end) {
-  const params = new URLSearchParams();
-  params.set('start', start.toISOString());
-  params.set('end', end.toISOString());
-  params.set('no_page', 1);
-  params.set('is_enrolled', 'true');
-  const rawCourses = await fetch(
-    // eslint-disable-next-line no-undef
-    `${Urls.timeslotList()}?${params.toString()}`,
-  ).then(
-    (result) => result.json(),
-    (error) => {
-      // eslint-disable-next-line no-console
-      console.error(`Error fetching the courses: ${error}`);
-    },
-  );
-
-  const formattedCourses = []; // Courses formatted for BigCalendar
-  for (const c of rawCourses) {
-    if (!courses.some((x) => x.id === c.id)) {
-      formattedCourses.push({
-        id: c.id,
-        type: eventType.COURSE,
-        title: c.course_name,
-        start: new Date(c.start),
-        end: new Date(c.end),
-      });
-    }
-  }
-
-  return formattedCourses;
+  return newEvents;
 }
 
 function handleSelectedEvent(e) {
-  if (e.type === eventType.EVENT) {
+  if (e.type === 'event') {
     const serveurUrl = window.location.origin;
     window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
   }
@@ -124,40 +82,55 @@ export default function EventCalendar({ localizer }) {
     [],
   );
 
-  const [events, setEvents] = useState([]);
-  const [courses, setCourses] = useState([]);
+  const tabs = {
+    EVENTS: 1,
+    SCHEDULE: 2,
+  };
+
+  const [schedule, setSchedule] = useState([]);
   const [fetchedRange, setFetchedRange] = useState({
     start: dates.add(dates.startOf(new Date(), 'day'), -10, 'day'),
     end: dates.add(dates.endOf(new Date(), 'day'), 10, 'day'),
   });
-  const [shownOnCalendar, setShownOnCalendar] = useState([]);
+  const [activeTab, setActiveTab] = useState(tabs.EVENTS);
+  const [urlParams, setUrlParams] = useState(
+    new URLSearchParams({
+      start: fetchedRange.start.toISOString(),
+      end: fetchedRange.end.toISOString(),
+      courses: 'false',
+    }),
+  );
 
   useEffect(() => {
-    if (events.length === 0) {
-      (async () => {
-        const fetchedEvents = await getEvents(
-          events,
-          fetchedRange.start,
-          fetchedRange.end,
-        );
-        setEvents(fetchedEvents);
-      })();
+    (async () => {
+      const fetchedSchedule = await getSchedule(schedule, urlParams);
+      setSchedule((prev) => fetchedSchedule.concat(prev));
+    })();
+  }, [urlParams]);
 
-      (async () => {
-        const fetchedCourses = await getCourses(
-          courses,
-          fetchedRange.start,
-          fetchedRange.end,
-        );
-        setCourses(fetchedCourses);
-      })();
+  const handleChangeTab = (tab) => () => {
+    if (tab !== activeTab) {
+      setSchedule([]);
+      if (tab === tabs.EVENTS) {
+        setUrlParams((prev) => {
+          prev.set('start', fetchedRange.start.toISOString());
+          prev.set('end', fetchedRange.end.toISOString());
+          prev.set('courses', 'false');
+          prev.delete('is_enrolled');
+          return new URLSearchParams(prev);
+        });
+      } else if (tab === tabs.SCHEDULE) {
+        setUrlParams((prev) => {
+          prev.set('start', fetchedRange.start.toISOString());
+          prev.set('end', fetchedRange.end.toISOString());
+          prev.set('courses', 'true');
+          prev.set('is_enrolled', 'true');
+          return new URLSearchParams(prev);
+        });
+      }
+      setActiveTab(tab);
     }
-  }, []);
-
-  // Update showedEvents when data value change or a filter state is changed
-  useEffect(() => {
-    setShownOnCalendar([].concat(events, courses));
-  }, [events, courses]);
+  };
 
   const onRangeChange = useCallback(
     (range) => {
@@ -172,48 +145,34 @@ export default function EventCalendar({ localizer }) {
       }
 
       if (start && end) {
-        if (dates.lt(start, fetchedRange.start)) {
-          (async () => {
-            const fetchedCourses = await getCourses(
-              courses,
-              start,
-              fetchedRange.start,
-            );
-            setCourses((prev) => fetchedCourses.concat(prev));
-          })();
-          (async () => {
-            const fetchedEvents = await getEvents(
-              events,
-              start,
-              fetchedRange.start,
-            );
-            setEvents((prev) => fetchedEvents.concat(prev));
-          })();
-          setFetchedRange((prev) => ({ start, end: prev.end }));
-        }
+        const startOutOfRange = dates.lt(start, fetchedRange.start);
+        const endOutOfRange = dates.gt(end, fetchedRange.end);
 
-        if (dates.gt(end, fetchedRange.end)) {
-          (async () => {
-            const fetchedCourses = await getCourses(
-              courses,
-              fetchedRange.end,
-              end,
-            );
-            setCourses((prev) => fetchedCourses.concat(prev));
-          })();
-          (async () => {
-            const fetchedEvents = await getEvents(
-              events,
-              fetchedRange.end,
-              end,
-            );
-            setEvents((prev) => fetchedEvents.concat(prev));
-          })();
+        if (startOutOfRange && endOutOfRange) {
+          setUrlParams((prev) => {
+            prev.set('start', start.toISOString());
+            prev.set('end', end.toISOString());
+            return new URLSearchParams(prev);
+          });
+          setFetchedRange({ start, end });
+        } else if (startOutOfRange) {
+          setUrlParams((prev) => {
+            prev.set('start', start.toISOString());
+            prev.set('end', fetchedRange.start.toISOString());
+            return new URLSearchParams(prev);
+          });
+          setFetchedRange((prev) => ({ start, end: prev.end }));
+        } else if (endOutOfRange) {
+          setUrlParams((prev) => {
+            prev.set('start', fetchedRange.end.toISOString());
+            prev.set('end', end.toISOString());
+            return new URLSearchParams(prev);
+          });
           setFetchedRange((prev) => ({ start: prev.start, end }));
         }
       }
     },
-    [courses, setCourses, events, setEvents, fetchedRange, setFetchedRange],
+    [urlParams, setUrlParams, fetchedRange, setFetchedRange],
   );
 
   // Manage default calendar view for small monitor like smartphones
@@ -225,22 +184,44 @@ export default function EventCalendar({ localizer }) {
   }
 
   return (
-    <div className="calendar-box box">
-      <Calendar
-        components={components}
-        messages={messages}
-        defaultDate={defaultDate}
-        events={shownOnCalendar}
-        localizer={localizer}
-        max={max}
-        showMultiDayTimes
-        step={60}
-        defaultView={defaultView}
-        views={views}
-        onSelectEvent={(e) => handleSelectedEvent(e)}
-        onRangeChange={onRangeChange}
-      />
-    </div>
+    <>
+      <div className="row tab">
+        <div className="col">
+          <button
+            className={activeTab === tabs.EVENTS ? 'active' : ''}
+            onClick={handleChangeTab(tabs.EVENTS)}
+            type="button"
+          >
+            Tous les events
+          </button>
+        </div>
+        <div className="col">
+          <button
+            className={activeTab === tabs.SCHEDULE ? 'active' : ''}
+            onClick={handleChangeTab(tabs.SCHEDULE)}
+            type="button"
+          >
+            Mon emploi du temps
+          </button>
+        </div>
+      </div>
+      <div className="calendar-box box">
+        <Calendar
+          components={components}
+          messages={messages}
+          defaultDate={defaultDate}
+          events={schedule}
+          localizer={localizer}
+          max={max}
+          showMultiDayTimes
+          step={60}
+          defaultView={defaultView}
+          views={views}
+          onSelectEvent={(e) => handleSelectedEvent(e)}
+          onRangeChange={onRangeChange}
+        />
+      </div>
+    </>
   );
 }
 EventCalendar.propTypes = {
