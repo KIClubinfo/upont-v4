@@ -1,9 +1,8 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework import filters, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -64,6 +63,7 @@ def view_course(request, course_id):
         "course": course,
     }
     return render(request, "courses/view_course.html", context)
+
 
 def update_timeslots(request):
     if not request.user.is_superuser:
