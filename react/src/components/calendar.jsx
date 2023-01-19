@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/locale/fr';
 
-import { Calendar, DateLocalizer, momentLocalizer } from 'react-big-calendar';
+import {
+  Calendar,
+  DateLocalizer,
+  momentLocalizer,
+  Views,
+} from 'react-big-calendar';
 
 import * as dates from 'date-arithmetic';
 
@@ -119,15 +124,6 @@ export default function EventCalendar({ localizer }) {
     [],
   );
 
-  // Manage default calendar view for small monitor like smartphones
-  let defaultView;
-  if (window.innerWidth < 700) {
-    defaultView = 'day';
-  } else {
-    defaultView = 'week';
-  }
-
-  const [view, setView] = useState(defaultView);
   const [events, setEvents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [fetchedRange, setFetchedRange] = useState({
@@ -167,16 +163,12 @@ export default function EventCalendar({ localizer }) {
     (range) => {
       let start;
       let end;
-      console.log(view);
-      if (view === 'week') {
-        [start] = range;
-        end = dates.add(range[6], 1, 'day');
-      } else if (view === 'day') {
-        [start] = range;
-        end = dates.add(range[0], 1, 'day');
-      } else if (view === 'month' || view === 'agenda') {
+      if (range.start && range.end) {
         start = range.start;
         end = range.end;
+      } else {
+        [start] = range;
+        end = dates.add(range.slice(-1), 1, 'day');
       }
 
       if (start && end) {
@@ -221,18 +213,16 @@ export default function EventCalendar({ localizer }) {
         }
       }
     },
-    [
-      view,
-      courses,
-      setCourses,
-      events,
-      setEvents,
-      fetchedRange,
-      setFetchedRange,
-    ],
+    [courses, setCourses, events, setEvents, fetchedRange, setFetchedRange],
   );
 
-  const onView = useCallback((newView) => setView(newView), [setView]);
+  // Manage default calendar view for small monitor like smartphones
+  let defaultView;
+  if (window.innerWidth < 700) {
+    defaultView = Views.DAY;
+  } else {
+    defaultView = Views.WEEK;
+  }
 
   return (
     <div className="calendar-box box">
@@ -245,8 +235,7 @@ export default function EventCalendar({ localizer }) {
         max={max}
         showMultiDayTimes
         step={60}
-        onView={onView}
-        view={view}
+        defaultView={defaultView}
         views={views}
         onSelectEvent={(e) => handleSelectedEvent(e)}
         onRangeChange={onRangeChange}
