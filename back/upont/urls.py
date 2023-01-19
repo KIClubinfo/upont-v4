@@ -36,6 +36,7 @@ from social.views import (
     StudentCanPublishAs,
     StudentViewSet,
 )
+from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
 
 from . import views
@@ -99,4 +100,5 @@ urlpatterns += [
         ListCourseDepartments.as_view(),
         name="course_department_list",
     ),
+    path("api/calendar_data/", CalendarData.as_view(), name="calendar_data"),
 ]
