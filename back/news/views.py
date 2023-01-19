@@ -100,7 +100,7 @@ class EventViewSet(viewsets.ModelViewSet):
             end_datetime = parse_datetime(end)
             if end_datetime is not None:
                 queryset = queryset.filter(
-                    Q(end__lte=end_datetime) | Q(end__lte=end_datetime)
+                    Q(date__lte=end_datetime) | Q(end__lte=end_datetime)
                 )
             else:
                 raise ValidationError(
@@ -113,7 +113,7 @@ class EventViewSet(viewsets.ModelViewSet):
         if is_enrolled is not None:
             student = get_object_or_404(Student, user__id=self.request.user.id)
             if is_enrolled == "true":
-                queryset = student.events.all()
+                queryset = queryset.intersection(student.events.all())
             elif is_enrolled == "false":
                 queryset = queryset.difference(student.events.all())
             else:
@@ -122,17 +122,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
 
         return queryset
-
-    @property
-    def paginator(self):
-        """
-        A parameter no_page is added to disable pagination because we want to
-        avoid it for the calendar
-        """
-        self._paginator = super(EventViewSet, self).paginator
-        if "no_page" in self.request.query_params:
-            self._paginator = None
-        return self._paginator
 
 
 @login_required

@@ -129,17 +129,6 @@ class TimeslotViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    @property
-    def paginator(self):
-        """
-        A parameter no_page is added to disable pagination because we want to
-        avoid it for the calendar
-        """
-        self._paginator = super(TimeslotViewSet, self).paginator
-        if "no_page" in self.request.query_params:
-            self._paginator = None
-        return self._paginator
-
 
 @login_required
 def index_courses(request):
