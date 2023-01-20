@@ -1,6 +1,7 @@
 from courses.models import Timeslot
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
 from news.models import Event
@@ -138,3 +139,71 @@ class CalendarData(views.APIView):
 @login_required
 def view_calendar(request):
     return render(request, "calendar/calendar.html")
+
+
+@login_required
+def export_schedule(request):
+    student = get_object_or_404(Student, user__pk=request.user.id)
+
+    events = Event.objects.all().intersection(student.events.all())
+    courses = Timeslot.objects.filter(course_groups__enrolment__student=student)
+
+    def date_to_TZ(date):
+        return "{year:04d}{month:02d}{day:02d}T{hour:02d}{min:02d}{sec:02d}Z".format(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=date.hour,
+            min=date.minute,
+            sec=date.second,
+        )
+
+    ics_data = (
+        "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//hacksw/handcal//NONSGML v1.0//EN"
+    )
+
+    for course in courses:
+        if course.course_groups.exists():
+            course_name = course.course_groups.first().course.name
+        else:
+            course_name = ""
+
+        ics_data += """
+            BEGIN:VEVENT
+            DTSTART:{start}
+            DTEND:{end}
+            SUMMARY:{title}
+            LOCATION:{place}
+            CATEGORIES:{categorie}
+            END:VEVENT\
+            """.format(
+            title=course_name,
+            start=date_to_TZ(course.start),
+            end=date_to_TZ(course.end),
+            place=course.place,
+            categorie="Cours",
+        )
+
+    for event in events:
+        ics_data += """
+            BEGIN:VEVENT
+            DTSTART:{start}
+            DTEND:{end}
+            SUMMARY:{title}
+            LOCATION:{place}
+            ORGANIZER;CN={organizer}
+            CATEGORIES:{categorie}
+            END:VEVENT\
+            """.format(
+            title=event.name,
+            start=date_to_TZ(event.date),
+            end=date_to_TZ(event.end),
+            place=event.location,
+            organizer=event.club.name,
+            categorie="Event",
+        )
+
+    ics_data += "\nEND:VCALENDAR"
+    response = HttpResponse(ics_data, content_type="text/plain")
+    response["Content-Disposition"] = 'attachment; filename="emploidutemps_upont.ics"'
+    return response
