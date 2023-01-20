@@ -8,4 +8,5 @@ urlpatterns = [
     path("courses/", views.index_courses, name="courses_index"),
     path("course/<int:course_id>/details", views.view_course, name="course_detail"),
     path("update_timeslots/", views.update_timeslots, name="update_timeslots"),
+    path("group/<int:group_id>/<str:action>", views.join_group, name="join_group"),
 ]

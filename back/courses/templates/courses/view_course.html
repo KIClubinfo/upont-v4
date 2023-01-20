@@ -58,6 +58,24 @@
 
                     </div><!--End of Column-->
 
+                    {%if groups%}
+                        <h5 class="text-bold mt-4"> Groupes : </h5>
+                        {%for group in groups%}
+                            <div class="col-lg-8">
+                                Groupe {{group.number}} : {{group.teacher}}
+                                {%if group in student_groups%}
+                                    <a href={%url 'courses:join_group' group_id=group.id action="Leave"%}>
+                                        <button class="button red-button"> Quitter </button>
+                                    </a>
+                                {%else%}
+                                    <a href={%url 'courses:join_group' group_id=group.id action="Join"%}>
+                                        <button class="button blue-button"> Rejoindre </button>
+                                    </a>
+                                {%endif%}
+                            </div>
+                        {%endfor%}
+                    {%endif%}
+
                 </div><!--End of Row-->
 
             </div><!--End of Club Bow-->

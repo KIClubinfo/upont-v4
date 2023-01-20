@@ -2,13 +2,14 @@ import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from rest_framework import filters, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from social.models import Student
 
-from .models import Course, CourseDepartment
+from .models import Course, CourseDepartment, Enrolment, Group
 from .scrapper import get_schedule
 from .serializers import CourseSerializer
 
@@ -59,8 +60,13 @@ def index_courses(request):
 @login_required
 def view_course(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
+    group_query = Group.objects.filter(course=course)
+    student = get_object_or_404(Student, user__id=request.user.id)
+    student_groups = student.course.all()
     context = {
         "course": course,
+        "groups": group_query,
+        "student_groups": student_groups,
     }
     return render(request, "courses/view_course.html", context)
 
@@ -91,3 +97,20 @@ def update_timeslots(request):
             context["date_updated"] = date
 
     return render(request, "courses/update_timeslots.html", context)
+
+
+@login_required
+def join_group(request, group_id, action):
+    group = get_object_or_404(Group, id=group_id)
+    student = get_object_or_404(Student, user__id=request.user.id)
+    if action == "Join":
+        enrolment = Enrolment(
+            group=group,
+            student=student,
+        )
+        enrolment.save()
+    elif action == "Leave":
+        student.course.remove(group)
+    else:
+        return HttpResponse(status=500)
+    return view_course(request, group.course.id)
