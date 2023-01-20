@@ -67,6 +67,23 @@ function handleSelectedEvent(e) {
   }
 }
 
+function eventStyleGetter(event, start, end, isSelected) {
+  let backgroundColor = '#3DC1F3';
+  if (event.type === 'course') {
+    backgroundColor = '#4AAD52';
+  }
+
+  const style = {
+    backgroundColor,
+    borderRadius: '2px',
+    opacity: 1,
+    color: 'white',
+    border: '0px',
+    display: 'block',
+  };
+  return { style };
+}
+
 export default function EventCalendar({ localizer }) {
   const { components, defaultDate, max, views } = useMemo(
     () => ({
@@ -219,6 +236,7 @@ export default function EventCalendar({ localizer }) {
           views={views}
           onSelectEvent={(e) => handleSelectedEvent(e)}
           onRangeChange={onRangeChange}
+          eventPropGetter={eventStyleGetter}
         />
       </div>
     </>
