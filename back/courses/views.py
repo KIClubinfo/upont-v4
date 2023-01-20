@@ -2,9 +2,7 @@ import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
-from django.utils.dateparse import parse_datetime
 from rest_framework import filters, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -73,16 +71,6 @@ class TimeslotViewSet(viewsets.ModelViewSet):
               which the current user is not enrolled
 
             - by default, return all timeslots
-
-      * "start" = date is ISO format
-
-            - if given, return only the timeslots which start or end after the
-              given date
-
-      * "end" = date is ISO format
-
-            - if given, return only the timeslots which start or end before the
-              given date
     """
 
     serializer_class = TimeslotSerializer
@@ -101,30 +89,6 @@ class TimeslotViewSet(viewsets.ModelViewSet):
             else:
                 raise ValidationError(
                     detail="is_enrolled must be either 'true' or 'false'"
-                )
-
-        start = self.request.GET.get("start")
-        if start is not None:
-            start_datetime = parse_datetime(start)
-            if start_datetime is not None:
-                queryset = queryset.filter(
-                    Q(start__gte=start_datetime) | Q(end__gte=start_datetime)
-                )
-            else:
-                raise ValidationError(
-                    detail="Error in parsing start parameter, the date must be in ISO format"
-                )
-
-        end = self.request.GET.get("end")
-        if end is not None:
-            end_datetime = parse_datetime(end)
-            if end_datetime is not None:
-                queryset = queryset.filter(
-                    Q(start__lte=end_datetime) | Q(end__lte=end_datetime)
-                )
-            else:
-                raise ValidationError(
-                    detail="Error in parsing end parameter, the date must be in ISO format"
                 )
 
         return queryset
