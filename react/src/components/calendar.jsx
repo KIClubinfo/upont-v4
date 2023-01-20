@@ -67,7 +67,7 @@ function handleSelectedEvent(e) {
   }
 }
 
-function eventStyleGetter(event, start, end, isSelected) {
+function eventStyleGetter(event) {
   let backgroundColor = '#3DC1F3';
   if (event.type === 'course') {
     backgroundColor = '#4AAD52';
