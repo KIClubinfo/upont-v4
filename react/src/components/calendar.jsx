@@ -70,7 +70,7 @@ function handleSelectedEvent(e) {
 function eventStyleGetter(event) {
   let backgroundColor = '#3DC1F3';
   if (event.type === 'course') {
-    backgroundColor = '#4AAD52';
+    backgroundColor = '#150578';
   }
 
   const style = {
