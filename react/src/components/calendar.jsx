@@ -1,12 +1,16 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { useAsync } from 'react-async';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/locale/fr';
 
-import { Calendar, DateLocalizer, momentLocalizer } from 'react-big-calendar';
+import {
+  Calendar,
+  DateLocalizer,
+  momentLocalizer,
+  Views,
+} from 'react-big-calendar';
 
-import * as dates from './utils/dates';
+import * as dates from 'date-arithmetic';
 
 // Set the calendar language to french
 moment.locale('fr');
@@ -27,36 +31,40 @@ const messages = {
   showMore: (total) => `+ ${total} événement(s) supplémentaire(s)`,
 };
 
-// Events fetching from back API
-async function getEvents() {
-  const response = await fetch('/api/events').then(
+async function getSchedule(schedule, urlParams) {
+  const rawEvents = await fetch(
+    // eslint-disable-next-line no-undef
+    `${Urls.calendarData()}?${urlParams.toString()}`,
+  ).then(
     (result) => result.json(),
-    (error) => {
-      // eslint-disable-next-line no-console
-      console.error(`Error getting the events: ${error}`);
-    },
+    // eslint-disable-next-line no-console
+    (error) => console.log(error),
   );
 
-  const rawEvents = response.results;
+  const isNew = (e) =>
+    !schedule.some((x) => x.id === e.id && x.type === e.type);
 
-  const formattedEvents = []; // Events formatted for BigCalendar
+  const newEvents = [];
   for (const e of rawEvents) {
-    formattedEvents.push({
-      id: e.id,
-      title: e.name,
-      desc: e.description,
-      participating: e.participating,
-      start: new Date(e.date),
-      end: new Date(e.end),
-    });
+    if (isNew(e)) {
+      newEvents.push({
+        id: e.id,
+        type: e.type,
+        title: e.title,
+        start: new Date(e.start),
+        end: new Date(e.end),
+      });
+    }
   }
 
-  return formattedEvents;
+  return newEvents;
 }
 
 function handleSelectedEvent(e) {
-  const serveurUrl = window.location.origin;
-  window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
+  if (e.type === 'event') {
+    const serveurUrl = window.location.origin;
+    window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
+  }
 }
 
 export default function EventCalendar({ localizer }) {
@@ -74,68 +82,146 @@ export default function EventCalendar({ localizer }) {
     [],
   );
 
-  const { data, error } = useAsync({ promiseFn: getEvents });
-  if (error) {
-    // eslint-disable-next-line no-console
-    console.log(error.message);
-  }
+  const tabs = {
+    EVENTS: 1,
+    SCHEDULE: 2,
+  };
 
-  const [showedEvents, setShowedEvents] = useState([]);
+  const [schedule, setSchedule] = useState([]);
+  const [fetchedRange, setFetchedRange] = useState({
+    start: dates.add(dates.startOf(new Date(), 'day'), -10, 'day'),
+    end: dates.add(dates.endOf(new Date(), 'day'), 10, 'day'),
+  });
+  const [activeTab, setActiveTab] = useState(tabs.EVENTS);
+  const [urlParams, setUrlParams] = useState(
+    new URLSearchParams({
+      start: fetchedRange.start.toISOString(),
+      end: fetchedRange.end.toISOString(),
+      courses: 'false',
+    }),
+  );
 
-  // State for filters
-  const [onlyParticipating, setOnlyParticipating] = useState(false);
-
-  function handleParticipating() {
-    setOnlyParticipating(!onlyParticipating); // Swap the state
-  }
-
-  // Update showedEvents when data value change or a filter state is changed
   useEffect(() => {
-    if (onlyParticipating) {
-      setShowedEvents(data.filter((e) => e.participating));
-      document.getElementById('participating_button').className =
-        'button red-button';
-    } else {
-      setShowedEvents(data);
-      document.getElementById('participating_button').className =
-        'button green-button';
+    (async () => {
+      const fetchedSchedule = await getSchedule(schedule, urlParams);
+      setSchedule((prev) => fetchedSchedule.concat(prev));
+    })();
+  }, [urlParams]);
+
+  const handleChangeTab = (tab) => () => {
+    if (tab !== activeTab) {
+      setSchedule([]);
+      if (tab === tabs.EVENTS) {
+        setUrlParams((prev) => {
+          prev.set('start', fetchedRange.start.toISOString());
+          prev.set('end', fetchedRange.end.toISOString());
+          prev.set('courses', 'false');
+          prev.delete('is_enrolled');
+          return new URLSearchParams(prev);
+        });
+      } else if (tab === tabs.SCHEDULE) {
+        setUrlParams((prev) => {
+          prev.set('start', fetchedRange.start.toISOString());
+          prev.set('end', fetchedRange.end.toISOString());
+          prev.set('courses', 'true');
+          prev.set('is_enrolled', 'true');
+          return new URLSearchParams(prev);
+        });
+      }
+      setActiveTab(tab);
     }
-  }, [data, onlyParticipating]);
+  };
+
+  const onRangeChange = useCallback(
+    (range) => {
+      let start;
+      let end;
+      if (range.start && range.end) {
+        start = range.start;
+        end = range.end;
+      } else {
+        [start] = range;
+        end = dates.add(range.slice(-1), 1, 'day');
+      }
+
+      if (start && end) {
+        const startOutOfRange = dates.lt(start, fetchedRange.start);
+        const endOutOfRange = dates.gt(end, fetchedRange.end);
+
+        if (startOutOfRange && endOutOfRange) {
+          setUrlParams((prev) => {
+            prev.set('start', start.toISOString());
+            prev.set('end', end.toISOString());
+            return new URLSearchParams(prev);
+          });
+          setFetchedRange({ start, end });
+        } else if (startOutOfRange) {
+          setUrlParams((prev) => {
+            prev.set('start', start.toISOString());
+            prev.set('end', fetchedRange.start.toISOString());
+            return new URLSearchParams(prev);
+          });
+          setFetchedRange((prev) => ({ start, end: prev.end }));
+        } else if (endOutOfRange) {
+          setUrlParams((prev) => {
+            prev.set('start', fetchedRange.end.toISOString());
+            prev.set('end', end.toISOString());
+            return new URLSearchParams(prev);
+          });
+          setFetchedRange((prev) => ({ start: prev.start, end }));
+        }
+      }
+    },
+    [urlParams, setUrlParams, fetchedRange, setFetchedRange],
+  );
 
   // Manage default calendar view for small monitor like smartphones
   let defaultView;
   if (window.innerWidth < 700) {
-    defaultView = 'day';
+    defaultView = Views.DAY;
   } else {
-    defaultView = 'week';
+    defaultView = Views.WEEK;
   }
 
   return (
-    <div className="calendar-box box">
-      <center>
-        <button
-          className="button green-button"
-          id="participating_button"
-          onClick={handleParticipating}
-          type="button"
-        >
-          Évènements auxquels je ne participe pas
-        </button>
-      </center>
-      <Calendar
-        components={components}
-        messages={messages}
-        defaultDate={defaultDate}
-        events={showedEvents}
-        localizer={localizer}
-        max={max}
-        showMultiDayTimes
-        step={60}
-        defaultView={defaultView}
-        views={views}
-        onSelectEvent={(e) => handleSelectedEvent(e)}
-      />
-    </div>
+    <>
+      <div className="row tab">
+        <div className="col">
+          <button
+            className={activeTab === tabs.EVENTS ? 'active' : ''}
+            onClick={handleChangeTab(tabs.EVENTS)}
+            type="button"
+          >
+            Tous les events
+          </button>
+        </div>
+        <div className="col">
+          <button
+            className={activeTab === tabs.SCHEDULE ? 'active' : ''}
+            onClick={handleChangeTab(tabs.SCHEDULE)}
+            type="button"
+          >
+            Mon emploi du temps
+          </button>
+        </div>
+      </div>
+      <div className="calendar-box box">
+        <Calendar
+          components={components}
+          messages={messages}
+          defaultDate={defaultDate}
+          events={schedule}
+          localizer={localizer}
+          max={max}
+          showMultiDayTimes
+          step={60}
+          defaultView={defaultView}
+          views={views}
+          onSelectEvent={(e) => handleSelectedEvent(e)}
+          onRangeChange={onRangeChange}
+        />
+      </div>
+    </>
   );
 }
 EventCalendar.propTypes = {

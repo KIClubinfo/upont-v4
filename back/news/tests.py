@@ -556,7 +556,6 @@ class EventAPITest(APITestCase):
         self.assertEqual(response_event1["date"], event1.date.astimezone().isoformat())
         self.assertEqual(response_event1["location"], event1.location)
         self.assertEqual(response_event1["participants"], [])
-        self.assertEqual(response_event1["participating"], False)
 
         response_event2 = response.data.get("results")[0]
         self.assertEqual(response_event2["id"], event2.pk)
@@ -567,4 +566,3 @@ class EventAPITest(APITestCase):
         self.assertEqual(len(response_event2["participants"]), 1)
         participant_id = int(response_event2["participants"][0].split("/")[-2])
         self.assertEqual(participant_id, self.student.pk)
-        self.assertEqual(response_event2["participating"], True)

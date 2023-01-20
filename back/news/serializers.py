@@ -205,16 +205,6 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 class EventSerializer(serializers.HyperlinkedModelSerializer):
     club = ClubSerializer()
 
-    def get_participating(self, obj):
-        user = None
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
-        student = get_object_or_404(Student, user__id=user.id)
-        return student in obj.participants.all()
-
-    participating = serializers.SerializerMethodField()
-
     class Meta:
         model = Event
         fields = [
@@ -225,7 +215,6 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             "end",
             "location",
             "participants",
-            "participating",
             "poster",
             "shotgun",
             "id",
