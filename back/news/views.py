@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
@@ -49,11 +50,41 @@ class PostViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed
+
+    Args:
+
+      * "is_enrolled" = true|false
+
+            - if true, return only the timeslots associated with courses in
+              which the current user is enrolled
+
+            - if false, return only the timeslots associated with courses in
+              which the current user is not enrolled
+
+            - by default, return all timeslots
     """
 
-    queryset = Event.objects.all().order_by("-date", "name")
     serializer_class = EventSerializer
     http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Event.objects.all()
+
+        # Must be the last argument to handle because no filter is alllowed
+        # after a queryset difference (case if is_enrolled=false)
+        is_enrolled = self.request.GET.get("is_enrolled")
+        if is_enrolled is not None:
+            student = get_object_or_404(Student, user__id=self.request.user.id)
+            if is_enrolled == "true":
+                queryset = queryset.intersection(student.events.all())
+            elif is_enrolled == "false":
+                queryset = queryset.difference(student.events.all())
+            else:
+                raise ValidationError(
+                    detail="is_enrolled must be either 'true' or 'false'"
+                )
+
+        return queryset.order_by("-date", "name")
 
 
 @login_required
