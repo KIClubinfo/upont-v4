@@ -3,7 +3,7 @@ import datetime
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import filters, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -113,4 +113,4 @@ def join_group(request, group_id, action):
         student.course.remove(group)
     else:
         return HttpResponse(status=500)
-    return view_course(request, group.course.id)
+    return redirect("courses:view_course", group.course.id)
