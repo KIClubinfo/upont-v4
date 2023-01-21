@@ -103,13 +103,10 @@ def index_courses(request):
 @login_required
 def view_course(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    group_query = Group.objects.filter(course=course)
     student = get_object_or_404(Student, user__id=request.user.id)
-    student_groups = student.course.all()
     context = {
         "course": course,
-        "groups": group_query,
-        "student_groups": student_groups,
+        "student": student,
     }
     return render(request, "courses/view_course.html", context)
 
@@ -147,6 +144,9 @@ def join_group(request, group_id, action):
     group = get_object_or_404(Group, id=group_id)
     student = get_object_or_404(Student, user__id=request.user.id)
     if action == "Join":
+        group_query = student.course.all().filter(course=group.course)
+        for group_to_delete in group_query:
+            student.course.remove(group_to_delete)
         enrolment = Enrolment(
             group=group,
             student=student,
@@ -156,4 +156,4 @@ def join_group(request, group_id, action):
         student.course.remove(group)
     else:
         return HttpResponse(status=500)
-    return redirect("courses:view_course", group.course.id)
+    return redirect("courses:course_detail", group.course.id)
