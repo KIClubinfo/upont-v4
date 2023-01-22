@@ -36,7 +36,9 @@ class CourseViewSet(viewsets.ModelViewSet):
         if is_enrolled is not None:
             student = get_object_or_404(Student, user__id=self.request.user.id)
             if is_enrolled == "true":
-                queryset = queryset.filter(groups__enrolment__student=student)
+                queryset = queryset.filter(
+                    groups__enrolment__student=student
+                ).distinct()
             elif is_enrolled == "false":
                 queryset = queryset.exclude(groups__enrolment__student=student)
             else:
