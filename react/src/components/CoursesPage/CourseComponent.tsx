@@ -1,8 +1,8 @@
-import { url } from 'inspector';
 import React from 'react';
 
 interface Props {
   course: {
+    id: number;
     name: string;
     acronym: string;
     department: string;
@@ -10,7 +10,11 @@ interface Props {
 }
 
 export const Course: React.FC<Props> = (props) => (
-  <a href={Urls['courses:course_detail'](props.course.id)}>
+  // @ts-ignore Urls is declared in the django template
+  <a
+    href={Urls['courses:course_detail'](props.course.id)}
+    className="course-link"
+  >
     <div className="course-card">
       <div className="course-information">
         <span className="course-name">

@@ -91,7 +91,7 @@ class CalendarData(views.APIView):
                 events_queryset = events_queryset.intersection(student.events.all())
                 courses_queryset = courses_queryset.filter(
                     course_groups__enrolment__student=student
-                )
+                ).distinct()
             elif is_enrolled == "false":
                 events_queryset = events_queryset.difference(student.events.all())
                 courses_queryset = courses_queryset.exclude(
