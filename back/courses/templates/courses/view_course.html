@@ -2,7 +2,7 @@
 <!--Markdownify-->
 {% load markdownify %}
 <!--Header-->
-{% if course.acronym %}{% include "header.html" with title=course.acronym %}{% else %}{% include "header.html" with title=course.name %}{% endif %}
+{% if course.acronym %}{% include "header.html" with title=course.acronym|add:"-"|add:course.name %}{% else %}{% include "header.html" with title=course.name %}{% endif %}
 
 <!--Body-->
 <body>
@@ -14,18 +14,6 @@
 
     <!--Content-->
     <div class="content">
-
-        <!--Header Content-->
-        <div class="content-header">
-            <div class="row justify-content-between w-100">
-                <div class="col">
-                    <div class="search-input-group">
-                        <input type="text" class="search-input" placeholder="Rechercher">
-                        <button class="button search-button"><i class="fas fa-search "></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!--Main Content-->
         <div class="content-main">

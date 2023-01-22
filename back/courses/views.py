@@ -145,7 +145,8 @@ def update_timeslots(request):
 def join_group(request, group_id, action):
     group = get_object_or_404(Group, id=group_id)
     student = get_object_or_404(Student, user__id=request.user.id)
-    for group_to_delete in group.course.groups.all():
+    # Remove all the groups of this course that the student follow
+    for group_to_delete in group.course.groups.all() & student.course.all():
         student.course.remove(group_to_delete)
     if action == "Join_group" or action == "Join_course":
         enrolment = Enrolment(
