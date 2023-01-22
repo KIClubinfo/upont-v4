@@ -57,21 +57,35 @@
 
                     <!--Column-->
                     <div class="col-12">
-                        {%if course.groups.all%}
+                        {%if course.groups.all|length_is:1%}
+                            {%for group in course.groups.all%}
+                                {%if group in student.course.all%}
+                                    <a href={%url 'courses:join_group' group_id=group.id action="Leave_course"%}>
+                                        <button class="button red-button"> Quitter </button>
+                                    </a>
+                                {%else%}
+                                    <a href={%url 'courses:join_group' group_id=group.id action="Join_course"%}>
+                                        <button class="button blue-button"> Rejoindre </button>
+                                    </a>
+                                {%endif%}
+                            {%endfor%}
+                        {%elif course.groups.all%}
                             <h5 class="text-bold mt-2"> Groupes : </h5>
                             {%for group in course.groups.all%}
-                                <div class="col-lg-8">
-                                    Groupe {{group.number}} : {{group.teacher}}
-                                    {%if group in student.course.all%}
-                                        <a href={%url 'courses:join_group' group_id=group.id action="Leave"%}>
-                                            <button class="button red-button"> Quitter </button>
-                                        </a>
-                                    {%else%}
-                                        <a href={%url 'courses:join_group' group_id=group.id action="Join"%}>
-                                            <button class="button blue-button"> Rejoindre </button>
-                                        </a>
-                                    {%endif%}
-                                </div>
+                                {%if group.number is not None%}
+                                    <div class="col-lg-8">
+                                        Groupe {{group.number}} : {{group.teacher}}
+                                        {%if group in student.course.all%}
+                                            <a href={%url 'courses:join_group' group_id=group.id action="Leave_group"%}>
+                                                <button class="button red-button"> Quitter </button>
+                                            </a>
+                                        {%else%}
+                                            <a href={%url 'courses:join_group' group_id=group.id action="Join_group"%}>
+                                                <button class="button blue-button"> Rejoindre </button>
+                                            </a>
+                                        {%endif%}
+                                    </div>
+                                {%endif%}
                             {%endfor%}
                         {%endif%}
                     </div><!--End of Column-->

@@ -143,17 +143,21 @@ def update_timeslots(request):
 def join_group(request, group_id, action):
     group = get_object_or_404(Group, id=group_id)
     student = get_object_or_404(Student, user__id=request.user.id)
-    if action == "Join":
-        group_query = student.course.all().filter(course=group.course)
-        for group_to_delete in group_query:
-            student.course.remove(group_to_delete)
+    for group_to_delete in group.course.groups.all():
+        student.course.remove(group_to_delete)
+    if action == "Join_group" or action == "Join_course":
         enrolment = Enrolment(
             group=group,
             student=student,
         )
         enrolment.save()
-    elif action == "Leave":
-        student.course.remove(group)
-    else:
+        if action == "Join_group":
+            for group in group.course.groups.all().filter(number__isnull=True):
+                enrolment = Enrolment(
+                    group=group,
+                    student=student,
+                )
+                enrolment.save()
+    elif action != "Leave_group" and action != "Leave_course":
         return HttpResponse(status=500)
     return redirect("courses:course_detail", group.course.id)
