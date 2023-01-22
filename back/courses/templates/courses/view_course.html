@@ -30,7 +30,7 @@
         <!--Main Content-->
         <div class="content-main">
 
-            <!--Club Box-->
+            <!--Course Box-->
             <div class="course-box">
 
                 <!--Row-->
@@ -48,37 +48,37 @@
                     <!--Column-->
                     <div class="col-12">
 
-                        <h5 class="text-bold mt-4">Enseignant : {{course.teacher}}</h5>
-                        <h5 class="text-bold mt-4">Département : {{course.department}}</h5>
-
-
-                        <h5 class="text-bold mt-4">Description du cours :</h5>
-
-                        <p class="text-thin text-justified mt-2" style="font-size: medium;">{{course.description|markdownify}}</p>
+                        <h5 class="text-bold mt-2">Enseignant : {{course.teacher}}</h5>
+                        <h5 class="text-bold mt-2">Département : {{course.department}}</h5>
+                        <h5 class="text-bold mt-1">Description du cours :</h5>
+                        <p class="text-thin text-justified mt-1" style="font-size: medium;">{{course.description|markdownify}}</p>
 
                     </div><!--End of Column-->
 
-                    {%if course.groups.all%}
-                        <h5 class="text-bold mt-4"> Groupes : </h5>
-                        {%for group in course.groups.all%}
-                            <div class="col-lg-8">
-                                Groupe {{group.number}} : {{group.teacher}}
-                                {%if group in student.course.all%}
-                                    <a href={%url 'courses:join_group' group_id=group.id action="Leave"%}>
-                                        <button class="button red-button"> Quitter </button>
-                                    </a>
-                                {%else%}
-                                    <a href={%url 'courses:join_group' group_id=group.id action="Join"%}>
-                                        <button class="button blue-button"> Rejoindre </button>
-                                    </a>
-                                {%endif%}
-                            </div>
-                        {%endfor%}
-                    {%endif%}
+                    <!--Column-->
+                    <div class="col-12">
+                        {%if course.groups.all%}
+                            <h5 class="text-bold mt-2"> Groupes : </h5>
+                            {%for group in course.groups.all%}
+                                <div class="col-lg-8">
+                                    Groupe {{group.number}} : {{group.teacher}}
+                                    {%if group in student.course.all%}
+                                        <a href={%url 'courses:join_group' group_id=group.id action="Leave"%}>
+                                            <button class="button red-button"> Quitter </button>
+                                        </a>
+                                    {%else%}
+                                        <a href={%url 'courses:join_group' group_id=group.id action="Join"%}>
+                                            <button class="button blue-button"> Rejoindre </button>
+                                        </a>
+                                    {%endif%}
+                                </div>
+                            {%endfor%}
+                        {%endif%}
+                    </div><!--End of Column-->
 
                 </div><!--End of Row-->
 
-            </div><!--End of Club Bow-->
+            </div><!--End of Course Box-->
 
         </div><!--End of Main Content-->
 
