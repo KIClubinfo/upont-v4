@@ -155,9 +155,11 @@ def join_group(request, group_id, action):
         )
         enrolment.save()
         if action == "Join_group":
-            for group in group.course.groups.all().filter(number__isnull=True):
+            # select the null group if he exists
+            null_group = group.course.groups.all().filter(number__isnull=True)[:1].get()
+            if null_group is not None:
                 enrolment = Enrolment(
-                    group=group,
+                    group=null_group,
                     student=student,
                 )
                 enrolment.save()
