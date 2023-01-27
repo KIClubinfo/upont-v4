@@ -98,6 +98,18 @@ class Timeslot(models.Model):
     course_groups = models.ManyToManyField(Group, related_name="timeslot", blank=True)
     place = models.CharField(max_length=50, blank=True)
 
+    def get_course_name(self):
+        """
+        Return the name of the corresponding course
+        Return None if it is attached to no course
+        """
+        if self.course_groups.exists():
+            course_name = self.course_groups.first().course.name
+        else:
+            course_name = None
+
+        return course_name
+
 
 class Resource(models.Model):
     name = models.CharField(max_length=50, default="Ressource")
