@@ -1418,6 +1418,48 @@ a.text-green:hover{
     text-decoration: none;
 }
 
+.course-box{
+    /* Styling */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 11rem;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    padding: 0rem 5rem;
+    border-radius: 0.5rem;
+    background-color: hsla(0, 0%, 100%, 0.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    max-width: 1500px;
+}
+
+.course-title{
+    /* Sizing */
+    padding: 2rem 0rem;
+    margin: 0rem 3rem 0rem 0rem;
+    /* Styling */
+    text-align: left;
+    font-family:'Neue Helvetica Medium';
+    font-style: normal;
+    font-size: 1.5rem;
+
+    border-bottom: solid var(--border-color) var(--border-width);
+}
+
+.group-box{
+    /* Styling */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5rem;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    padding: 0rem 0.5rem;
+    border-radius: 0.5rem;
+    background-color: hsla(0, 0%, 100%, 0.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
 /*-------------------------------------------------*/
 /*--------------- CALENDAR COMPONENTS -------------*/
 /*-------------------------------------------------*/
