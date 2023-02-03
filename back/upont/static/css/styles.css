@@ -1422,7 +1422,7 @@ a.text-green:hover{
     /* Styling */
     margin-left: auto;
     margin-right: auto;
-    margin-top: 11rem;
+    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     color: white;
@@ -1436,7 +1436,7 @@ a.text-green:hover{
 .course-title{
     /* Sizing */
     padding: 2rem 0rem;
-    margin: 0rem 3rem 0rem 0rem;
+    margin: 0rem 0rem 1.5rem 0rem;
     /* Styling */
     text-align: left;
     font-family:'Neue Helvetica Medium';
@@ -1450,7 +1450,8 @@ a.text-green:hover{
     /* Styling */
     margin-left: auto;
     margin-right: auto;
-    margin-top: 5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
     display: flex;
     flex-direction: column;
     color: white;
