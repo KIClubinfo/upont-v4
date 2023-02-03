@@ -22,30 +22,29 @@
 
             <!--Course Box-->
             <div class="course-box">
-
                 <!--Row-->
                 <div class="row">
+                    <!--Column-->
                     <div class="col-12">
                         <div class="course-title">
-                            <div>
-                                {{course.name}} - {{course.acronym}}
-                            </div>
+                            <h4> {{course.name}} - {{course.acronym}} </h4>
                             <h5 class="text-bold mt-1">{{course.teacher}} - {{course.department}}</h5>
                         </div>
-                    </div>
+                    </div><!--End of Column-->
 
 
                     {%if course.new_courses.all%}
+                        <!--Column-->
                         <div class="col-12">
                             <h6 class="text-warning">Ce cours n'existe plus, voici le(s) cours ayant vocation à le remplacer :</h5>
                             {%for new_course in course.new_courses.all%}
                                 <a href={% url 'courses:course_detail' course_id=new_course.id %}> {{new_course.name}} - ({{new_course.acronym}})</a>
                             {%endfor%}
-                        </div>
+                        </div><!--End of Column-->
                     {%endif%}
 
+                    <!--Column-->
                     <div class="col-12">
-                        <!--Column-->
                         {%if course.groups.all|length_is:1%}
                             {%for group in course.groups.all%}
                                 {%if group in student.course.all%}
@@ -80,15 +79,17 @@
                             </div> <!--End of Column-->
                         {%endif%}
 
-                    </div><!--End of Row-->
+                    </div><!--End of Column-->
 
                     <!--Column-->
                     <div class="col-12">
                         <h5 class="text-bold mt-2">Description du cours :</h5>
                         <p class="text-thin text-justified mt-2" style="font-size: medium;">{{course.description|markdownify}}</p>
                     </div><!--End of Column-->
-                </div><!--End of Row-->
-            </div><!--End of Course Box-->
+
+                </div><!--End of Course Box-->
+
+            </div><!--End of Row-->
 
         </div><!--End of Main Content-->
 
