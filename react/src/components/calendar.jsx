@@ -2,7 +2,6 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/locale/fr';
-import ExportCalendar from './export_calendar';
 
 import {
   Calendar,
@@ -12,6 +11,8 @@ import {
 } from 'react-big-calendar';
 
 import * as dates from 'date-arithmetic';
+
+import ExportCalendar from './export_calendar';
 
 // Set the calendar language to french
 moment.locale('fr');
