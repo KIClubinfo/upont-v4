@@ -1414,11 +1414,40 @@ a.text-green:hover{
     border-radius: 5px;
 }
 
+.button-drawer{
+    /* Positionning */
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+    /* Sizing */
+    margin: 0.3rem 0;
+    width: 100%;
+    line-height: 1.8rem;
+    font-size: 1rem;
+    text-indent: 0.5rem;
+    /* Styling */
+    border-radius: 3px;
+    border-width: 0.2px;
+    background-color: #26272b;
+    color: white;
+}
+
 /*-------------------------------------------------*/
 /*--------------- CALENDAR COMPONENTS -------------*/
 /*-------------------------------------------------*/
 .calendar-box {
     width: 80%;
+}
+
+.calendar-export-form {
+    /* Positionning */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /*-------------------------------------------------*/
