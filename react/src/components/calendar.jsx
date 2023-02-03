@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/locale/fr';
+import ExportCalendar from './export_calendar';
 
 import {
   Calendar,
@@ -206,6 +207,7 @@ export default function EventCalendar({ localizer }) {
         </div>
       </div>
       <div className="calendar-box box">
+        {activeTab === tabs.SCHEDULE ? <ExportCalendar /> : null}
         <Calendar
           components={components}
           messages={messages}
