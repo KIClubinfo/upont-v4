@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("courses", "0005_merge_0004_rename_resources_resource_0004_timeslot"),
     ]

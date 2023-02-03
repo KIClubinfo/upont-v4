@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("social", "0004_auto_20220826_1123"),
         ("social", "0006_alter_role_name"),

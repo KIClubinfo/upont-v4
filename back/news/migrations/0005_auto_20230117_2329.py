@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("social", "0007_merge_0004_auto_20220826_1123_0006_alter_role_name"),
         ("news", "0004_post_dislikes"),
