@@ -12,6 +12,8 @@ import {
 
 import * as dates from 'date-arithmetic';
 
+import ExportCalendar from './export_calendar';
+
 // Set the calendar language to french
 moment.locale('fr');
 const mLocalizer = momentLocalizer(moment);
@@ -223,6 +225,7 @@ export default function EventCalendar({ localizer }) {
         </div>
       </div>
       <div className="calendar-box box">
+        {activeTab === tabs.SCHEDULE ? <ExportCalendar /> : null}
         <Calendar
           components={components}
           messages={messages}

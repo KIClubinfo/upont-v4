@@ -77,7 +77,6 @@ def get_schedule(date):
                         start__range=[start, end], course_groups__course=course
                     ).exists()
                 ):
-
                     timeslot = Timeslot(
                         start=start,
                         end=end,
