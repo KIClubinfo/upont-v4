@@ -59,12 +59,12 @@ def add(request):
             name=teachers,
         )   
         if not created:
-            students_not_added.append(
-                (column[2] + "." + column[1]).replace(" ", "-").lower()
+            course_not_added.append(
+                (column[1])
             )
     context = {
-        "order": order,
-        "promo_added": True,
-        "students_not_added": students_not_added,
+          "order": order,
+            "type_error": True,
+            "courses_not_added": course_not_added,
     }
-    return render(request, "add_promo.html", context)
+    return render(request, "add_courses.html", context)
