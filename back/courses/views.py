@@ -42,7 +42,7 @@ def add(request):
     data_set = csv_file.read().decode("UTF-8")
     io_string = io.StringIO(data_set)
     next(io_string)
-    course_not_added = []
+    courses_not_added = []
     for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
         Course, created = models.User.objects.get_or_create(
         name=column[1],
@@ -51,7 +51,7 @@ def add(request):
         acronym=column[3],
         )
         if  (name="") or (teachers="") or (department="") or (acronym=""):
-            course_not_added.append(column),
+            courses_not_added.append(column),
         if not department in models.CourseDepartment.values:
             department=="AHE"
             
@@ -59,12 +59,12 @@ def add(request):
             name=teachers,
         )   
         if not created:
-            course_not_added.append(
-                (column[1])
+            courses_not_added.append(
+                (column)
             )
-    context = {
-          "order": order,
-            "type_error": True,
-            "courses_not_added": course_not_added,
+            context = {
+                "order": order,
+                "type_error": True,
+                "courses_not_added": courses_not_added,
     }
     return render(request, "add_courses.html", context)
