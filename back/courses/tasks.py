@@ -18,7 +18,7 @@ def update_timeslots(days_forward):
     """
     today = timezone.now().date()
 
-    Timeslot.objects.filter(start__lte=today - datetime.timedelta(60))
+    Timeslot.objects.filter(start__lte=today - datetime.timedelta(60)).delete()
 
     for i in range(days_forward):
         get_schedule(today + datetime.timedelta(days=i))
