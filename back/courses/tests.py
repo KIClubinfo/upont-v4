@@ -3,8 +3,10 @@ from unittest.mock import MagicMock
 from django.contrib.auth import models
 from django.core.files import File
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 from news.models import Post
+from rest_framework.test import APITestCase
 from social.models import Student
 
 from .models import (
@@ -200,3 +202,30 @@ class ResourceModelTest(TestCase):
         retrieved_resource = Resource.objects.get(pk=resource.pk)
 
         self.assertEqual(retrieved_resource, resource)
+
+
+class ListCourseDepartmentsTest(APITestCase):
+    def setUp(self):
+        self.username = "user"
+        self.email = "user@mail.com"
+        self.password = "Follow the white rabbit"
+
+        self.user = models.User.objects.create_user(
+            self.username, self.email, self.password
+        )
+
+        self.student = Student(
+            user=self.user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+        )
+        self.student.save()
+
+    def test_course_departements(self):
+        self.client.login(username=self.username, password=self.password)
+        url = reverse("course_department_list")
+        response = self.client.get(url)
+
+        self.assertEqual(response.data, CourseDepartment.values)
