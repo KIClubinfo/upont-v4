@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from django.contrib.auth import models
 from django.core.files import File
 from django.test import TestCase
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from news.models import Post
 from rest_framework.test import APITestCase
@@ -228,4 +228,94 @@ class ListCourseDepartmentsTest(APITestCase):
         url = reverse("course_department_list")
         response = self.client.get(url)
 
+        # Check if the request was successful
+        self.assertEqual(response.status_code, 200)
+        # Check the received data
         self.assertEqual(response.data, CourseDepartment.values)
+
+
+class CourseViewsetTest(APITestCase):
+    url = reverse_lazy("course-list")
+
+    def setUp(self):
+        self.username = "user"
+        self.email = "user@mail.com"
+        self.password = "Follow the white rabbit"
+
+        self.user = models.User.objects.create_user(
+            self.username, self.email, self.password
+        )
+
+        self.student = Student(
+            user=self.user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+        )
+        self.student.save()
+
+        self.teacher = Teacher(name="Frankenstein")
+        self.teacher.save()
+
+        self.course1 = Course(
+            name="Course 1",
+            acronym="C1",
+            department="GMM",
+            teacher=self.teacher,
+            description="Course 1 description",
+        )
+        self.course1.save()
+
+        self.course2 = Course(
+            name="Course 2",
+            acronym="C2",
+            department="GMM",
+            teacher=self.teacher,
+            description="Course 2 description",
+        )
+        self.course2.save()
+
+    def test_courses_list(self):
+        self.client.login(username=self.username, password=self.password)
+        response = self.client.get(self.url)
+
+        # Check if the request was successful
+        self.assertEqual(response.status_code, 200)
+        # Check if all the courses are received
+        self.assertEqual(response.data.get("count"), 2)
+        # Check course1 data
+        response_course1 = response.data.get("results")[0]
+        self.assertEqual(response_course1["id"], self.course1.pk)
+        self.assertEqual(response_course1["name"], self.course1.name)
+        self.assertEqual(response_course1["acronym"], self.course1.acronym)
+        self.assertEqual(response_course1["department"], self.course1.department)
+        self.assertEqual(response_course1["teacher"]["id"], self.course1.teacher.pk)
+        self.assertEqual(response_course1["description"], self.course1.description)
+
+    def test_is_enrolled_filter(self):
+        # Enroll the user in Course1
+        group = Group(
+            course=self.course1,
+            teacher=self.teacher,
+        )
+        group.save()
+
+        enrolment = Enrolment(group=group, student=self.student)
+        enrolment.save()
+
+        self.client.login(username=self.username, password=self.password)
+        response_true = self.client.get(self.url + "?is_enrolled=true")
+        response_false = self.client.get(self.url + "?is_enrolled=false")
+
+        # Check if the requests was successful
+        self.assertEqual(response_true.status_code, 200)
+        self.assertEqual(response_false.status_code, 200)
+        # Check response_true
+        self.assertEqual(response_true.data.get("count"), 1)
+        response_true_course = response_true.data.get("results")[0]
+        self.assertEqual(response_true_course["id"], self.course1.pk)
+        # Check response false
+        self.assertEqual(response_false.data.get("count"), 1)
+        response_false_course = response_false.data.get("results")[0]
+        self.assertEqual(response_false_course["id"], self.course2.pk)
