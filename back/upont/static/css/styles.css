@@ -1459,6 +1459,7 @@ a.text-green:hover{
     border-radius: 0.5rem;
     background-color: hsla(0, 0%, 100%, 0.05);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
 
 .button-drawer{
     /* Positionning */
