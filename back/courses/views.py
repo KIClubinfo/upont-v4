@@ -91,7 +91,7 @@ class TimeslotViewSet(viewsets.ModelViewSet):
                     detail="is_enrolled must be either 'true' or 'false'"
                 )
 
-        return queryset
+        return queryset.order_by("start", "pk")
 
 
 @login_required
