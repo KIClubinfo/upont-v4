@@ -319,3 +319,66 @@ class CourseViewsetTest(APITestCase):
         self.assertEqual(response_false.data.get("count"), 1)
         response_false_course = response_false.data.get("results")[0]
         self.assertEqual(response_false_course["id"], self.course2.pk)
+
+
+class GroupViewSetTest(APITestCase):
+    url = reverse_lazy("group-list")
+
+    def setUp(self):
+        self.username = "user"
+        self.email = "user@mail.com"
+        self.password = "Follow the white rabbit"
+
+        self.user = models.User.objects.create_user(
+            self.username, self.email, self.password
+        )
+
+        self.student = Student(
+            user=self.user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+        )
+        self.student.save()
+
+    def test_group_list(self):
+        teacher = Teacher(name="Mike Hock")
+        teacher.save()
+        course = Course(
+            name="course name",
+            acronym="ACR",
+            department="GMM",
+            teacher=teacher,
+            description=("Course description"),
+        )
+        course.save()
+
+        group = Group(
+            course=course,
+            teacher=teacher,
+            number=42,
+        )
+        group.save()
+
+        enrolment = Enrolment(
+            group=group,
+            student=self.student,
+        )
+        enrolment.save()
+
+        self.client.login(username=self.username, password=self.password)
+        response = self.client.get(self.url)
+
+        # Check if the request was successful
+        self.assertEqual(response.status_code, 200)
+        # Check response data
+        self.assertEqual(response.data.get("count"), 1)
+
+        response_group = response.data.get("results")[0]
+        course_id = int(response_group["course"].split("/")[-2])
+        self.assertEqual(course_id, course.pk)
+        self.assertEqual(response_group["teacher"]["id"], teacher.pk)
+        self.assertEqual(response_group["number"], group.number)
+        student_id = int(response_group["students"][0].split("/")[-2])
+        self.assertEqual(student_id, self.student.pk)
