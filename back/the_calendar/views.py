@@ -106,7 +106,7 @@ class CalendarData(views.APIView):
         #    Formatting
         # --------------------------------------------------
         scheduled = []
-        for course in courses_queryset:
+        for course in courses_queryset.order_by("start", "pk"):
             if course.course_groups.exists():
                 course_name = course.course_groups.first().course.name
             else:
@@ -116,19 +116,19 @@ class CalendarData(views.APIView):
                     "id": course.pk,
                     "type": "course",
                     "title": course_name,
-                    "start": course.start,
-                    "end": course.end,
+                    "start": course.start.astimezone().isoformat(),
+                    "end": course.end.astimezone().isoformat(),
                 }
             )
 
-        for event in events_queryset:
+        for event in events_queryset.order_by("date", "pk"):
             scheduled.append(
                 {
                     "id": event.id,
                     "type": "event",
                     "title": event.name,
-                    "start": event.date,
-                    "end": event.end,
+                    "start": event.date.astimezone().isoformat(),
+                    "end": event.end.astimezone().isoformat(),
                 }
             )
 
