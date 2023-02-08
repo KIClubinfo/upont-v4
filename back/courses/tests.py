@@ -1,3 +1,4 @@
+import datetime
 from unittest.mock import MagicMock
 
 from django.contrib.auth import models
@@ -382,3 +383,123 @@ class GroupViewSetTest(APITestCase):
         self.assertEqual(response_group["number"], group.number)
         student_id = int(response_group["students"][0].split("/")[-2])
         self.assertEqual(student_id, self.student.pk)
+
+
+class TimeslotViewSetTest(APITestCase):
+    url = reverse_lazy("timeslot-list")
+
+    def setUp(self):
+        self.username = "user"
+        self.email = "user@mail.com"
+        self.password = "Follow the white rabbit"
+
+        self.user = models.User.objects.create_user(
+            self.username, self.email, self.password
+        )
+
+        self.student = Student(
+            user=self.user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+        )
+        self.student.save()
+
+        self.teacher = Teacher(name="Frankenstein")
+        self.teacher.save()
+
+        self.course1 = Course(
+            name="Course 1",
+            acronym="C1",
+            department="GMM",
+            teacher=self.teacher,
+            description="Course 1 description",
+        )
+        self.course1.save()
+
+        self.course2 = Course(
+            name="Course 2",
+            acronym="C2",
+            department="GMM",
+            teacher=self.teacher,
+            description="Course 2 description",
+        )
+        self.course2.save()
+
+        self.group1 = Group(
+            course=self.course1,
+            teacher=self.teacher,
+            number=12,
+        )
+        self.group1.save()
+
+        self.group2 = Group(
+            course=self.course2,
+            teacher=self.teacher,
+            number=42,
+        )
+        self.group2.save()
+
+        self.timeslot1 = Timeslot(
+            start=timezone.now(),
+            end=timezone.now() + datetime.timedelta(hours=3),
+            place="Tatooine",
+        )
+        self.timeslot1.save()
+        self.timeslot1.course_groups.add(self.group1)
+
+        self.timeslot2 = Timeslot(
+            start=timezone.now(),
+            end=timezone.now() + datetime.timedelta(hours=3),
+            place="Coruscant",
+        )
+        self.timeslot2.save()
+        self.timeslot2.course_groups.add(self.group2)
+
+    def test_timeslot_list(self):
+        self.client.login(username=self.username, password=self.password)
+        response = self.client.get(self.url)
+
+        # Check if the request was successful
+        self.assertEqual(response.status_code, 200)
+        # Check if all the timeslots are send
+        self.assertEqual(response.data.get("count"), 2)
+        # Check data of timeslot1
+        response_timeslot1 = response.data.get("results")[0]
+        self.assertEqual(response_timeslot1["id"], self.timeslot1.pk)
+        self.assertEqual(
+            response_timeslot1["start"], self.timeslot1.start.astimezone().isoformat()
+        )
+        self.assertEqual(
+            response_timeslot1["end"], self.timeslot1.end.astimezone().isoformat()
+        )
+        group_id = int(response_timeslot1["course_groups"][0].split("/")[-2])
+        self.assertEqual(group_id, self.group1.pk)
+        self.assertEqual(response_timeslot1["course_name"], self.course1.name)
+        self.assertEqual(response_timeslot1["place"], self.timeslot1.place)
+
+    def test_is_enrolled_filter(self):
+        # Enroll the student in course 1
+        enrolment = Enrolment(
+            group=self.group1,
+            student=self.student,
+        )
+        enrolment.save()
+
+        self.client.login(username=self.username, password=self.password)
+        response_true = self.client.get(self.url + "?is_enrolled=true")
+        response_false = self.client.get(self.url + "?is_enrolled=false")
+
+        # Check if the responses were successful
+        self.assertEqual(response_true.status_code, 200)
+        self.assertEqual(response_false.status_code, 200)
+
+        # Check if the right timeslots were sent
+        self.assertEqual(response_true.data.get("count"), 1)
+        response_true_timeslot = response_true.data.get("results")[0]
+        self.assertEqual(response_true_timeslot["id"], self.timeslot1.pk)
+
+        self.assertEqual(response_false.data.get("count"), 1)
+        response_false_timeslot = response_false.data.get("results")[0]
+        self.assertEqual(response_false_timeslot["id"], self.timeslot2.pk)
