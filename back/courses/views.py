@@ -43,6 +43,7 @@ def add(request):
     io_string = io.StringIO(data_set)
     next(io_string)
     courses_not_added = []
+    list_courses=[]
     list_teachers=[]
     for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
         name=column[1],
@@ -54,14 +55,16 @@ def add(request):
         if not department in models.CourseDepartment.values:
             department=="AHE"
         
-        course, created = models.User.objects.get_or_create(
-            name=name,
-            department=department,
-            acronym=acronym,
-            teacher=teachers,
-        )
+        if (name not in list_courses):
+            course, created = models.User.objects.get_or_create(
+                name=name,
+                department=department,
+                acronym=acronym,
+                teacher=teachers,
+            )
 
-        created.save()
+            created.save()
+            list_courses.append(name)
 
         if created:
             for i in range (len(teachers)):
