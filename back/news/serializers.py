@@ -1,3 +1,4 @@
+from courses.serializers import ResourceSerializer
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework import serializers
@@ -172,6 +173,8 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_user_author_url(self, obj):
         return reverse("social:profile_viewed", args=(obj.author.user.pk,))
+
+    resource = ResourceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post

@@ -12,6 +12,7 @@ import Comment from './comment';
 import CommentForm from './commentForm';
 import { addZero } from './utils/utils';
 import { getCookie } from './utils/csrf';
+import Resource from './resource';
 
 function postLogo(state) {
   if (state.post.club) {
@@ -330,6 +331,9 @@ class Post extends React.Component {
             {this.show_event_button()}
           </div>
           {postIllustration(this.state)}
+          {this.state.post.resource.map((resource) => (
+            <Resource resource={resource} key={resource.id} />
+          ))}
           <div className="news-card-actions">
             <span>
               {this.post_like_button()} {this.state.post.total_likes}{' '}
