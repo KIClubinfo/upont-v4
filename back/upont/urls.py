@@ -73,7 +73,7 @@ else:
 
 router = routers.DefaultRouter()
 router.register(r"students", StudentViewSet)
-router.register(r"posts", PostViewSet)
+router.register(r"posts", PostViewSet, basename="post")
 router.register(r"events", EventViewSet, basename="event")
 router.register(r"courses", CourseViewSet, basename="course")
 router.register(r"groups", GroupViewSet, basename="group")

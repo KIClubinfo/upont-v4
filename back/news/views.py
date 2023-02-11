@@ -1,7 +1,9 @@
 import json
 
+from courses.models import Course
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -42,9 +44,28 @@ class PostViewSet(viewsets.ModelViewSet):
     API endpoint that allows posts to be viewed.
     """
 
-    queryset = Post.objects.filter(course__isnull=True).order_by("-date", "title")
     serializer_class = PostSerializer
     http_method_names = ["get"]
+
+    def get_queryset(self):
+        mode = self.request.GET.get("mode")
+        if (mode is None) or (mode == "social"):
+            return Post.objects.filter(course__isnull=True).order_by("-date", "title")
+        elif mode == "course":
+            queryset = Post.objects.filter(course__isnull=False)
+
+            course_id = self.request.GET.get("course_id")
+            if course_id is not None:
+                course = get_object_or_404(Course, id=course_id)
+                queryset = queryset.filter(course=course)
+
+            return queryset.annotate(rank=Count("likes") - Count("dislikes")).order_by(
+                "-rank", "-date"
+            )
+        else:
+            raise ValidationError(
+                detail="mode argument must be eiter 'social' or 'course'"
+            )
 
 
 class EventViewSet(viewsets.ModelViewSet):
