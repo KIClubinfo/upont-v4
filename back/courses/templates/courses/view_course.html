@@ -1,0 +1,100 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% if course.acronym %}{% include "header.html" with title=course.acronym|add:"-"|add:course.name %}{% else %}{% include "header.html" with title=course.name %}{% endif %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="courses" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <!--Main Content-->
+        <div class="content-main">
+
+            <a href={% url 'courses:courses_index' %} style="margin-left: auto;"><button class="button green-button">Retour à l'index</button></a>
+
+            <!--Course Box-->
+            <div class="course-box">
+                <!--Row-->
+                <div class="row">
+                    <!--Column-->
+                    <div class="col-12">
+                        <div class="course-title">
+                            <h4> {{course.name}} - {{course.acronym}} </h4>
+                            <h5 class="text-bold mt-1">{{course.teacher}} - {{course.department}}</h5>
+                        </div>
+                    </div><!--End of Column-->
+
+
+                    {%if course.new_courses.all%}
+                        <!--Column-->
+                        <div class="col-12">
+                            <h6 class="text-warning">Ce cours n'existe plus, voici le(s) cours ayant vocation à le remplacer :</h5>
+                            {%for new_course in course.new_courses.all%}
+                                <a href={% url 'courses:course_detail' course_id=new_course.id %}> {{new_course.name}} - ({{new_course.acronym}})</a>
+                            {%endfor%}
+                        </div><!--End of Column-->
+                    {%endif%}
+
+                    <!--Column-->
+                    <div class="col-12">
+                        {%if course.groups.all|length_is:1%}
+                            {%for group in course.groups.all%}
+                                {%if group in student.course.all%}
+                                    <a href={%url 'courses:join_group' group_id=group.id action="Leave_course"%}>
+                                        <button class="button red-button"> Quitter le cours</button>
+                                    </a>
+                                {%else%}
+                                    <a href={%url 'courses:join_group' group_id=group.id action="Join_course"%}>
+                                        <button class="button blue-button"> Rejoindre le cours</button>
+                                    </a>
+                                {%endif%}
+                            {%endfor%}
+                        {%elif course.groups.all%}
+                            <div class="group-box">
+                                <h5 class="text-bold mt-2"> Groupes : </h5>
+                                {%for group in course.groups.all%}
+                                    {%if group.number is not None%}
+                                        <div class="col-lg-12">
+                                            Groupe {{group.number}} : {{group.teacher}}
+                                            {%if group in student.course.all%}
+                                                <a href={%url 'courses:join_group' group_id=group.id action="Leave_group"%}>
+                                                    <button class="button red-button"> Quitter </button>
+                                                </a>
+                                            {%else%}
+                                                <a href={%url 'courses:join_group' group_id=group.id action="Join_group"%}>
+                                                    <button class="button blue-button"> Rejoindre </button>
+                                                </a>
+                                            {%endif%}
+                                        </div>
+                                    {%endif%}
+                                {%endfor%}
+                            </div> <!--End of Column-->
+                        {%endif%}
+
+                    </div><!--End of Column-->
+
+                    <!--Column-->
+                    <div class="col-12">
+                        <h5 class="text-bold mt-2">Description du cours :</h5>
+                        <p class="text-thin text-justified mt-2" style="font-size: medium;">{{course.description|markdownify}}</p>
+                    </div><!--End of Column-->
+
+                </div><!--End of Course Box-->
+
+            </div><!--End of Row-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+</body><!--End of Body-->
+
+</html><!--End of Document-->

@@ -2,13 +2,14 @@ import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import filters, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from social.models import Student
 
-from .models import Course, CourseDepartment, Group, Timeslot
+from .models import Course, CourseDepartment, Enrolment, Group, Timeslot
 from .scrapper import get_schedule
 from .serializers import CourseSerializer, GroupSerializer, TimeslotSerializer
 
@@ -35,7 +36,9 @@ class CourseViewSet(viewsets.ModelViewSet):
         if is_enrolled is not None:
             student = get_object_or_404(Student, user__id=self.request.user.id)
             if is_enrolled == "true":
-                queryset = queryset.filter(groups__enrolment__student=student)
+                queryset = queryset.filter(
+                    groups__enrolment__student=student
+                ).distinct()
             elif is_enrolled == "false":
                 queryset = queryset.exclude(groups__enrolment__student=student)
             else:
@@ -100,6 +103,16 @@ def index_courses(request):
 
 
 @login_required
+def view_course(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    student = get_object_or_404(Student, user__id=request.user.id)
+    context = {
+        "course": course,
+        "student": student,
+    }
+    return render(request, "courses/view_course.html", context)
+
+
 def update_timeslots(request):
     if not request.user.is_superuser:
         raise PermissionDenied()
@@ -126,3 +139,30 @@ def update_timeslots(request):
             context["date_updated"] = date
 
     return render(request, "courses/update_timeslots.html", context)
+
+
+@login_required
+def join_group(request, group_id, action):
+    group = get_object_or_404(Group, id=group_id)
+    student = get_object_or_404(Student, user__id=request.user.id)
+    # Remove all the groups of this course that the student follow
+    query = group.course.groups.all() & student.course.all()
+    student.course.remove(*query)
+    if action == "Join_group" or action == "Join_course":
+        enrolment = Enrolment(
+            group=group,
+            student=student,
+        )
+        enrolment.save()
+        if action == "Join_group":
+            # select the null group if he exists
+            null_group = group.course.groups.all().filter(number__isnull=True)[:1].get()
+            if null_group is not None:
+                enrolment = Enrolment(
+                    group=null_group,
+                    student=student,
+                )
+                enrolment.save()
+    elif action != "Leave_group" and action != "Leave_course":
+        return HttpResponse(status=500)
+    return redirect("courses:course_detail", group.course.id)
