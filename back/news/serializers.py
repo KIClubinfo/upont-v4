@@ -199,6 +199,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "can_edit",
             "user_author_url",
+            "resource",
         ]
 
 
