@@ -18,6 +18,7 @@ from courses.views import (
     CourseViewSet,
     GroupViewSet,
     ListCourseDepartments,
+    ResourceViewSet,
     TimeslotViewSet,
 )
 from django.conf import settings
@@ -78,6 +79,7 @@ router.register(r"events", EventViewSet, basename="event")
 router.register(r"courses", CourseViewSet, basename="course")
 router.register(r"groups", GroupViewSet, basename="group")
 router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
+router.register(r"resources", ResourceViewSet, basename="resource")
 
 urlpatterns += [
     path(

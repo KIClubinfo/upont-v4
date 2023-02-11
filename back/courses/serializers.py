@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Course, Group, Teacher, Timeslot
+from .models import Course, Group, Resource, Teacher, Timeslot
 
 
 class TeacherSerializer(serializers.HyperlinkedModelSerializer):
@@ -62,4 +62,17 @@ class TimeslotSerializer(serializers.HyperlinkedModelSerializer):
             "course_groups",
             "course_name",
             "place",
+        ]
+
+
+class ResourceSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Resource
+        fields = [
+            "id",
+            "name",
+            "author",
+            "date",
+            "file",
+            "post",
         ]
