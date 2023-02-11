@@ -367,10 +367,15 @@ class Post extends React.Component {
 class Posts extends React.Component {
   constructor(props) {
     super(props);
+    const { mode } = props;
+    let url;
+    if (mode === 'social') {
+      // eslint-disable-next-line no-undef
+      url = `${Urls.postList()}?mode=social`;
+    }
     this.state = {
       posts: [],
-      // eslint-disable-next-line no-undef
-      next_url: Urls.postList(),
+      next_url: url,
       more_exist: true,
       currentStudent: '',
     };
