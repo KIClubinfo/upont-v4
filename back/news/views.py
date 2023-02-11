@@ -48,24 +48,29 @@ class PostViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
     def get_queryset(self):
+        queryset = Post.objects.all()
         mode = self.request.GET.get("mode")
-        if (mode is None) or (mode == "social"):
-            return Post.objects.filter(course__isnull=True).order_by("-date", "title")
+        if mode is None:
+            queryset = queryset.order_by("-date", "title")
+        elif mode == "social":
+            queryset = queryset.filter(course__isnull=True).order_by("-date", "title")
         elif mode == "course":
-            queryset = Post.objects.filter(course__isnull=False)
+            queryset = queryset.filter(course__isnull=False)
 
             course_id = self.request.GET.get("course_id")
             if course_id is not None:
                 course = get_object_or_404(Course, id=course_id)
                 queryset = queryset.filter(course=course)
 
-            return queryset.annotate(rank=Count("likes") - Count("dislikes")).order_by(
-                "-rank", "-date"
-            )
+            queryset = queryset.annotate(
+                rank=Count("likes") - Count("dislikes")
+            ).order_by("-rank", "-date")
         else:
             raise ValidationError(
                 detail="mode argument must be eiter 'social' or 'course'"
             )
+
+        return queryset
 
 
 class EventViewSet(viewsets.ModelViewSet):
