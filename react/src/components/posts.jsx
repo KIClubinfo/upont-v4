@@ -107,8 +107,10 @@ function postIllustration(state) {
 class Post extends React.Component {
   constructor(props) {
     super(props);
+    const { mode } = props;
     this.state = {
       post: props.post,
+      mode,
       numberOfCommentsShown: 1,
     };
     this.refresh = this.refresh.bind(this);
@@ -356,6 +358,7 @@ class Post extends React.Component {
               post_id={this.state.post.id}
               currentStudent={this.props.currentStudent}
               refreshPost={this.refresh}
+              mode={this.state.mode}
             />
           </div>
         </div>
@@ -378,6 +381,7 @@ class Posts extends React.Component {
       url = `${Urls.postList()}?mode=course&course_id=${courseId}`;
     }
     this.state = {
+      mode,
       posts: [],
       next_url: url,
       more_exist: true,
@@ -443,6 +447,7 @@ class Posts extends React.Component {
               post={post}
               key={post.id}
               currentStudent={this.state.currentStudent}
+              mode={this.state.mode}
             />
           ))}
         </div>

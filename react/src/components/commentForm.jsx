@@ -6,6 +6,7 @@ export default class CommentForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      mode: props.mode,
       content: '',
       post_id: props.post_id,
       club: '',
@@ -35,7 +36,8 @@ export default class CommentForm extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const url = '';
+    // eslint-disable-next-line no-undef
+    const url = Urls['news:comment_post'](this.state.post_id);
     const csrfmiddlewaretoken = getCookie('csrftoken');
     const requestOptions = {
       method: 'POST',
@@ -101,7 +103,7 @@ export default class CommentForm extends React.Component {
       </div>
     );
 
-    if (options.length > 1) {
+    if (this.state.mode === 'social' && options.length > 1) {
       // The user is member of at least one club, he/she can choose to comment as a club
       const field2 = (
         <div className="">
@@ -139,6 +141,7 @@ export default class CommentForm extends React.Component {
   }
 }
 CommentForm.propTypes = {
+  mode: PropTypes.string.isRequired,
   post_id: PropTypes.number.isRequired,
   refreshPost: PropTypes.func.isRequired,
 };

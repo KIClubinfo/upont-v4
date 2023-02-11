@@ -22,12 +22,14 @@ def posts(request):
     if request.method == "GET":
         return render(request, "news/posts.html")
 
-    elif request.method == "POST":
+
+@login_required
+def comment_post(request, post_id):
+    if request.method == "POST":
         student = get_object_or_404(Student, user__id=request.user.id)
         data = json.loads(request.body.decode("utf-8"))
-        commented_post_id = data["post"]
-        commented_post = get_object_or_404(Post, id=commented_post_id)
-        filled_form = CommentForm(commented_post_id, student.user.id, data=data)
+        commented_post = get_object_or_404(Post, id=post_id)
+        filled_form = CommentForm(post_id, student.user.id, data=data)
 
         if filled_form.is_valid():
             new_comment = filled_form.save(commit=False)
@@ -37,6 +39,8 @@ def posts(request):
             new_comment.save()
             return HttpResponse(status=201)
         return HttpResponse(status=500)
+    else:
+        return HttpResponse(status=400)
 
 
 class PostViewSet(viewsets.ModelViewSet):
