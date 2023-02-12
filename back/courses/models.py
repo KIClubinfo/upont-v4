@@ -35,7 +35,6 @@ class Course(models.Model):
     )
     teacher = models.ManyToManyField(
         Teacher, 
-        on_delete=models.CASCADE,
         related_name="courses",
         blank=True,
         )
