@@ -1,5 +1,6 @@
 import json
 
+from course.models import Resource
 from courses.models import Course
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -248,7 +249,7 @@ def post_edit(request, post_id):
 
 
 @login_required
-def post_create(request, event_id=None):
+def post_create(request, event_id=None, course_id=None):
     context = {}
     if request.method == "POST":
         if "Valider" in request.POST:
@@ -262,6 +263,15 @@ def post_create(request, event_id=None):
                 post.author = Student.objects.get(user__id=request.user.id)
                 post.date = timezone.now()
                 post.save()
+                if course_id is not None and form.cleaned_data["resource_file"]:
+                    resource = Resource(
+                        name=post.title,
+                        author=post.author,
+                        date=post.date,
+                        file=form.cleaned_data["resource_file"],
+                        post=post,
+                    )
+                    resource.save()
                 return HttpResponseRedirect(request.session["origin"])
     else:
         form = EditPost(request.user.id)
