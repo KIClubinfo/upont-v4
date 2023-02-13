@@ -50,7 +50,7 @@ def add(request):
         teachers=map(lambda teacher: teacher.strip(), column[2].split(","))
         department=column[3],
         acronym=column[3],
-        if  (name="") or (teachers="") or (department="") or (acronym=""):
+        if  (name=="") or (teachers=="") or (department=="") or (acronym==""):
             courses_not_added.append(column),
         if not department in models.CourseDepartment.values:
             department=="AHE"
