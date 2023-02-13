@@ -1,15 +1,13 @@
-import csv
-import io
+import django_cas_ng.views
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.contrib.auth import views as auth_views
+from django.urls import include, path
+from django_reverse_js.views import urls_js
+from rest_framework import routers
+from . import views
 
-from django.contrib.auth import models as models
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
-from django.shortcuts import render
-from django.urls import reverse
-from courses.models import Course, Teacher
-
-from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
 
 
 app_name = "course"
