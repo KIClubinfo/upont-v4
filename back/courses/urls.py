@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from course.models import Course, Teacher
+from courses.models import Course, Teacher
 
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
 
