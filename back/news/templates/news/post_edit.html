@@ -22,11 +22,17 @@
             <div class="news-card">
                 <form action="
                     {% if Edit %}
-                        {% url 'news:post_edit' post.id %}
-                    {% elif course_id == None %}
-                        {% url 'news:post_create' %}
-                    {% else %}
-                        {%url 'courses:course_post_create' course_id=course_id%}
+                        {%if course_id == None%}
+                            {% url 'news:post_edit' post.id %}
+                        {%else%}
+                            {%url 'courses:course_post_edit' post_id=post.id course_id=course_id%}
+                        {%endif%}
+                    {% else%}
+                        {%if course_id == None%}
+                            {% url 'news:post_create'%}
+                        {%else%}
+                            {%url 'courses:course_post_create' course_id=course_id%}
+                        {%endif%}
                     {% endif %}" method="post" enctype="multipart/form-data"
                 >
                     {% csrf_token %}
@@ -51,14 +57,16 @@
                             {{EditPost.content}}<br><br>
                             <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</p>
 
-                            {{EditPost.illustration.errors}}
-                            <div class="input-title">Ajouter/modifier une image :</div>
-                            {{EditPost.illustration}}<br>
                             {%if course_id != None%}
                                 {{EditPost.resource_file.errors}}
                                 <div class="input-title">Ajouter/modifier une ressource:</div>
                                 {{EditPost.resource_file}}
                             {%endif%}
+
+                            {{EditPost.illustration.errors}}
+                            <div class="input-title">Ajouter/modifier une image :</div>
+                            {{EditPost.illustration}}<br>
+
                         </div>
                     </div>
                     {%if post.illustration%}
