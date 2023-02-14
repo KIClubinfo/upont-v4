@@ -14,6 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import django_cas_ng.views
+from courses.views import (
+    CourseViewSet,
+    GroupViewSet,
+    ListCourseDepartments,
+    TimeslotViewSet,
+)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -30,6 +36,7 @@ from social.views import (
     StudentCanPublishAs,
     StudentViewSet,
 )
+from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
 
 from . import views
@@ -67,7 +74,10 @@ else:
 router = routers.DefaultRouter()
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet)
-router.register(r"events", EventViewSet)
+router.register(r"events", EventViewSet, basename="event")
+router.register(r"courses", CourseViewSet, basename="course")
+router.register(r"groups", GroupViewSet, basename="group")
+router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 
 urlpatterns += [
     path(
@@ -85,4 +95,10 @@ urlpatterns += [
     path("api/search/students/", SearchStudent.as_view(), name="search_students"),
     path("api/search/alcohols/", SearchAlcohol.as_view(), name="search_alcohols"),
     path("api/id/pochtron/", PochtronId.as_view(), name="pochtron_id"),
+    path(
+        "api/course_departments/",
+        ListCourseDepartments.as_view(),
+        name="course_department_list",
+    ),
+    path("api/calendar_data/", CalendarData.as_view(), name="calendar_data"),
 ]

@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
@@ -41,7 +42,7 @@ class PostViewSet(viewsets.ModelViewSet):
     API endpoint that allows posts to be viewed.
     """
 
-    queryset = Post.objects.all().order_by("-date", "title")
+    queryset = Post.objects.filter(course__isnull=True).order_by("-date", "title")
     serializer_class = PostSerializer
     http_method_names = ["get"]
 
@@ -49,11 +50,41 @@ class PostViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed
+
+    Args:
+
+      * "is_enrolled" = true|false
+
+            - if true, return only the timeslots associated with courses in
+              which the current user is enrolled
+
+            - if false, return only the timeslots associated with courses in
+              which the current user is not enrolled
+
+            - by default, return all timeslots
     """
 
-    queryset = Event.objects.all().order_by("-date", "name")
     serializer_class = EventSerializer
     http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Event.objects.all()
+
+        # Must be the last argument to handle because no filter is alllowed
+        # after a queryset difference (case if is_enrolled=false)
+        is_enrolled = self.request.GET.get("is_enrolled")
+        if is_enrolled is not None:
+            student = get_object_or_404(Student, user__id=self.request.user.id)
+            if is_enrolled == "true":
+                queryset = queryset.intersection(student.events.all())
+            elif is_enrolled == "false":
+                queryset = queryset.difference(student.events.all())
+            else:
+                raise ValidationError(
+                    detail="is_enrolled must be either 'true' or 'false'"
+                )
+
+        return queryset.order_by("-date", "name")
 
 
 @login_required
@@ -216,10 +247,16 @@ def post_create(request, event_id=None):
 def post_like(request, post_id, action):
     post = get_object_or_404(Post, id=post_id)
     student = get_object_or_404(Student, user__id=request.user.id)
-    if action == "Dislike":
+    if action == "Unlike":
         post.likes.remove(student)
     elif action == "Like":
         post.likes.add(student)
+        post.dislikes.remove(student)
+    elif action == "Dislike":
+        post.dislikes.add(student)
+        post.likes.remove(student)
+    elif action == "Undislike":
+        post.dislikes.remove(student)
     else:
         return HttpResponse(status=500)
     return HttpResponse(status=200)
@@ -302,7 +339,7 @@ def shotgun_participate(request, shotgun_id):
     if shotgun.requires_motivation:
         try:
             motivation = request.POST["motivation"]
-        except (KeyError):
+        except KeyError:
             error_message = "Tu n'as pas fourni de motivation !"
             return HttpResponseRedirect(
                 reverse(

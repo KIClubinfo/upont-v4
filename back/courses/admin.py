@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Course, CourseUpdate, Enrolment, Group, Teacher
+from .models import Course, CourseUpdate, Enrolment, Group, Resource, Teacher, Timeslot
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -31,8 +31,28 @@ class EnrolmentAdmin(admin.ModelAdmin):
     )
 
 
+class ResourceAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "author",
+        "date",
+        "post",
+    )
+
+
+class TimeslotAdmin(admin.ModelAdmin):
+    list_display = (
+        "start",
+        "end",
+        "place",
+    )
+    list_filter = ("course_groups",)
+
+
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CourseUpdate, CourseUpdateAdmin)
 admin.site.register(Teacher)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Enrolment, EnrolmentAdmin)
+admin.site.register(Resource, ResourceAdmin)
+admin.site.register(Timeslot, TimeslotAdmin)

@@ -68,8 +68,9 @@ RUN poetry install \
     # install sass
     && apt-get update \
     && apt-get install --no-install-recommends -y npm=7.5.2+ds-2 \
-    && npm install -g sass@1.54.3
-
+    && npm install -g sass@1.54.3 \
+    # install redis
+    && apt-get install --no-install-recommends -y redis=5:6.0.16-1+deb11u2
 
 
 WORKDIR /src
@@ -114,6 +115,8 @@ RUN apt-get update \
     # for checking when db is up
     netcat=1.10-46 \
     iputils-ping=3:20210202-1 \
+    # redis is used as message brocker for Celery
+    redis=5:6.0.16-1+deb11u2 \
     # to install sass \
     npm=7.5.2+ds-2 \
     && rm -rf /var/lib/apt/lists/* \

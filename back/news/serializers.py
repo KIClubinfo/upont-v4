@@ -98,15 +98,30 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     def get_like_url(self, obj):
         return reverse("news:post_like", args=(obj.pk, "Like"))
 
+    unlike_url = serializers.SerializerMethodField()
+
+    def get_unlike_url(self, obj):
+        return reverse("news:post_like", args=(obj.pk, "Unlike"))
+
+    undislike_url = serializers.SerializerMethodField()
+
+    def get_total_likes(self, obj):
+        return obj.total_likes()
+
     dislike_url = serializers.SerializerMethodField()
 
     def get_dislike_url(self, obj):
         return reverse("news:post_like", args=(obj.pk, "Dislike"))
 
-    total_likes = serializers.SerializerMethodField()
+    undislike_url = serializers.SerializerMethodField()
 
-    def get_total_likes(self, obj):
-        return obj.total_likes()
+    def get_undislike_url(self, obj):
+        return reverse("news:post_like", args=(obj.pk, "Undislike"))
+
+    total_dislikes = serializers.SerializerMethodField()
+
+    def get_total_dislikes(self, obj):
+        return obj.total_dislikes()
 
     total_comments = serializers.SerializerMethodField()
 
@@ -122,6 +137,18 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             user = request.user
         student = get_object_or_404(Student, user__id=user.id)
         if student and student in obj.likes.all():
+            return True
+        return False
+
+    user_disliked = serializers.SerializerMethodField()
+
+    def get_user_disliked(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        student = get_object_or_404(Student, user__id=user.id)
+        if student and student in obj.dislikes.all():
             return True
         return False
 
@@ -160,10 +187,14 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "edit_url",
             "author_url",
             "like_url",
-            "dislike_url",
+            "unlike_url",
             "total_likes",
+            "dislike_url",
+            "undislike_url",
+            "total_dislikes",
             "total_comments",
             "user_liked",
+            "user_disliked",
             "comments",
             "id",
             "can_edit",
@@ -173,16 +204,6 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
     club = ClubSerializer()
-
-    def get_participating(self, obj):
-        user = None
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
-        student = get_object_or_404(Student, user__id=user.id)
-        return student in obj.participants.all()
-
-    participating = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -194,7 +215,6 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             "end",
             "location",
             "participants",
-            "participating",
             "poster",
             "shotgun",
             "id",

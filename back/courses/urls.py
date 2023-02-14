@@ -1,18 +1,13 @@
-import django_cas_ng.views
-from django.conf import settings
-from django.conf.urls.static import static
-from django.contrib import admin
-from django.contrib.auth import views as auth_views
-from django.urls import include, path
-from django_reverse_js.views import urls_js
-from rest_framework import routers
+from django.urls import path
+
 from . import views
 
-
-
-app_name = "course"
-
+app_name = "courses"
 
 urlpatterns = [
+    path("courses/", views.index_courses, name="courses_index"),
+    path("course/<int:course_id>/details", views.view_course, name="course_detail"),
+    path("update_timeslots/", views.update_timeslots, name="update_timeslots"),
+    path("group/<int:group_id>/<str:action>", views.join_group, name="join_group"),
     path("add_course/", views.add, name="add_course"),
 ]

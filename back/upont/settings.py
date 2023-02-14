@@ -67,6 +67,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
     "django_reverse_js",
+    "django_celery_beat",
 ]
 
 PROJECT_APPS = [
@@ -140,7 +141,9 @@ LOGIN_REDIRECT_URL = "news:posts"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        ),
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -315,3 +318,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
 }
+
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
