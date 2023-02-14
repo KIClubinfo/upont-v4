@@ -93,7 +93,20 @@
 
         </div><!--End of Main Content-->
 
+        <h4 class="page-title">Posts</h4>
+        <div id="posts">
+            <!--Posts are rendered here by react-->
+        </div>
+
     </div><!--End of Content-->
+
+    <!--Scripts-->
+    <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+    <script>
+        const courseId = {{course.pk}};
+        window.react_mount = document.getElementById("posts");
+    </script>
+    <script src="{% static 'react/course_posts.bundle.js' %}"></script>
 
 </body><!--End of Body-->
 

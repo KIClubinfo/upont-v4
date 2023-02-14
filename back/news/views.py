@@ -1,7 +1,9 @@
 import json
 
+from courses.models import Course
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -20,12 +22,14 @@ def posts(request):
     if request.method == "GET":
         return render(request, "news/posts.html")
 
-    elif request.method == "POST":
+
+@login_required
+def comment_post(request, post_id):
+    if request.method == "POST":
         student = get_object_or_404(Student, user__id=request.user.id)
         data = json.loads(request.body.decode("utf-8"))
-        commented_post_id = data["post"]
-        commented_post = get_object_or_404(Post, id=commented_post_id)
-        filled_form = CommentForm(commented_post_id, student.user.id, data=data)
+        commented_post = get_object_or_404(Post, id=post_id)
+        filled_form = CommentForm(post_id, student.user.id, data=data)
 
         if filled_form.is_valid():
             new_comment = filled_form.save(commit=False)
@@ -35,6 +39,8 @@ def posts(request):
             new_comment.save()
             return HttpResponse(status=201)
         return HttpResponse(status=500)
+    else:
+        return HttpResponse(status=400)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -42,9 +48,33 @@ class PostViewSet(viewsets.ModelViewSet):
     API endpoint that allows posts to be viewed.
     """
 
-    queryset = Post.objects.filter(course__isnull=True).order_by("-date", "title")
     serializer_class = PostSerializer
     http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        mode = self.request.GET.get("mode")
+        if mode is None:
+            queryset = queryset.order_by("-date", "title")
+        elif mode == "social":
+            queryset = queryset.filter(course__isnull=True).order_by("-date", "title")
+        elif mode == "course":
+            queryset = queryset.filter(course__isnull=False)
+
+            course_id = self.request.GET.get("course_id")
+            if course_id is not None:
+                course = get_object_or_404(Course, id=course_id)
+                queryset = queryset.filter(course=course)
+
+            queryset = queryset.annotate(
+                rank=Count("likes") - Count("dislikes")
+            ).order_by("-rank", "-date")
+        else:
+            raise ValidationError(
+                detail="mode argument must be eiter 'social' or 'course'"
+            )
+
+        return queryset
 
 
 class EventViewSet(viewsets.ModelViewSet):

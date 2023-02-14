@@ -1309,6 +1309,22 @@ a.text-green:hover{
     height: 0;
 }
 
+.news-card-resource{
+    /* Positionning */
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.2rem 0.5rem;
+}
+
+.resource-name{
+    font-weight: bold;
+}
+.resource-download{
+    margin-left: auto;
+}
+
 /*-------------------------------------------------*/
 /*------------------- NAV OF NEWS -----------------*//*      A REVOIR      */
 /*-------------------------------------------------*/
