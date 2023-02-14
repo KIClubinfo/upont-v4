@@ -94,6 +94,11 @@
         </div><!--End of Main Content-->
 
         <h4 class="page-title">Posts</h4>
+        <div class="centered-div mt-2">
+            <a href="{% url 'courses:course_post_create' course_id=course.id %}">
+                <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un post</button>
+            </a>
+        </div>
         <div id="posts">
             <!--Posts are rendered here by react-->
         </div>

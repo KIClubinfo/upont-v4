@@ -20,7 +20,15 @@
 
             <!--News Card-->
             <div class="news-card">
-                <form action="{% if Edit %}{% url 'news:post_edit' post.id %}{% else %}{% url 'news:post_create' %}{% endif %}" method="post" enctype="multipart/form-data">
+                <form action="
+                    {% if Edit %}
+                        {% url 'news:post_edit' post.id %}
+                    {% elif course_id == None %}
+                        {% url 'news:post_create' %}
+                    {% else %}
+                        {%url 'courses:course_post_create' course_id=course_id%}
+                    {% endif %}" method="post" enctype="multipart/form-data"
+                >
                     {% csrf_token %}
                     <div class="news-card-content">
                         <div class="centered-div">
@@ -46,10 +54,11 @@
                             {{EditPost.illustration.errors}}
                             <div class="input-title">Ajouter/modifier une image :</div>
                             {{EditPost.illustration}}<br>
-
-                            {{EditPost.resource_file.errors}}
-                            <div class="input-title">Ajouter/modifier une ressource:</div>
-                            {{EditPost.resource_file}}
+                            {%if course_id != None%}
+                                {{EditPost.resource_file.errors}}
+                                <div class="input-title">Ajouter/modifier une ressource:</div>
+                                {{EditPost.resource_file}}
+                            {%endif%}
                         </div>
                     </div>
                     {%if post.illustration%}

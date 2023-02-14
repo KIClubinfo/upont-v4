@@ -1,7 +1,6 @@
 import json
 
-from course.models import Resource
-from courses.models import Course
+from courses.models import Course, Resource
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
@@ -263,6 +262,9 @@ def post_create(request, event_id=None, course_id=None):
                 post.author = Student.objects.get(user__id=request.user.id)
                 post.date = timezone.now()
                 post.save()
+                if course_id is not None:
+                    course = get_object_or_404(Course, pk=course_id)
+                    course.posts.add(post)
                 if course_id is not None and form.cleaned_data["resource_file"]:
                     resource = Resource(
                         name=post.title,
@@ -280,6 +282,7 @@ def post_create(request, event_id=None, course_id=None):
     request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     context["EditPost"] = form
     context["Edit"] = False
+    context["course_id"] = course_id
     return render(request, "news/post_edit.html", context)
 
 
