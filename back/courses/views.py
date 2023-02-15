@@ -62,7 +62,7 @@ def add(request):
             department == "AHE"
 
         if name not in list_courses:
-            course, created = models.User.objects.get_or_create(
+            course, created = Course.objects.get_or_create(
                 name=name,
                 department=department,
                 acronym=acronym,
