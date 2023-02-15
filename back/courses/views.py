@@ -37,15 +37,15 @@ def add(request):
         context = {
             "order": order,
             "no_file": True,
-            "courses_not_added": True,
+            "list_courses_not_added": True,
         }
-        return render(request, "add_promo.html", context)
+        return render(request, "add_courses.html", context)
 
     if not csv_file.name.endswith(".csv"):
         context = {
             "order": order,
             "type_error": True,
-            "courses_not_added": True,
+            "list_courses_not_added": True,
         }
         return render(request, "add_courses.html", context)
     data_set = csv_file.read().decode("UTF-8")
@@ -92,6 +92,7 @@ def add(request):
         context = {
             "order": order,
             "type_error": True,
+            "list_courses_added":True
             "courses_not_added": courses_not_added,
         }
     return render(request, "add_courses.html", context)
