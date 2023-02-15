@@ -84,7 +84,11 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     edit_url = serializers.SerializerMethodField()
 
     def get_edit_url(self, obj):
-        return reverse("news:post_edit", args=(obj.pk,))
+        if not obj.course.all():
+            return reverse("news:post_edit", args=(obj.pk,))
+        else:
+            course_id = obj.course.all()[0].id
+            return reverse("courses:course_post_edit", args=(course_id, obj.pk))
 
     author_url = serializers.SerializerMethodField()
 

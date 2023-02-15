@@ -121,7 +121,7 @@ class Resource(models.Model):
     post = models.ForeignKey(
         "news.Post",
         verbose_name="post",
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         related_name="resource",
     )

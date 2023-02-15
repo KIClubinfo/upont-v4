@@ -1,6 +1,6 @@
 import json
 
-from courses.models import Course
+from courses.models import Course, Resource
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
@@ -209,7 +209,7 @@ def event_participate(request, event_id, action):
 
 
 @login_required
-def post_edit(request, post_id):
+def post_edit(request, post_id, course_id=None):
     student = get_object_or_404(Student, user__id=request.user.id)
     post = get_object_or_404(Post, id=post_id)
 
@@ -235,6 +235,16 @@ def post_edit(request, post_id):
             if form.is_valid():
                 if "illustration" in request.FILES:
                     post.illustration.delete()
+                if course_id is not None and form.cleaned_data["resource_file"]:
+                    post.resource.all().delete()
+                    resource = Resource(
+                        name=form.cleaned_data["resource_file"].name,
+                        author=post.author,
+                        date=post.date,
+                        file=form.cleaned_data["resource_file"],
+                        post=post,
+                    )
+                    resource.save()
                 form.save()
                 return HttpResponseRedirect(request.session["origin"])
 
@@ -243,12 +253,13 @@ def post_edit(request, post_id):
     context["EditPost"] = form
     context["post"] = post
     context["Edit"] = True
+    context["course_id"] = course_id
     request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     return render(request, "news/post_edit.html", context)
 
 
 @login_required
-def post_create(request, event_id=None):
+def post_create(request, event_id=None, course_id=None):
     context = {}
     if request.method == "POST":
         if "Valider" in request.POST:
@@ -262,6 +273,18 @@ def post_create(request, event_id=None):
                 post.author = Student.objects.get(user__id=request.user.id)
                 post.date = timezone.now()
                 post.save()
+                if course_id is not None:
+                    course = get_object_or_404(Course, pk=course_id)
+                    course.posts.add(post)
+                if course_id is not None and form.cleaned_data["resource_file"]:
+                    resource = Resource(
+                        name=form.cleaned_data["resource_file"].name,
+                        author=post.author,
+                        date=post.date,
+                        file=form.cleaned_data["resource_file"],
+                        post=post,
+                    )
+                    resource.save()
                 return HttpResponseRedirect(request.session["origin"])
     else:
         form = EditPost(request.user.id)
@@ -270,6 +293,7 @@ def post_create(request, event_id=None):
     request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     context["EditPost"] = form
     context["Edit"] = False
+    context["course_id"] = course_id
     return render(request, "news/post_edit.html", context)
 
 
