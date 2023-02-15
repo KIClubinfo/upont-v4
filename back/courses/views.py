@@ -66,18 +66,18 @@ def add(request):
                 acronym=acronym,
             )
 
-            created.save()
-            list_courses.append(name)
+            if created:
+                course.save()
+                list_courses.append(name)
+                for i in range(len(teachers)):
+                    if teachers[i] not in list_teachers:
+                        teacher, created2 = Teacher.objects.get_or_create(name=name)
+                        if created2:
+                            teacher.save()
+                            list_teachers.append(teachers[i])
 
-        if created:
-            for i in range(len(teachers)):
-                if teachers[i] not in list_teachers:
-                    teacher, created2 = Teacher.objects.get_or_create(name=name)
-                    created2.save()
-                    list_teachers.append(teachers[i])
-
-        if not created:
-            courses_not_added.append((",".join(column)))
+            if not created:
+                courses_not_added.append((",".join(column)))
         context = {
             "order": order,
             "type_error": True,
