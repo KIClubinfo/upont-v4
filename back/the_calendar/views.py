@@ -113,11 +113,14 @@ class CalendarData(views.APIView):
         for course_timeslot in course_timeslots_queryset.order_by("start", "pk"):
             if course_timeslot.course_groups.exists():
                 course_name = course_timeslot.course_groups.first().course.name
+                course_id = course_timeslot.course_groups.first().course.pk
             else:
                 course_name = ""
+                course_id = None
             scheduled.append(
                 {
                     "id": course_timeslot.pk,
+                    "course_id": course_id,
                     "type": "course",
                     "title": course_name,
                     "start": course_timeslot.start.astimezone().isoformat(),
