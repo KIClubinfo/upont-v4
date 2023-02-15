@@ -47,7 +47,7 @@
                 <strong>Les cours ont étés ajoutés.</strong><br><br>
             {% endif %}
             {% if courses_not_added %}
-                <p>Les étudiants suivants n'ont pas pu être ajoutés :</p>
+                <p>Les cours suivants n'ont pas pu être ajoutés :</p>
                 {% for course in courses_not_added %}
                     <li>{{course}}</li>
                 {% endfor %}
