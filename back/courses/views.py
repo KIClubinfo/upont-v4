@@ -69,12 +69,12 @@ def add(request):
             if created:
                 course.save()
                 list_courses.append(name)
-                for i in range(len(teachers)):
-                    if teachers[i] not in list_teachers:
+                for t in teachers:
+                    if t not in list_teachers:
                         teacher, created2 = Teacher.objects.get_or_create(name=name)
                         if created2:
                             teacher.save()
-                            list_teachers.append(teachers[i])
+                            list_teachers.append(t)
 
             if not created:
                 courses_not_added.append((",".join(column)))
