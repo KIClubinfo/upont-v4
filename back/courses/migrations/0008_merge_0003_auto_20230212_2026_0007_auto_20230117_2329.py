@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("courses", "0003_auto_20230212_2026"),
         ("courses", "0007_auto_20230117_2329"),
