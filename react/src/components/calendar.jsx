@@ -68,7 +68,12 @@ function handleSelectedEvent(e) {
     window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
   } else if (e.type === 'course') {
     const serveurUrl = window.location.origin;
-    window.open(`${serveurUrl}/courses/course/${e.id}/details`, '_blank');
+    window.open(
+      `${serveurUrl}/courses/course/${
+        e.course_groups.first().course.pk
+      }/details`,
+      '_blank',
+    );
   }
 }
 
