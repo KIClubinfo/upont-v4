@@ -50,7 +50,6 @@ def add(request):
     next(io_string)
     courses_not_added = []
     list_courses = []
-    list_teachers = []
     for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
         name = (column[0],)
         teachers = map(lambda teacher: teacher.strip(), column[1].split(","))
@@ -67,14 +66,15 @@ def add(request):
             )
 
             if created:
+                course.name=name,
+                course.department=department,
                 course.save()
                 list_courses.append(name)
-                for t in teachers:
-                    if t not in list_teachers:
-                        teacher, created2 = Teacher.objects.get_or_create(name=name)
-                        if created2:
-                            teacher.save()
-                            list_teachers.append(t)
+                for teacher_name in teachers:
+                    teacher, created2 = Teacher.objects.get_or_create(name=teacher_name)
+                    if created2:
+                        teacher.save()
+                    course.teacher.add(teacher)
 
             if not created:
                 courses_not_added.append((",".join(column)))
