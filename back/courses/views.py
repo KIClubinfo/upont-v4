@@ -1,21 +1,18 @@
 import csv
-import io
 import datetime
+import io
 
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
-from django.urls import reverse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import filters, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from social.models import Student
-from upont.settings import LOGIN_REDIRECT_URL, LOGIN_URL
 
-
-from .models import Course, CourseDepartment, Enrolment, Group, Timeslot
+from .models import Course, CourseDepartment, Enrolment, Group, Teacher, Timeslot
 from .scrapper import get_schedule
 from .serializers import CourseSerializer, GroupSerializer, TimeslotSerializer
 
@@ -29,7 +26,7 @@ def add(request):
         "order": order,
     }
     if request.method == "GET":
-        return render(request, "add_courses.html", context)
+        return render(request, "courses/add_courses.html", context)
 
     if "file" in request.FILES:
         csv_file = request.FILES["file"]
@@ -47,24 +44,24 @@ def add(request):
             "type_error": True,
             "list_courses_not_added": True,
         }
-        return render(request, "add_courses.html", context)
+        return render(request, "courses/add_courses.html", context)
     data_set = csv_file.read().decode("UTF-8")
     io_string = io.StringIO(data_set)
     next(io_string)
     courses_not_added = []
-    list_courses=[]
-    list_teachers=[]
+    list_courses = []
+    list_teachers = []
     for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
-        name=column[1],
-        teachers=map(lambda teacher: teacher.strip(), column[2].split(","))
-        department=column[3],
-        acronym=column[3],
-        if  (name=="") or (teachers=="") or (department=="") or (acronym==""):
+        name = (column[1],)
+        teachers = map(lambda teacher: teacher.strip(), column[2].split(","))
+        department = (column[3],)
+        acronym = (column[3],)
+        if (name == "") or (teachers == "") or (department == "") or (acronym == ""):
             courses_not_added.append(column),
-        if not department in CourseDepartment.values:
-            department=="AHE"
-        
-        if (name not in list_courses):
+        if department not in CourseDepartment.values:
+            department == "AHE"
+
+        if name not in list_courses:
             course, created = models.User.objects.get_or_create(
                 name=name,
                 department=department,
@@ -76,26 +73,21 @@ def add(request):
             list_courses.append(name)
 
         if created:
-            for i in range (len(teachers)):
+            for i in range(len(teachers)):
                 if teachers[i] not in list_teachers:
-                    teacher, created2 = Teacher.objects.get_or_creat(
-                        name=name
-                    )
+                    teacher, created2 = Teacher.objects.get_or_create(name=name)
                     created2.save()
                     list_teachers.append(teachers[i])
 
-        
         if not created:
-            courses_not_added.append(
-                (",".join(column))
-            )
+            courses_not_added.append((",".join(column)))
         context = {
             "order": order,
             "type_error": True,
             "list_courses_added":True
             "courses_not_added": courses_not_added,
         }
-    return render(request, "add_courses.html", context)
+    return render(request, "courses/add_courses.html", context)
 
 
 class ListCourseDepartments(views.APIView):
@@ -250,4 +242,3 @@ def join_group(request, group_id, action):
     elif action != "Leave_group" and action != "Leave_course":
         return HttpResponse(status=500)
     return redirect("courses:course_detail", group.course.id)
-
