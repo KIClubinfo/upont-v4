@@ -52,9 +52,9 @@ def add(request):
     list_courses = []
     list_teachers = []
     for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
-        name = (column[1],)
-        teachers = map(lambda teacher: teacher.strip(), column[2].split(","))
-        department = (column[3],)
+        name = (column[0],)
+        teachers = map(lambda teacher: teacher.strip(), column[1].split(","))
+        department = (column[2],)
         acronym = (column[3],)
         if (name == "") or (teachers == "") or (department == "") or (acronym == ""):
             courses_not_added.append(column),
@@ -63,10 +63,7 @@ def add(request):
 
         if name not in list_courses:
             course, created = Course.objects.get_or_create(
-                name=name,
-                department=department,
                 acronym=acronym,
-                teacher=teachers,
             )
 
             created.save()
