@@ -22,9 +22,9 @@ from .models import (
 )
 
 
-class TeacherModelest(TestCase):
+class TeacherModelTest(TestCase):
     def test_teacher_save_in_database(self):
-        teacher = Teacher(name="Professeur")
+        teacher = Teacher(name="Professeur Layton")
         teacher.save()
         retrieved_teacher = Teacher.objects.get(pk=teacher.pk)
         self.assertEqual(retrieved_teacher.pk, teacher.pk)
@@ -503,3 +503,65 @@ class TimeslotViewSetTest(APITestCase):
         self.assertEqual(response_false.data.get("count"), 1)
         response_false_timeslot = response_false.data.get("results")[0]
         self.assertEqual(response_false_timeslot["id"], self.timeslot2.pk)
+
+
+class ResourceViewSetTest(APITestCase):
+    url = reverse_lazy("resource-list")
+
+    def setUp(self):
+        self.username = "user"
+        self.email = "user@mail.com"
+        self.password = "Follow the white rabbit"
+
+        self.user = models.User.objects.create_user(
+            self.username, self.email, self.password
+        )
+
+        self.student = Student(
+            user=self.user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+        )
+        self.student.save()
+
+    def test_resource(self):
+        post = Post(
+            title="Post Title",
+            author=self.student,
+            date=timezone.now(),
+            content="Lorem ipsum...",
+        )
+        post.save()
+
+        file_mock = MagicMock(spec=File)
+        file_mock.name = "filename.txt"
+
+        resource = Resource(
+            name="Resource name",
+            author=self.student,
+            date=timezone.now(),
+            post=post,
+            file=file_mock,
+        )
+        resource.save()
+
+        self.client.login(username=self.username, password=self.password)
+        response = self.client.get(self.url)
+
+        # Check if the request was succesful
+        self.assertEqual(response.status_code, 200)
+
+        # Check data
+        self.assertEqual(response.data.get("count"), 1)
+        response_resource = response.data.get("results")[0]
+        self.assertEqual(response_resource["id"], resource.pk)
+        self.assertEqual(response_resource["name"], resource.name)
+        author_id = int(response_resource["author"].split("/")[-2])
+        self.assertEqual(author_id, resource.author.pk)
+        post_id = int(response_resource["post"].split("/")[-2])
+        self.assertEqual(post_id, resource.post.pk)
+        self.assertEqual(
+            response_resource["file"], "http://testserver" + resource.file.url
+        )

@@ -12,6 +12,7 @@ import Comment from './comment';
 import CommentForm from './commentForm';
 import { addZero } from './utils/utils';
 import { getCookie } from './utils/csrf';
+import Resource from './resource';
 
 function postLogo(state) {
   if (state.post.club) {
@@ -107,8 +108,10 @@ function postIllustration(state) {
 class Post extends React.Component {
   constructor(props) {
     super(props);
+    const { mode } = props;
     this.state = {
       post: props.post,
+      mode,
       numberOfCommentsShown: 1,
     };
     this.refresh = this.refresh.bind(this);
@@ -328,6 +331,9 @@ class Post extends React.Component {
             {this.show_event_button()}
           </div>
           {postIllustration(this.state)}
+          {this.state.post.resource.map((resource) => (
+            <Resource resource={resource} key={resource.id} />
+          ))}
           <div className="news-card-actions">
             <span>
               {this.post_like_button()} {this.state.post.total_likes}{' '}
@@ -356,6 +362,7 @@ class Post extends React.Component {
               post_id={this.state.post.id}
               currentStudent={this.props.currentStudent}
               refreshPost={this.refresh}
+              mode={this.state.mode}
             />
           </div>
         </div>
@@ -367,10 +374,20 @@ class Post extends React.Component {
 class Posts extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      posts: [],
+    const { mode } = props;
+    let url;
+    if (mode === 'social') {
       // eslint-disable-next-line no-undef
-      next_url: Urls.postList(),
+      url = `${Urls.postList()}?mode=social`;
+    } else if (mode === 'course') {
+      const { courseId } = props;
+      // eslint-disable-next-line no-undef
+      url = `${Urls.postList()}?mode=course&course_id=${courseId}`;
+    }
+    this.state = {
+      mode,
+      posts: [],
+      next_url: url,
       more_exist: true,
       currentStudent: '',
     };
@@ -434,6 +451,7 @@ class Posts extends React.Component {
               post={post}
               key={post.id}
               currentStudent={this.state.currentStudent}
+              mode={this.state.mode}
             />
           ))}
         </div>
