@@ -2,7 +2,6 @@ import csv
 import datetime
 import io
 
-from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -52,7 +51,7 @@ def add(request):
     list_courses = []
     for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
         name = column[0]
-        teachers = map(lambda teacher: teacher.strip(), column[1].split(","))
+        teachers = list(map(lambda teacher: teacher.strip(), column[1].split(",")))
         department = column[2]
         acronym = column[3]
         if (name == "") or (teachers == "") or (department == "") or (acronym == ""):
@@ -66,22 +65,26 @@ def add(request):
             )
 
             if created:
-                course.name=name
-                course.department=department
-                course.save()
+                course.name = name
+                course.department = department
                 list_courses.append(name)
-                for teacher_name in teachers:
-                    teacher, created2 = Teacher.objects.get_or_create(name=teacher_name)
-                    if created2:
-                        teacher.save()
-                    course.teacher.add(teacher)
+                # for teacher_name in teachers:
+                #     teacher, created2 = Teacher.objects.get_or_create(name=teacher_name)
+                #     if created2:
+                #         teacher.save()
+                #     course.teacher.add(teacher)
+                teacher, created2 = Teacher.objects.get_or_create(name=teachers[0])
+                if created2:
+                    teacher.save()
+                course.teacher = teacher
+                course.save()
 
             if not created:
                 courses_not_added.append((",".join(column)))
         context = {
             "order": order,
             "type_error": False,
-            "list_courses_added":True,
+            "list_courses_added": True,
             "courses_not_added": courses_not_added,
         }
     return render(request, "courses/add_courses.html", context)
