@@ -1,4 +1,6 @@
+import csv
 import datetime
+import io
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -9,7 +11,15 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from social.models import Student
 
-from .models import Course, CourseDepartment, Enrolment, Group, Resource, Timeslot
+from .models import (
+    Course,
+    CourseDepartment,
+    Enrolment,
+    Group,
+    Resource,
+    Teacher,
+    Timeslot,
+)
 from .scrapper import get_schedule
 from .serializers import (
     CourseSerializer,
@@ -17,6 +27,80 @@ from .serializers import (
     ResourceSerializer,
     TimeslotSerializer,
 )
+
+
+@login_required
+def add(request):
+    order = "name, teachers, department, acronym"
+    if not request.user.is_superuser:
+        raise PermissionDenied()
+    context = {
+        "order": order,
+    }
+    if request.method == "GET":
+        return render(request, "courses/add_courses.html", context)
+
+    if "file" in request.FILES:
+        csv_file = request.FILES["file"]
+    else:
+        context = {
+            "order": order,
+            "no_file": True,
+            "list_courses_not_added": True,
+        }
+        return render(request, "add_courses.html", context)
+
+    if not csv_file.name.endswith(".csv"):
+        context = {
+            "order": order,
+            "type_error": True,
+            "list_courses_not_added": True,
+        }
+        return render(request, "courses/add_courses.html", context)
+    data_set = csv_file.read().decode("UTF-8")
+    io_string = io.StringIO(data_set)
+    next(io_string)
+    courses_not_added = []
+    list_courses = []
+    for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
+        name = column[0]
+        teachers = list(map(lambda teacher: teacher.strip(), column[1].split(",")))
+        department = column[2]
+        acronym = column[3]
+        if (name == "") or (teachers == "") or (department == "") or (acronym == ""):
+            courses_not_added.append(column),
+        if department not in CourseDepartment.values:
+            department == "AHE"
+
+        if name not in list_courses:
+            course, created = Course.objects.get_or_create(
+                acronym=acronym,
+            )
+
+            if created:
+                course.name = name
+                course.department = department
+                list_courses.append(name)
+                # for teacher_name in teachers:
+                #     teacher, created2 = Teacher.objects.get_or_create(name=teacher_name)
+                #     if created2:
+                #         teacher.save()
+                #     course.teacher.add(teacher)
+                teacher, created2 = Teacher.objects.get_or_create(name=teachers[0])
+                if created2:
+                    teacher.save()
+                course.teacher = teacher
+                course.save()
+
+            if not created:
+                courses_not_added.append((",".join(column)))
+        context = {
+            "order": order,
+            "type_error": False,
+            "list_courses_added": True,
+            "courses_not_added": courses_not_added,
+        }
+    return render(request, "courses/add_courses.html", context)
 
 
 class ListCourseDepartments(views.APIView):
