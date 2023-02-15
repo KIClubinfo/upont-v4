@@ -84,7 +84,7 @@ def add(request):
         context = {
             "order": order,
             "type_error": True,
-            "list_courses_added":True
+            "list_courses_added":True,
             "courses_not_added": courses_not_added,
         }
     return render(request, "courses/add_courses.html", context)
