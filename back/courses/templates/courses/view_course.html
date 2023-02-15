@@ -28,7 +28,11 @@
                     <div class="col-12">
                         <div class="course-title">
                             <h4> {{course.name}} - {{course.acronym}} </h4>
-                            <h5 class="text-bold mt-1">{{course.teacher}} - {{course.department}}</h5>
+                            <h5 class="text-bold mt-1">
+                                {%for teacher in course.teacher.all%}
+                                    {{teacher}} -
+                                {%endfor%}
+                                {{course.department}}</h5>
                         </div>
                     </div><!--End of Column-->
 
