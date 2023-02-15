@@ -11,9 +11,22 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from social.models import Student
 
-from .models import Course, CourseDepartment, Enrolment, Group, Teacher, Timeslot
+from .models import (
+    Course,
+    CourseDepartment,
+    Enrolment,
+    Group,
+    Resource,
+    Teacher,
+    Timeslot,
+)
 from .scrapper import get_schedule
-from .serializers import CourseSerializer, GroupSerializer, TimeslotSerializer
+from .serializers import (
+    CourseSerializer,
+    GroupSerializer,
+    ResourceSerializer,
+    TimeslotSerializer,
+)
 
 
 @login_required
@@ -171,6 +184,12 @@ class TimeslotViewSet(viewsets.ModelViewSet):
                 )
 
         return queryset.order_by("start", "pk")
+
+
+class ResourceViewSet(viewsets.ModelViewSet):
+    queryset = Resource.objects.all().order_by("date", "name")
+    serializer_class = ResourceSerializer
+    http_method_names = ["get"]
 
 
 @login_required

@@ -33,15 +33,15 @@ class CalendarData(views.APIView):
         fetch_courses = self.request.GET.get("courses")
         if fetch_courses is not None:
             if fetch_courses == "true":
-                courses_queryset = Timeslot.objects.all()
+                course_timeslots_queryset = Timeslot.objects.all()
             elif fetch_courses == "false":
-                courses_queryset = Timeslot.objects.none()
+                course_timeslots_queryset = Timeslot.objects.none()
             else:
                 raise ValidationError(
                     detail="Error in parsing courses parameter: must be either 'true' or 'false'"
                 )
         else:
-            courses_queryset = Timeslot.objects.all()
+            course_timeslots_queryset = Timeslot.objects.all()
 
         fetch_events = self.request.GET.get("events")
         if fetch_events is not None:
@@ -63,7 +63,7 @@ class CalendarData(views.APIView):
                 events_queryset = events_queryset.filter(
                     Q(date__gte=start_datetime) | Q(end__gte=start_datetime)
                 )
-                courses_queryset = courses_queryset.filter(
+                course_timeslots_queryset = course_timeslots_queryset.filter(
                     Q(start__gte=start_datetime) | Q(end__gte=start_datetime)
                 )
             else:
@@ -78,7 +78,7 @@ class CalendarData(views.APIView):
                 events_queryset = events_queryset.filter(
                     Q(date__lte=end_datetime) | Q(end__lte=end_datetime)
                 )
-                courses_queryset = courses_queryset.filter(
+                course_timeslots_queryset = course_timeslots_queryset.filter(
                     Q(start__lte=end_datetime) | Q(end__lte=end_datetime)
                 )
             else:
@@ -93,12 +93,12 @@ class CalendarData(views.APIView):
             student = get_object_or_404(Student, user__id=self.request.user.id)
             if is_enrolled == "true":
                 events_queryset = events_queryset.intersection(student.events.all())
-                courses_queryset = courses_queryset.filter(
+                course_timeslots_queryset = course_timeslots_queryset.filter(
                     course_groups__enrolment__student=student
                 ).distinct()
             elif is_enrolled == "false":
                 events_queryset = events_queryset.difference(student.events.all())
-                courses_queryset = courses_queryset.exclude(
+                course_timeslots_queryset = course_timeslots_queryset.exclude(
                     course_groups__enrolment__student=student
                 )
             else:
@@ -110,18 +110,21 @@ class CalendarData(views.APIView):
         #    Formatting
         # --------------------------------------------------
         scheduled = []
-        for course in courses_queryset.order_by("start", "pk"):
-            if course.course_groups.exists():
-                course_name = course.course_groups.first().course.name
+        for course_timeslot in course_timeslots_queryset.order_by("start", "pk"):
+            if course_timeslot.course_groups.exists():
+                course_name = course_timeslot.course_groups.first().course.name
+                course_id = course_timeslot.course_groups.first().course.pk
             else:
                 course_name = ""
+                course_id = None
             scheduled.append(
                 {
-                    "id": course.pk,
+                    "id": course_timeslot.pk,
+                    "course_id": course_id,
                     "type": "course",
                     "title": course_name,
-                    "start": course.start.astimezone().isoformat(),
-                    "end": course.end.astimezone().isoformat(),
+                    "start": course_timeslot.start.astimezone().isoformat(),
+                    "end": course_timeslot.end.astimezone().isoformat(),
                 }
             )
 

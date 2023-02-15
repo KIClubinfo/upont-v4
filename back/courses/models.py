@@ -120,5 +120,9 @@ class Resource(models.Model):
     date = models.DateTimeField()
     file = models.FileField("Fichier", upload_to="ressources", null=True, blank=True)
     post = models.ForeignKey(
-        "news.Post", verbose_name="post", on_delete=models.SET_NULL, null=True
+        "news.Post",
+        verbose_name="post",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="resource",
     )
