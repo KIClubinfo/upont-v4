@@ -80,7 +80,7 @@ def add(request):
                 courses_not_added.append((",".join(column)))
         context = {
             "order": order,
-            "type_error": True,
+            "type_error": False,
             "list_courses_added":True,
             "courses_not_added": courses_not_added,
         }
