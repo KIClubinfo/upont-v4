@@ -66,6 +66,9 @@ function handleSelectedEvent(e) {
   if (e.type === 'event') {
     const serveurUrl = window.location.origin;
     window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
+  } else if (e.type === 'course') {
+    const serveurUrl = window.location.origin;
+    window.open(`${serveurUrl}/courses/course/${e.id}/details`, '_blank');
   }
 }
 
