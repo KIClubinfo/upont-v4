@@ -12,6 +12,7 @@ class EditEvent(forms.ModelForm):
             "name",
             "description",
             "date",
+            "end",
             "location",
             "poster",
             "club",
@@ -21,6 +22,7 @@ class EditEvent(forms.ModelForm):
             "name": forms.TextInput(attrs={"class": "profil-input"}),
             "description": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "date": forms.TextInput(attrs={"class": "profil-input"}),
+            "end": forms.TextInput(attrs={"class": "profil-input"}),
             "location": forms.TextInput(attrs={"class": "profil-input"}),
             "poster": forms.FileInput(attrs={"class": "profil-input"}),
             "club": forms.Select(attrs={"class": "profil-select"}),
@@ -39,6 +41,20 @@ class EditEvent(forms.ModelForm):
             if shotgun.club.is_member(student.id):
                 shotguns_choices_list.append((shotgun.id, shotgun.title))
         self.fields["shotgun"].choices = shotguns_choices_list
+
+    def clean(self):
+        cleaned_data = super(EditEvent, self).clean()
+        date = cleaned_data.get("date")
+        end = cleaned_data.get("end")
+
+        if date and end:  # check if the inputs are valid
+            if end <= date:
+                self.add_error(
+                    "end",
+                    "La date de fin doit être postérieure à la date de début",
+                )
+
+        return cleaned_data
 
 
 class EditPost(forms.ModelForm):
@@ -73,6 +89,9 @@ class EditPost(forms.ModelForm):
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
+        self.fields["resource_file"] = forms.FileField(
+            widget=forms.FileInput(attrs={"class": "profil-input"}), required=False
+        )
 
 
 class CommentForm(forms.ModelForm):

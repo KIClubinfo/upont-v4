@@ -1,15 +1,15 @@
 'use strict'
 
 // entryMap is an object containing all entrypoints (files under ./src/pages)
-const fs = require('fs');
-const entryMap = {};
+const fs = require('fs')
+const entryMap = {}
 fs.readdirSync('./src/pages/')
-    .filter(file => {
-        return file.match(/.*\.(j|t)sx?$/);
-    })
-    .forEach(file => {
-        entryMap[file.replace(/\.(j|t)sx?$/, '')] = './src/pages/' + file;
-    });
+  .filter(file => {
+    return file.match(/.*\.(j|t)sx?$/)
+  })
+  .forEach(file => {
+    entryMap[file.replace(/\.(j|t)sx?$/, '')] = './src/pages/' + file
+  })
 
 module.exports = (env) => {
   return {
@@ -26,7 +26,7 @@ module.exports = (env) => {
     },
     module: {
       rules: [
-        { test: /\.tsx?$/, loader: "ts-loader" },
+        { test: /\.tsx?$/, loader: 'ts-loader' },
         { test: /\.jsx?$/, loader: 'babel-loader' }
       ]
     }

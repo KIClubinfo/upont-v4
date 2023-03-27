@@ -1,0 +1,48 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Mise à jour manuel des créneaux de cours" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="admin" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <!--Header Content-->
+
+        <!--Main Content-->
+        <div class="content-main">
+
+            <h3 class="page-title">
+                Mise à jours des crénaux de cours
+            </h3>
+
+            {% if bad_input %}
+                <p class="text-red">Format de date incorrect. Utiliser le format "jour/mois/année" </p>
+            {% endif %}
+            {% if updated %}
+                <p class="text-green">Crénaux mis à jour pour la date {{date}}</p>
+            {% endif %}
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="text" id="date" name="date">
+                <script>
+                    $( function() {
+                        var $input = jQuery.noConflict();
+                        $input( "#date" ).datetimepicker({
+                            format: "d/m/Y"
+                        });
+                    } );
+                </script>
+                <button type="submit">Mettre à jour</button>
+            </form><br>
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+</body><!--End of Body-->
+</html><!--End of Document-->

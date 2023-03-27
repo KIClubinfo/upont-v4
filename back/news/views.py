@@ -1,17 +1,20 @@
 import json
 
+from courses.models import Course, Resource
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
-from .serializers import PostSerializer
+from .serializers import EventSerializer, PostSerializer
 
 
 @login_required
@@ -19,12 +22,14 @@ def posts(request):
     if request.method == "GET":
         return render(request, "news/posts.html")
 
-    elif request.method == "POST":
+
+@login_required
+def comment_post(request, post_id):
+    if request.method == "POST":
         student = get_object_or_404(Student, user__id=request.user.id)
         data = json.loads(request.body.decode("utf-8"))
-        commented_post_id = data["post"]
-        commented_post = get_object_or_404(Post, id=commented_post_id)
-        filled_form = CommentForm(commented_post_id, student.user.id, data=data)
+        commented_post = get_object_or_404(Post, id=post_id)
+        filled_form = CommentForm(post_id, student.user.id, data=data)
 
         if filled_form.is_valid():
             new_comment = filled_form.save(commit=False)
@@ -34,6 +39,8 @@ def posts(request):
             new_comment.save()
             return HttpResponse(status=201)
         return HttpResponse(status=500)
+    else:
+        return HttpResponse(status=400)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -41,9 +48,73 @@ class PostViewSet(viewsets.ModelViewSet):
     API endpoint that allows posts to be viewed.
     """
 
-    queryset = Post.objects.all().order_by("-date", "title")
     serializer_class = PostSerializer
     http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        mode = self.request.GET.get("mode")
+        if mode is None:
+            queryset = queryset.order_by("-date", "title")
+        elif mode == "social":
+            queryset = queryset.filter(course__isnull=True).order_by("-date", "title")
+        elif mode == "course":
+            queryset = queryset.filter(course__isnull=False)
+
+            course_id = self.request.GET.get("course_id")
+            if course_id is not None:
+                course = get_object_or_404(Course, id=course_id)
+                queryset = queryset.filter(course=course)
+
+            queryset = queryset.annotate(
+                rank=Count("likes") - Count("dislikes")
+            ).order_by("-rank", "-date")
+        else:
+            raise ValidationError(
+                detail="mode argument must be eiter 'social' or 'course'"
+            )
+
+        return queryset
+
+
+class EventViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows events to be viewed
+
+    Args:
+
+      * "is_enrolled" = true|false
+
+            - if true, return only the timeslots associated with courses in
+              which the current user is enrolled
+
+            - if false, return only the timeslots associated with courses in
+              which the current user is not enrolled
+
+            - by default, return all timeslots
+    """
+
+    serializer_class = EventSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Event.objects.all()
+
+        # Must be the last argument to handle because no filter is alllowed
+        # after a queryset difference (case if is_enrolled=false)
+        is_enrolled = self.request.GET.get("is_enrolled")
+        if is_enrolled is not None:
+            student = get_object_or_404(Student, user__id=self.request.user.id)
+            if is_enrolled == "true":
+                queryset = queryset.intersection(student.events.all())
+            elif is_enrolled == "false":
+                queryset = queryset.difference(student.events.all())
+            else:
+                raise ValidationError(
+                    detail="is_enrolled must be either 'true' or 'false'"
+                )
+
+        return queryset.order_by("-date", "name")
 
 
 @login_required
@@ -138,7 +209,7 @@ def event_participate(request, event_id, action):
 
 
 @login_required
-def post_edit(request, post_id):
+def post_edit(request, post_id, course_id=None):
     student = get_object_or_404(Student, user__id=request.user.id)
     post = get_object_or_404(Post, id=post_id)
 
@@ -164,6 +235,16 @@ def post_edit(request, post_id):
             if form.is_valid():
                 if "illustration" in request.FILES:
                     post.illustration.delete()
+                if course_id is not None and form.cleaned_data["resource_file"]:
+                    post.resource.all().delete()
+                    resource = Resource(
+                        name=form.cleaned_data["resource_file"].name,
+                        author=post.author,
+                        date=post.date,
+                        file=form.cleaned_data["resource_file"],
+                        post=post,
+                    )
+                    resource.save()
                 form.save()
                 return HttpResponseRedirect(request.session["origin"])
 
@@ -172,12 +253,13 @@ def post_edit(request, post_id):
     context["EditPost"] = form
     context["post"] = post
     context["Edit"] = True
+    context["course_id"] = course_id
     request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     return render(request, "news/post_edit.html", context)
 
 
 @login_required
-def post_create(request, event_id=None):
+def post_create(request, event_id=None, course_id=None):
     context = {}
     if request.method == "POST":
         if "Valider" in request.POST:
@@ -191,6 +273,18 @@ def post_create(request, event_id=None):
                 post.author = Student.objects.get(user__id=request.user.id)
                 post.date = timezone.now()
                 post.save()
+                if course_id is not None:
+                    course = get_object_or_404(Course, pk=course_id)
+                    course.posts.add(post)
+                if course_id is not None and form.cleaned_data["resource_file"]:
+                    resource = Resource(
+                        name=form.cleaned_data["resource_file"].name,
+                        author=post.author,
+                        date=post.date,
+                        file=form.cleaned_data["resource_file"],
+                        post=post,
+                    )
+                    resource.save()
                 return HttpResponseRedirect(request.session["origin"])
     else:
         form = EditPost(request.user.id)
@@ -199,6 +293,7 @@ def post_create(request, event_id=None):
     request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     context["EditPost"] = form
     context["Edit"] = False
+    context["course_id"] = course_id
     return render(request, "news/post_edit.html", context)
 
 
@@ -206,10 +301,16 @@ def post_create(request, event_id=None):
 def post_like(request, post_id, action):
     post = get_object_or_404(Post, id=post_id)
     student = get_object_or_404(Student, user__id=request.user.id)
-    if action == "Dislike":
+    if action == "Unlike":
         post.likes.remove(student)
     elif action == "Like":
         post.likes.add(student)
+        post.dislikes.remove(student)
+    elif action == "Dislike":
+        post.dislikes.add(student)
+        post.likes.remove(student)
+    elif action == "Undislike":
+        post.dislikes.remove(student)
     else:
         return HttpResponse(status=500)
     return HttpResponse(status=200)

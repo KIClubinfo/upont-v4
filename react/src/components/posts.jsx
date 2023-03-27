@@ -12,6 +12,7 @@ import Comment from './comment';
 import CommentForm from './commentForm';
 import { addZero } from './utils/utils';
 import { getCookie } from './utils/csrf';
+import Resource from './resource';
 
 function postLogo(state) {
   if (state.post.club) {
@@ -107,13 +108,17 @@ function postIllustration(state) {
 class Post extends React.Component {
   constructor(props) {
     super(props);
+    const { mode } = props;
     this.state = {
       post: props.post,
+      mode,
       numberOfCommentsShown: 1,
     };
     this.refresh = this.refresh.bind(this);
     this.like = this.like.bind(this);
+    this.dislike = this.dislike.bind(this);
     this.post_like_button = this.post_like_button.bind(this);
+    this.post_dislike_button = this.post_dislike_button.bind(this);
     this.show_more = this.show_more.bind(this);
     this.show_less = this.show_less.bind(this);
     this.show_comments_button = this.show_comments_button.bind(this);
@@ -141,7 +146,7 @@ class Post extends React.Component {
     let url;
     if (this.state.post.user_liked) {
       // eslint-disable-next-line no-undef
-      url = Urls['news:post_like'](this.state.post.id, 'Dislike');
+      url = Urls['news:post_like'](this.state.post.id, 'Unlike');
     } else {
       // eslint-disable-next-line no-undef
       url = Urls['news:post_like'](this.state.post.id, 'Like');
@@ -157,25 +162,66 @@ class Post extends React.Component {
     fetch(url, requestOptions)
       .then(this.setState({}))
       // eslint-disable-next-line no-console
-      .then(() => console.log('Liked / Disliked successfully'))
+      .then(() => console.log('Liked / Unliked successfully'))
+      // eslint-disable-next-line no-console
+      .catch((error) => console.log('Submit error', error));
+    setTimeout(() => this.refresh(), 200);
+  }
+
+  dislike(event) {
+    event.preventDefault();
+    let url;
+    if (this.state.post.user_disliked) {
+      // eslint-disable-next-line no-undef
+      url = Urls['news:post_like'](this.state.post.id, 'Undislike');
+    } else {
+      // eslint-disable-next-line no-undef
+      url = Urls['news:post_like'](this.state.post.id, 'Dislike');
+    }
+    const csrfmiddlewaretoken = getCookie('csrftoken');
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/html',
+        'X-CSRFToken': csrfmiddlewaretoken,
+      },
+    };
+    fetch(url, requestOptions)
+      .then(this.setState({}))
+      // eslint-disable-next-line no-console
+      .then(() => console.log('Disliked / Undisliked successfully'))
       // eslint-disable-next-line no-console
       .catch((error) => console.log('Submit error', error));
     setTimeout(() => this.refresh(), 200);
   }
 
   post_like_button() {
-    let heart;
     if (this.state.post.user_liked) {
-      heart = <i className="fas fa-heart" style={{ color: 'red' }} />;
-    } else {
-      heart = <i className="far fa-heart" />;
+      return (
+        <switch onClick={this.like} className="">
+          <i className="fas fa-arrow-up" style={{ color: '#F33D3D' }} />
+        </switch>
+      );
     }
-
     return (
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-      <a onClick={this.like} className="">
-        {heart}
-      </a>
+      <switch onClick={this.like} className="">
+        <i className="fas fa-arrow-up" />
+      </switch>
+    );
+  }
+
+  post_dislike_button() {
+    if (this.state.post.user_disliked) {
+      return (
+        <switch onClick={this.dislike} className="">
+          <i className="fas fa-arrow-down" style={{ color: '#3DC1F3' }} />
+        </switch>
+      );
+    }
+    return (
+      <switch onClick={this.dislike} className="">
+        <i className="fas fa-arrow-down" />
+      </switch>
     );
   }
 
@@ -285,9 +331,16 @@ class Post extends React.Component {
             {this.show_event_button()}
           </div>
           {postIllustration(this.state)}
+          {this.state.post.resource.map((resource) => (
+            <Resource resource={resource} key={resource.id} />
+          ))}
           <div className="news-card-actions">
             <span>
               {this.post_like_button()} {this.state.post.total_likes}{' '}
+            </span>
+            &ensp;
+            <span>
+              {this.post_dislike_button()} {this.state.post.total_dislikes}{' '}
             </span>
             &ensp;
             <span>
@@ -309,6 +362,7 @@ class Post extends React.Component {
               post_id={this.state.post.id}
               currentStudent={this.props.currentStudent}
               refreshPost={this.refresh}
+              mode={this.state.mode}
             />
           </div>
         </div>
@@ -320,10 +374,20 @@ class Post extends React.Component {
 class Posts extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      posts: [],
+    const { mode } = props;
+    let url;
+    if (mode === 'social') {
       // eslint-disable-next-line no-undef
-      next_url: Urls.posts(),
+      url = `${Urls.postList()}?mode=social`;
+    } else if (mode === 'course') {
+      const { courseId } = props;
+      // eslint-disable-next-line no-undef
+      url = `${Urls.postList()}?mode=course&course_id=${courseId}`;
+    }
+    this.state = {
+      mode,
+      posts: [],
+      next_url: url,
       more_exist: true,
       currentStudent: '',
     };
@@ -387,6 +451,7 @@ class Posts extends React.Component {
               post={post}
               key={post.id}
               currentStudent={this.state.currentStudent}
+              mode={this.state.mode}
             />
           ))}
         </div>
