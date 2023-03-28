@@ -10,8 +10,8 @@ interface Props {
 }
 
 export const Course: React.FC<Props> = (props) => (
-  // @ts-ignore Urls is declared in the django template
   <a
+    // @ts-ignore Urls is declared in the django template
     href={Urls['courses:course_detail'](props.course.id)}
     className="course-link"
   >
