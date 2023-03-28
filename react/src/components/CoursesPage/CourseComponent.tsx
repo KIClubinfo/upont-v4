@@ -2,6 +2,7 @@ import React from 'react';
 
 interface Props {
   course: {
+    id: number;
     name: string;
     acronym: string;
     department: string;
@@ -9,7 +10,11 @@ interface Props {
 }
 
 export const Course: React.FC<Props> = (props) => (
-  <div>
+  // @ts-ignore Urls is declared in the django template
+  <a
+    href={Urls['courses:course_detail'](props.course.id)}
+    className="course-link"
+  >
     <div className="course-card">
       <div className="course-information">
         <span className="course-name">
@@ -18,5 +23,5 @@ export const Course: React.FC<Props> = (props) => (
         <span className="course-departement">{props.course.department}</span>
       </div>
     </div>
-  </div>
+  </a>
 );

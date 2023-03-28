@@ -33,7 +33,8 @@ class Course(models.Model):
     department = models.CharField(
         max_length=8, choices=CourseDepartment.choices, default=CourseDepartment.AHE
     )
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
+
     description = models.TextField()
     old_courses = models.ManyToManyField(
         "self",
@@ -119,5 +120,9 @@ class Resource(models.Model):
     date = models.DateTimeField()
     file = models.FileField("Fichier", upload_to="ressources", null=True, blank=True)
     post = models.ForeignKey(
-        "news.Post", verbose_name="post", on_delete=models.SET_NULL, null=True
+        "news.Post",
+        verbose_name="post",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="resource",
     )

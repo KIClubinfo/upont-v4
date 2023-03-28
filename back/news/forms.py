@@ -89,6 +89,9 @@ class EditPost(forms.ModelForm):
             (membership.club.id, membership.club)
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
+        self.fields["resource_file"] = forms.FileField(
+            widget=forms.FileInput(attrs={"class": "profil-input"}), required=False
+        )
 
 
 class CommentForm(forms.ModelForm):

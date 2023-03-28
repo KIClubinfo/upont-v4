@@ -21,6 +21,7 @@ urlpatterns = [
         "post/create/<int:event_id>", views.post_create, name="post_create_with_origin"
     ),
     path("post/<int:post_id>/<str:action>", views.post_like, name="post_like"),
+    path("comment/add/<int:post_id>/", views.comment_post, name="comment_post"),
     path(
         "comment/delete/<int:comment_id>/",
         views.delete_comment,

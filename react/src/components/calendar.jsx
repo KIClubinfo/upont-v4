@@ -51,6 +51,7 @@ async function getSchedule(schedule, urlParams) {
     if (isNew(e)) {
       newEvents.push({
         id: e.id,
+        course_id: e.course_id,
         type: e.type,
         title: e.title,
         start: new Date(e.start),
@@ -66,6 +67,12 @@ function handleSelectedEvent(e) {
   if (e.type === 'event') {
     const serveurUrl = window.location.origin;
     window.open(`${serveurUrl}/news/event/${e.id}/detail`, '_blank');
+  } else if (e.type === 'course') {
+    const serveurUrl = window.location.origin;
+    window.open(
+      `${serveurUrl}/courses/course/${e.course_id}/details`,
+      '_blank',
+    );
   }
 }
 

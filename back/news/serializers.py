@@ -1,3 +1,4 @@
+from courses.serializers import ResourceSerializer
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework import serializers
@@ -83,7 +84,11 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     edit_url = serializers.SerializerMethodField()
 
     def get_edit_url(self, obj):
-        return reverse("news:post_edit", args=(obj.pk,))
+        if not obj.course.all():
+            return reverse("news:post_edit", args=(obj.pk,))
+        else:
+            course_id = obj.course.all()[0].id
+            return reverse("courses:course_post_edit", args=(course_id, obj.pk))
 
     author_url = serializers.SerializerMethodField()
 
@@ -173,6 +178,8 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     def get_user_author_url(self, obj):
         return reverse("social:profile_viewed", args=(obj.author.user.pk,))
 
+    resource = ResourceSerializer(many=True, read_only=True)
+
     class Meta:
         model = Post
         fields = [
@@ -199,6 +206,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "can_edit",
             "user_author_url",
+            "resource",
         ]
 
 

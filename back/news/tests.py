@@ -10,7 +10,7 @@ from rest_framework.test import APITestCase
 from social.models import Club, Membership, Student
 
 from .models import Comment, Event, Participation, Post, Shotgun
-from .views import posts
+from .views import comment_post
 
 
 class ShotgunModelTest(TestCase):
@@ -383,7 +383,7 @@ class CommentViewsTest(TestCase):
             separators=(",", ":"),
         ).encode("utf-8")
         comment_request.user = self.comment_user
-        response = posts(comment_request)
+        response = comment_post(comment_request, self.post.pk)
         self.assertEqual(response.status_code, 201)
         retrieved_comment = Comment.objects.get(post=self.post)
         self.assertEqual(retrieved_comment.content, "Some test comment from a student")
@@ -431,7 +431,7 @@ class CommentViewsTest(TestCase):
             separators=(",", ":"),
         ).encode("utf-8")
         comment_request.user = self.comment_user
-        response = posts(comment_request)
+        response = comment_post(comment_request, self.post.pk)
         self.assertEqual(response.status_code, 201)
         retrieved_comment = Comment.objects.get(post=self.post)
         self.assertEqual(retrieved_comment.content, "Some test comment from a club")
