@@ -19,7 +19,7 @@ echo "PostgreSQL started."
 python3 manage.py migrate --noinput
 
 # Compile scss files
-sass --watch /src/upont/static/scss/styles.scss /src/upont/static/scss/styles.css
+sass --watch /src/upont/static/scss/styles.scss /src/upont/static/scss/styles.css &
 
 # Start redis server
 redis-server 1>/dev/null 2>&1 &
