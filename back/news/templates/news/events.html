@@ -36,11 +36,11 @@
             <!--End of News Navigation-->
 
             {% if is_member %}
-            <div class="centered-div mt-2">
-                <a href="{% url 'news:event_create' %}">
-                    <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un évènement</button>
-                </a>                
-            </div>
+                <div class="centered-div mt-2">
+                    <a href="{% url 'news:event_create' %}">
+                        <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un évènement</button>
+                    </a>
+                </div>
             {% endif %}
 
             {% for event in all_events_list %}
@@ -57,20 +57,21 @@
                     </div>
                     <div class="news-card-content">
                         <ul>
-                            <li><div class="text-bold mt-1"><i class="fas fa-calendar-alt"></i>  Date de l'évènement : <strong class="text-thin">{{event.date}}</strong></div></li>
+                            <li><div class="text-bold mt-1"><i class="fas fa-calendar-alt"></i>  Début de l'évènement : <strong class="text-thin">{{event.date}}</strong></div></li>
+                            <li><div class="text-bold mt-1"><i class="fas fa-calendar-alt"></i>  Fin de l'évènement : <strong class="text-thin">{{event.end}}</strong></div></li>
                             <li><div class="text-bold mt-1"><i class="fas fa-map-marker-alt"></i> Lieu de l'évènement : <strong class="text-thin">{{event.location}}</strong></div></li>
                             <li><div class="text-bold mt-1">
                                 <i class="fas fa-users"></i> Nombre de participants :
                                 <strong class="text-thin">
-                                {% if event.shotgun %}
-                                    {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
-                                        0
+                                    {% if event.shotgun %}
+                                        {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
+                                            0
+                                        {% else %}
+                                            {{event.shotgun.accepted_participations.count}}
+                                        {% endif %}
                                     {% else %}
-                                        {{event.shotgun.accepted_participations.count}}
+                                        {{event.participants.count}}
                                     {% endif %}
-                                {% else %}
-                                    {{event.participants.count}}
-                                {% endif %}
                                 </strong>
                             </div></li>
                         </ul>
