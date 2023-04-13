@@ -49,7 +49,7 @@ def get_schedule(date):
         department = infos[1].text.strip()
         emplacement = infos[2].text.split("-")[0].strip()
         group = infos[3].text.strip()
-        group_number = int(group[3]) if group else None
+        group_number = int(group[3]) if (group and group.isdigit()) else None
         if "-" not in infos[4].text:
             acronym = ""
             # name = infos[4].text.strip()
