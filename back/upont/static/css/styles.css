@@ -137,8 +137,6 @@ img.logo-svg{
 @media(max-width:856px){
     .content{
         /* Sizing */
-        margin-top: 4rem;
-        margin-left: 0rem;
         padding: 1rem 1rem;
     }
 }
