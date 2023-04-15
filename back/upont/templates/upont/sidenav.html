@@ -1,7 +1,7 @@
 {% load static %}
 
 <!--Sidenav-->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid justify-conctent-start">
         <a class="navbar-brand" href="{% url 'news:posts' %}">
             <img src="{% static 'assets/img/logo.png' %}" class="logo" alt="">
@@ -13,41 +13,41 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!--Left aligned-->
             <ul class="navbar-nav me-auto">
-                <li class="nav-item align-middle {% if active_link == 'news' %} active {% endif %}">
-                    <a class="nav-link" href="{% url 'news:posts' %}"><i class="fas fa-newspaper logo-button"></i>News</a>
-                </li>
-
-                <li class="nav-item {% if active_link == 'users' %} active {% endif %}">
-                    <a class="nav-link" href="{% url 'social:index_users' %}"><i class="fas fa-user-graduate logo-button"></i>Élèves</a>
-                </li>
-
-                <li class="nav-item {% if active_link == 'clubs' %} active {% endif %}">
-                    <a class="nav-link" href="{% url 'social:club_index' %}"><i class="fas fa-gamepad logo-button"></i>Clubs</a>
-                </li>
-
-                <li class="nav-item {% if active_link == 'the_calendar' %} active {% endif %}">
-                    <a class="nav-link" href="{% url 'the_calendar:big_calendar' %}"><i class="fas fa-calendar logo-button"></i>Calendrier</a>
-                </li>
-
-                <li class="nav-item {% if active_link == 'courses' %} active {% endif %}">
-                    <a class="nav-link" href="{% url 'courses:courses_index' %}"><i class="fas fa-book logo-button"></i>Cours</a>
-                </li>
-
-                <li class="nav-item {% if active_link == 'pochtron' %} active {% endif %}">
-                    <a class="nav-link" href="{% url 'pochtron:home' %}"><i class="fas fa-beer logo-button"></i>Pochtron</a>
+                <li class="nav-item align-middle" >
+                    <a class="nav-link {% if active_link == 'news' %} active {% endif %}" href="{% url 'news:posts' %}"><i class="fas fa-newspaper logo-button"></i>News</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="hhtps://ponthe.enpc.org/" target="_blank"><i class="fas fa-image logo-button"></i>Galeries</a>
+                    <a class="nav-link {% if active_link == 'users' %} active {% endif %}" href="{% url 'social:index_users' %}"><i class="fas fa-user-graduate logo-button"></i>Élèves</a>
                 </li>
 
-                <li class="nav-item {% if active_link == 'profile' %} active {% endif %}">
-                    <a class="nav-link" href="{% url 'social:profile' %}"><i class="fas fa-address-card logo-button"></i>Profil</a>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_link == 'clubs' %} active {% endif %}" href="{% url 'social:club_index' %}"><i class="fas fa-gamepad logo-button"></i>Clubs</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if active_link == 'the_calendar' %} active {% endif %}" href="{% url 'the_calendar:big_calendar' %}"><i class="fas fa-calendar logo-button"></i>Calendrier</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if active_link == 'courses' %} active {% endif %}" href="{% url 'courses:courses_index' %}"><i class="fas fa-book logo-button"></i>Cours</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if active_link == 'pochtron' %} active {% endif %}" href="{% url 'pochtron:home' %}"><i class="fas fa-beer logo-button"></i>Pochtron</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="https://ponthe.enpc.org/" target="_blank"><img class="logo-svg " src="{% static 'assets/img/logo-ponthe.svg' %}">Galeries</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if active_link == 'profile' %} active {% endif %}" href="{% url 'social:profile' %}"><i class="fas fa-address-card logo-button"></i>Profil</a>
                 </li>
 
                 {% if user.is_staff %}
-                    <li class="nav-item {% if active_link == 'admin' %} active {% endif %}">
-                        <a class="nav-link" href="{% url 'admin:index' %}"><i class="fas fa-user-edit logo-button"></i>Admin</a>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_link == 'admin' %} active {% endif %}" href="{% url 'admin:index' %}"><i class="fas fa-user-edit logo-button"></i>Admin</a>
                     </li>
                 {% endif %}
             </ul>
