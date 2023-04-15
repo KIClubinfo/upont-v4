@@ -109,8 +109,7 @@ img.logo-svg{
     /* Positioning */
     position: relative;
     /* Sizing */
-    margin-left: var(--sidenav-width);
-    padding: 0rem 2rem;
+    padding: 1rem 1rem;
     /* Styling */
     color: white;
     background-color:transparent;
@@ -140,7 +139,7 @@ img.logo-svg{
         /* Sizing */
         margin-top: 4rem;
         margin-left: 0rem;
-        padding: 0rem 1rem;
+        padding: 1rem 1rem;
     }
 }
 
