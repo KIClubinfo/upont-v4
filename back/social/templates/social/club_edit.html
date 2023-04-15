@@ -1,7 +1,10 @@
 {% load static %}
 <!--Header-->
-{% if club.nickname %}{% include "header.html" with title=club.nickname%}{% else %}{% include "header.html" with
-    title=club.name %}{% endif %}
+{% if club.nickname %}
+    {% include "header.html" with title=club.nickname %}
+{% else %}
+    {% include "header.html" with title=club.name %}
+{% endif %}
 
 <!--Body-->
 
