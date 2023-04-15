@@ -38,6 +38,15 @@ body{
 /*---------------------------------- SIDE-NAV ----------------------------------*/
 /*------------------------------------------------------------------------------*/
 
+.navbar-nav li a {
+    padding:0 15px;
+    line-height:3rem;
+}
+.navbar-header a {
+    padding:0 15px;
+    line-height:3rem;
+}
+
 .sidenav-container{
     /* Positioning */
     position: fixed;
@@ -116,8 +125,8 @@ body{
 
 img.logo{
     /* Sizing */
-    height: 3rem;
-    width: 3rem;
+    height: 2rem;
+    width: 2rem;
 }
 
 img.logo-svg{
