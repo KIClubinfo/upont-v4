@@ -102,7 +102,7 @@
                                 <h5 class="section-title">
                                     Participation n°{{participation.rank}} :
                                     {% if participation.failed_motivation %}
-                                        <strong class="text-bold text-green">Participation recallée !</strong>
+                                        <strong class="text-bold text-green">Participation recalée !</strong>
                                     {% endif %}
                                 </h5>
 
@@ -111,7 +111,7 @@
                                     {% if participation.failed_motivation %}
                                         <a href="{% url 'news:unfail_participation' participation.id %}"><button class="button red-button">Annuler</button></a>
                                     {% else %}
-                                        <a href="{% url 'news:fail_participation' participation.id %}"><button class="button red-button">Recaller</button></a>
+                                        <a href="{% url 'news:fail_participation' participation.id %}"><button class="button red-button">Recaler</button></a>
                                     {% endif %}
                                 </div>
 
