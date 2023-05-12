@@ -48,6 +48,12 @@
                         {% endif %}
                         <div class="profil-information-box">{{student.department}}</div>
                         <div class="profil-information-box">{{student.origin}}</div>
+                        {% if student.birthdate is not None %}
+                            <div class="profil-information-box">{{student.birthdate}}</div>
+                        {% endif %}
+                        {% if student.biography is not None %}
+                            <div class="profil-information-box">{{student.biography}}</div>
+                        {% endif %}
 
                     </div><!--End of Box-->
 
