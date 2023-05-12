@@ -41,6 +41,8 @@ class StudentModelTest(TestCase):
             gender=Student.Gender.A,
             origin=Student.Origin.CC,
             phone_number="+33666666666",
+            birthdate="00/00/2000",
+            biography="Je suis un test"
         )
         student.save()
         retrieved_student = Student.objects.get(pk=student.pk)
@@ -55,6 +57,22 @@ class StudentModelTest(TestCase):
             gender=Student.Gender.A,
             origin=Student.Origin.CC,
             phone_number="test",
+            birthdate="00/00/2000",
+            biography="Je suis un test"
+        )
+        self.assertRaises(ValidationError, student.full_clean)
+    
+    def test_student_rejects_wrong_birthdate(self):
+        test_user = models.User()
+        test_user.save()
+        student = Student(
+            user=test_user,
+            department=Student.Department.A1,
+            gender=Student.Gender.A,
+            origin=Student.Origin.CC,
+            phone_number="+33666666666",
+            birthdate="01.0.000",
+            biography="Je suis un test"
         )
         self.assertRaises(ValidationError, student.full_clean)
 
