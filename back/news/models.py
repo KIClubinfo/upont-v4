@@ -135,7 +135,7 @@ class Shotgun(models.Model):
             return True
         return False
 
-    def got_accepted(self, student: Student):
+    def got_accepted(self, student: Student):       # Complexité dégueulasse
         for participation in self.accepted_participations():
             if participation.participant == student:
                 return True
