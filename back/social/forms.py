@@ -17,7 +17,7 @@ class EditProfile(forms.ModelForm):
             "department": forms.Select(attrs={"class": "profil-select"}),
             "picture": forms.FileInput(attrs={"class": "profil-input"}),
             "gender": forms.Select(attrs={"class": "profil-select"}),
-            "birthdate": forms.DateField(widget=extras.SelectDateWidget),
+            "birthdate": forms.DateField(widget=extras.SelectDateWidget, format = '%d/%m/%Y'),
             "biography": forms.Textarea(attrs={"class": "profil-input"})
         }
 
