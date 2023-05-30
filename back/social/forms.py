@@ -1,4 +1,5 @@
-from django import forms, extras
+from django import forms
+#from django.forms import extras
 
 from .models import Club, ClubRequest, Membership, Role, Student
 
@@ -17,7 +18,7 @@ class EditProfile(forms.ModelForm):
             "department": forms.Select(attrs={"class": "profil-select"}),
             "picture": forms.FileInput(attrs={"class": "profil-input"}),
             "gender": forms.Select(attrs={"class": "profil-select"}),
-            "birthdate": forms.DateField(widget=extras.SelectDateWidget, format = '%d/%m/%Y'),
+            "birthdate": forms.DateField(widget=forms.SelectDateWidget, input_formats = 'dd/mm/yyyy'),
             "biography": forms.Textarea(attrs={"class": "profil-input"})
         }
 
