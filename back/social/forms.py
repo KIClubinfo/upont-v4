@@ -32,7 +32,9 @@ class EditProfile(forms.ModelForm):
         ]
         self.fields["phone_number"].placeholder = "False"
         self.fields["birthdate"].required = False
-        self.fields["biography"].required = False
+        #self.fields["birthdate"].placeholder = False
+        #self.fields["biography"].placeholder = False
+
 
 
 
