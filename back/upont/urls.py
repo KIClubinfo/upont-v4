@@ -39,7 +39,6 @@ from social.views import (
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
-from colocaponts.views import ColocapontsViewSet
 
 from . import views
 

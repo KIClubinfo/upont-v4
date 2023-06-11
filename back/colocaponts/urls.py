@@ -5,6 +5,6 @@ from . import views
 app_name = "colocaponts"
 
 urlpatterns = [
-    path("/", views.coloc, name="coloc"),
+    path("", views.coloc, name="coloc"),
 
 ]

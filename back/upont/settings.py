@@ -77,6 +77,7 @@ PROJECT_APPS = [
     "trade.apps.TradeConfig",
     "the_calendar.apps.CalendarConfig",
     "courses.apps.CoursesConfig",
+    "colocaponts.apps.ColocapontsConfig",
 ]
 
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + PROJECT_APPS
