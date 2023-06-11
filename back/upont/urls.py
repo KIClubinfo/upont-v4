@@ -39,6 +39,7 @@ from social.views import (
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
+from colocaponts.views import ColocapontsViewSet
 
 from . import views
 
@@ -50,6 +51,7 @@ urlpatterns = [
     path("pochtron/", include("pochtron.urls")),
     path("courses/", include("courses.urls")),
     path("the_calendar/", include("the_calendar.urls")),
+    path("colocaponts/", include("colocaponts.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo/", views.add, name="add_promo"),
