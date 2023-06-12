@@ -1,6 +1,6 @@
 {% load static %}
 <!--Header-->
-{% include "header.html" with title="Modifier la publication" %}
+{% include "header.html" with title="Modifier la colocation" %}
 
 <!--Body-->
 <body>
@@ -22,63 +22,23 @@
             <div class="news-card">
                 <form action="
                     {% if Edit %}
-                        {%if course_id == None%}
-                            {% url 'news:post_edit' post.id %}
-                        {%else%}
-                            {%url 'courses:course_post_edit' post_id=post.id course_id=course_id%}
-                        {%endif%}
+                        {% url 'colocaponts:coloc_edit' coloc.id %}
                     {% else%}
-                        {%if course_id == None%}
-                            {% url 'news:post_create'%}
-                        {%else%}
-                            {%url 'courses:course_post_create' course_id=course_id%}
-                        {%endif%}
+                        {% url 'colocaponts:add_coloc' %}
                     {% endif %}" method="post" enctype="multipart/form-data"
                 >
                     {% csrf_token %}
                     <div class="news-card-content">
                         <div class="centered-div">
-                            {{EditPost.club.errors}}
-                            {% if EditPost.club|length > 1 %}
-                                <div class="input-title">Publier en tant que :</div>
-                                {{EditPost.club}}
-                            {% endif %}
+                            <div class="input-title">Nom :</div>
+                            {{EditColoc.name}}<br>
 
-                            {{EditPost.event.errors}}
-                            <div class="input-title">Est-ce que ce post est associé à un évènement ?</div>
-                            {{EditPost.event}}
-
-                            {{EditPost.title.errors}}
-                            <div class="input-title">Titre :</div>
-                            {{EditPost.title}}<br>
-
-                            {{EditPost.content.errors}}
                             <div class="input-title">Description :</div>
-                            {{EditPost.content}}<br><br>
-                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</p>
+                            {{EditColoc.description}}<br>
 
-                            {%if course_id != None%}
-                                {{EditPost.resource_file.errors}}
-                                <div class="input-title">Ajouter/modifier une ressource:</div>
-                                {{EditPost.resource_file}}
-                            {%endif%}
+                            <div class="input-title">Adresse :</div>
+                            {{EditColoc.address}}<br>
 
-                            {{EditPost.illustration.errors}}
-                            <div class="input-title">Ajouter/modifier une image :</div>
-                            {{EditPost.illustration}}<br>
-
-                        </div>
-                    </div>
-                    {%if post.illustration%}
-                        <div class="news-card-images">
-                            <!--All-Images-Linked-With-The-Post-->
-                            <div class="news-card-carousel">
-                                <div class="carousel-cell">
-                                    <img class="news-card_image_sized" src="{{post.illustration.url}}" alt="">
-                                </div>
-                            </div>
-                        </div>
-                    {%endif%}
                     <div class="centered-div">
                         <button type="button" class="button red-button" onclick="history.back()">Annuler</button>
                         <input class="button green-button" type="submit" name= "Valider" value="Valider">
