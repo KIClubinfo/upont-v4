@@ -17,3 +17,9 @@ def coloc(request):
     if request.method == "GET":
         return render(request, "colocaponts/liste_coloc.html")
     
+@login_required
+def add_coloc(request):
+    context = {}
+    if request.method == "POST":
+        pass
+    return render(request, "colocaponts/coloc_edit.html", context=context)

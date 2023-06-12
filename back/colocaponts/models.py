@@ -6,7 +6,7 @@ from social.models import Student
 # Place in an apartment (ex: a bedrooom)
 class Room(models.Model):
     occupant = models.ForeignKey('social.Student', on_delete=models.CASCADE) # The occupant of the place
-    not_from_ponts = models.BooleanField() # If the Studen is not from Ponts
+    not_from_ponts = models.BooleanField() # If the Student is not from Ponts
     rent_without_charges = models.IntegerField() # The rent without charges (in cents)
     charges = models.IntegerField() # The charges (in cents)
     description = models.TextField() # A description of the place

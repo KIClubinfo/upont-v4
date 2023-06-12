@@ -2,7 +2,7 @@
 <!--Markdownify-->
 {% load markdownify %}
 <!--Header-->
-{% include "header.html" with title="Publications" %}
+{% include "header.html" with title="Colocations" %}
 
 <!--Body-->
 <body>
@@ -10,7 +10,7 @@
     {% include "feedback.html" %}
 
     <!--Sidenav-->
-    {% include "sidenav.html" with active_link="news" %}
+    {% include "sidenav.html" with active_link="colocaponts" %}
 
     <!--Content-->
     <div class="content">
@@ -34,8 +34,8 @@
             <h3 class="page-title">Colocations</h3>
 
             <div class="centered-div mt-2">
-                <a href="{% url 'news:post_create' %}">
-                    <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un post</button>
+                <a href="{% url 'colocaponts:add_coloc' %}">
+                    <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter une colocation</button>
                 </a>                
             </div>
 
