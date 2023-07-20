@@ -38,7 +38,7 @@ function commentContent(state) {
   if (state.comment.club && state.comment.is_my_comment) {
     return (
       <div className="news-card-comment-box">
-        <a className="text-bold" href={state.comment.author_url}>
+        <a className="news-card-comment-author" href={state.comment.author_url}>
           {state.comment.club.name}
         </a>
         <br />
@@ -63,7 +63,7 @@ function commentContent(state) {
   if (state.comment.club) {
     return (
       <div className="news-card-comment-box">
-        <a className="text-bold" href={state.comment.author_url}>
+        <a className="news-card-comment-author" href={state.comment.author_url}>
           {state.comment.club.name}
         </a>
         <br />
@@ -79,7 +79,7 @@ function commentContent(state) {
   }
   return (
     <div className="news-card-comment-box">
-      <a className="text-bold" href={state.comment.author_url}>
+      <a className="news-card-comment-author" href={state.comment.author_url}>
         {state.comment.author.user.first_name}{' '}
         {state.comment.author.user.last_name}
       </a>
@@ -133,7 +133,7 @@ export default class Comment extends React.Component {
       return (
         // eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <a onClick={this.delete}>
-          <i className="fas fa-times-circle" />
+          <i className="fas fa-times-circle" style={{cursor: "pointer"}}/>
         </a>
       );
     }

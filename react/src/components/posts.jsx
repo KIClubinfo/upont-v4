@@ -37,13 +37,13 @@ function postAuthor(state) {
   if (state.post.club) {
     return (
       <a className="news-card-header-name" href={state.post.author_url}>
-        {state.post.club.name}
+        Par {state.post.club.name}
       </a>
     );
   }
   return (
     <a className="news-card-header-name" href={state.post.author_url}>
-      {state.post.author.user.first_name} {state.post.author.user.last_name}
+      Par {state.post.author.user.first_name} {state.post.author.user.last_name}
     </a>
   );
 }
@@ -74,7 +74,7 @@ function postClubAuthor(state) {
   if (state.post.club && state.post.can_edit) {
     return (
       <span className="news-card-header-date">
-        Posté par&nbsp;
+        Par&nbsp;
         <a href={state.post.user_author_url}>
           {state.post.author.user.first_name} {state.post.author.user.last_name}
         </a>
@@ -314,17 +314,15 @@ class Post extends React.Component {
           <div className="news-card-header">
             {postLogo(this.state)}
             <div className="news-card-header-text">
-              {postAuthor(this.state)}
-              {postClubAuthor(this.state)}
+              {postTitle(this.state)}
               {postDate(this.state)}
+              {postClubAuthor(this.state)}
+              {postAuthor(this.state)}
             </div>
             {this.edit_button()}
           </div>
           <div className="news-card-content">
             {this.show_event_name()}
-            <div className="news-card-content-title">
-              {postTitle(this.state)}
-            </div>
             <ReactMarkdown remarkPlugins={[gfm, emoji]}>
               {this.state.post.content}
             </ReactMarkdown>
