@@ -1312,6 +1312,10 @@ a.text-green:hover{
     padding: 1rem;
 }
 
+.news-card-more-comments{
+    color: var(--white-color-light);
+}
+
 .news-card-edit-comment-input{
     /* Sizing */
     margin-left: 1rem;

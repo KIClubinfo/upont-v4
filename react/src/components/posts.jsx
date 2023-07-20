@@ -245,7 +245,7 @@ class Post extends React.Component {
           className="news-card-edit-comment-container"
           style={{ textAlign: 'center' }}
         >
-          <a href="javascript:void(0)" onClick={this.show_more}>
+          <a className="news-card-more-comments" href="javascript:void(0)" onClick={this.show_more}>
             Voir plus de commentaires
           </a>
         </div>
