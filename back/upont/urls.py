@@ -103,4 +103,5 @@ urlpatterns += [
         name="course_department_list",
     ),
     path("api/calendar_data/", CalendarData.as_view(), name="calendar_data"),
+    path("api/get_token", views.get_token, name="get_token"),
 ]
