@@ -27,7 +27,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django_reverse_js.views import urls_js
-from news.views import EventViewSet, PostViewSet
+from news.views import EventViewSet, PostViewSet, ShotgunView
 from pochtron.views import PochtronId, SearchAlcohol
 from rest_framework import routers
 from social.views import (
@@ -104,4 +104,6 @@ urlpatterns += [
     ),
     path("api/calendar_data/", CalendarData.as_view(), name="calendar_data"),
     path("api/get_token", views.get_token, name="get_token"),
+    path("api/notification_token", views.notification_token, name="notification_token"),
+    path("api/shotguns/", ShotgunView.as_view(), name="shotgun"),
 ]

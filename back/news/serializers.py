@@ -5,7 +5,7 @@ from rest_framework import serializers
 from social.models import Student
 from social.serializers import ClubSerializer, StudentSerializer
 
-from .models import Comment, Event, Post
+from .models import Comment, Event, Post, Shotgun
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -226,4 +226,21 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             "poster",
             "shotgun",
             "id",
+        ]
+
+class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
+    
+    club = ClubSerializer()
+    
+    class Meta:
+        model = Shotgun
+        fields = [
+            "title",
+            "club",
+            "content",
+            "starting_date",
+            "ending_date",
+            "size",
+            "requires_motivation",
+            "motivations_review_finished",
         ]

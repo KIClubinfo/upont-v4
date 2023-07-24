@@ -10,11 +10,13 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
-from .serializers import EventSerializer, PostSerializer
+from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
 
 
 @login_required
@@ -75,6 +77,46 @@ class PostViewSet(viewsets.ModelViewSet):
             )
 
         return queryset
+
+
+class ShotgunView(APIView):
+    """
+    API endpoint that returns avalaible shotguns for a logged student.
+    """
+
+    def get(self, request):
+        # shotguns to which the user participated :
+        student = get_object_or_404(Student, user__id=request.user.id)
+        user_participations = Participation.objects.filter(participant=student)
+        user_shotguns = []
+        for participation in user_participations:
+            user_shotguns.append(participation.shotgun)
+        # shotguns that are not ended and to which the user did not participate :
+        next_shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by(
+            "starting_date"
+        )
+        for user_shotgun in user_shotguns:
+            next_shotguns = next_shotguns.exclude(id=user_shotgun.pk)
+        # shotguns that are ended and to which the user did not participate :
+        old_shotguns = Shotgun.objects.filter(ending_date__lte=timezone.now()).order_by(
+            "ending_date"
+        )
+        for user_shotgun in user_shotguns:
+            old_shotguns = old_shotguns.exclude(id=user_shotgun.pk)
+
+        context = {
+            "next_shotguns": next_shotguns,
+            "old_shotguns": old_shotguns,
+            "user_shotguns": user_shotguns,
+        }
+
+        serializer1 = ShotgunSerializer(next_shotguns, many=True)
+        serializer2 = ShotgunSerializer(old_shotguns, many=True)
+        serializer3 = ShotgunSerializer(user_shotguns, many=True)
+
+        return Response({"next_shotguns": serializer1.data, 
+                         "old_shotguns": serializer2.data, 
+                         "user_shotguns": serializer3.data,})
 
 
 class EventViewSet(viewsets.ModelViewSet):
