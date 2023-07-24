@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, Role, Student
+from .models import Category, Club, Membership, Role, Student, NotificationToken
 from .serializers import RoleSerializer, StudentSerializer
 
 
@@ -99,6 +99,19 @@ class SearchStudent(APIView):
             )[:25]
         serializer = StudentSerializer(students, many=True)
         return Response({"students": serializer.data})
+    
+class NotificationTokenView(APIView):
+    """
+    API endpoint that returns or edit the student whose username contains the query.
+    """
+    
+    def post(self, request):
+        token = request.data["token"]
+        if not NotificationToken.objects.filter(token=token).exists():
+            NotificationToken.objects.create(student=Student.objects.get(user__id=request.user.id), token=token)
+            return Response({"status": "created"})
+        return Response({"status": "exists"})
+
 
 
 @login_required

@@ -36,6 +36,7 @@ from social.views import (
     SearchStudent,
     StudentCanPublishAs,
     StudentViewSet,
+    NotificationTokenView,
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
@@ -106,4 +107,5 @@ urlpatterns += [
     path("api/get_token", views.get_token, name="get_token"),
     path("api/notification_token", views.notification_token, name="notification_token"),
     path("api/shotguns/", ShotgunView.as_view(), name="shotgun"),
+    path("api/notification_token/", NotificationTokenView.as_view(), name="student_token"),
 ]

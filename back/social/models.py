@@ -190,6 +190,13 @@ class ClubRequest(models.Model):
 
     def __str__(self):
         return self.student.user.username + " : " + self.name
+    
+class NotificationToken(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    token = models.CharField(max_length=200)
+    
+    def __str__(self):
+        return self.student.user.username + " : " + self.token
 
 
 def compress_image(image, quality, name):
