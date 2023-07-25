@@ -102,9 +102,10 @@ class ShotgunParticipateView(APIView):
     def post(self, request):
         shotgun = get_object_or_404(Shotgun, pk=request.data["shotgun"])
         student = Student.objects.get(user__id=request.user.id)
-        if not shotgun.is_started:
+        if not shotgun.is_started():
             return Response({'status': 'shotgun_not_started'})
-        if shotgun.is_ended:
+        
+        if shotgun.is_ended():
             return Response({'status': 'shotgun_ended'})
         if shotgun.participated(student):
             return Response({'status': 'already_participating'})
