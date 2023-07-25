@@ -105,7 +105,6 @@ urlpatterns += [
     ),
     path("api/calendar_data/", CalendarData.as_view(), name="calendar_data"),
     path("api/get_token", views.get_token, name="get_token"),
-    path("api/notification_token", views.notification_token, name="notification_token"),
     path("api/shotguns/", ShotgunView.as_view(), name="shotgun"),
     path("api/notification_token/", NotificationTokenView.as_view(), name="student_token"),
 ]

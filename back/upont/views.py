@@ -127,8 +127,3 @@ def get_token(request):
         return Response({'error': 'Invalid credentials'})
     token, created = Token.objects.get_or_create(user=user)
     return Response({'token': token.key})
-
-@api_view(["POST"])
-def notification_token(request):
-    print(request.data)
-    return Response(status=200)
