@@ -93,6 +93,41 @@ class ShotgunView(APIView):
         serializer = ShotgunSerializer(shotguns, many=True, context={"student": student})
 
         return Response({'shotguns': serializer.data})
+    
+class ShotgunParticipateView(APIView):
+    """
+    API endpoint to participate to a shotgun.
+    """
+
+    def post(self, request):
+        shotgun = get_object_or_404(Shotgun, pk=request.data["shotgun"])
+        student = Student.objects.get(user__id=request.user.id)
+        if shotgun.is_started:
+            return Response({'status': 'shotgun_not_started'})
+        if shotgun.is_ended:
+            return Response({'status': 'shotgun_ended'})
+        if shotgun.participated(student):
+            return Response({'status': 'already_participating'})
+        if shotgun.requires_motivation:
+            if "motivation" not in request.data:
+                error_message = "Tu n'as pas fourni de motivation !"
+                return Response({'status': 'error', 'message': error_message})
+            
+            participation = Participation(
+                shotgun=shotgun,
+                shotgun_date=timezone.now(),
+                participant=student,
+                motivation=request.data["motivation"],
+            )
+            participation.save()
+        else:
+            participation = Participation(
+                shotgun=shotgun,
+                shotgun_date=timezone.now(),
+                participant=student,
+            )
+            participation.save()
+        return Response({'status': 'ok'})
 
 
 class EventViewSet(viewsets.ModelViewSet):

@@ -251,11 +251,16 @@ class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
                     return "waiting"
         else:
             return "not_participated"
-            
+        
+    id = serializers.SerializerMethodField()
+
+    def get_id(self, obj):
+        return obj.pk
     
     class Meta:
         model = Shotgun
         fields = [
+            "id",
             "title",
             "club",
             "content",
