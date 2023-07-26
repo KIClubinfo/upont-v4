@@ -142,9 +142,13 @@ class PostReactionView(APIView):
         if request.data["reaction"] == "like":
             post.likes.add(student)
             post.dislikes.remove(student)
+        elif request.data["reaction"] == "unlike":
+            post.likes.remove(student)
         elif request.data["reaction"] == "dislike":
             post.likes.remove(student)
             post.dislikes.add(student)
+        elif request.data["reaction"] == "undislike":
+            post.dislikes.remove(student)
         else:
             return Response({"status": "error", "message": "Invalid reaction"})
         post.save()
