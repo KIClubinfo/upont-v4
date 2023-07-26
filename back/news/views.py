@@ -154,6 +154,18 @@ class PostReactionView(APIView):
         post.save()
         return Response({"status": "ok"})
 
+class PostCommentView(APIView):
+    """
+    API endpoint that allows students to comment posts
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        commented_post = get_object_or_404(Post, id=request.data["post"])
+        comment = Comment(date=timezone.now(), author=student, post=commented_post, content=request.data["comment"])
+        comment.save()
+        return Response({"status": "ok"})
+    
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed
