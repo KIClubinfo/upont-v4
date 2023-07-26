@@ -130,6 +130,25 @@ class ShotgunParticipateView(APIView):
             participation.save()
         return Response({'status': 'ok'})
 
+class PostReactionView(APIView):
+
+    """
+    API endpoint that allows users to react to posts.
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = get_object_or_404(Post, id=request.data["post"])
+        if request.data["reaction"] == "like":
+            post.likes.add(student)
+            post.dislikes.remove(student)
+        elif request.data["reaction"] == "dislike":
+            post.likes.remove(student)
+            post.dislikes.add(student)
+        else:
+            return Response({"status": "error", "message": "Invalid reaction"})
+        post.save()
+        return Response({"status": "ok"})
 
 class EventViewSet(viewsets.ModelViewSet):
     """
@@ -169,7 +188,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
 
         return queryset.order_by("-date", "name")
-
 
 @login_required
 def events(request):
