@@ -166,6 +166,22 @@ class PostCommentView(APIView):
         comment.save()
         return Response({"status": "ok"})
     
+class PostCreateView(APIView):
+    """
+    API endpoint that allows students to create posts
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = Post(title=request.data['title'], author=student, date=timezone.now(), content=request.data['content'])
+        if request.data['title'] == '' :
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data['content'] == '':
+            return Response({'status': 'error', 'message': 'empty_content'})
+
+        post.save()
+        return Response({"status": "ok"})
+    
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed
@@ -356,6 +372,7 @@ def post_create(request, event_id=None, course_id=None):
                 request.POST,
                 request.FILES,
             )
+            print(request.POST)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = Student.objects.get(user__id=request.user.id)
