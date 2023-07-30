@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
 from .models import Category, Club, Membership, Role, Student, NotificationToken
-from .serializers import RoleSerializer, StudentSerializer
+from .serializers import RoleSerializer, StudentSerializer, ClubSerializer
 
 
 @login_required
@@ -111,6 +111,17 @@ class NotificationTokenView(APIView):
             NotificationToken.objects.create(student=Student.objects.get(user__id=request.user.id), token=token)
             return Response({"status": "created"})
         return Response({"status": "exists"})
+
+class ClubsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows clubs to be viewed.
+    """
+
+    queryset = Club.objects.all().order_by(
+        "name", "nickname"
+    )
+    serializer_class = ClubSerializer
+    http_method_names = ["get"]
 
 
 

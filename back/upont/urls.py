@@ -37,6 +37,7 @@ from social.views import (
     StudentCanPublishAs,
     StudentViewSet,
     NotificationTokenView,
+    ClubsViewSet,
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
@@ -81,6 +82,7 @@ router.register(r"courses", CourseViewSet, basename="course")
 router.register(r"groups", GroupViewSet, basename="group")
 router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
+router.register(r"clubs", ClubsViewSet)
 
 urlpatterns += [
     path(
