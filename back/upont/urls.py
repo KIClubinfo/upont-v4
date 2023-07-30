@@ -38,6 +38,8 @@ from social.views import (
     StudentViewSet,
     NotificationTokenView,
     ClubsViewSet,
+    OneStudentView,
+    OneClubView,
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
@@ -106,11 +108,13 @@ urlpatterns += [
         name="course_department_list",
     ),
     path("api/calendar_data/", CalendarData.as_view(), name="calendar_data"),
-    path("api/get_token", views.get_token, name="get_token"),
+    path("api/get_token/", views.get_token, name="get_token"),
     path("api/shotguns/", ShotgunView.as_view(), name="shotgun"),
     path("api/shotgun/participate/", ShotgunParticipateView.as_view(), name="shotgun_participate"),
     path("api/notification_token/", NotificationTokenView.as_view(), name="student_token"),
     path("api/post_reaction/", PostReactionView.as_view(), name="post_reaction"),
     path("api/comment_post/", PostCommentView.as_view(), name="post_comment"),
-    path("api/create_post", PostCreateView.as_view(), name="post_creation")
+    path("api/create_post/", PostCreateView.as_view(), name="post_creation"),
+    path("api/student/", OneStudentView.as_view(), name="student"),
+    path("api/club/", OneClubView.as_view(), name="club"),
 ]

@@ -38,6 +38,21 @@ class StudentViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
 
+class OneStudentView(APIView):
+    """
+    API endpoint that allows a unique student to be viewed.
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Student, user__id=request.GET["id"])
+        serializer = StudentSerializer(student)
+        return Response({"student": serializer.data})
+    
+    @classmethod
+    def get_extra_actions(cls):
+        return []
+
+
 class CurrentStudentView(APIView):
     """
     API endpoint that returns the current student.
@@ -51,7 +66,7 @@ class CurrentStudentView(APIView):
     @classmethod
     def get_extra_actions(cls):
         return []
-
+    
 
 class StudentCanPublishAs(APIView):
     """
@@ -122,6 +137,20 @@ class ClubsViewSet(viewsets.ModelViewSet):
     )
     serializer_class = ClubSerializer
     http_method_names = ["get"]
+
+class OneClubView(APIView):
+    """
+    API endpoint that allows a unique club to be viewed.
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Club, id=request.GET["id"])
+        serializer = ClubSerializer(student)
+        return Response({"club": serializer.data})
+    
+    @classmethod
+    def get_extra_actions(cls):
+        return []
 
 
 
