@@ -58,9 +58,12 @@ class ClubSerializer(
         else:
             return False
 
+    def get_id(self, obj):
+        return obj.pk
+
     class Meta:
         model = Club
-        fields = ["name", "nickname", "logo_url", "background_picture_url"]
+        fields = ["id", "name", "nickname", "logo_url", "background_picture_url"]
 
 
 class RoleSerializer(serializers.HyperlinkedModelSerializer):
