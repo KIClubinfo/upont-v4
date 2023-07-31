@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Comment, Event, Participation, Post, Shotgun
+from .models import Comment, Event, Participation, Post, Shotgun, Page, PageMembership
 
 
 class EventsAdmin(admin.ModelAdmin):
@@ -10,7 +10,7 @@ class EventsAdmin(admin.ModelAdmin):
 
 
 class PostsAdmin(admin.ModelAdmin):
-    list_display = ("title", "author", "date")
+    list_display = ("title", "author", "date", "page")
     ordering = ("date",)
 
 
@@ -24,9 +24,10 @@ class ShotgunAdmin(admin.ModelAdmin):
     list_filter = ("club",)
     ordering = ("starting_date",)
 
-
 admin.site.register(Event, EventsAdmin)
 admin.site.register(Post, PostsAdmin)
 admin.site.register(Comment)
 admin.site.register(Participation, ParticipationAdmin)
 admin.site.register(Shotgun, ShotgunAdmin)
+admin.site.register(Page)
+admin.site.register(PageMembership)

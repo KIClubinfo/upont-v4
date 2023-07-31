@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
-from .models import Comment, Event, Participation, Post, Shotgun
+from .models import Comment, Event, Participation, Post, Shotgun, Page, PageMembership
 from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
 
 import upont.notifications as notification
@@ -45,7 +45,6 @@ def comment_post(request, post_id):
         return HttpResponse(status=500)
     else:
         return HttpResponse(status=400)
-
 
 class PostViewSet(viewsets.ModelViewSet):
     """
@@ -80,6 +79,24 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+class PostInPageView(APIView):
+    """
+    API endpoint that allows posts to be viewed.
+    """
+
+    def post(self, request):
+        page = get_object_or_404(Page, slug=request.data["page"])
+        student = get_object_or_404(Student, user__id=request.user.id)
+        
+        queryset = Post.objects.all().filter(page=page)
+
+        canRead = PageMembership.objects.filter(student=student, page=page).exists()
+
+        if(canRead):
+            queryset.order_by("-date", "title")
+            return Response(PostSerializer(queryset, many=True, context={"request":request}).data)
+        else: 
+            return Response({'status': "error", 'message': 'Permission denied'})
 
 class ShotgunView(APIView):
     """

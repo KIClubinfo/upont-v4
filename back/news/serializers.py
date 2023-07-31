@@ -5,7 +5,7 @@ from rest_framework import serializers
 from social.models import Student
 from social.serializers import ClubSerializer, StudentSerializer
 
-from .models import Comment, Event, Post, Shotgun, Participation
+from .models import Comment, Event, Post, Shotgun, Participation, Page
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -52,6 +52,18 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
             "user_author_url",
             "id",
         ]
+
+
+class PageSerializer(serializers.HyperlinkedModelSerializer):
+
+    id = serializers.SerializerMethodField()
+
+    def get_id(self, obj):
+        return obj.pk
+
+    class Meta: 
+        model = Page
+        fields = ["name", "slug", "id"]
 
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
@@ -180,6 +192,8 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
     resource = ResourceSerializer(many=True, read_only=True)
 
+    page = PageSerializer(read_only=True)
+
     class Meta:
         model = Post
         fields = [
@@ -207,6 +221,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "can_edit",
             "user_author_url",
             "resource",
+            "page",
         ]
 
 

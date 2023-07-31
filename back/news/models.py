@@ -27,17 +27,30 @@ class Event(models.Model):
         return self.name
 
 
-class Pages(models.Model):
+class Page(models.Model):
     name = models.CharField(max_length=50)
     slug = models.CharField(max_length=50)
-    visibility = models.CharField(max_length=10)
+
+    class Visibility(models.TextChoices):
+        SCHOOL = 'École'
+        PUBLIC = 'Publique'
+        PRIVATE = 'Privée'
+    visibility = models.CharField(max_length=50, choices=Visibility.choices, default=Visibility.PRIVATE)
+    members = models.ManyToManyField(Student, through='PageMembership')
 
     def __str__(self):
         return self.name
     
 class PageMembership(models.Model):
-    page = models.ForeignKey(Pages, blank=False)
-    student = models.ForeignKey(Student, blank=False)
+    page = models.ForeignKey(Page, blank=False, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
+
+    class Role(models.TextChoices):
+        ADMIN = 'Administrateur'
+        MODERATOR = 'Modérateur'
+        MEMBER = 'Membre'
+        VISITOR = 'Visiteur'
+    role = models.CharField(max_length=50, choices=Role.choices, default=Role.VISITOR)
 
 class Post(models.Model):
     title = models.CharField(max_length=50)
@@ -65,6 +78,8 @@ class Post(models.Model):
         blank=True,
         editable=False,
     )
+
+    page = models.ForeignKey("Page", on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
