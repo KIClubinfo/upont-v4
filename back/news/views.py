@@ -10,11 +10,15 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
-from .serializers import EventSerializer, PostSerializer
+from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
+
+import upont.notifications as notification
 
 
 @login_required
@@ -77,6 +81,107 @@ class PostViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+class ShotgunView(APIView):
+    """
+    API endpoint that returns avalaible shotguns for a logged student.
+    """
+
+    def get(self, request):
+        # shotguns to which the user participated :
+        student = get_object_or_404(Student, user__id=request.user.id)
+        shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by("starting_date")
+        serializer = ShotgunSerializer(shotguns, many=True, context={"student": student})
+
+        return Response({'shotguns': serializer.data})
+    
+class ShotgunParticipateView(APIView):
+    """
+    API endpoint to participate to a shotgun.
+    """
+
+    def post(self, request):
+        shotgun = get_object_or_404(Shotgun, pk=request.data["shotgun"])
+        student = Student.objects.get(user__id=request.user.id)
+        if not shotgun.is_started():
+            return Response({'status': 'shotgun_not_started'})
+        
+        if shotgun.is_ended():
+            return Response({'status': 'shotgun_ended'})
+        if shotgun.participated(student):
+            return Response({'status': 'already_participating'})
+        if shotgun.requires_motivation:
+            if "motivation" not in request.data:
+                error_message = "Tu n'as pas fourni de motivation !"
+                return Response({'status': 'error', 'message': error_message})
+            
+            participation = Participation(
+                shotgun=shotgun,
+                shotgun_date=timezone.now(),
+                participant=student,
+                motivation=request.data["motivation"],
+            )
+            participation.save()
+        else:
+            participation = Participation(
+                shotgun=shotgun,
+                shotgun_date=timezone.now(),
+                participant=student,
+            )
+            participation.save()
+        return Response({'status': 'ok'})
+
+class PostReactionView(APIView):
+
+    """
+    API endpoint that allows users to react to posts.
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = get_object_or_404(Post, id=request.data["post"])
+        if request.data["reaction"] == "like":
+            post.likes.add(student)
+            post.dislikes.remove(student)
+        elif request.data["reaction"] == "unlike":
+            post.likes.remove(student)
+        elif request.data["reaction"] == "dislike":
+            post.likes.remove(student)
+            post.dislikes.add(student)
+        elif request.data["reaction"] == "undislike":
+            post.dislikes.remove(student)
+        else:
+            return Response({"status": "error", "message": "Invalid reaction"})
+        post.save()
+        return Response({"status": "ok"})
+
+class PostCommentView(APIView):
+    """
+    API endpoint that allows students to comment posts
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        commented_post = get_object_or_404(Post, id=request.data["post"])
+        comment = Comment(date=timezone.now(), author=student, post=commented_post, content=request.data["comment"])
+        comment.save()
+        return Response({"status": "ok"})
+    
+class PostCreateView(APIView):
+    """
+    API endpoint that allows students to create posts
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = Post(title=request.data['title'], author=student, date=timezone.now(), content=request.data['content'])
+        if request.data['title'] == '' :
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data['content'] == '':
+            return Response({'status': 'error', 'message': 'empty_content'})
+
+        post.save()
+        return Response({"status": "ok"})
+    
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed
@@ -115,7 +220,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
 
         return queryset.order_by("-date", "name")
-
 
 @login_required
 def events(request):
@@ -268,6 +372,7 @@ def post_create(request, event_id=None, course_id=None):
                 request.POST,
                 request.FILES,
             )
+            print(request.POST)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = Student.objects.get(user__id=request.user.id)

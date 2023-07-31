@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, Role, Student
-from .serializers import RoleSerializer, StudentSerializer
+from .models import Category, Club, Membership, Role, Student, NotificationToken
+from .serializers import RoleSerializer, StudentSerializer, ClubSerializer
 
 
 @login_required
@@ -38,6 +38,21 @@ class StudentViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
 
+class OneStudentView(APIView):
+    """
+    API endpoint that allows a unique student to be viewed.
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Student, user__id=request.GET["id"])
+        serializer = StudentSerializer(student)
+        return Response({"student": serializer.data})
+    
+    @classmethod
+    def get_extra_actions(cls):
+        return []
+
+
 class CurrentStudentView(APIView):
     """
     API endpoint that returns the current student.
@@ -51,7 +66,7 @@ class CurrentStudentView(APIView):
     @classmethod
     def get_extra_actions(cls):
         return []
-
+    
 
 class StudentCanPublishAs(APIView):
     """
@@ -99,6 +114,44 @@ class SearchStudent(APIView):
             )[:25]
         serializer = StudentSerializer(students, many=True)
         return Response({"students": serializer.data})
+    
+class NotificationTokenView(APIView):
+    """
+    API endpoint that returns or edit the student whose username contains the query.
+    """
+    
+    def post(self, request):
+        token = request.data["token"]
+        if not NotificationToken.objects.filter(token=token).exists():
+            NotificationToken.objects.create(student=Student.objects.get(user__id=request.user.id), token=token)
+            return Response({"status": "created"})
+        return Response({"status": "exists"})
+
+class ClubsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows clubs to be viewed.
+    """
+
+    queryset = Club.objects.all().order_by(
+        "name", "nickname"
+    )
+    serializer_class = ClubSerializer
+    http_method_names = ["get"]
+
+class OneClubView(APIView):
+    """
+    API endpoint that allows a unique club to be viewed.
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Club, id=request.GET["id"])
+        serializer = ClubSerializer(student)
+        return Response({"club": serializer.data})
+    
+    @classmethod
+    def get_extra_actions(cls):
+        return []
+
 
 
 @login_required

@@ -3,7 +3,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from rest_framework import serializers
 
-from .models import Club, Promotion, Role, Student
+from .models import Club, Promotion, Role, Student, NotificationToken, Membership
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -38,6 +38,17 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         model = Student
         fields = ["id", "user", "promo", "department", "profile_url", "picture_url"]
 
+class RoleSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Role
+        fields = ["name", "id"]
+
+class MembershipSerializer(serializers.ModelSerializer):
+    student = StudentSerializer()
+    role = RoleSerializer()
+    class Meta:
+        model = Membership
+        fields = ["student", "is_admin", "is_old", "role"]
 
 class ClubSerializer(
     serializers.HyperlinkedModelSerializer
@@ -58,12 +69,11 @@ class ClubSerializer(
         else:
             return False
 
+    def get_id(self, obj):
+        return obj.pk
+
+    members = MembershipSerializer(source='membership_set',many=True)
+    
     class Meta:
         model = Club
-        fields = ["name", "nickname", "logo_url", "background_picture_url"]
-
-
-class RoleSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Role
-        fields = ["name", "id"]
+        fields = ["id", "name", "nickname", "logo_url", "background_picture_url", "members"]

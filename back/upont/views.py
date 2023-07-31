@@ -9,6 +9,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from social.models import Promotion, Student
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+
+from upont.auth import EmailBackend
+
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
 
 
@@ -108,3 +115,15 @@ def add(request):
         "students_not_added": students_not_added,
     }
     return render(request, "add_promo.html", context)
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def get_token(request):
+    if "email" not in request.data or "password" not in request.data:
+        return Response({'error': 'Please provide both email and password'})
+    user = EmailBackend().authenticate(request, username=request.data['email'], password=request.data['password'])
+    if user is None:
+        return Response({'error': 'Invalid credentials'})
+    token, created = Token.objects.get_or_create(user=user)
+    return Response({'token': token.key})

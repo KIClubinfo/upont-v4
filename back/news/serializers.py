@@ -5,7 +5,7 @@ from rest_framework import serializers
 from social.models import Student
 from social.serializers import ClubSerializer, StudentSerializer
 
-from .models import Comment, Event, Post
+from .models import Comment, Event, Post, Shotgun, Participation
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -226,4 +226,48 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             "poster",
             "shotgun",
             "id",
+        ]
+
+class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
+    
+    club = ClubSerializer()
+
+    user_state = serializers.SerializerMethodField()
+
+    def get_user_state(self, obj):
+        if obj.participated(self.context.get("student")):
+            if not obj.requires_motivation:
+                if obj.got_accepted(self.context.get("student")):
+                    return "accepted"
+                else:
+                    return "failed"
+            else:
+                if obj.motivations_review_finished:
+                    if obj.got_accepted(self.context.get("student")):
+                        return "accepted"
+                    else:
+                        return "failed"
+                else:
+                    return "waiting"
+        else:
+            return "not_participated"
+        
+    id = serializers.SerializerMethodField()
+
+    def get_id(self, obj):
+        return obj.pk
+    
+    class Meta:
+        model = Shotgun
+        fields = [
+            "id",
+            "title",
+            "club",
+            "content",
+            "starting_date",
+            "ending_date",
+            "size",
+            "requires_motivation",
+            "motivations_review_finished",
+            "user_state",
         ]
