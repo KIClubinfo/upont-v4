@@ -27,6 +27,18 @@ class Event(models.Model):
         return self.name
 
 
+class Pages(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.CharField(max_length=50)
+    visibility = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+    
+class PageMembership(models.Model):
+    page = models.ForeignKey(Pages, blank=False)
+    student = models.ForeignKey(Student, blank=False)
+
 class Post(models.Model):
     title = models.CharField(max_length=50)
     author = models.ForeignKey(
