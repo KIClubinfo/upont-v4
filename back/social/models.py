@@ -170,6 +170,9 @@ class Club(models.Model):
 
     def balance_in_euros(self):
         return self.balance_in_cents() / 100
+    
+    def getMembers(self):
+        return self.members.filter(membership__is_old=False)
 
 
 class Membership(models.Model):
