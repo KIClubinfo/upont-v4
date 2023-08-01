@@ -8,7 +8,12 @@ from django.conf import settings
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect, FileResponse
+from django.http import (
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+    FileResponse,
+)
 from django.shortcuts import render
 from django.urls import reverse
 from social.models import Promotion, Student
@@ -29,6 +34,7 @@ def root_redirect(request):
     else:
         return HttpResponseRedirect(reverse(LOGIN_URL))
 
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_media_path(request, path):
@@ -43,7 +49,9 @@ def get_media_path(request, path):
     return: A FileResponse object that contains the file specified in the path parameter
     """
     if not os.path.exists(f"{settings.MEDIA_ROOT}/{path}"):
-        return Response({"status":"error", "message":"No such file exists."}, status=404)
+        return Response(
+            {"status": "error", "message": "No such file exists."}, status=404
+        )
     # retrieve user authentication token from cookies
     # I'm using django-rest-framework token authentication
 
@@ -59,6 +67,7 @@ def get_media_path(request, path):
         # FileResponse - A streaming HTTP response class optimized for files.
         return FileResponse(open(file_path, "rb"), content_type=mimetype)
     return Response("Access to this file is permitted.", status=404)
+
 
 def media(request, path):
     """

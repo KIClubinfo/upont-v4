@@ -131,5 +131,5 @@ urlpatterns += [
     path("api/create_post/", PostCreateView.as_view(), name="post_creation"),
     path("api/student/", OneStudentView.as_view(), name="student"),
     path("api/club/", OneClubView.as_view(), name="club"),
-    path("api/media/<path:path>", views.get_media_path, name="get_media_path")
+    path("api/media/<path:path>", views.get_media_path, name="get_media_path"),
 ]
