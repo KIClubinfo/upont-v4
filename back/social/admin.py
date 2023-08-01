@@ -30,8 +30,11 @@ class MembershipsAdmin(admin.ModelAdmin):
 class ClubRequestAdmin(admin.ModelAdmin):
     list_display = ("name", "student")
 
+
 class NotificationTokenAdmin(admin.ModelAdmin):
-    list_display = ( "student", "token")
+    list_display = ("student", "token")
+
+
 admin.site.register(Promotion)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Nationality)

@@ -18,8 +18,6 @@ from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
 from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
 
-import upont.notifications as notification
-
 
 @login_required
 def posts(request):
@@ -89,11 +87,16 @@ class ShotgunView(APIView):
     def get(self, request):
         # shotguns to which the user participated :
         student = get_object_or_404(Student, user__id=request.user.id)
-        shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by("starting_date")
-        serializer = ShotgunSerializer(shotguns, many=True, context={"student": student})
+        shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by(
+            "starting_date"
+        )
+        serializer = ShotgunSerializer(
+            shotguns, many=True, context={"student": student}
+        )
 
-        return Response({'shotguns': serializer.data})
-    
+        return Response({"shotguns": serializer.data})
+
+
 class ShotgunParticipateView(APIView):
     """
     API endpoint to participate to a shotgun.
@@ -103,17 +106,17 @@ class ShotgunParticipateView(APIView):
         shotgun = get_object_or_404(Shotgun, pk=request.data["shotgun"])
         student = Student.objects.get(user__id=request.user.id)
         if not shotgun.is_started():
-            return Response({'status': 'shotgun_not_started'})
-        
+            return Response({"status": "shotgun_not_started"})
+
         if shotgun.is_ended():
-            return Response({'status': 'shotgun_ended'})
+            return Response({"status": "shotgun_ended"})
         if shotgun.participated(student):
-            return Response({'status': 'already_participating'})
+            return Response({"status": "already_participating"})
         if shotgun.requires_motivation:
             if "motivation" not in request.data:
                 error_message = "Tu n'as pas fourni de motivation !"
-                return Response({'status': 'error', 'message': error_message})
-            
+                return Response({"status": "error", "message": error_message})
+
             participation = Participation(
                 shotgun=shotgun,
                 shotgun_date=timezone.now(),
@@ -128,7 +131,8 @@ class ShotgunParticipateView(APIView):
                 participant=student,
             )
             participation.save()
-        return Response({'status': 'ok'})
+        return Response({"status": "ok"})
+
 
 class PostReactionView(APIView):
 
@@ -154,6 +158,7 @@ class PostReactionView(APIView):
         post.save()
         return Response({"status": "ok"})
 
+
 class PostCommentView(APIView):
     """
     API endpoint that allows students to comment posts
@@ -162,10 +167,16 @@ class PostCommentView(APIView):
     def post(self, request):
         student = get_object_or_404(Student, user__id=request.user.id)
         commented_post = get_object_or_404(Post, id=request.data["post"])
-        comment = Comment(date=timezone.now(), author=student, post=commented_post, content=request.data["comment"])
+        comment = Comment(
+            date=timezone.now(),
+            author=student,
+            post=commented_post,
+            content=request.data["comment"],
+        )
         comment.save()
         return Response({"status": "ok"})
-    
+
+
 class PostCreateView(APIView):
     """
     API endpoint that allows students to create posts
@@ -173,15 +184,21 @@ class PostCreateView(APIView):
 
     def post(self, request):
         student = get_object_or_404(Student, user__id=request.user.id)
-        post = Post(title=request.data['title'], author=student, date=timezone.now(), content=request.data['content'])
-        if request.data['title'] == '' :
+        post = Post(
+            title=request.data["title"],
+            author=student,
+            date=timezone.now(),
+            content=request.data["content"],
+        )
+        if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
-        elif request.data['content'] == '':
-            return Response({'status': 'error', 'message': 'empty_content'})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
 
         post.save()
         return Response({"status": "ok"})
-    
+
+
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed
@@ -220,6 +237,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
 
         return queryset.order_by("-date", "name")
+
 
 @login_required
 def events(request):
