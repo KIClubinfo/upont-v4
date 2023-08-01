@@ -11,7 +11,6 @@ from social.models import Student, NotificationToken
 session = requests.Session()
 session.headers.update(
     {
-        "Authorization": "Bearer iiBDmsbzZGGi19zWgLy9uhrBfCiSPVsl5ah5H0jZ",
         "accept": "application/json",
         "accept-encoding": "gzip, deflate",
         "content-type": "application/json",
