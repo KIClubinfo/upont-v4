@@ -27,7 +27,15 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django_reverse_js.views import urls_js
-from news.views import EventViewSet, PostViewSet, ShotgunView, ShotgunParticipateView, PostReactionView, PostCommentView, PostCreateView
+from news.views import (
+    EventViewSet,
+    PostViewSet,
+    ShotgunView,
+    ShotgunParticipateView,
+    PostReactionView,
+    PostCommentView,
+    PostCreateView,
+)
 from pochtron.views import PochtronId, SearchAlcohol
 from rest_framework import routers
 from social.views import (
@@ -110,11 +118,18 @@ urlpatterns += [
     path("api/calendar_data/", CalendarData.as_view(), name="calendar_data"),
     path("api/get_token/", views.get_token, name="get_token"),
     path("api/shotguns/", ShotgunView.as_view(), name="shotgun"),
-    path("api/shotgun/participate/", ShotgunParticipateView.as_view(), name="shotgun_participate"),
-    path("api/notification_token/", NotificationTokenView.as_view(), name="student_token"),
+    path(
+        "api/shotgun/participate/",
+        ShotgunParticipateView.as_view(),
+        name="shotgun_participate",
+    ),
+    path(
+        "api/notification_token/", NotificationTokenView.as_view(), name="student_token"
+    ),
     path("api/post_reaction/", PostReactionView.as_view(), name="post_reaction"),
     path("api/comment_post/", PostCommentView.as_view(), name="post_comment"),
     path("api/create_post/", PostCreateView.as_view(), name="post_creation"),
     path("api/student/", OneStudentView.as_view(), name="student"),
     path("api/club/", OneClubView.as_view(), name="club"),
+    path("api/media/<path:path>", views.get_media_path, name="get_media_path")
 ]

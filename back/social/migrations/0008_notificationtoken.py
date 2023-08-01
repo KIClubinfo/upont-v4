@@ -5,18 +5,30 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('social', '0007_merge_0004_auto_20220826_1123_0006_alter_role_name'),
+        ("social", "0007_merge_0004_auto_20220826_1123_0006_alter_role_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='NotificationToken',
+            name="NotificationToken",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('token', models.CharField(max_length=200)),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='social.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("token", models.CharField(max_length=200)),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="social.student"
+                    ),
+                ),
             ],
         ),
     ]
