@@ -5,7 +5,7 @@ from rest_framework import serializers
 from social.models import Student
 from social.serializers import ClubSerializer, StudentSerializer
 
-from .models import Comment, Event, Post, Shotgun, Participation
+from .models import Comment, Event, Post, Shotgun
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):

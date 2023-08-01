@@ -7,7 +7,7 @@ from .models import Post
 @receiver(post_save, sender=Post)
 def on_post_create(sender, instance, created, **kwargs):
     if created:
-        if not instance.club is None:
+        if instance.club is not None:
             notifications.send_push_message_to_all_students(
                 instance.club.name, instance.title
             )

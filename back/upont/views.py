@@ -55,7 +55,7 @@ def get_media_path(request, path):
     # retrieve user authentication token from cookies
     # I'm using django-rest-framework token authentication
 
-    if not request.user == None:
+    if request.user is not None:
         # Guess the MIME type of a file. Like pdf/docx/xlsx/png/jpeg
         mimetype, encoding = mimetypes.guess_type(path, strict=True)
         if not mimetype:

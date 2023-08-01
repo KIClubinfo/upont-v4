@@ -18,8 +18,6 @@ from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
 from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
 
-import upont.notifications as notification
-
 
 @login_required
 def posts(request):
