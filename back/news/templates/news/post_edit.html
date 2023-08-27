@@ -29,7 +29,7 @@
                         {%endif%}
                     {% else%}
                         {%if course_id == None%}
-                            {% url 'news:post_create'%}
+                            
                         {%else%}
                             {%url 'courses:course_post_create' course_id=course_id%}
                         {%endif%}

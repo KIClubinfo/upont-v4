@@ -1371,6 +1371,45 @@ a.text-green:hover{
     color: #39cbfb;
 }
 
+.pages-nav{
+    position: fixed;
+    margin: 0 auto;
+    top: 26rem;
+    left: 13rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 9rem;
+    max-width: 50rem;
+    background-color: var(--primary-bg-color);
+    border-radius: 0.5rem;
+    border: solid var(--border-color) var(--border-width);
+}
+
+.pages-nav a {
+    font-family: 'Neue Helvetica Thin';
+    font-weight: normal;
+    text-decoration: none;
+    font-size: 1.6rem;
+    padding: 1rem 1rem;
+    border-bottom: solid var(--border-width) var(--border-color);
+}
+
+@media(max-width:1175px){
+    .pages-nav{
+        margin-top: 20px;
+        position: relative;
+        text-align: center;
+        top: 0;
+        left: 0;
+    }
+
+    .pages-nav a{
+        font-size: 1.5rem;
+        padding: 0.8rem 1rem;
+    }
+}
+
 /*-------------------------------------------------*/
 /*--------------------- POCHTRON ------------------*/
 /*-------------------------------------------------*/

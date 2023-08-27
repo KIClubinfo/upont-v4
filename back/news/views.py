@@ -9,43 +9,31 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import viewsets
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from social.models import Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun, Page, PageMembership
-from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
+from .serializers import EventSerializer, PostSerializer, ShotgunSerializer, PageSerializer
 
 import upont.notifications as notification
 
 
-@login_required
-def posts(request):
-    if request.method == "GET":
-        return render(request, "news/posts.html")
+class PageViewSet(APIView):
+    """
+    API endpoint that allows students to view accessible pages
+    """
 
-
-@login_required
-def comment_post(request, post_id):
-    if request.method == "POST":
-        student = get_object_or_404(Student, user__id=request.user.id)
-        data = json.loads(request.body.decode("utf-8"))
-        commented_post = get_object_or_404(Post, id=post_id)
-        filled_form = CommentForm(post_id, student.user.id, data=data)
-
-        if filled_form.is_valid():
-            new_comment = filled_form.save(commit=False)
-            new_comment.post = commented_post
-            new_comment.author = student
-            new_comment.date = timezone.now()
-            new_comment.save()
-            return HttpResponse(status=201)
-        return HttpResponse(status=500)
-    else:
-        return HttpResponse(status=400)
-
+    def get(self, request):
+        pages = Page.objects.all()
+        result = []
+        for page in pages:
+            if page.can_view(request.user):
+                result.append(page)
+        return Response(PageSerializer(result, many=True).data)
+    
 class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows posts to be viewed.
@@ -78,25 +66,31 @@ class PostViewSet(viewsets.ModelViewSet):
             )
 
         return queryset
-
-class PostInPageView(APIView):
+    
+class PostInPageViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows posts to be viewed.
     """
 
-    def post(self, request):
-        page = get_object_or_404(Page, slug=request.data["page"])
-        student = get_object_or_404(Student, user__id=request.user.id)
-        
-        queryset = Post.objects.all().filter(page=page)
+    serializer_class = PostSerializer
+    http_method_names = ["get"]
 
-        canRead = PageMembership.objects.filter(student=student, page=page).exists()
-
-        if(canRead):
-            queryset.order_by("-date", "title")
-            return Response(PostSerializer(queryset, many=True, context={"request":request}).data)
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        page_slug = self.request.GET.get("page_slug")
+        page_query = Page.objects.filter(slug=page_slug)
+        if(page_query.count() == 0):
+            raise ValidationError(
+                detail="Page inexistante"
+            )
+        page = page_query.first()
+        if(page.can_view(self.request.user)):
+            queryset = queryset.filter(page=page).order_by("-date", "title")
         else: 
-            return Response({'status': "error", 'message': 'Permission denied'})
+            raise PermissionDenied(
+                detail="You are not allowed to view this page"
+            )
+        return queryset
 
 class ShotgunView(APIView):
     """
@@ -237,6 +231,47 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
 
         return queryset.order_by("-date", "name")
+
+@login_required
+def posts(request):
+    if request.method == "GET":
+        return render(request, "news/posts.html")
+
+@login_required
+def page(request, page_slug):
+    if request.method == "GET":
+        page = get_object_or_404(Page, slug=page_slug)
+        context = {"page_slug": page_slug, "page_name": page.name}
+        return render(request, "news/page.html", context)
+    
+@login_required
+def pages(request):
+    pages = Page.objects.all()
+    result = []
+    for page in pages:
+        if page.can_view(request.user):
+            result.append(page)
+    serializer = PageSerializer(result, many=True)
+    return render(request, "news/pages.html", {"pages": json.dumps({"data": serializer.data} )})
+
+@login_required
+def comment_post(request, post_id):
+    if request.method == "POST":
+        student = get_object_or_404(Student, user__id=request.user.id)
+        data = json.loads(request.body.decode("utf-8"))
+        commented_post = get_object_or_404(Post, id=post_id)
+        filled_form = CommentForm(post_id, student.user.id, data=data)
+
+        if filled_form.is_valid():
+            new_comment = filled_form.save(commit=False)
+            new_comment.post = commented_post
+            new_comment.author = student
+            new_comment.date = timezone.now()
+            new_comment.save()
+            return HttpResponse(status=201)
+        return HttpResponse(status=500)
+    else:
+        return HttpResponse(status=400)
 
 @login_required
 def events(request):
@@ -380,6 +415,30 @@ def post_edit(request, post_id, course_id=None):
 
 
 @login_required
+def post_create_on_page(request, page_slug):
+    context = {}
+    if request.method == "POST":
+        if "Valider" in request.POST:
+            form = EditPost(
+                request.user.id,
+                request.POST,
+                request.FILES,
+            )
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = Student.objects.get(user__id=request.user.id)
+                post.date = timezone.now()
+                post.page = page
+                post.save()
+                return HttpResponseRedirect(request.session["origin"])
+    else:
+        form = EditPost(request.user.id)
+    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
+    context["EditPost"] = form
+    context["Edit"] = False
+    return render(request, "news/post_edit.html", context)
+
+@login_required
 def post_create(request, event_id=None, course_id=None):
     context = {}
     if request.method == "POST":
@@ -389,7 +448,6 @@ def post_create(request, event_id=None, course_id=None):
                 request.POST,
                 request.FILES,
             )
-            print(request.POST)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = Student.objects.get(user__id=request.user.id)

@@ -1,0 +1,66 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% include "header.html" with title="Publications" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="news" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <!--Header Content
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        -->
+
+        <!--Main Content-->
+        <div class="content-main">
+
+            <h3 class="page-title">{{page_name}}</h3>
+
+            <!--News Navigation-->
+            {% include "../news/newsnav.html" %}
+            <!--End of News Navigation-->
+
+            <div class="centered-div mt-2">
+                <a href="{% url 'news:post_create' %}/{{page_slug}}">
+                    <button class="button blue-button "><i class="fas fa-plus-circle  fa-2x logo-button"></i>Ajouter un post</button>
+                </a>                
+            </div>
+
+            <!--News Card-->
+            <div id="posts">
+                <!--  Posts are rendered with React  -->
+            </div>
+            <!--End of News Card-->
+
+        </div><!--End of Main Content-->
+
+    </div><!--End of Content-->
+
+    <!--Scripts-->
+    <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+    <script>
+        window.react_mount = document.getElementById('posts');
+        page_slug = "{{ page_slug }}";
+    </script>
+    <script src="{% static 'react/page.bundle.js' %}"></script>
+    <!--End of Scripts-->
+
+</body><!--End of Body-->
+</html><!--End of Document-->

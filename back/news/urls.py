@@ -6,6 +6,8 @@ app_name = "news"
 
 urlpatterns = [
     path("post/", views.posts, name="posts"),
+    path("page/<slug:page_slug>/", views.page, name="page"),
+    path("pages/", views.pages, name="pages"),
     path("event/", views.events, name="events"),
     path("event/<int:event_id>/detail", views.event_detail, name="event_detail"),
     path("event/<int:event_id>/edit", views.event_edit, name="event_edit"),
@@ -20,6 +22,7 @@ urlpatterns = [
     path(
         "post/create/<int:event_id>", views.post_create, name="post_create_with_origin"
     ),
+    path("post/create/<slug:page_slug>", views.post_create_on_page, name="post_create_on_page"),
     path("post/<int:post_id>/<str:action>", views.post_like, name="post_like"),
     path("comment/add/<int:post_id>/", views.comment_post, name="comment_post"),
     path(

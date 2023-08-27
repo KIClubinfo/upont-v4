@@ -52,19 +52,6 @@ function postTitle(state) {
   return <span className="news-card-header-title">{state.post.title}</span>;
 }
 
-function postPage(state) {
-  if (state.post.page ==  null) {
-    return <></>
-  }else{
-
-    return (
-      <>
-        <span className="news-card-header-date">Publié dans <a className='new-card-header-date' href={"/news/page/" + state.post.page.slug}>{state.post.page.name}</a> </span>
-      </>
-      )
-    }
-}
-
 function postDate(state) {
   const options = {
     weekday: 'short',
@@ -329,7 +316,6 @@ class Post extends React.Component {
             <div className="news-card-header-text">
               {postAuthor(this.state)}
               {postClubAuthor(this.state)}
-              {postPage(this.state)}
               {postDate(this.state)}
             </div>
             {this.edit_button()}
@@ -385,19 +371,15 @@ class Post extends React.Component {
   }
 }
 
-class Posts extends React.Component {
+class Page extends React.Component {
   constructor(props) {
     super(props);
     const { mode } = props;
     let url;
-    if (mode === 'social') {
-      // eslint-disable-next-line no-undef
-      url = `${Urls.postList()}?mode=social`;
-    } else if (mode === 'course') {
-      const { courseId } = props;
-      // eslint-disable-next-line no-undef
-      url = `${Urls.postList()}?mode=course&course_id=${courseId}`;
-    }
+
+    // eslint-disable-next-line no-undef
+    url = `/api/posts_in_page?page_slug=` + page_slug;
+      
     this.state = {
       mode,
       posts: [],
@@ -474,4 +456,4 @@ class Posts extends React.Component {
   }
 }
 
-export default Posts;
+export default Page;

@@ -27,7 +27,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django_reverse_js.views import urls_js
-from news.views import EventViewSet, PostViewSet, PostInPageView, ShotgunView, ShotgunParticipateView, PostReactionView, PostCommentView, PostCreateView
+from news.views import EventViewSet, PostViewSet, PostInPageViewSet, ShotgunView, ShotgunParticipateView, PostReactionView, PostCommentView, PostCreateView, PageViewSet
 from pochtron.views import PochtronId, SearchAlcohol
 from rest_framework import routers
 from social.views import (
@@ -81,6 +81,7 @@ router.register(r"courses", CourseViewSet, basename="course")
 router.register(r"groups", GroupViewSet, basename="group")
 router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
+router.register(r"posts_in_page", PostInPageViewSet, basename="post_in_page")
 
 urlpatterns += [
     path(
@@ -111,5 +112,5 @@ urlpatterns += [
     path("api/post_reaction/", PostReactionView.as_view(), name="post_reaction"),
     path("api/comment_post/", PostCommentView.as_view(), name="post_comment"),
     path("api/create_post", PostCreateView.as_view(), name="post_creation"),
-    path("api/postinpage", PostInPageView.as_view(), name="post_in_page")
+    path("api/pages/", PageViewSet.as_view(), name="pages"),
 ]

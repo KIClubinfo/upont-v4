@@ -40,6 +40,15 @@ class Page(models.Model):
 
     def __str__(self):
         return self.name
+
+    def can_view(self, user):
+        if(user.is_authenticated):
+            if(self.visibility == Page.Visibility.SCHOOL):
+                return True
+            elif(user.is_staff or user.is_superuser or (self.visibility == Page.Visibility.PRIVATE and user in self.members.all())):
+                return True
+        else:
+            return False
     
 class PageMembership(models.Model):
     page = models.ForeignKey(Page, blank=False, on_delete=models.CASCADE)
