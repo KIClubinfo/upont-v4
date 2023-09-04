@@ -210,25 +210,6 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class EventSerializer(serializers.HyperlinkedModelSerializer):
-    club = ClubSerializer()
-
-    class Meta:
-        model = Event
-        fields = [
-            "name",
-            "description",
-            "club",
-            "date",
-            "end",
-            "location",
-            "participants",
-            "poster",
-            "shotgun",
-            "id",
-        ]
-
-
 class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
     club = ClubSerializer()
 
@@ -270,4 +251,24 @@ class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
             "requires_motivation",
             "motivations_review_finished",
             "user_state",
+        ]
+
+
+class EventSerializer(serializers.HyperlinkedModelSerializer):
+    club = ClubSerializer()
+    shotgun = ShotgunSerializer()
+
+    class Meta:
+        model = Event
+        fields = [
+            "name",
+            "description",
+            "club",
+            "date",
+            "end",
+            "location",
+            "participants",
+            "poster",
+            "shotgun",
+            "id",
         ]
