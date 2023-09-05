@@ -129,10 +129,15 @@ def add(request):
     students_not_added = []
     for column in csv.reader(io_string, delimiter=";", quotechar="|"):
         password = models.User.objects.make_random_password()  # à envoyer par mail
+        debut = column[3].split("@")[0]
+        if len(debut.split(".")[1].split("-"))>1:
+            username=debut.split(".")[0][0]+"."+debut.split(".")[1]
+        else:
+            username=debut
         user, created = models.User.objects.get_or_create(
             last_name=column[1],
             first_name=column[2],
-            username=column[3].split("@")[0],
+            username=username,
             email=column[3],
         )
         if created:
