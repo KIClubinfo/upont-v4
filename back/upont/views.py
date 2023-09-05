@@ -1,29 +1,13 @@
 import csv
 import io
-import mimetypes
-import os
-from urllib.parse import unquote
 
-from django.conf import settings
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import (
-    HttpResponse,
-    HttpResponseForbidden,
-    HttpResponseRedirect,
-    FileResponse,
-)
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from social.models import Promotion, Student
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-
-from upont.auth import EmailBackend
 
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
 
@@ -33,40 +17,6 @@ def root_redirect(request):
         return HttpResponseRedirect(reverse(LOGIN_REDIRECT_URL))
     else:
         return HttpResponseRedirect(reverse(LOGIN_URL))
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def get_media_path(request, path):
-    """
-    The get_media_path function is a helper function that takes in the request and
-    path of a file. It then checks if the file exists, and returns an error message if
-    it does not exist. If it does exist, it will return an HttpResponse with the
-    correct headers to serve up the media.
-
-    @param request: Get the user's authentication token
-    @param path: Determine the path of the file to be served
-    return: A FileResponse object that contains the file specified in the path parameter
-    """
-    if not os.path.exists(f"{settings.MEDIA_ROOT}/{path}"):
-        return Response(
-            {"status": "error", "message": "No such file exists."}, status=404
-        )
-    # retrieve user authentication token from cookies
-    # I'm using django-rest-framework token authentication
-
-    if request.user is not None:
-        # Guess the MIME type of a file. Like pdf/docx/xlsx/png/jpeg
-        mimetype, encoding = mimetypes.guess_type(path, strict=True)
-        if not mimetype:
-            mimetype = "text/html"
-        # By default, percent-encoded sequences are decoded with UTF-8, and invalid
-        # sequences are replaced by a placeholder character.
-        # Example: unquote('abc%20def') -> 'abc def'.
-        file_path = unquote(os.path.join(settings.MEDIA_ROOT, path)).encode("utf-8")
-        # FileResponse - A streaming HTTP response class optimized for files.
-        return FileResponse(open(file_path, "rb"), content_type=mimetype)
-    return Response("Access to this file is permitted.", status=404)
 
 
 def media(request, path):
@@ -163,17 +113,3 @@ def add(request):
         "students_not_added": students_not_added,
     }
     return render(request, "add_promo.html", context)
-
-
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def get_token(request):
-    if "email" not in request.data or "password" not in request.data:
-        return Response({"error": "Please provide both email and password"})
-    user = EmailBackend().authenticate(
-        request, username=request.data["email"], password=request.data["password"]
-    )
-    if user is None:
-        return Response({"error": "Invalid credentials"})
-    token, created = Token.objects.get_or_create(user=user)
-    return Response({"token": token.key})
