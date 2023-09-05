@@ -1,17 +1,15 @@
 {
-    "compilerOptions": {
-        "baseUrl": "./src",
-        "target": "ESNext",
-        "module": "esnext",
-        "jsx": "react-jsx",
-        "outDir": "/src/upont/static/react/",
-        "allowJs": true,
-        "moduleResolution": "node",
-        "allowSyntheticDefaultImports": true,
-        "isolatedModules": true,
-        "types": [
-            "node"
-        ],
-    },
-    "include": ["./src/**/*"]
-  }
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "target": "ESNext",
+    "module": "esnext",
+    "jsx": "react-jsx",
+    "outDir": "/src/upont/static/react/",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "types": ["node"]
+  },
+  "include": ["./src/**/*"]
+}

@@ -6,10 +6,10 @@ from .models import (
     ClubRequest,
     Membership,
     Nationality,
+    NotificationToken,
     Promotion,
     Role,
     Student,
-    NotificationToken,
 )
 
 

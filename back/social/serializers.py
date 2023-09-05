@@ -3,7 +3,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from rest_framework import serializers
 
-from .models import Club, Promotion, Role, Student, Membership
+from .models import Club, Membership, Promotion, Role, Student
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

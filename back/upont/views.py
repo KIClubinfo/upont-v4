@@ -9,20 +9,18 @@ from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import (
+    FileResponse,
     HttpResponse,
     HttpResponseForbidden,
     HttpResponseRedirect,
-    FileResponse,
 )
 from django.shortcuts import render
 from django.urls import reverse
-from social.models import Promotion, Student
-
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-
+from social.models import Promotion, Student
 from upont.auth import EmailBackend
 
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
@@ -130,10 +128,10 @@ def add(request):
     for column in csv.reader(io_string, delimiter=";", quotechar="|"):
         password = models.User.objects.make_random_password()  # à envoyer par mail
         debut = column[3].split("@")[0]
-        if len(debut.split(".")[1].split("-"))>1:
-            username=debut.split(".")[0][0]+"."+debut.split(".")[1]
+        if len(debut.split(".")[1].split("-")) > 1:
+            username = debut.split(".")[0][0] + "." + debut.split(".")[1]
         else:
-            username=debut
+            username = debut
         user, created = models.User.objects.get_or_create(
             last_name=column[1],
             first_name=column[2],

@@ -1,11 +1,6 @@
-from exponent_server_sdk import (
-    DeviceNotRegisteredError,
-    PushClient,
-    PushMessage,
-)
 import requests
-
-from social.models import Student, NotificationToken
+from exponent_server_sdk import DeviceNotRegisteredError, PushClient, PushMessage
+from social.models import NotificationToken, Student
 
 # Optionally providing an access token within a session if you have enabled push security
 session = requests.Session()

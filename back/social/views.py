@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, Role, Student, NotificationToken
-from .serializers import RoleSerializer, StudentSerializer, ClubSerializer
+from .models import Category, Club, Membership, NotificationToken, Role, Student
+from .serializers import ClubSerializer, RoleSerializer, StudentSerializer
 
 
 @login_required

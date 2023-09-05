@@ -29,25 +29,25 @@ from django.urls import include, path
 from django_reverse_js.views import urls_js
 from news.views import (
     EventViewSet,
-    PostViewSet,
-    ShotgunView,
-    ShotgunParticipateView,
-    PostReactionView,
     PostCommentView,
     PostCreateView,
+    PostReactionView,
+    PostViewSet,
+    ShotgunParticipateView,
+    ShotgunView,
 )
 from pochtron.views import PochtronId, SearchAlcohol
 from rest_framework import routers
 from social.views import (
+    ClubsViewSet,
     CurrentStudentView,
+    NotificationTokenView,
+    OneClubView,
+    OneStudentView,
     SearchRole,
     SearchStudent,
     StudentCanPublishAs,
     StudentViewSet,
-    NotificationTokenView,
-    ClubsViewSet,
-    OneStudentView,
-    OneClubView,
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
