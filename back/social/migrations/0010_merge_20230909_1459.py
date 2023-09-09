@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("social", "0008_notificationtoken"),
         ("social", "0009_add_birthdate_and_bio"),
