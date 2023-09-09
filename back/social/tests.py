@@ -41,7 +41,7 @@ class StudentModelTest(TestCase):
             gender=Student.Gender.A,
             origin=Student.Origin.CC,
             phone_number="+33666666666",
-            birthdate="01/01/2000",
+            birthdate="2000-01-01",
             biography="Je suis un test",
         )
         student.save()
