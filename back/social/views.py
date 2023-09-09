@@ -264,6 +264,8 @@ def profile_edit(request):
         form.fields["department"].initial = student.department
         form.fields["picture"].initial = student.picture
         form.fields["gender"].initial = student.gender
+        form.fields["birthdate"].initial = student.birthdate
+        form.fields["biography"].initial = student.biography
     context["EditProfile"] = form
     return render(request, "social/profile_edit.html", context)
 

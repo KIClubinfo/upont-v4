@@ -18,8 +18,9 @@ class EditProfile(forms.ModelForm):
             "department": forms.Select(attrs={"class": "profil-select"}),
             "picture": forms.FileInput(attrs={"class": "profil-input"}),
             "gender": forms.Select(attrs={"class": "profil-select"}),
-            "birthdate": forms.DateField(widget=forms.SelectDateWidget, input_formats = 'dd/mm/yyyy'),
-            "biography": forms.Textarea(attrs={"class": "profil-input"})
+            #"birthdate": forms.DateField(widget=forms.SelectDateWidget, input_formats = 'dd/mm/yyyy'),
+            "birthdate": forms.DateInput(format='%d/%m/%Y', attrs={'class': 'profil-input'}), 
+            "biography": forms.TextInput(attrs={"class": "profil-input"})
         }
 
     def __init__(self, *args, **kwargs):
