@@ -13,18 +13,15 @@ class Migration(migrations.Migration):
             model_name="student",
             name="birthdate",
             field=models.DateField(
-                        blank=True,
-                        max_length=12, 
-                        null=True, verbose_name="Date de naissance au format JJ/MM/AAAA"),
-                ),
+                blank=True,
+                max_length=12,
+                null=True,
+                verbose_name="Date de naissance au format JJ/MM/AAAA",
+            ),
+        ),
         migrations.AddField(
             model_name="student",
             name="biography",
-            field=models.TextField(
-                        blank=True,
-                        max_length=30,
-                        null=True),
-                ),
+            field=models.TextField(blank=True, max_length=30, null=True),
+        ),
     ]
-
-    
