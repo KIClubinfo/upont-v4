@@ -41,7 +41,7 @@ class StudentModelTest(TestCase):
             gender=Student.Gender.A,
             origin=Student.Origin.CC,
             phone_number="+33666666666",
-            birthdate="00/00/2000",
+            birthdate="01/01/2000",
             biography="Je suis un test",
         )
         student.save()
@@ -57,7 +57,7 @@ class StudentModelTest(TestCase):
             gender=Student.Gender.A,
             origin=Student.Origin.CC,
             phone_number="test",
-            birthdate="00/00/2000",
+            birthdate="01/01/2000",
             biography="Je suis un test",
         )
         self.assertRaises(ValidationError, student.full_clean)
