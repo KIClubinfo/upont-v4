@@ -1,4 +1,5 @@
 from django import forms
+#from django.forms import extras
 
 from .models import Club, ClubRequest, Membership, Role, Student
 
@@ -6,7 +7,7 @@ from .models import Club, ClubRequest, Membership, Role, Student
 class EditProfile(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ("phone_number", "department", "picture", "gender")
+        fields = ("phone_number", "department", "picture", "gender", "birthdate", "biography")
         widgets = {
             "phone_number": forms.TextInput(
                 attrs={
@@ -17,6 +18,9 @@ class EditProfile(forms.ModelForm):
             "department": forms.Select(attrs={"class": "profil-select"}),
             "picture": forms.FileInput(attrs={"class": "profil-input"}),
             "gender": forms.Select(attrs={"class": "profil-select"}),
+            #"birthdate": forms.DateField(widget=forms.SelectDateWidget, input_formats = 'dd/mm/yyyy'),
+            "birthdate": forms.DateInput(format='%d/%m/%Y', attrs={'class': 'profil-input'}), 
+            "biography": forms.TextInput(attrs={"class": "profil-input"})
         }
 
     def __init__(self, *args, **kwargs):
@@ -28,6 +32,11 @@ class EditProfile(forms.ModelForm):
             ("Autre", "Autre"),
         ]
         self.fields["phone_number"].placeholder = "False"
+        self.fields["birthdate"].required = False
+        #self.fields["birthdate"].placeholder = False
+        #self.fields["biography"].placeholder = False
+
+
 
 
 class EditClub(forms.ModelForm):

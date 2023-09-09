@@ -46,8 +46,17 @@
                         {% else %}
                             <div class="profil-information-box">{{student.user.first_name}} n'a pas renseigné son numéro</div>
                         {% endif %}
+                        {% if student.birthdate is not None %}
+                            <div class="profil-information-box">{{student.birthdate}}</div>
+                        {% else %}
+                            <div class="profil-information-box"> --- DD/MM/YYYY --- </div>
+                        {% endif %}
                         <div class="profil-information-box">{{student.department}}</div>
                         <div class="profil-information-box">{{student.origin}}</div>
+                        {% if student.biography != "" and student.biography is not None %}
+                            <div class="profil-information-box">{{student.biography}}</div>
+                        {% else %}
+                        {% endif %}
 
                     </div><!--End of Box-->
 
