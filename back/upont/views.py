@@ -175,3 +175,7 @@ def get_token(request):
         return Response({"error": "Invalid credentials"})
     token, created = Token.objects.get_or_create(user=user)
     return Response({"token": token.key})
+
+
+def privacy(request):
+    return render(request, "privacy.html")
