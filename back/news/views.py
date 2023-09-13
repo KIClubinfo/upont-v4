@@ -153,6 +153,10 @@ class PostReactionView(APIView):
             post.dislikes.add(student)
         elif request.data["reaction"] == "undislike":
             post.dislikes.remove(student)
+        elif request.data["reaction"] == "bookmark":
+            post.bookmark.add(student)
+        elif request.data["reaction"] == "unbookmark":
+            post.bookmark.remove(student)
         else:
             return Response({"status": "error", "message": "Invalid reaction"})
         post.save()
@@ -434,6 +438,10 @@ def post_like(request, post_id, action):
         post.likes.remove(student)
     elif action == "Undislike":
         post.dislikes.remove(student)
+    elif action == "Bookmark":
+        post.bookmark.add(student)
+    elif action == "Unbookmark":
+        post.bookmark.remove(student)
     else:
         return HttpResponse(status=500)
     return HttpResponse(status=200)
