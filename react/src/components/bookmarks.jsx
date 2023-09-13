@@ -422,14 +422,9 @@ class Posts extends React.Component {
     super(props);
     const { mode } = props;
     let url;
-    if (mode === 'social') {
-      // eslint-disable-next-line no-undef
-      url = `${Urls.postList()}?mode=social`;
-    } else if (mode === 'course') {
-      const { courseId } = props;
-      // eslint-disable-next-line no-undef
-      url = `${Urls.postList()}?mode=course&course_id=${courseId}`;
-    }
+    // eslint-disable-next-line no-undef
+    url = `${Urls.postList()}`;
+
     this.state = {
       mode,
       posts: [],

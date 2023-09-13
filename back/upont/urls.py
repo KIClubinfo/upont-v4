@@ -33,6 +33,7 @@ from news.views import (
     PostCreateView,
     PostReactionView,
     PostViewSet,
+    BookmarkViewSet,
     ShotgunParticipateView,
     ShotgunView,
 )
@@ -88,6 +89,7 @@ else:
 router = routers.DefaultRouter()
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet, basename="post")
+router.register(r"bookmarks", BookmarkViewSet, basename="bookmark")
 router.register(r"events", EventViewSet, basename="event")
 router.register(r"courses", CourseViewSet, basename="course")
 router.register(r"groups", GroupViewSet, basename="group")

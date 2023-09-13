@@ -78,6 +78,19 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+class BookmarkViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows bookmarks to be viewed.
+    """
+
+    serializer_class = PostSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        student = get_object_or_404(Student, user__id=self.request.user.id)
+        queryset = Post.objects.filter(bookmark=student).order_by("-date")
+        return queryset
+
 
 class ShotgunView(APIView):
     """
@@ -706,3 +719,13 @@ def publish_shotgun_results(request, shotgun_id):
 @login_required
 def markdown(request):
     return render(request, "news/markdown.html")
+
+@login_required
+def bookmarks(request):
+    student = get_object_or_404(Student, user__id=request.user.id)
+    bookmarks = Post.objects.filter(bookmark=student).order_by("-date")
+    print(bookmarks)
+    context = {
+        "bookmarks": bookmarks,
+    }
+    return render(request, "news/bookmarks.html", context)
