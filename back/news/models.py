@@ -61,7 +61,6 @@ class Post(models.Model):
         editable=False,
     )
 
-
     def __str__(self):
         return self.title
 

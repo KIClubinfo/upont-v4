@@ -420,11 +420,15 @@ class Post extends React.Component {
 class Posts extends React.Component {
   constructor(props) {
     super(props);
-    const { mode } = props;
+    const { mode, bookmark } = props;
     let url;
     if (mode === 'social') {
       // eslint-disable-next-line no-undef
-      url = `${Urls.postList()}?mode=social`;
+      if (bookmark == 'true') {
+        url = `${Urls.postList()}?mode=social&bookmark=true`;
+      } else {
+        url = `${Urls.postList()}?mode=social`;
+      }
     } else if (mode === 'course') {
       const { courseId } = props;
       // eslint-disable-next-line no-undef

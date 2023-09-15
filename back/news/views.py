@@ -56,10 +56,14 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Post.objects.all()
         mode = self.request.GET.get("mode")
+        bookmark = self.request.GET.get("bookmark")
+        student = get_object_or_404(Student, user__id=self.request.user.id)
         if mode is None:
             queryset = queryset.order_by("-date", "title")
         elif mode == "social":
             queryset = queryset.filter(course__isnull=True).order_by("-date", "title")
+            if bookmark:
+                queryset = queryset.filter(bookmark=student)
         elif mode == "course":
             queryset = queryset.filter(course__isnull=False)
 
@@ -77,6 +81,7 @@ class PostViewSet(viewsets.ModelViewSet):
             )
 
         return queryset
+
 
 class BookmarkViewSet(viewsets.ModelViewSet):
     """
@@ -720,12 +725,7 @@ def publish_shotgun_results(request, shotgun_id):
 def markdown(request):
     return render(request, "news/markdown.html")
 
+
 @login_required
 def bookmarks(request):
-    student = get_object_or_404(Student, user__id=request.user.id)
-    bookmarks = Post.objects.filter(bookmark=student).order_by("-date")
-    print(bookmarks)
-    context = {
-        "bookmarks": bookmarks,
-    }
-    return render(request, "news/bookmarks.html", context)
+    return render(request, "news/bookmarks.html")
