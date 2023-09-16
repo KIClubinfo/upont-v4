@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("social", "0011_alter_student_birthdate"),
         ("news", "0005_auto_20230117_2329"),
