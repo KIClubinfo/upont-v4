@@ -424,9 +424,11 @@ class Posts extends React.Component {
     let url;
     if (mode === 'social') {
       // eslint-disable-next-line no-undef
-      if (bookmark == 'true') {
+      if (bookmark === 'true') {
+        // eslint-disable-next-line no-undef
         url = `${Urls.postList()}?mode=social&bookmark=true`;
       } else {
+        // eslint-disable-next-line no-undef
         url = `${Urls.postList()}?mode=social`;
       }
     } else if (mode === 'course') {
