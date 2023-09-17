@@ -119,6 +119,8 @@ class Post extends React.Component {
     this.dislike = this.dislike.bind(this);
     this.post_like_button = this.post_like_button.bind(this);
     this.post_dislike_button = this.post_dislike_button.bind(this);
+    this.post_bookmark_button = this.post_bookmark_button.bind(this);
+    this.bookmark = this.bookmark.bind(this);
     this.show_more = this.show_more.bind(this);
     this.show_less = this.show_less.bind(this);
     this.show_comments_button = this.show_comments_button.bind(this);
@@ -223,6 +225,48 @@ class Post extends React.Component {
         <i className="fas fa-arrow-down" />
       </switch>
     );
+  }
+
+  post_bookmark_button() {
+    if (this.state.post.user_bookmarked) {
+      return (
+        <switch onClick={this.bookmark} className="">
+          <i className="fas fa-bookmark" style={{ color: '#3DC1F3' }} />
+        </switch>
+      );
+    }
+    return (
+      <switch onClick={this.bookmark} className="">
+        <i className="fas fa-bookmark" style={{ color: '#575555' }} />
+      </switch>
+    );
+  }
+
+  bookmark(event) {
+    event.preventDefault();
+    let url;
+    if (this.state.post.user_bookmarked) {
+      // eslint-disable-next-line no-undef
+      url = Urls['news:post_like'](this.state.post.id, 'Unbookmark');
+    } else {
+      // eslint-disable-next-line no-undef
+      url = Urls['news:post_like'](this.state.post.id, 'Bookmark');
+    }
+    const csrfmiddlewaretoken = getCookie('csrftoken');
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/html',
+        'X-CSRFToken': csrfmiddlewaretoken,
+      },
+    };
+    fetch(url, requestOptions)
+      .then(this.setState({}))
+      // eslint-disable-next-line no-console
+      .then(() => console.log('Bookmarked / Unbookmarked successfully'))
+      // eslint-disable-next-line no-console
+      .catch((error) => console.log('Submit error', error));
+    setTimeout(() => this.refresh(), 200);
   }
 
   show_more() {
@@ -346,6 +390,8 @@ class Post extends React.Component {
             <span>
               <i className="fas fa-comment" /> {this.state.post.total_comments}
             </span>
+            &ensp;
+            <span>{this.post_bookmark_button()}</span>
           </div>
           <div style={{ display: 'block' }}>
             {this.state.post.comments
@@ -374,11 +420,17 @@ class Post extends React.Component {
 class Posts extends React.Component {
   constructor(props) {
     super(props);
-    const { mode } = props;
+    const { mode, bookmark } = props;
     let url;
     if (mode === 'social') {
       // eslint-disable-next-line no-undef
-      url = `${Urls.postList()}?mode=social`;
+      if (bookmark === 'true') {
+        // eslint-disable-next-line no-undef
+        url = `${Urls.postList()}?mode=social&bookmark=true`;
+      } else {
+        // eslint-disable-next-line no-undef
+        url = `${Urls.postList()}?mode=social`;
+      }
     } else if (mode === 'course') {
       const { courseId } = props;
       // eslint-disable-next-line no-undef

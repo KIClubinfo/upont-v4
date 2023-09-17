@@ -51,6 +51,8 @@
                                 <div class="profil-information-box">{% if student.user.first_name %}{{student.user.first_name}}{% else %}---Prénom---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.phone_number %}{{student.phone_number}}{% else %}---Tel---{% endif %}</div>
                                 <div class="profil-information-box">{% if student.gender %}{{student.gender}}{% else %}------{% endif %}</div>
+                                <div class="profil-information-box">{% if student.birthdate %}{{student.birthdate}}{% else %}--mm-dd-yyyy--{% endif %}</div>
+                                <div class="profil-information-box">{% if student.biography %}{{student.biography}}{% else %}------{% endif %}</div>
                             </div><!--End of Column-->
 
                             <!--Column-->
