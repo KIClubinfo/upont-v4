@@ -180,6 +180,28 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
     resource = ResourceSerializer(many=True, read_only=True)
 
+    user_bookmarked = serializers.SerializerMethodField()
+
+    def get_user_bookmarked(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        student = get_object_or_404(Student, user__id=user.id)
+        if student and student in obj.bookmark.all():
+            return True
+        return False
+
+    bookmark_url = serializers.SerializerMethodField()
+
+    def get_bookmark_url(self, obj):
+        return reverse("news:post_like", args=(obj.pk, "Bookmark"))
+
+    unbookmark_url = serializers.SerializerMethodField()
+
+    def get_unbookmark_url(self, obj):
+        return reverse("news:post_like", args=(obj.pk, "Unbookmark"))
+
     class Meta:
         model = Post
         fields = [
@@ -207,6 +229,9 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "can_edit",
             "user_author_url",
             "resource",
+            "bookmark_url",
+            "unbookmark_url",
+            "user_bookmarked",
         ]
 
 

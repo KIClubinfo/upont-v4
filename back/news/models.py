@@ -54,6 +54,13 @@ class Post(models.Model):
         editable=False,
     )
 
+    bookmark = models.ManyToManyField(
+        Student,
+        related_name="posts_bookmark",
+        blank=True,
+        editable=False,
+    )
+
     def __str__(self):
         return self.title
 
