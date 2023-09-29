@@ -81,6 +81,7 @@ urlpatterns = [
     path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
     path("page_not_created/", views.page_not_created, name="page_not_created"),
     path("privacy", views.privacy, name="privacy"),
+    path("contact", views.contact, name="contact"),
 ]
 
 if settings.DEBUG:  # in debug anyone can access any image
