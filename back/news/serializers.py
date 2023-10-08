@@ -3,14 +3,14 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework import serializers
 from social.models import Student
-from social.serializers import ClubSerializer, StudentSerializer
+from social.serializers import ClubSerializerLite, StudentSerializer
 
 from .models import Comment, Event, Post, Shotgun
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
     author = StudentSerializer()
-    club = ClubSerializer()
+    club = ClubSerializerLite()
 
     is_my_comment = serializers.SerializerMethodField()
 
@@ -56,7 +56,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     author = StudentSerializer()
-    club = ClubSerializer()
+    club = ClubSerializerLite()
     illustration_url = serializers.SerializerMethodField()
 
     def get_illustration_url(self, obj):
@@ -236,7 +236,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
-    club = ClubSerializer()
+    club = ClubSerializerLite()
 
     user_state = serializers.SerializerMethodField()
 
@@ -280,7 +280,7 @@ class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
-    club = ClubSerializer()
+    club = ClubSerializerLite()
     shotgun = ShotgunSerializer()
 
     class Meta:
