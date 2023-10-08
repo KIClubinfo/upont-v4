@@ -98,3 +98,36 @@ class ClubSerializer(
             "background_picture_url",
             "members",
         ]
+
+
+class ClubSerializerLite(
+    serializers.HyperlinkedModelSerializer
+):  # Not all fields yet as it is only used for posts
+    logo_url = serializers.SerializerMethodField()
+
+    def get_logo_url(self, obj):
+        if obj.logo:
+            return obj.logo.url
+        else:
+            return static("assets/img/logo_default.png")
+
+    background_picture_url = serializers.SerializerMethodField()
+
+    def get_background_picture_url(self, obj):
+        if obj.background_picture:
+            return obj.background_picture.url
+        else:
+            return False
+
+    def get_id(self, obj):
+        return obj.pk
+
+    class Meta:
+        model = Club
+        fields = [
+            "id",
+            "name",
+            "nickname",
+            "logo_url",
+            "background_picture_url",
+        ]
