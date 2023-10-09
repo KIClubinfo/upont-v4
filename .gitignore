@@ -8,3 +8,4 @@ backups/
 back/fixtures
 database/
 dump.rdb
+*.DS_Store

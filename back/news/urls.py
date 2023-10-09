@@ -71,4 +71,5 @@ urlpatterns = [
         views.markdown,
         name="markdown",
     ),
+    path("bookmarks/", views.bookmarks, name="bookmarks"),
 ]

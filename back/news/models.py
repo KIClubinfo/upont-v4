@@ -54,6 +54,13 @@ class Post(models.Model):
         editable=False,
     )
 
+    bookmark = models.ManyToManyField(
+        Student,
+        related_name="posts_bookmark",
+        blank=True,
+        editable=False,
+    )
+
     def __str__(self):
         return self.title
 
@@ -135,7 +142,7 @@ class Shotgun(models.Model):
             return True
         return False
 
-    def got_accepted(self, student: Student):
+    def got_accepted(self, student: Student):  # Complexité dégueulasse
         for participation in self.accepted_participations():
             if participation.participant == student:
                 return True
