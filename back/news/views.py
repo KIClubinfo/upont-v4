@@ -56,10 +56,14 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Post.objects.all()
         mode = self.request.GET.get("mode")
+        bookmark = self.request.GET.get("bookmark")
+        student = get_object_or_404(Student, user__id=self.request.user.id)
         if mode is None:
             queryset = queryset.order_by("-date", "title")
         elif mode == "social":
             queryset = queryset.filter(course__isnull=True).order_by("-date", "title")
+            if bookmark:
+                queryset = queryset.filter(bookmark=student)
         elif mode == "course":
             queryset = queryset.filter(course__isnull=False)
 
@@ -76,6 +80,20 @@ class PostViewSet(viewsets.ModelViewSet):
                 detail="mode argument must be eiter 'social' or 'course'"
             )
 
+        return queryset
+
+
+class BookmarkViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows bookmarks to be viewed.
+    """
+
+    serializer_class = PostSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        student = get_object_or_404(Student, user__id=self.request.user.id)
+        queryset = Post.objects.filter(bookmark=student).order_by("-date")
         return queryset
 
 
@@ -131,6 +149,10 @@ class ShotgunParticipateView(APIView):
                 participant=student,
             )
             participation.save()
+            if shotgun.got_accepted(student):
+                return Response({"status": "ok"})
+            else:
+                return Response({"status": "not_accepted"})
         return Response({"status": "ok"})
 
 
@@ -153,6 +175,10 @@ class PostReactionView(APIView):
             post.dislikes.add(student)
         elif request.data["reaction"] == "undislike":
             post.dislikes.remove(student)
+        elif request.data["reaction"] == "bookmark":
+            post.bookmark.add(student)
+        elif request.data["reaction"] == "unbookmark":
+            post.bookmark.remove(student)
         else:
             return Response({"status": "error", "message": "Invalid reaction"})
         post.save()
@@ -434,6 +460,10 @@ def post_like(request, post_id, action):
         post.likes.remove(student)
     elif action == "Undislike":
         post.dislikes.remove(student)
+    elif action == "Bookmark":
+        post.bookmark.add(student)
+    elif action == "Unbookmark":
+        post.bookmark.remove(student)
     else:
         return HttpResponse(status=500)
     return HttpResponse(status=200)
@@ -698,3 +728,8 @@ def publish_shotgun_results(request, shotgun_id):
 @login_required
 def markdown(request):
     return render(request, "news/markdown.html")
+
+
+@login_required
+def bookmarks(request):
+    return render(request, "news/bookmarks.html")
