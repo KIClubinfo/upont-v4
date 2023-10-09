@@ -36,7 +36,12 @@ from news.views import (
     ShotgunParticipateView,
     ShotgunView,
 )
-from pochtron.views import PochtronId, SearchAlcohol
+from pochtron.views import (
+    PochtronBalance,
+    PochtronId,
+    PochtronTransactions,
+    SearchAlcohol,
+)
 from rest_framework import routers
 from social.views import (
     ClubsViewSet,
@@ -76,6 +81,7 @@ urlpatterns = [
     path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
     path("page_not_created/", views.page_not_created, name="page_not_created"),
     path("privacy", views.privacy, name="privacy"),
+    path("contact", views.contact, name="contact"),
 ]
 
 if settings.DEBUG:  # in debug anyone can access any image
@@ -133,4 +139,10 @@ urlpatterns += [
     path("api/student/", OneStudentView.as_view(), name="student"),
     path("api/club/", OneClubView.as_view(), name="club"),
     path("api/media/<path:path>", views.get_media_path, name="get_media_path"),
+    path("api/pochtron/balance", PochtronBalance.as_view(), name="pochtron_balance"),
+    path(
+        "api/pochtron/transactions",
+        PochtronTransactions.as_view(),
+        name="pochtron_transactions",
+    ),
 ]

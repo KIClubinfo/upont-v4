@@ -315,3 +315,36 @@ class PochtronId(APIView):
     def get(self, request):
         club = get_object_or_404(Club, name="Foyer")
         return Response({"id": club.id})
+
+
+class PochtronBalance(APIView):
+    """
+    API endpoint that returns the balance of the current student
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Student, user__pk=request.user.id)
+        club = get_object_or_404(Club, name="Foyer")
+        return Response({"balance": student.balance_in_euros(club)})
+
+
+class PochtronTransactions(APIView):
+    """
+    API endpoint that returns the transactions of the current student
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Student, user__pk=request.user.id)
+        club = get_object_or_404(Club, name="Foyer")
+        transactions = [
+            {
+                "product": t.good.name,
+                "quantity": t.quantity,
+                "price": -t.quantity * t.good.price_at_date(t.date) / 100,
+                "date": t.date,
+            }
+            for t in Transaction.objects.filter(student=student)
+            .filter(good__club=club)
+            .order_by("-date")
+        ]
+        return Response({"transactions": transactions})
