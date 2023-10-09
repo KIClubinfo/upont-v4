@@ -2,7 +2,7 @@ version: "3.6"
 
 services:
   db:
-    image: postgres
+    image: postgres:13.12-bookworm
     volumes:
       - ./database:/var/lib/postgresql/data
       - ./backups:/backups
@@ -19,7 +19,7 @@ services:
     volumes:
       - ./back:/src
       - ./media:/media
-      - bundles:/src/upont/static/react:rw
+      - bundles:/src/upont/static/react
       - ./backups:/backups
     ports:
       - "$BACK_PORT:8000"
@@ -50,7 +50,7 @@ services:
       target: development
     volumes:
       - ./react/:/app/:rw
-      - bundles:/src/upont/static/react:rw
+      - bundles:/src/upont/static/react
 volumes:
   bundles:
     driver: local
