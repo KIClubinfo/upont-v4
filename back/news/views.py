@@ -149,6 +149,10 @@ class ShotgunParticipateView(APIView):
                 participant=student,
             )
             participation.save()
+            if shotgun.got_accepted(student):
+                return Response({"status": "ok"})
+            else:
+                return Response({"status": "not_accepted"})
         return Response({"status": "ok"})
 
 
