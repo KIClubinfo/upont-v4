@@ -2,7 +2,7 @@ version: "3.6"
 
 services:
   db:
-    image: postgres:13.12-bookworm
+    image: postgres
     volumes:
       - ./database:/var/lib/postgresql/data
       - ./backups:/backups
