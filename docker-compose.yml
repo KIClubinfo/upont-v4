@@ -49,7 +49,7 @@ services:
       dockerfile: ./webinstaller/Dockerfile
       target: development
     volumes:
-      - ./react/:/app/:rw
+      - ./react/:/app/
       - bundles:/src/upont/static/react
 volumes:
   bundles:
