@@ -40,7 +40,7 @@
             </div>
 
             <!--News Card-->
-            <div id="colocs">
+            <div id="apartments">
                 <!--  Posts are rendered with React  -->
             </div>
             <!--End of News Card-->
@@ -52,9 +52,9 @@
     <!--Scripts-->
     <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
     <script>
-        window.react_mount = document.getElementById('posts');
+        window.react_mount = document.getElementById('apartments');
     </script>
-    <script src="{% static 'react/posts.bundle.js' %}"></script>
+    <script src="{% static 'react/apartment.bundle.js' %}"></script>
     <!--End of Scripts-->
 
 </body><!--End of Body-->

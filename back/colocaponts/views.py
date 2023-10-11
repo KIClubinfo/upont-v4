@@ -36,8 +36,8 @@ def add_coloc(request):
                 post.save()
                 return HttpResponseRedirect(request.session["origin"])
     else:
-        form = EditColoc(request.user.id)
-    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
+        form = EditColoc(request.user.id,)
+    request.session["origin"] = request.META.get("HTTP_REFERER", "colocaponts")
     context["EditPost"] = form
     context["Edit"] = False
     return render(request, "colocaponts/coloc_edit.html", context)
