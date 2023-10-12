@@ -4,11 +4,9 @@ FROM python:3.11.6-bookworm as build-base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    \
     # Pip
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    \
     # Poetry
     POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
@@ -25,8 +23,7 @@ COPY pyproject.toml poetry.lock ./
 
 # Pipefail to ensure build files if something goes wrong
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN poetry lock \
-    && poetry install --no-dev --no-root --no-cache
+RUN poetry install --no-dev --no-root --no-cache
 
 # ====================== RUNTIME ENVIRONMENT ======================
 FROM python:3.11.6-slim-bookworm as runtime-base
