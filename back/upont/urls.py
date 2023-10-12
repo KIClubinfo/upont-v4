@@ -49,6 +49,7 @@ from social.views import (
     NotificationTokenView,
     OneClubView,
     OneStudentView,
+    SearchClub,
     SearchRole,
     SearchStudent,
     StudentCanPublishAs,
@@ -115,6 +116,7 @@ urlpatterns += [
     path("api/forms/transactions/credit/", credit_account, name="credit_account"),
     path("api/search/roles/", SearchRole.as_view(), name="search_roles"),
     path("api/search/students/", SearchStudent.as_view(), name="search_students"),
+    path("api/search/clubs/", SearchClub.as_view(), name="search_clubs"),
     path("api/search/alcohols/", SearchAlcohol.as_view(), name="search_alcohols"),
     path("api/id/pochtron/", PochtronId.as_view(), name="pochtron_id"),
     path(
