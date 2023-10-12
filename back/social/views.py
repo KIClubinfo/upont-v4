@@ -156,6 +156,21 @@ class OneClubView(APIView):
         return []
 
 
+class SearchClub(APIView):
+    """
+    API endpoint that returns the club whose name contains the query.
+    """
+
+    def get(self, request):
+        if "club" in request.GET and request.GET["club"].strip():
+            clubs, searched_expression = search_club(request)
+            clubs = clubs[:25]
+        else:
+            clubs = Club.objects.all().order_by("name", "nickname")[:25]
+        serializer = ClubSerializer(clubs, many=True)
+        return Response({"clubs": serializer.data})
+
+
 @login_required
 def profile(request, user_id=None):
     if user_id is None:
