@@ -10,7 +10,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, NotificationToken, Role, Student
+from .models import (
+    Category,
+    Club,
+    Membership,
+    NotificationToken,
+    Role,
+    Student,
+    Subscription,
+)
 from .serializers import ClubSerializer, RoleSerializer, StudentSerializer
 
 
@@ -169,6 +177,34 @@ class SearchClub(APIView):
             clubs = Club.objects.all().order_by("name", "nickname")[:25]
         serializer = ClubSerializer(clubs, many=True)
         return Response({"clubs": serializer.data})
+
+
+class ClubSubscription(APIView):
+    """
+    API end that allows a student to subscribe to a club.
+    """
+
+    def post(self, request):
+        club = get_object_or_404(Club, id=request.data["club_id"])
+        student = get_object_or_404(Student, user__id=request.user.id)
+        if not Subscription.objects.filter(club=club, student=student).exists():
+            Subscription.objects.create(club=club, student=student, notification=True)
+            return Response({"status": "subscribed"})
+        return Response({"status": "exists"})
+
+
+class ClubUnsubscription(APIView):
+    """
+    API end that allows a student to unsubscribe from a club.
+    """
+
+    def post(self, request):
+        club = get_object_or_404(Club, id=request.data["club_id"])
+        student = get_object_or_404(Student, user__id=request.user.id)
+        if Subscription.objects.filter(club=club, student=student).exists():
+            Subscription.objects.filter(club=club, student=student).delete()
+            return Response({"status": "unsubscribed"})
+        return Response({"status": "does not exist"})
 
 
 @login_required

@@ -10,6 +10,7 @@ from .models import (
     Promotion,
     Role,
     Student,
+    Subscription,
 )
 
 
@@ -35,6 +36,10 @@ class NotificationTokenAdmin(admin.ModelAdmin):
     list_display = ("student", "token")
 
 
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ("student", "club")
+
+
 admin.site.register(Promotion)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Nationality)
@@ -44,3 +49,4 @@ admin.site.register(Category)
 admin.site.register(Club, ClubAdmin)
 admin.site.register(ClubRequest, ClubRequestAdmin)
 admin.site.register(NotificationToken, NotificationTokenAdmin)
+admin.site.register(Subscription, SubscriptionAdmin)

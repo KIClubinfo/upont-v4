@@ -44,7 +44,9 @@ from pochtron.views import (
 )
 from rest_framework import routers
 from social.views import (
+    ClubSubscription,
     ClubsViewSet,
+    ClubUnsubscription,
     CurrentStudentView,
     NotificationTokenView,
     OneClubView,
@@ -140,6 +142,10 @@ urlpatterns += [
     path("api/create_post/", PostCreateView.as_view(), name="post_creation"),
     path("api/student/", OneStudentView.as_view(), name="student"),
     path("api/club/", OneClubView.as_view(), name="club"),
+    path("api/club/subscribe/", ClubSubscription.as_view(), name="club_subscribe"),
+    path(
+        "api/club/unsubscribe/", ClubUnsubscription.as_view(), name="club_unsubscribe"
+    ),
     path("api/media/<path:path>", views.get_media_path, name="get_media_path"),
     path("api/pochtron/balance", PochtronBalance.as_view(), name="pochtron_balance"),
     path(

@@ -35,6 +35,12 @@ class Role(models.Model):
         return self.name
 
 
+class Subscription(models.Model):
+    student = models.ForeignKey("Student", on_delete=models.CASCADE)
+    club = models.ForeignKey("Club", on_delete=models.CASCADE)
+    notification = models.BooleanField(default=False)
+
+
 class Student(models.Model):
     user = models.OneToOneField(models2.User(), on_delete=models.PROTECT)
     promo = models.ForeignKey("Promotion", on_delete=models.SET_NULL, null=True)
@@ -84,6 +90,7 @@ class Student(models.Model):
     nationality = models.ForeignKey(
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
     )
+    subscriptions = models.ManyToManyField("Club", through="Subscription")
 
     def save(self, *args, **kwargs):
         if self.picture:
