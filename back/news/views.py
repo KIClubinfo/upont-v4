@@ -262,13 +262,13 @@ class EventViewSet(viewsets.ModelViewSet):
                     detail="is_enrolled must be either 'true' or 'false'"
                 )
 
-        return queryset.order_by("-date", "name")
+        return queryset.order_by("date", "name").filter(end__gte=timezone.now())
 
 
 @login_required
 def events(request):
     student = get_object_or_404(Student, user__id=request.user.id)
-    all_events_list = Event.objects.order_by("-date")
+    all_events_list = Event.objects.filter(end__gte=timezone.now()).order_by("date")
     is_member = Membership.objects.filter(student=student).exists()
     context = {"all_events_list": all_events_list, "is_member": is_member}
     return render(request, "news/events.html", context)
