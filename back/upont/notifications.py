@@ -18,7 +18,7 @@ session.headers.update(
 
 def send_push_message_to_all_students(title, message, extra=None):
     students = Student.objects.all()
-    send_push_message_to_group(students, title, message, extra)
+    send_push_message_to_group.delay(students, title, message, extra)
 
 
 def send_push_message_to_student(student, title, message, extra=None):
