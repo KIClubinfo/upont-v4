@@ -1,4 +1,7 @@
+import time
+
 import requests
+from celery import shared_task
 from exponent_server_sdk import DeviceNotRegisteredError, PushClient, PushMessage
 from social.models import NotificationToken, Student
 
@@ -15,14 +18,23 @@ session.headers.update(
 
 def send_push_message_to_all_students(title, message, extra=None):
     students = Student.objects.all()
-    for student in students:
-        send_push_message_to_student(student, title, message, extra)
+    send_push_message_to_group.delay(students, title, message, extra)
 
 
 def send_push_message_to_student(student, title, message, extra=None):
     tokens = NotificationToken.objects.filter(student=student)
     for token in tokens:
         send_push_message(token.token, title, message, extra)
+
+
+@shared_task
+def send_push_message_to_group(students, title, message, extra=None):
+    for i in range(len(students)):
+        if i > 0 and i % 90 == 0:
+            time.sleep(2)
+        tokens = NotificationToken.objects.filter(student=students[i])
+        for token in tokens:
+            send_push_message(token.token, title, message, extra)
 
 
 # Basic arguments. You should extend this function with the push features you
