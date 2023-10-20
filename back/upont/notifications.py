@@ -18,7 +18,9 @@ session.headers.update(
 
 def send_push_message_to_all_students(title, message, extra=None):
     students = Student.objects.all()
-    send_push_message_to_group.delay(students, title, message, extra)
+    send_push_message_to_group.delay(
+        [student.user.username for student in students], title, message, extra
+    )
 
 
 def send_push_message_to_student(student, title, message, extra=None):
@@ -29,6 +31,7 @@ def send_push_message_to_student(student, title, message, extra=None):
 
 @shared_task
 def send_push_message_to_group(students, title, message, extra=None):
+    students = Student.objects.filter(user__username__in=students)
     for i in range(len(students)):
         if i > 0 and i % 90 == 0:
             time.sleep(2)
