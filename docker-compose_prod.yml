@@ -3,83 +3,107 @@ version: "3.6"
 services:
   db:
     image: postgres:13.12-bookworm
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    restart: always
     volumes:
       - ./database:/var/lib/postgresql/data
       - ./backups:/backups
-    restart: always
-    environment:
-      POSTGRES_DB: $DB_NAME
-      POSTGRES_USER: $DB_USER
-      POSTGRES_PASSWORD: $DB_PASSWORD
     networks:
       - db_link
+    healthcheck:
+        test: pg_isready -U ${DB_USER}
+        interval: 5s
+        timeout: 3s
+        retries: 5
+
+  redis:
+    image: redis:7.2.2-bookworm
+    command: redis-server --save 60 1 --loglevel notice --requirepass ${REDIS_PASSWORD}
+    restart: always
+    volumes:
+      - cache:/data
+    networks:
+      - cache_link
+    healthcheck:
+        test: echo 'auth ${REDIS_PASSWORD}\nping' | redis-cli | grep PONG
+        interval: 5s
+        timeout: 3s
+        retries: 5
+
   back:
     build:
       context: back
       dockerfile: Dockerfile
       target: production
     command: gunicorn upont.wsgi:application --bind 0.0.0.0:8000
-    depends_on:
-      - db
-      - webinstaller
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG}
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      GUNICORN_NB_WORKERS: ${GUNICORN_NB_WORKERS}
+      SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT}
+      REMOTE_STATIC_STORAGE: ${REMOTE_STATIC_STORAGE}
+      FTP_STORAGE_LOCATION: ${FTP_STORAGE_LOCATION}
+      REMOTE_STATIC_URL: ${REMOTE_STATIC_URL}
+    restart: always
     volumes:
       - static_volume:/src/static
       - media_volume:/src/media
       - bundles:/src/upont/static/react
       - ./backups:/backups
-    restart: always
-    environment:
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_NAME: $DB_NAME
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      SENDGRID_API_KEY: $SENDGRID_API_KEY
-      ADMIN_EMAIL: $ADMIN_EMAIL
-      DEFAULT_FROM_EMAIL: $DEFAULT_FROM_EMAIL
-      SECRET_KEY: $SECRET_KEY
-      DEBUG: $DEBUG
-      DOMAIN_NAME: $DOMAIN_NAME
-      GUNICORN_NB_WORKERS: $GUNICORN_NB_WORKERS
-      SECURE_SSL_REDIRECT: $SECURE_SSL_REDIRECT
-      REMOTE_STATIC_STORAGE: $REMOTE_STATIC_STORAGE
-      FTP_STORAGE_LOCATION: $FTP_STORAGE_LOCATION
-      REMOTE_STATIC_URL: $REMOTE_STATIC_URL
     networks:
-      - ping
       - db_link
+      - cache_link
       - nginx_link
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      webinstaller:
+        condition: service_completed_successfully
+
   nginx:
     build: ./nginx
     ports:
       - $BACK_PORT:80
-    depends_on:
-      - back
+    restart: always
     volumes:
       - static_volume:/src/static
       - media_volume:/src/media
-    restart: always
     networks:
       - nginx_link
+    depends_on:
+      - back
+
   webinstaller:
     build:
-      context: ./
+      context: .
       dockerfile: ./webinstaller/Dockerfile
       target: production
     volumes:
       - bundles:/src/upont/static/react
-    networks:
-      - ping
+
 volumes:
   static_volume:
   media_volume:
-  database:
+  cache:
   bundles:
-    driver: local
+
 networks:
-  ping:
-    driver: bridge
+  cache_link:
   db_link:
-    driver: bridge
   nginx_link:
-    driver: bridge
