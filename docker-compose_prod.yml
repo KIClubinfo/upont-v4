@@ -65,6 +65,7 @@ services:
       - bundles:/src/upont/static/react
       - ./backups:/backups
     networks:
+      - ping
       - db_link
       - cache_link
       - nginx_link
@@ -74,7 +75,7 @@ services:
       redis:
         condition: service_healthy
       webinstaller:
-        condition: service_completed_successfully
+        condition: service_started
 
   nginx:
     build: ./nginx
@@ -96,6 +97,8 @@ services:
       target: production
     volumes:
       - bundles:/src/upont/static/react
+    networks:
+      - ping
 
 volumes:
   static_volume:
@@ -104,6 +107,7 @@ volumes:
   bundles:
 
 networks:
-  cache_link:
+  ping:
   db_link:
+  cache_link:
   nginx_link:
