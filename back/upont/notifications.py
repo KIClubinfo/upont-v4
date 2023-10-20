@@ -17,10 +17,13 @@ session.headers.update(
 
 
 def send_push_message_to_all_students(title, message, extra=None):
+    pass
+    """
     students = Student.objects.all()
     send_push_message_to_group.delay(
         [student.user.username for student in students], title, message, extra
     )
+    """
 
 
 def send_push_message_to_student(student, title, message, extra=None):
