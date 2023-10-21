@@ -132,7 +132,7 @@ export default class Comment extends React.Component {
   moderate(event) {
     event.preventDefault();
     // eslint-disable-next-line no-undef
-    const url = Urls['api_news_comment_delete']();
+    const url = Urls.api_news_comment_delete();
     // eslint-disable-next-line no-undef
     const csrfmiddlewaretoken = getCookie('csrftoken');
     const requestOptions = {
@@ -160,9 +160,11 @@ export default class Comment extends React.Component {
           <i className="fas fa-times-circle" />
         </a>
       );
-    } else if (this.state.comment.can_moderate) {
+    }
+    if (this.state.comment.can_moderate) {
       return (
-        <a onClick={this.moderate}>
+        // eslint-disable-next-line
+        <a href="javascript:void(0)" onClick={this.moderate}>
           <i className="fas fa-times-circle" />
         </a>
       );

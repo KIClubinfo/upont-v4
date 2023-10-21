@@ -283,7 +283,7 @@ class Post extends React.Component {
   delete_post(event) {
     event.preventDefault();
     // eslint-disable-next-line no-undef
-    let url = Urls['api_news_post_delete']();
+    const url = Urls.api_news_post_delete();
     const csrfmiddlewaretoken = getCookie('csrftoken');
     const requestOptions = {
       method: 'POST',
@@ -339,10 +339,11 @@ class Post extends React.Component {
           </a>
         </div>
       );
-    } else if (this.state.post.can_moderate) {
+    }
+    if (this.state.post.can_moderate) {
       return (
         <div className="news-card-header-edit-button">
-          <a onClick={this.delete_post}>
+          <a href="javascript:void(0)" onClick={this.delete_post}>
             <i className="fa fa-gavel" />
           </a>
         </div>
