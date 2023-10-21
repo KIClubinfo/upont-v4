@@ -84,6 +84,7 @@ class Student(models.Model):
     nationality = models.ForeignKey(
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
     )
+    is_moderator = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.picture:

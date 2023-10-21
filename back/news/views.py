@@ -225,6 +225,44 @@ class PostCreateView(APIView):
         return Response({"status": "ok"})
 
 
+class PostDeleteView(APIView):
+    """
+    API endpoint that allows students or moderators to delete posts
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = get_object_or_404(Post, id=request.data["post"])
+        if (
+            post.author == student
+            or (post.club is not None and post.club.is_admin(student.id))
+            or student.is_moderator
+        ):
+            post.delete()
+            return Response({"status": "ok"})
+        else:
+            return Response({"status": "error", "message": "not_allowed"})
+
+
+class DeleteCommentView(APIView):
+    """
+    API endpoint that allows students or moderators to delete comments
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        comment = get_object_or_404(Comment, id=request.data["comment"])
+        if (
+            comment.author == student
+            or (comment.club is not None and comment.club.is_admin(student.id))
+            or student.is_moderator
+        ):
+            comment.delete()
+            return Response({"status": "ok"})
+        else:
+            return Response({"status": "error", "message": "not_allowed"})
+
+
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed
