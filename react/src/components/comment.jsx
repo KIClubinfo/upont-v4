@@ -102,6 +102,7 @@ export default class Comment extends React.Component {
       comment: props.comment,
     };
     this.delete = this.delete.bind(this);
+    this.moderate = this.moderate.bind(this);
     // this.comment_delete_button = this.commentDeleteButton.bind(this);
   }
 
@@ -128,11 +129,42 @@ export default class Comment extends React.Component {
     setTimeout(() => this.props.refreshPost(), 200);
   }
 
+  moderate(event) {
+    event.preventDefault();
+    // eslint-disable-next-line no-undef
+    const url = Urls.api_news_comment_delete();
+    // eslint-disable-next-line no-undef
+    const csrfmiddlewaretoken = getCookie('csrftoken');
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfmiddlewaretoken,
+      },
+      body: JSON.stringify({ comment: this.state.comment.id }),
+    };
+    fetch(url, requestOptions)
+      .then(this.setState({}))
+      // eslint-disable-next-line no-console
+      .then(() => console.log('Deleted successfully'))
+      // eslint-disable-next-line no-console
+      .catch((error) => console.log('Submit error', error));
+    setTimeout(() => this.props.refreshPost(), 200);
+  }
+
   commentDeleteButton() {
     if (this.state.comment.is_my_comment) {
       return (
         // eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <a onClick={this.delete}>
+          <i className="fas fa-times-circle" />
+        </a>
+      );
+    }
+    if (this.state.comment.can_moderate) {
+      return (
+        // eslint-disable-next-line
+        <a href="javascript:void(0)" onClick={this.moderate}>
           <i className="fas fa-times-circle" />
         </a>
       );

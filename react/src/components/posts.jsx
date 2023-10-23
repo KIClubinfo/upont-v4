@@ -125,6 +125,7 @@ class Post extends React.Component {
     this.show_less = this.show_less.bind(this);
     this.show_comments_button = this.show_comments_button.bind(this);
     this.edit_button = this.edit_button.bind(this);
+    this.delete_post = this.delete_post.bind(this);
   }
 
   refresh() {
@@ -279,6 +280,28 @@ class Post extends React.Component {
     this.setState({ numberOfCommentsShown: 1 });
   }
 
+  delete_post(event) {
+    event.preventDefault();
+    // eslint-disable-next-line no-undef
+    const url = Urls.api_news_post_delete();
+    const csrfmiddlewaretoken = getCookie('csrftoken');
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfmiddlewaretoken,
+      },
+      body: JSON.stringify({ post: this.state.post.id }),
+    };
+    fetch(url, requestOptions)
+      .then(this.setState({}))
+      // eslint-disable-next-line no-console
+      .then(() => console.log('Successfully deleted post'))
+      // eslint-disable-next-line no-console
+      .catch((error) => console.log('Submit error', error));
+    window.location.reload();
+  }
+
   show_comments_button() {
     if (this.state.post.comments.length <= 1) {
       return <div />;
@@ -313,6 +336,15 @@ class Post extends React.Component {
         <div className="news-card-header-edit-button">
           <a href={this.state.post.edit_url}>
             <i className="fas fa-edit" />
+          </a>
+        </div>
+      );
+    }
+    if (this.state.post.can_moderate) {
+      return (
+        <div className="news-card-header-edit-button">
+          <a href="javascript:void(0)" onClick={this.delete_post}>
+            <i className="fa fa-gavel" />
           </a>
         </div>
       );
