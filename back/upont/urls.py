@@ -55,6 +55,7 @@ from social.views import (
     SearchRole,
     SearchStudent,
     StudentCanPublishAs,
+    StudentMembershipView,
     StudentViewSet,
 )
 from the_calendar.views import CalendarData
@@ -149,6 +150,7 @@ urlpatterns += [
     path("api/comment_post/", PostCommentView.as_view(), name="post_comment"),
     path("api/create_post/", PostCreateView.as_view(), name="post_creation"),
     path("api/student/", OneStudentView.as_view(), name="student"),
+    path("api/membership/", StudentMembershipView.as_view(), name="membership"),
     path("api/club/", OneClubView.as_view(), name="club"),
     path("api/media/<path:path>", views.get_media_path, name="get_media_path"),
     path("api/pochtron/balance", PochtronBalance.as_view(), name="pochtron_balance"),

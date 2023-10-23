@@ -11,7 +11,12 @@ from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
 from .models import Category, Club, Membership, NotificationToken, Role, Student
-from .serializers import ClubSerializer, RoleSerializer, StudentSerializer
+from .serializers import (
+    ClubSerializer,
+    ClubSerializerLite,
+    RoleSerializer,
+    StudentSerializer,
+)
 
 
 @login_required
@@ -84,6 +89,28 @@ class StudentCanPublishAs(APIView):
         return []
 
 
+class StudentMembershipView(APIView):
+    """
+    API endpoint that returns the clubs that student can publish as.
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Student, user__id=request.GET["id"])
+        data = []
+        for membership in Membership.objects.filter(student__user__pk=student.id):
+            club = Club.objects.get(id=membership.club.id)
+            serializer = ClubSerializerLite(club)
+            club_data = serializer.data
+            club_data["is_admin"] = membership.is_admin
+            club_data["is_old"] = membership.is_old
+            data.append(club_data)
+        return Response({"is_member_of": data})
+
+    @classmethod
+    def get_extra_actions(cls):
+        return []
+
+
 class SearchRole(APIView):
     """
     API endpoint that returns the roles whose name contains the query.
@@ -147,8 +174,8 @@ class OneClubView(APIView):
     """
 
     def get(self, request):
-        student = get_object_or_404(Club, id=request.GET["id"])
-        serializer = ClubSerializer(student)
+        club = get_object_or_404(Club, id=request.GET["id"])
+        serializer = ClubSerializer(club)
         return Response({"club": serializer.data})
 
     @classmethod
