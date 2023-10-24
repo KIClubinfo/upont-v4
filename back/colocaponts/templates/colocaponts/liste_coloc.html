@@ -10,7 +10,7 @@
     {% include "feedback.html" %}
 
     <!--Sidenav-->
-    {% include "sidenav.html" with active_link="colocaponts" %}
+    <!--{% include "sidenav.html" with active_link="colocaponts" %}-->
 
     <!--Content-->
     <div class="content">
@@ -39,9 +39,18 @@
                 </a>                
             </div>
 
-            <!--News Card-->
-            <div id="apartments">
-                <!--  Posts are rendered with React  -->
+            <!--Apartments Card-->
+            <div class="centered-div mt-2">
+                {% if apartment_list %}
+                    <ul>
+                        {%for apart in apartment_list %}
+                            <li> {{apart.name}} </li>
+                            <img src = {{apart.illustration}} alt = {{apart.name}}>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p> No apartments are available. </p>
+                {% endif %}
             </div>
             <!--End of News Card-->
 

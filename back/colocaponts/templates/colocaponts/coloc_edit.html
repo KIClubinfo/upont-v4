@@ -18,36 +18,9 @@
 
             <h3 class="page-title">{% if Edit %}Éditer{% else %}Ajouter{% endif %} une colocation</h3>
 
-            <!--News Card-->
-            <div class="news-card">
-                <form action="
-                    {% if Edit %}
-                        {% url 'colocaponts:coloc_edit' coloc.id %}
-                    {% else%}
-                        {% url 'colocaponts:add_coloc' %}
-                    {% endif %}" method="post" enctype="multipart/form-data"
-                >
-                    {% csrf_token %}
-                    <div class="news-card-content">
-                        <div class="centered-div">
-                            <div class="input-title">Nom :</div>
-                            {{EditColoc.name}}<br>
-
-                            <div class="input-title">Description :</div>
-                            {{EditColoc.description}}<br>
-
-                            <div class="input-title">Adresse :</div>
-                            {{EditColoc.address}}<br>
-
-                    <div class="centered-div">
-                        <button type="button" class="button red-button" onclick="history.back()">Annuler</button>
-                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
-                        {% if Edit %}
-                            <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
-                        {% endif %}
-                    </div>
-                </form>
-            </div><!--End of News Card-->
+            <div class="test">
+                Hello world
+            </div>
 
         </div><!--End of Main Content-->
 

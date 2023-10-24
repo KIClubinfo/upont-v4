@@ -1,4 +1,3 @@
-
 from colocaponts.models import Room, Apartment
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -12,13 +11,18 @@ from rest_framework.exceptions import ValidationError
 
 from social.models import Membership, Student
 from .forms import EditColoc
+
 # Create your views here.
+
 
 @login_required
 def coloc(request):
+    apart_list = Apartment.objects.all()
+    context = {"apartment_list": apart_list}
     if request.method == "GET":
-        return render(request, "colocaponts/liste_coloc.html")
-    
+        return render(request, "colocaponts/liste_coloc.html", context)
+
+
 @login_required
 def add_coloc(request):
     context = {}
@@ -36,7 +40,9 @@ def add_coloc(request):
                 post.save()
                 return HttpResponseRedirect(request.session["origin"])
     else:
-        form = EditColoc(request.user.id,)
+        form = EditColoc(
+            request.user.id,
+        )
     request.session["origin"] = request.META.get("HTTP_REFERER", "colocaponts")
     context["EditPost"] = form
     context["Edit"] = False
