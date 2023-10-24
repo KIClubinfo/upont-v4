@@ -97,7 +97,7 @@ class StudentMembershipView(APIView):
     def get(self, request):
         student = get_object_or_404(Student, user__pk=request.GET["id"])
         data = []
-        for membership in Membership.objects.filter(student__user__pk=student.id):
+        for membership in Membership.objects.filter(student=student):
             club = Club.objects.get(id=membership.club.id)
             serializer = ClubSerializerLite(club)
             club_data = serializer.data
