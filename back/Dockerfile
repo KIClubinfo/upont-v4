@@ -37,7 +37,7 @@ FROM python-base as builder-base
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
     # deps for installing poetry
-    curl=7.74.0-1.3+deb11u7 \
+    curl=7.74.0-1.3+deb11u10 \
     # deps for building python deps
     build-essential=12.9 \
     && rm -rf /var/lib/apt/lists/*
