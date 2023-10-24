@@ -80,7 +80,7 @@ class StudentCanPublishAs(APIView):
 
     def get(self, request):
         data = {"-1": "Élève"}
-        for membership in Membership.objects.filter(student__user__pk=request.user.id):
+        for membership in Membership.objects.filter(student__user__id=request.user.id):
             data[membership.club.id] = membership.club.name
         return Response({"can_publish_as": data})
 
@@ -97,7 +97,7 @@ class StudentMembershipView(APIView):
     def get(self, request):
         student = get_object_or_404(Student, user__id=request.GET["id"])
         data = []
-        for membership in Membership.objects.filter(student__user__pk=student.id):
+        for membership in Membership.objects.filter(student__user__id=student.user.id):
             club = Club.objects.get(id=membership.club.id)
             serializer = ClubSerializerLite(club)
             club_data = serializer.data
