@@ -12,7 +12,7 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from social.models import Membership, Student
+from social.models import Club, Membership, Student
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
@@ -210,12 +210,22 @@ class PostCreateView(APIView):
 
     def post(self, request):
         student = get_object_or_404(Student, user__id=request.user.id)
-        post = Post(
-            title=request.data["title"],
-            author=student,
-            date=timezone.now(),
-            content=request.data["content"],
-        )
+        if request.data["publish_as"] == "-1":
+            post = Post(
+                title=request.data["title"],
+                author=student,
+                date=timezone.now(),
+                content=request.data["content"],
+            )
+        else:
+            club = get_object_or_404(Club, id=request.data["publish_as"])
+            post = Post(
+                title=request.data["title"],
+                author=student,
+                club=club,
+                date=timezone.now(),
+                content=request.data["content"],
+            )
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
         elif request.data["content"] == "":
