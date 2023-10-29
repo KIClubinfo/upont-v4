@@ -144,7 +144,7 @@ class Club(models.Model):
         ASSO = "Association"
         CLUB = "Club"
         LISTE = "Liste"
-        INACTIF = "Inactif"
+        POLE = "Pôle"
 
     label = models.CharField(max_length=20, choices=Label.choices, default=Label.CLUB)
 

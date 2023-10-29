@@ -163,7 +163,7 @@ class ClubsViewSet(viewsets.ModelViewSet):
     API endpoint that allows clubs to be viewed.
     """
 
-    queryset = Club.objects.all().order_by("name", "nickname")
+    queryset = Club.objects.all().order_by("label", "name", "nickname")
     serializer_class = ClubSerializer
     http_method_names = ["get"]
 
@@ -233,7 +233,7 @@ def search(request):
     if "club" in request.GET:
         all_clubs_list = Club.objects.order_by("name")
         all_categories_list = Category.objects.order_by("name")
-        all_label_list = Label.objects.order_by("name")
+        all_label_list = Club.Label.choices
         my_memberships_list = Membership.objects.filter(
             student__user__id=request.user.id
         )
@@ -385,6 +385,9 @@ def index_clubs(request):
     LISTE_club_list = Club.objects.filter(label=Club.Label.LISTE, active=True).order_by(
         "name"
     )
+    POLE_club_list = Club.objects.filter(label=Club.Label.POLE, active=True).order_by(
+        "name"
+    )
     context = {
         "all_clubs_list": all_clubs_list,
         "club_displayed_list": active_clubs_list,
@@ -392,6 +395,7 @@ def index_clubs(request):
         "ASSO_club_list": ASSO_club_list,
         "CLUB_club_list": CLUB_club_list,
         "LISTE_club_list": LISTE_club_list,
+        "POLE_club_list": POLE_club_list,
     }
     all_categories_list = Category.objects.order_by("name")
     context["all_categories_list"] = all_categories_list

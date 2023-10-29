@@ -28,90 +28,90 @@
 
                     <h4 class="page-title">
                         {% if searched_expression %}
-                        Résultats de la recherche "{{searched_expression}}"
+                            Résultats de la recherche "{{searched_expression}}"
                         {% else %}
-                        Clubs & Assos
+                            Clubs & Assos
                         {% endif %}
                     </h4>
 
                     {% if club_displayed_list %}
-                    <!--Row-->
-                    <div class="row">
-                        {% if ASSO_club_list %}
-                        {% for club in ASSO_club_list %}
-                        <!--Column-->
-                        <div class="col-clubmd-4 col-clubsm-6">
-                            <div class="club-card">
-                                <div class="club-card-content">
-                                    <div class="club-card-image">
-                                        <img class="image-centered"
-                                            src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
-                                            alt="">
-                                    </div>
+                        <!--Row-->
+                        <div class="row">
+                            {% if ASSO_club_list %}
+                                {% for club in ASSO_club_list %}
+                                    <!--Column-->
+                                    <div class="col-clubmd-4 col-clubsm-6">
+                                        <div class="club-card">
+                                            <div class="club-card-content">
+                                                <div class="club-card-image">
+                                                    <img class="image-centered"
+                                                        src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                        alt="">
+                                                </div>
+                                            </div>
+                                            <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
+                                                ({{club.nickname}}) {% endif %}</span></div>
+                                            <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                        </div>
+                                    </div><!--End of Column-->
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if CLUB_club_list %}
+                                {% for club in CLUB_club_list %}
+                                    <!--Column-->
+                                    <div class="col-clubmd-4 col-clubsm-6">
+                                        <div class="club-card">
+                                            <div class="club-card-content">
+                                                <div class="club-card-image">
+                                                    <img class="image-centered"
+                                                        src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                        alt="">
+                                                </div>
+                                            </div>
+                                            <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
+                                                ({{club.nickname}}) {% endif %}</span></div>
+                                            <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                        </div>
+                                    </div><!--End of Column-->
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if LISTE_club_list %}
+                                {% for club in LISTE_club_list %}
+                                    <!--Column-->
+                                    <div class="col-clubmd-4 col-clubsm-6">
+                                        <div class="club-card">
+                                            <div class="club-card-content">
+                                                <div class="club-card-image">
+                                                    <img class="image-centered"
+                                                        src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                        alt="">
+                                                </div>
+                                            </div>
+                                            <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
+                                                ({{club.nickname}}) {% endif %}</span></div>
+                                            <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                        </div>
+                                    </div><!--End of Column-->
+                                {% endfor %}
+                            {% endif %}
+
+                            <div class="col-clubmd-4 col-clubsm-6">
+                                <div class="club-card">
+                                    <div class="club-card-content"><i class="fas fa-plus-circle fa-5x"></i></div>
+                                    <div class="club-card-title"><span>Demander la création <br> d'un club</span></div>
+                                    <a href="{% url 'social:club_request' %}" class="stretched-link"></a>
                                 </div>
-                                <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
-                                        ({{club.nickname}}) {% endif %}</span></div>
-                                <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
                             </div>
-                        </div><!--End of Column-->
-                        {% endfor %}
-                        {% endif %}
 
-                        {% if CLUB_club_list %}
-                        {% for club in CLUB_club_list %}
-                        <!--Column-->
-                        <div class="col-clubmd-4 col-clubsm-6">
-                            <div class="club-card">
-                                <div class="club-card-content">
-                                    <div class="club-card-image">
-                                        <img class="image-centered"
-                                            src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
-                                            alt="">
-                                    </div>
-                                </div>
-                                <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
-                                        ({{club.nickname}}) {% endif %}</span></div>
-                                <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
-                            </div>
-                        </div><!--End of Column-->
-                        {% endfor %}
-                        {% endif %}
-
-                        {% if LISTE_club_list %}
-                        {% for club in LISTE_club_list %}
-                        <!--Column-->
-                        <div class="col-clubmd-4 col-clubsm-6">
-                            <div class="club-card">
-                                <div class="club-card-content">
-                                    <div class="club-card-image">
-                                        <img class="image-centered"
-                                            src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
-                                            alt="">
-                                    </div>
-                                </div>
-                                <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
-                                        ({{club.nickname}}) {% endif %}</span></div>
-                                <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
-                            </div>
-                        </div><!--End of Column-->
-                        {% endfor %}
-                        {% endif %}
-
-                        <div class="col-clubmd-4 col-clubsm-6">
-                            <div class="club-card">
-                                <div class="club-card-content"><i class="fas fa-plus-circle fa-5x"></i></div>
-                                <div class="club-card-title"><span>Demander la création <br> d'un club</span></div>
-                                <a href="{% url 'social:club_request' %}" class="stretched-link"></a>
-                            </div>
-                        </div>
-
-                    </div><!--End of Row-->
+                        </div><!--End of Row-->
                     {% else %}
-                    {% if searched_expression %}
-                    <div class="text-bold text-center mt-2">Aucun club n'a été trouvé</div>
-                    {% else %}
-                    <div class="text-bold text-center mt-2">Il n'y a pas de clubs dans la base de données.</div>
-                    {% endif %}
+                        {% if searched_expression %}
+                            <div class="text-bold text-center mt-2">Aucun club n'a été trouvé</div>
+                        {% else %}
+                            <div class="text-bold text-center mt-2">Il n'y a pas de clubs dans la base de données.</div>
+                        {% endif %}
                     {% endif %}
                 </div><!--End of Column-->
 
@@ -122,25 +122,25 @@
                     <div class="row">
 
                         {% if my_memberships_list %}
-                        {% for membership in my_memberships_list %}
-                        <!--Column-->
-                        <div class="col-12">
-                            <div class="vignette-club-mini">
-                                <div class="vignette-image-mini">
-                                    <img class="image-centered"
-                                        src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
-                                        alt="">
-                                </div>
-                                <div class="vignette-mini-title">
-                                    <span>{{membership.club.name}}</span>
-                                    <span class="vignette-mini-role"><br>{{membership.role}}</span>
-                                </div>
-                                <a href="{% url 'social:club_detail' membership.club.id %}" class="stretched-link"></a>
-                            </div>
-                        </div><!--End of Column-->
-                        {% endfor %}
+                            {% for membership in my_memberships_list %}
+                                <!--Column-->
+                                <div class="col-12">
+                                    <div class="vignette-club-mini">
+                                        <div class="vignette-image-mini">
+                                            <img class="image-centered"
+                                                src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                alt="">
+                                        </div>
+                                        <div class="vignette-mini-title">
+                                            <span>{{membership.club.name}}</span>
+                                            <span class="vignette-mini-role"><br>{{membership.role}}</span>
+                                        </div>
+                                        <a href="{% url 'social:club_detail' membership.club.id %}" class="stretched-link"></a>
+                                    </div>
+                                </div><!--End of Column-->
+                            {% endfor %}
                         {% else %}
-                        <div class="text-bold text-center mt-2">Tu n'es membre d'aucun club pour l'instant.</div>
+                            <div class="text-bold text-center mt-2">Tu n'es membre d'aucun club pour l'instant.</div>
                         {% endif %}
 
                     </div><!--End of Row-->
@@ -148,39 +148,39 @@
                 </div><!--Column-->
 
                 {% if inactive_clubs_list %}
-                <div class="col-clublg-8" style="margin-top:1.5em">
+                    <div class="col-clublg-8" style="margin-top:1.5em">
 
-                    <h4 class="page-title">Clubs & Assos inactifs</h4>
-                    <!--Row-->
-                    <div class="row">
-                        {% for club in inactive_clubs_list %}
-                        <!--Column-->
-                        <div class="col-clubmd-4 col-clubsm-6">
-                            <div class="club-card">
-                                <div class="club-card-content">
-                                    <div class="club-card-image">
-                                        <img class="image-centered"
-                                            src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
-                                            alt="">
+                        <h4 class="page-title">Clubs & Assos inactifs</h4>
+                        <!--Row-->
+                        <div class="row">
+                            {% for club in inactive_clubs_list %}
+                                <!--Column-->
+                                <div class="col-clubmd-4 col-clubsm-6">
+                                    <div class="club-card">
+                                        <div class="club-card-content">
+                                            <div class="club-card-image">
+                                                <img class="image-centered"
+                                                    src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                    alt="">
+                                            </div>
+                                        </div>
+                                        <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
+                                            ({{club.nickname}}) {% endif %}</span></div>
+                                        <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
                                     </div>
-                                </div>
-                                <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
-                                        ({{club.nickname}}) {% endif %}</span></div>
-                                <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
-                            </div>
-                        </div><!--End of Column-->
-                        {% endfor %}
-                    </div><!--End of Row-->
-                    {% endif %}
+                                </div><!--End of Column-->
+                            {% endfor %}
+                        </div><!--End of Row-->
+                {% endif %}
 
 
-                </div><!--End of Column-->
+            </div><!--End of Column-->
 
 
-            </div><!--End of Row-->
-        </div><!--End of Main Content-->
+        </div><!--End of Row-->
+    </div><!--End of Main Content-->
 
-    </div><!--End of Content-->
+</div><!--End of Content-->
 
 </body><!--End of Body-->
 
