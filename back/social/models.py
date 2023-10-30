@@ -140,6 +140,14 @@ class Club(models.Model):
         blank=True,
     )
 
+    class Label(models.TextChoices):
+        ASSO = "Association"
+        CLUB = "Club"
+        LISTE = "Liste"
+        POLE = "Pôle"
+
+    label = models.CharField(max_length=20, choices=Label.choices, default=Label.CLUB)
+
     def save(self, *args, **kwargs):
         if self.logo:
             self.logo = compress_image(self.logo, 30, unidecode(self.name))
