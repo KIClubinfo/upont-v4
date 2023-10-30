@@ -211,7 +211,7 @@ class PostCreateView(APIView):
             title=request.data["title"],
             author=student,
             date=timezone.now(),
-            content=request.data["content"],
+            content=convert_to_markdown(request.data["content"]),
         )
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
