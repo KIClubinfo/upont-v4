@@ -205,6 +205,24 @@ class PostCommentView(APIView):
 
 
 class PostCreateView(APIView):
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = Post(
+            title=request.data["title"],
+            author=student,
+            date=timezone.now(),
+            content=request.data["content"],
+        )
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
+
+        post.save()
+        return Response({"status": "ok"})
+
+
+class PostCreateViewV2(APIView):
     """
     API endpoint that allows students to create posts
     """
