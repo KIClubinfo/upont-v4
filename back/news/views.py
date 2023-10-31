@@ -275,6 +275,7 @@ class PostEditView(APIView):
             if club.is_member(student.id):
                 post.title = request.data["title"]
                 post.content = convert_to_markdown(request.data["content"])
+                post.club = club
                 post.save()
             else:
                 return Response({"status": "error", "message": "forbidden"})
