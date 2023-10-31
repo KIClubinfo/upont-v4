@@ -236,15 +236,48 @@ class PostCreateViewV2(APIView):
                 date=timezone.now(),
                 content=convert_to_markdown(request.data["content"]),
             )
+            post.save()
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
-            post = Post(
-                title=request.data["title"],
-                author=student,
-                club=club,
-                date=timezone.now(),
-                content=convert_to_markdown(request.data["content"]),
-            )
+            if club.is_member(student.id):
+                post = Post(
+                    title=request.data["title"],
+                    author=student,
+                    club=club,
+                    date=timezone.now(),
+                    content=convert_to_markdown(request.data["content"]),
+                )
+                post.save()
+            else:
+                return Response({"status": "error", "message": "forbidden"})
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
+
+        return Response({"status": "ok"})
+
+
+class PostEditView(APIView):
+    """
+    API endpoint that allows students to create posts
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = get_object_or_404(Post, id=request.data["post"])
+        if request.data["publish_as"] == "-1":
+            post.title = request.data["title"]
+            post.content = convert_to_markdown(request.data["content"])
+            post.save()
+        else:
+            club = get_object_or_404(Club, id=request.data["publish_as"])
+            if club.is_member(student.id):
+                post.title = request.data["title"]
+                post.content = convert_to_markdown(request.data["content"])
+                post.save()
+            else:
+                return Response({"status": "error", "message": "forbidden"})
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
         elif request.data["content"] == "":
