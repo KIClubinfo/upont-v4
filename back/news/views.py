@@ -269,6 +269,7 @@ class PostEditView(APIView):
         if request.data["publish_as"] == "-1":
             post.title = request.data["title"]
             post.content = convert_to_markdown(request.data["content"])
+            post.club = None
             post.save()
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
