@@ -274,6 +274,8 @@ class PostEditView(APIView):
             post.title = request.data["title"]
             post.content = convert_to_markdown(request.data["content"])
             post.club = None
+            if request.data["illustration"]:
+                post.illustration = request.data["illustration"]
             post.save()
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
@@ -281,6 +283,8 @@ class PostEditView(APIView):
                 post.title = request.data["title"]
                 post.content = convert_to_markdown(request.data["content"])
                 post.club = club
+                if request.data["illustration"]:
+                    post.illustration = request.data["illustration"]
                 post.save()
             else:
                 return Response({"status": "error", "message": "forbidden"})
