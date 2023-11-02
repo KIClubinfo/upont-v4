@@ -53,6 +53,7 @@ from social.views import (
     NotificationTokenView,
     OneClubView,
     OneStudentView,
+    ProfilePicUpdate,
     SearchClub,
     SearchRole,
     SearchStudent,
@@ -163,4 +164,5 @@ urlpatterns += [
         PochtronTransactions.as_view(),
         name="pochtron_transactions",
     ),
+    path("api/test/", ProfilePicUpdate.as_view(), name="test"),
 ]

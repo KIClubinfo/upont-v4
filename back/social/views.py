@@ -6,6 +6,7 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import viewsets
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -196,6 +197,14 @@ class SearchClub(APIView):
             clubs = Club.objects.all().order_by("label", "name", "nickname")[:25]
         serializer = ClubSerializer(clubs, many=True)
         return Response({"clubs": serializer.data})
+
+
+class ProfilePicUpdate(APIView):
+
+    parser_classes = [MultiPartParser]
+
+    def post(self, request, format=None):
+        return Response({"received data": request.data})
 
 
 @login_required
