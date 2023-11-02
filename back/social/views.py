@@ -204,6 +204,7 @@ class ProfilePicUpdate(APIView):
 
     def post(self, request, format=None):
         image = request.data["image"]
+        print(request.data)
         student = get_object_or_404(Student, user__id=request.user.id)
         student.picture = image
         student.save()
