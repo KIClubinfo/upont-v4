@@ -203,8 +203,11 @@ class ProfilePicUpdate(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, format=None):
-        print(request.data)
-        return Response({"received data": request.data})
+        image = request.data["image"]
+        student = get_object_or_404(Student, user__id=request.user.id)
+        student.picture = image
+        student.save()
+        return Response({"status": "ok"})
 
 
 @login_required
