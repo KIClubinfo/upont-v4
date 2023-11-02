@@ -204,6 +204,7 @@ class ProfilePicUpdate(APIView):
     parser_classes = [MultiPartParser]
 
     def post(self, request, format=None):
+        print(request.data)
         return Response({"received data": request.data})
 
 
