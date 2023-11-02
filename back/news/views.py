@@ -236,6 +236,8 @@ class PostCreateViewV2(APIView):
                 date=timezone.now(),
                 content=convert_to_markdown(request.data["content"]),
             )
+            if request.data["illustration"]:
+                post.illustration = request.data["illustration"]
             post.save()
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
@@ -247,6 +249,8 @@ class PostCreateViewV2(APIView):
                     date=timezone.now(),
                     content=convert_to_markdown(request.data["content"]),
                 )
+                if request.data["illustration"]:
+                    post.illustration = request.data["illustration"]
                 post.save()
             else:
                 return Response({"status": "error", "message": "forbidden"})
