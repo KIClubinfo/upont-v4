@@ -228,6 +228,10 @@ class PostCreateViewV2(APIView):
     """
 
     def post(self, request):
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
         student = get_object_or_404(Student, user__id=request.user.id)
         if request.data["publish_as"] == "-1":
             post = Post(
@@ -254,10 +258,6 @@ class PostCreateViewV2(APIView):
                 post.save()
             else:
                 return Response({"status": "error", "message": "forbidden"})
-        if request.data["title"] == "":
-            return Response({"status": "error", "message": "empty_title"})
-        elif request.data["content"] == "":
-            return Response({"status": "error", "message": "empty_content"})
 
         return Response({"status": "ok"})
 
@@ -268,6 +268,10 @@ class PostEditView(APIView):
     """
 
     def post(self, request):
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
         student = get_object_or_404(Student, user__id=request.user.id)
         post = get_object_or_404(Post, id=request.data["post"])
         if request.data["publish_as"] == "-1":
@@ -288,12 +292,6 @@ class PostEditView(APIView):
                 post.save()
             else:
                 return Response({"status": "error", "message": "forbidden"})
-        if request.data["title"] == "":
-            return Response({"status": "error", "message": "empty_title"})
-        elif request.data["content"] == "":
-            return Response({"status": "error", "message": "empty_content"})
-
-        post.save()
         return Response({"status": "ok"})
 
 
