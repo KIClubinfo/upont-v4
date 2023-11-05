@@ -240,7 +240,7 @@ class PostCreateViewV2(APIView):
                 date=timezone.now(),
                 content=convert_to_markdown(request.data["content"]),
             )
-            if request.data["illustration"]:
+            if "illustration" in request.data:
                 post.illustration = request.data["illustration"]
             post.save()
         else:
@@ -253,7 +253,7 @@ class PostCreateViewV2(APIView):
                     date=timezone.now(),
                     content=convert_to_markdown(request.data["content"]),
                 )
-                if request.data["illustration"]:
+                if "illustration" in request.data:
                     post.illustration = request.data["illustration"]
                 post.save()
             else:
@@ -278,7 +278,7 @@ class PostEditView(APIView):
             post.title = request.data["title"]
             post.content = convert_to_markdown(request.data["content"])
             post.club = None
-            if request.data["illustration"]:
+            if "illustration" in request.data:
                 post.illustration = request.data["illustration"]
             post.save()
         else:
@@ -287,7 +287,7 @@ class PostEditView(APIView):
                 post.title = request.data["title"]
                 post.content = convert_to_markdown(request.data["content"])
                 post.club = club
-                if request.data["illustration"]:
+                if "illustration" in request.data:
                     post.illustration = request.data["illustration"]
                 post.save()
             else:
