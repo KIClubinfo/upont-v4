@@ -62,7 +62,13 @@ from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
 
 from . import views
+from django.contrib import admin
+from django.urls import include, path
 
+urlpatterns = [
+    path("polls/", include("polls.urls")),
+    path("admin/", admin.site.urls),
+]
 # ---- MAIN URLS ----#
 
 urlpatterns = [
@@ -161,10 +167,3 @@ urlpatterns += [
     ),
 ]
 
-from django.contrib import admin
-from django.urls import include, path
-
-urlpatterns = [
-    path("polls/", include("polls.urls")),
-    path("admin/", admin.site.urls),
-]
