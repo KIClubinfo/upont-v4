@@ -65,10 +65,6 @@ from . import views
 from django.contrib import admin
 from django.urls import include, path
 
-urlpatterns = [
-    path("polls/", include("polls.urls")),
-    path("admin/", admin.site.urls),
-]
 # ---- MAIN URLS ----#
 
 urlpatterns = [
@@ -77,6 +73,7 @@ urlpatterns = [
     path("pochtron/", include("pochtron.urls")),
     path("courses/", include("courses.urls")),
     path("the_calendar/", include("the_calendar.urls")),
+    path("polls/", include("polls.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo/", views.add, name="add_promo"),
@@ -166,4 +163,3 @@ urlpatterns += [
         name="pochtron_transactions",
     ),
 ]
-
