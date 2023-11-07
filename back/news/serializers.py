@@ -39,6 +39,18 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
     def get_user_author_url(self, obj):
         return reverse("social:profile_viewed", args=(obj.author.user.pk,))
 
+    can_moderate = serializers.SerializerMethodField()
+
+    def get_can_moderate(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        student = get_object_or_404(Student, user__id=user.id)
+        if student.is_moderator:
+            return True
+        return False
+
     class Meta:
         model = Comment
         fields = [
@@ -48,6 +60,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
             "date",
             "content",
             "is_my_comment",
+            "can_moderate",
             "author_url",
             "user_author_url",
             "id",
@@ -173,6 +186,18 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             return True
         return False
 
+    can_moderate = serializers.SerializerMethodField()
+
+    def get_can_moderate(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        student = get_object_or_404(Student, user__id=user.id)
+        if student.is_moderator:
+            return True
+        return False
+
     user_author_url = serializers.SerializerMethodField()
 
     def get_user_author_url(self, obj):
@@ -227,6 +252,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "comments",
             "id",
             "can_edit",
+            "can_moderate",
             "user_author_url",
             "resource",
             "bookmark_url",

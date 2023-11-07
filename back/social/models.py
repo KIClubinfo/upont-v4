@@ -84,6 +84,7 @@ class Student(models.Model):
     nationality = models.ForeignKey(
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
     )
+    is_moderator = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.picture:
@@ -138,6 +139,14 @@ class Club(models.Model):
         related_name="clubs",
         blank=True,
     )
+
+    class Label(models.TextChoices):
+        ASSO = "Association"
+        CLUB = "Club"
+        LISTE = "Liste"
+        POLE = "Pôle"
+
+    label = models.CharField(max_length=20, choices=Label.choices, default=Label.CLUB)
 
     def save(self, *args, **kwargs):
         if self.logo:

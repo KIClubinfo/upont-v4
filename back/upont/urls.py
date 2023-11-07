@@ -28,9 +28,13 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django_reverse_js.views import urls_js
 from news.views import (
+    DeleteCommentView,
     EventViewSet,
     PostCommentView,
     PostCreateView,
+    PostCreateViewV2,
+    PostDeleteView,
+    PostEditView,
     PostReactionView,
     PostViewSet,
     ShotgunParticipateView,
@@ -49,10 +53,12 @@ from social.views import (
     NotificationTokenView,
     OneClubView,
     OneStudentView,
+    ProfilePicUpdate,
     SearchClub,
     SearchRole,
     SearchStudent,
     StudentCanPublishAs,
+    StudentMembershipView,
     StudentViewSet,
 )
 from the_calendar.views import CalendarData
@@ -136,9 +142,20 @@ urlpatterns += [
         "api/notification_token/", NotificationTokenView.as_view(), name="student_token"
     ),
     path("api/post_reaction/", PostReactionView.as_view(), name="post_reaction"),
+    path(
+        "api/news/post/delete/", PostDeleteView.as_view(), name="api_news_post_delete"
+    ),
+    path(
+        "api/news/comment/delete/",
+        DeleteCommentView.as_view(),
+        name="api_news_comment_delete",
+    ),
     path("api/comment_post/", PostCommentView.as_view(), name="post_comment"),
     path("api/create_post/", PostCreateView.as_view(), name="post_creation"),
+    path("api/create_post/v2/", PostCreateViewV2.as_view(), name="post_creation_v2"),
+    path("api/edit_post/", PostEditView.as_view(), name="post_edit"),
     path("api/student/", OneStudentView.as_view(), name="student"),
+    path("api/membership/", StudentMembershipView.as_view(), name="membership"),
     path("api/club/", OneClubView.as_view(), name="club"),
     path("api/media/<path:path>", views.get_media_path, name="get_media_path"),
     path("api/pochtron/balance", PochtronBalance.as_view(), name="pochtron_balance"),
@@ -147,4 +164,5 @@ urlpatterns += [
         PochtronTransactions.as_view(),
         name="pochtron_transactions",
     ),
+    path("api/test/", ProfilePicUpdate.as_view(), name="test"),
 ]

@@ -97,6 +97,7 @@ class ClubSerializer(
             "logo_url",
             "background_picture_url",
             "members",
+            "label",
         ]
 
 
@@ -130,4 +131,5 @@ class ClubSerializerLite(
             "nickname",
             "logo_url",
             "background_picture_url",
+            "label",
         ]
