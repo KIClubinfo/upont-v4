@@ -280,6 +280,8 @@ class PostEditView(APIView):
             post.club = None
             if "illustration" in request.data:
                 post.illustration = request.data["illustration"]
+            else:
+                post.illustration = None
             post.save()
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
@@ -289,6 +291,8 @@ class PostEditView(APIView):
                 post.club = club
                 if "illustration" in request.data:
                     post.illustration = request.data["illustration"]
+                else:
+                    post.illustration = None
                 post.save()
             else:
                 return Response({"status": "error", "message": "forbidden"})
