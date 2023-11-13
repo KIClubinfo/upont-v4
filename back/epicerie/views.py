@@ -11,8 +11,7 @@ def index(request):
 
 def basket(request):
     basket_list = Basket.objects.filter(is_active=True)
-    output = ', '.join([str(basket) for basket in basket_list])
-    return HttpResponse(output)
+    return render(request, 'epicerie/basket_homepage.html', {'basket_list': basket_list})
 
 def basket_detail(request, basket_id):
     basket = get_object_or_404(Basket, pk=basket_id)

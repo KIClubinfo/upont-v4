@@ -1,9 +1,0 @@
-{% if panier_list %}
-    <ul>
-        {% for panier in panier_list %}
-            <li><a href="/epicerie/panier/{{panier.id}}/"> {{panier}}</a> </a> </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p> Il n'y a pas de panier</p>
-{% endif %}
