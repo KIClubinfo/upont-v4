@@ -11,18 +11,27 @@ class Basket(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"Panier à {self.price/100}€ du {self.pickup_date}" 
+        return f"panier à {self.price/100}€ du {self.pickup_date.day}/{self.pickup_date.month}" 
 
 class Basket_Order(models.Model):
     basket = models.ForeignKey(Basket, on_delete=models.SET_NULL, null=True)
     student = models.ForeignKey('social.Student', on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0)
 
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.basker = kwargs.get('basket', None)
+        print(kwargs)
+        self.basket = kwargs.get('basket', None)
         self.student = kwargs.get('student', None)
         self.quantity = kwargs.get('quantity', None)
+    """
 
     def __str__(self):
-        return str(self.basket) + " " + str(self.student)
+        return f"{self.quantity} {self.basket} by {self.student}"
+    
+    def isValid(self):
+        bool = self.basket != None
+        bool = bool and self.student != None
+        bool = bool and self.quantity >= 0 and type(self.quantity) == int
+        return bool

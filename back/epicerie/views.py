@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from .models import Basket, Basket_Order
+from social.models import Student
 
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
@@ -17,16 +19,27 @@ def basket_detail(request, basket_id):
     basket = get_object_or_404(Basket, pk=basket_id)
     return HttpResponse(f"This is basket {basket}, with composition {basket.composition}")
 
+@login_required
 def basket_order(request):
-    #on veut créer l'objet basket_order à partir de la requête
-    basket_list = Basket.objects.filter(is_active=True)
-    try:
-        quantities = request.POST['basket']
-    except (KeyError):
-        quantities = [0 for basket in basket_list]
-    for i, basket in enumerate(basket_list):
-        if quantities[i] > 0:
-            basket_order = Basket_Order(basket=basket, student=request.user.student , quantity=quantities[i])
-            basket_order.save()
+    if request.method == 'POST':
+        basket_list = Basket.objects.filter(is_active=True)
+        student = get_object_or_404(Student, user__id=request.user.id)
+        quantities = [0] * len(basket_list)
+        try:
+            quantities = request.POST.getlist('basket_quantity')
+        except (KeyError):
+            return HttpResponse("Error")
+            
+        for i, basket in enumerate(basket_list):
+            if int(quantities[i]) > 0:
+                print(basket)
+                print(student)
+                print(quantities[i])
+                basket_order = Basket_Order(basket=basket, student=student, quantity=int(quantities[i]))
+                if basket_order.isValid():
+                    basket_order.save()
+                    print("I'm saving an order")
+                else:
+                    return HttpResponse("Error")
 
-    return HttpResponseRedirect("/epicerie/panier/")
+        return HttpResponseRedirect("/epicerie/panier/")
