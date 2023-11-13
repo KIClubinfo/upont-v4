@@ -4,7 +4,7 @@
     {% if basket_list %}
     <ul>
         {% for basket in basket_list %}
-            <input type="text" id="basket{{ forloop.counter }}" value="0">
+            <input type="text" name="basket" id="basket{{ forloop.counter }}" value="0">
             <label for = "basket{{ forloop.counter }}"> {{basket}} </label><br>
         {% endfor %}
     {% else %}

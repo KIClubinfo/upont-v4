@@ -18,5 +18,10 @@ class Basket_Order(models.Model):
     student = models.ForeignKey('social.Student', on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0)
 
+    def __init__(self, basket, student, quantity):
+        self.basket = basket
+        self.student = student
+        self.quantity = quantity
+
     def __str__(self):
         return str(self.basket) + " " + str(self.student)
