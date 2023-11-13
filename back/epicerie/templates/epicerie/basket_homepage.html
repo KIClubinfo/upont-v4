@@ -1,8 +1,16 @@
-{% if basket_list %}
+<form action="{% url 'epicerie:panier' %}"> 
+    {% csrf_token %}
+    <fieldset>
+    {% if basket_list %}
     <ul>
         {% for basket in basket_list %}
-            <li><a href= "{% url 'epicerie:panier_detail' basket.id %}"> {{basket}}</a> </a> </li>
+            <legend><h1>{{ panier.composition }}</h1></legend> 
+            <input type="radio" name="basket" id="basket{{ forloop.counter }}" value="{{ basket.id }}">
+            <label>{{panier.composition}}</label><br>
         {% endfor %}
-{% else %}
-    <p> Il n'y a pas de panier</p>
-{% endif %}
+    {% else %}
+        <p> Il n'y a pas de panier</p>
+    {% endif %}
+</fieldset>
+<input type="submit" value="Commander">
+</form>
