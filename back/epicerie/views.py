@@ -17,7 +17,7 @@ def basket_detail(request, basket_id):
     basket = get_object_or_404(Basket, pk=basket_id)
     return HttpResponse(f"This is basket {basket}, with composition {basket.composition}")
 
-def commander(request, basket_id):
+def basket_order(request):
     #on veut créer l'objet basket_order à partir de la requête
     print(request.POST)
-    return HttpResponse(f"Vous avez commandé le panier {basket} !")
+    return HttpResponse(f"Vous avez commandé le panier !")
