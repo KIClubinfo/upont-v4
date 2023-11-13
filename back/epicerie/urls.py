@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 
+app_name = "epicerie"
 urlpatterns = [
     path("", views.index, name="index"),
     path("panier/", views.basket, name="panier"),
