@@ -1,12 +1,11 @@
-<form action="{% url 'epicerie:panier' %}"> 
+<form action="{% url 'epicerie:panier' %}" method = "post"> 
     {% csrf_token %}
     <fieldset>
     {% if basket_list %}
     <ul>
         {% for basket in basket_list %}
-            <legend><h1>{{ panier.composition }}</h1></legend> 
-            <input type="radio" name="basket" id="basket{{ forloop.counter }}" value="{{ basket.id }}">
-            <label>{{panier.composition}}</label><br>
+            <input type="radio" id="basket{{ forloop.counter }}" value="{{ basket.id }}">
+            <label for = "basket{{ forloop.counter }}"> {{basket}} </label><br>
         {% endfor %}
     {% else %}
         <p> Il n'y a pas de panier</p>
