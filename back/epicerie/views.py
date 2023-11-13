@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from .models import Basket
 
@@ -15,4 +15,5 @@ def basket(request):
     return HttpResponse(output)
 
 def basket_detail(request, basket_id):
-    return HttpResponse(f"This is basket {basket_id}")
+    basket = get_object_or_404(Basket, pk=basket_id)
+    return HttpResponse(f"This is basket {basket}, with composition {basket.composition}")
