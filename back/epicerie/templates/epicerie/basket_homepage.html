@@ -1,4 +1,4 @@
-<form action="{% url 'epicerie:panier' %}" method = "post"> 
+<form action="{% url 'epicerie:commande_panier' %}" method = "post"> 
     {% csrf_token %}
     <fieldset>
     {% if basket_list %}
