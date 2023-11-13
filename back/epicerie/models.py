@@ -18,10 +18,11 @@ class Basket_Order(models.Model):
     student = models.ForeignKey('social.Student', on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0)
 
-    def __init__(self, basket, student, quantity):
-        self.basket = basket
-        self.student = student
-        self.quantity = quantity
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.basker = kwargs.get('basket', None)
+        self.student = kwargs.get('student', None)
+        self.quantity = kwargs.get('quantity', None)
 
     def __str__(self):
         return str(self.basket) + " " + str(self.student)

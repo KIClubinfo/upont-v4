@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Basket, Basket_Order
 
 # Create your views here.
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 
 def index(request):
@@ -19,5 +19,14 @@ def basket_detail(request, basket_id):
 
 def basket_order(request):
     #on veut créer l'objet basket_order à partir de la requête
-    print(request.POST)
-    return HttpResponse(f"Vous avez commandé le panier !")
+    basket_list = Basket.objects.filter(is_active=True)
+    try:
+        quantities = request.POST['basket']
+    except (KeyError):
+        quantities = [0 for basket in basket_list]
+    for i, basket in enumerate(basket_list):
+        if quantities[i] > 0:
+            basket_order = Basket_Order(basket=basket, student=request.user.student , quantity=quantities[i])
+            basket_order.save()
+
+    return HttpResponseRedirect("/epicerie/panier/")
