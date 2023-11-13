@@ -1,7 +1,8 @@
 {% if basket_list %}
     <ul>
         {% for basket in basket_list %}
-            <li><a href="/epicerie/panier/{{basket.id}}/"> {{basket}}</a> </a> </li>
+            <li><a href= "{% url 'panier_detail' basket.id %}"> {{basket}}</a> </a> </li>
         {% endfor %}
 {% else %}
     <p> Il n'y a pas de panier</p>
+{% endif %}
