@@ -12,7 +12,8 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from social.models import Membership, Student
+from social.models import Club, Membership, Student
+from upont.regex import convert_to_markdown
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
@@ -204,17 +205,13 @@ class PostCommentView(APIView):
 
 
 class PostCreateView(APIView):
-    """
-    API endpoint that allows students to create posts
-    """
-
     def post(self, request):
         student = get_object_or_404(Student, user__id=request.user.id)
         post = Post(
             title=request.data["title"],
             author=student,
             date=timezone.now(),
-            content=request.data["content"],
+            content=convert_to_markdown(request.data["content"]),
         )
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
@@ -222,6 +219,83 @@ class PostCreateView(APIView):
             return Response({"status": "error", "message": "empty_content"})
 
         post.save()
+        return Response({"status": "ok"})
+
+
+class PostCreateViewV2(APIView):
+    """
+    API endpoint that allows students to create posts
+    """
+
+    def post(self, request):
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
+        student = get_object_or_404(Student, user__id=request.user.id)
+        if request.data["publish_as"] == "-1":
+            post = Post(
+                title=request.data["title"],
+                author=student,
+                date=timezone.now(),
+                content=convert_to_markdown(request.data["content"]),
+            )
+            if "illustration" in request.data:
+                post.illustration = request.data["illustration"]
+            post.save()
+        else:
+            club = get_object_or_404(Club, id=request.data["publish_as"])
+            if club.is_member(student.id):
+                post = Post(
+                    title=request.data["title"],
+                    author=student,
+                    club=club,
+                    date=timezone.now(),
+                    content=convert_to_markdown(request.data["content"]),
+                )
+                if "illustration" in request.data:
+                    post.illustration = request.data["illustration"]
+                post.save()
+            else:
+                return Response({"status": "error", "message": "forbidden"})
+
+        return Response({"status": "ok"})
+
+
+class PostEditView(APIView):
+    """
+    API endpoint that allows students to create posts
+    """
+
+    def post(self, request):
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = get_object_or_404(Post, id=request.data["post"])
+        if request.data["publish_as"] == "-1":
+            post.title = request.data["title"]
+            post.content = convert_to_markdown(request.data["content"])
+            post.club = None
+            if "illustration" in request.data:
+                post.illustration = request.data["illustration"]
+            else:
+                post.illustration = None
+            post.save()
+        else:
+            club = get_object_or_404(Club, id=request.data["publish_as"])
+            if club.is_member(student.id):
+                post.title = request.data["title"]
+                post.content = convert_to_markdown(request.data["content"])
+                post.club = club
+                if "illustration" in request.data:
+                    post.illustration = request.data["illustration"]
+                else:
+                    post.illustration = None
+                post.save()
+            else:
+                return Response({"status": "error", "message": "forbidden"})
         return Response({"status": "ok"})
 
 
@@ -454,11 +528,11 @@ def post_create(request, event_id=None, course_id=None):
                 request.POST,
                 request.FILES,
             )
-            print(request.POST)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = Student.objects.get(user__id=request.user.id)
                 post.date = timezone.now()
+                post.content = convert_to_markdown(post.content)
                 post.save()
                 if course_id is not None:
                     course = get_object_or_404(Course, pk=course_id)

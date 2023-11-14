@@ -61,6 +61,7 @@ class EditClub(forms.ModelForm):
             "active",
             "has_fee",
             "category",
+            "label",
         )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
@@ -69,6 +70,7 @@ class EditClub(forms.ModelForm):
             "nickname": forms.TextInput(attrs={"class": "profil-input"}),
             "description": forms.Textarea(attrs={"class": "profil-input"}),
             "category": forms.CheckboxSelectMultiple,
+            "label": forms.CheckboxInput(attrs={"class": "profil-input"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -77,6 +79,7 @@ class EditClub(forms.ModelForm):
         self.fields["logo"].required = False
         self.fields["background_picture"].required = False
         self.fields["category"].required = False
+        self.fields["label"].required = True
 
 
 class AddMember(forms.ModelForm):
