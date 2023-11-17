@@ -24,7 +24,21 @@
                 <a href="{% url 'epicerie:vrac' %}">Vrac</a>
                 <a href="{% url 'epicerie:recettes' %}">Recettes</a>
             </div>
+
+            <div id="epicerie">
+                <!--Links are rendered with React-->
+            </div>
         </div>
-    
+
     </div><!--End of Content-->
+
+    <!--Scripts-->
+    <!--Put this script before any react script to be able to reverse django urls in react-->
+    <script src="{% url 'reverse_js' %}" type="text/javascript"></script>
+    <script>
+        window.react_mount = document.getElementById('epicerie');
+    </script>
+    <script src="{% static 'react/epicerie.bundle.js' %}"></script>
+    <!--End of Scripts-->
+
 </body>

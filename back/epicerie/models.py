@@ -2,8 +2,9 @@ from django.db import models
 
 # Create your models here.
 
+
 class Basket(models.Model):
-    price = models.IntegerField(default=0)          # in cents
+    price = models.IntegerField(default=0)  # in cents
     composition = models.TextField()
     open_date = models.DateTimeField()
     close_date = models.DateTimeField()
@@ -11,27 +12,20 @@ class Basket(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"panier à {self.price/100}€ du {self.pickup_date.day}/{self.pickup_date.month}" 
+        date = f"{self.pickup_date.day}/{self.pickup_date.month}"
+        return f"panier à {self.price/100}€ du {date}"
+
 
 class Basket_Order(models.Model):
     basket = models.ForeignKey(Basket, on_delete=models.SET_NULL, null=True)
-    student = models.ForeignKey('social.Student', on_delete=models.SET_NULL, null=True)
+    student = models.ForeignKey("social.Student", on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0)
-
-    """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        print(kwargs)
-        self.basket = kwargs.get('basket', None)
-        self.student = kwargs.get('student', None)
-        self.quantity = kwargs.get('quantity', None)
-    """
 
     def __str__(self):
         return f"{self.quantity} {self.basket} by {self.student}"
-    
+
     def isValid(self):
-        bool = self.basket != None
-        bool = bool and self.student != None
-        bool = bool and self.quantity >= 0 and type(self.quantity) == int
+        bool = self.basket is not None
+        bool = bool and self.student is not None
+        bool = bool and self.quantity >= 0 and isinstance(self.quantity, int)
         return bool
