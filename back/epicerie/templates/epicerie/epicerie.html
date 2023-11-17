@@ -1,0 +1,30 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% include "header.html" with title="Publications" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="epicerie" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <div class="content-main">
+            <h3 class="page-title">Epicerie</h3>
+            
+
+            <div class="centered-div mt-2">
+                <a href="{% url 'epicerie:panier' %}">Panier</a>
+                <a href="{% url 'epicerie:vrac' %}">Vrac</a>
+                <a href="{% url 'epicerie:recettes' %}">Recettes</a>
+            </div>
+        </div>
+    
+    </div><!--End of Content-->
+</body>

@@ -13,6 +13,7 @@
             <a href="{% url 'the_calendar:big_calendar' %}" class="sidenav-link {% if active_link == 'the_calendar' %} active {% endif %}"><i class="fas fa-calendar logo-button"></i>Calendrier</a>
             <a href="{% url 'courses:courses_index' %}" class="sidenav-link {% if active_link == 'courses' %} active {% endif %}"><i class="fas fa-book logo-button"></i>Cours</a>
             <a href="{% url 'pochtron:home' %}" class="sidenav-link {% if active_link == 'pochtron' %} active {% endif %}"><i class="fas fa-beer logo-button"></i>Pochtron</a>
+            <a href="{% url 'epicerie:home' %}" class="sidenav-link {% if active_link == 'epicerie' %} active {% endif %}"><i class="fa fa-envira logo-button"></i>Epicerie</a>
             <a href="https://ponthe.enpc.org/" target="_blank" class="sidenav-link"><img class="logo-svg " src="{% static 'assets/img/logo-ponthe.svg' %}">Galeries</a>
             <a href="{% url 'social:profile' %}" class="sidenav-link {% if active_link == 'profile' %} active {% endif %}"><i class="fas fa-address-card logo-button"></i>Profil</a>
             {% if user.is_staff %}

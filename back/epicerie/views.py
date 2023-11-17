@@ -8,12 +8,12 @@ from social.models import Student
 from django.http import HttpResponse, HttpResponseRedirect
 
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the epicerie index.")
+def home(request):
+    return render(request, 'epicerie/epicerie.html')
 
 def basket(request):
     basket_list = Basket.objects.filter(is_active=True)
-    return render(request, 'epicerie/basket_homepage.html', {'basket_list': basket_list})
+    return render(request, 'epicerie/basket.html', {'basket_list': basket_list})
 
 def basket_detail(request, basket_id):
     basket = get_object_or_404(Basket, pk=basket_id)
@@ -32,9 +32,6 @@ def basket_order(request):
             
         for i, basket in enumerate(basket_list):
             if int(quantities[i]) > 0:
-                print(basket)
-                print(student)
-                print(quantities[i])
                 basket_order = Basket_Order(basket=basket, student=student, quantity=int(quantities[i]))
                 if basket_order.isValid():
                     basket_order.save()
@@ -43,3 +40,10 @@ def basket_order(request):
                     return HttpResponse("Error")
 
         return HttpResponseRedirect("/epicerie/panier/")
+    
+
+def vrac(request):
+    return HttpResponse("This is the vrac page")
+
+def recipes(request):
+    return HttpResponse("This is the recettes page")
