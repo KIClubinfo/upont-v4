@@ -9,3 +9,5 @@ back/fixtures
 database/
 dump.rdb
 *.DS_Store
+node_modules/
+```
