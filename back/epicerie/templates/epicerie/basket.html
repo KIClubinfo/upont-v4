@@ -2,7 +2,7 @@
 <!--Markdownify-->
 {% load markdownify %}
 <!--Header-->
-{% include "header.html" with title="Publications" %}
+{% include "header.html" with title="Commande de Paniers" %}
 
 <!--Body-->
 <body>
@@ -10,30 +10,36 @@
     {% include "feedback.html" %}
 
     <!--Sidenav-->
-    {% include "sidenav.html" with active_link="news" %}
+    {% include "sidenav.html" with active_link="epicerie" %}
 
     <!--Content-->
     <div class="content">
 
-        <div class="centered-div mt-2">
-            
-            <form action="{% url 'epicerie:commande_panier' %}" method = "post"> 
-                {% csrf_token %}
-                <fieldset>
-                {% if basket_list %}
-                <ul>
-                    {% for basket in basket_list %}
-                        <input type="text" name="basket_quantity" id="basket{{ forloop.counter }}" value="0">
-                        <label for = "basket{{ forloop.counter }}"> {{basket}} </label><br>
-                    {% endfor %}
-                {% else %}
-                    <p> Il n'y a pas de panier</p>
-                {% endif %}
-            </fieldset>
-            <input type="submit" value="Commander">
-            </form>
+        <div class="content-main">
 
+            <h3 class="page-title">Commande de Paniers</h3>
+
+                <div class="centered-div mt-2">
+                    
+                    <form action="{% url 'epicerie:commande_panier' %}" method = "post"> 
+                        {% csrf_token %}
+                        <fieldset>
+                        {% if basket_list %}
+                        <ul>
+                            {% for basket in basket_list %}
+                                <input type="text" name="basket_quantity" id="basket{{ forloop.counter }}" value="0">
+                                <label for = "basket{{ forloop.counter }}"> {{basket}} </label><br>
+                            {% endfor %}
+                        {% else %}
+                            <p> Il n'y a pas de panier</p>
+                        {% endif %}
+                    </fieldset>
+                    <input type="submit" value="Commander">
+                    </form>
+
+                </div>
         </div>
+
 
 
         
