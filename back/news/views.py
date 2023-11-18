@@ -58,7 +58,11 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.all()
         mode = self.request.GET.get("mode")
         bookmark = self.request.GET.get("bookmark")
+        club = self.request.GET.get("club")
         student = get_object_or_404(Student, user__id=self.request.user.id)
+        if club is not None:
+            club = get_object_or_404(Club, id=club)
+            queryset = queryset.filter(club=club)
         if mode is None:
             queryset = queryset.order_by("-date", "title")
         elif mode == "social":
