@@ -13,7 +13,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from social.models import Club, Membership, Student
-from upont.regex import convert_to_markdown
+from upont.regex import split_then_markdownify
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Shotgun
@@ -211,7 +211,7 @@ class PostCreateView(APIView):
             title=request.data["title"],
             author=student,
             date=timezone.now(),
-            content=convert_to_markdown(request.data["content"]),
+            content=split_then_markdownify(request.data["content"]),
         )
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
@@ -238,7 +238,7 @@ class PostCreateViewV2(APIView):
                 title=request.data["title"],
                 author=student,
                 date=timezone.now(),
-                content=convert_to_markdown(request.data["content"]),
+                content=split_then_markdownify(request.data["content"]),
             )
             if "illustration" in request.data:
                 post.illustration = request.data["illustration"]
@@ -251,7 +251,7 @@ class PostCreateViewV2(APIView):
                     author=student,
                     club=club,
                     date=timezone.now(),
-                    content=convert_to_markdown(request.data["content"]),
+                    content=split_then_markdownify(request.data["content"]),
                 )
                 if "illustration" in request.data:
                     post.illustration = request.data["illustration"]
@@ -276,7 +276,7 @@ class PostEditView(APIView):
         post = get_object_or_404(Post, id=request.data["post"])
         if request.data["publish_as"] == "-1":
             post.title = request.data["title"]
-            post.content = convert_to_markdown(request.data["content"])
+            post.content = split_then_markdownify(request.data["content"])
             post.club = None
             if "illustration" in request.data:
                 post.illustration = request.data["illustration"]
@@ -287,7 +287,7 @@ class PostEditView(APIView):
             club = get_object_or_404(Club, id=request.data["publish_as"])
             if club.is_member(student.id):
                 post.title = request.data["title"]
-                post.content = convert_to_markdown(request.data["content"])
+                post.content = split_then_markdownify(request.data["content"])
                 post.club = club
                 if "illustration" in request.data:
                     post.illustration = request.data["illustration"]
@@ -532,7 +532,7 @@ def post_create(request, event_id=None, course_id=None):
                 post = form.save(commit=False)
                 post.author = Student.objects.get(user__id=request.user.id)
                 post.date = timezone.now()
-                post.content = convert_to_markdown(post.content)
+                post.content = split_then_markdownify(post.content)
                 post.save()
                 if course_id is not None:
                     course = get_object_or_404(Course, pk=course_id)
