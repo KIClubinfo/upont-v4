@@ -147,3 +147,10 @@ class Shotgun(models.Model):
             if participation.participant == student:
                 return True
         return False
+
+    def denied(self):
+        return [
+            participation
+            for participation in self.participations().order_by("shotgun_date")
+            if participation not in self.accepted_participations()
+        ]
