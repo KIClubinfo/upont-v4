@@ -141,7 +141,18 @@
                         {% endfor %}
                     {% endif %}
 
-
+                    <h3 class="page-title mt-2">Liste d'attente</h3>
+                    {% for participation in shotgun.denied %}
+                        <!--Box-->
+                        <div class="box small-box">
+                            <h5 class="section-title text-bold">{{participation.participant.user.first_name}} {{participation.participant.user.last_name}}</h5>
+                        </div><!--End of Box-->
+                    {% empty %}
+                        <!--Box-->
+                        <div class="box small-box">
+                            <h5 class="section-title">Personne n'est en ligne d'attente.</h5>
+                        </div><!--End of Box-->
+                    {% endfor %}
                 </div><!--End of Column-->
 
             </div><!--End of Row-->
