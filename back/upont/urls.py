@@ -41,6 +41,7 @@ from news.views import (
     ShotgunView,
 )
 from pochtron.views import (
+    CagnotteURL,
     PochtronBalance,
     PochtronId,
     PochtronTransactions,
@@ -164,5 +165,6 @@ urlpatterns += [
         PochtronTransactions.as_view(),
         name="pochtron_transactions",
     ),
+    path("api/pochtron/cagnotte_url/", CagnotteURL.as_view(), name="cagnotte_url"),
     path("api/test/", ProfilePicUpdate.as_view(), name="test"),
 ]
