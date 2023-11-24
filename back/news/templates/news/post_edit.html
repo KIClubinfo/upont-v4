@@ -3,6 +3,7 @@
 {% include "header.html" with title="Modifier la publication" %}
 
 <!--Body-->
+
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
@@ -33,8 +34,7 @@
                         {%else%}
                             {%url 'courses:course_post_create' course_id=course_id%}
                         {%endif%}
-                    {% endif %}" method="post" enctype="multipart/form-data"
-                >
+                    {% endif %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="news-card-content">
                         <div class="centered-div">
@@ -55,7 +55,8 @@
                             {{EditPost.content.errors}}
                             <div class="input-title">Description :</div>
                             {{EditPost.content}}<br><br>
-                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</p>
+                            <p>Tu peux écrire en markdown, clique <a href="{% url 'news:markdown' %}"
+                                target="_blank">sur ce lien</a> pour en savoir plus.</p>
 
                             {%if course_id != None%}
                                 {{EditPost.resource_file.errors}}
@@ -81,7 +82,7 @@
                     {%endif%}
                     <div class="centered-div">
                         <button type="button" class="button red-button" onclick="history.back()">Annuler</button>
-                        <input class="button green-button" type="submit" name= "Valider" value="Valider">
+                        <input class="button green-button" type="submit" name="Valider" value="Valider">
                         {% if Edit %}
                             <input class="button red-button" type="submit" name="Supprimer" value="Supprimer le post">
                         {% endif %}
@@ -94,4 +95,5 @@
     </div><!--End of Content-->
 
 </body><!--End of Body-->
+
 </html><!--End of Document-->

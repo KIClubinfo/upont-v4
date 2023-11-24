@@ -3,6 +3,7 @@
 {% include "header.html" with title="Modifier l'évènement" %}
 
 <!--Body-->
+
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
@@ -32,8 +33,8 @@
                             {{EditEvent.description.errors}}
                             <div class="input-title">Description de l'évènement :</div>
                             {{EditEvent.description}}<br><br>
-                            <p>Tu peux écrire en markdown, rends toi <a href="{% url 'news:markdown' %}" target="_blank">ici</a> pour en savoir plus.</p>
-
+                            <p>Tu peux écrire en markdown, clique <a href="{% url 'news:markdown' %}"
+                                target="_blank">sur ce lien</a> pour en savoir plus.</p>
                             {{EditEvent.date.errors}}
                             <div class="input-title">Début de l'évènement :</div>
                             {{EditEvent.date}}
@@ -47,7 +48,7 @@
                                     dateField = $("#id_date");
                                     endField = $("#id_end");
 
-                                    function endPicker (minDate) {
+                                    function endPicker(minDate) {
                                         endField.datetimepicker({
                                             format: 'd/m/Y H:i',
                                             minDate: minDate,
@@ -68,6 +69,47 @@
                             <div class="input-title">Où se déroule l'évènement :</div>
                             {{EditEvent.location}}
 
+                            {{EditEvent.organizer.errors}}
+                            <div class="input-title">Élève référent à contacter :</div>
+                            {{EditEvent.organizer}}
+
+                            {{EditEvent.isPrice.errors}}
+                            <div class="input-title">L'évènement est-il payant ?</div>
+                            
+                            <label for="isPrice_0">
+                                <input 
+                                  type="radio" 
+                                  class="radio" 
+                                  name="isPrice" 
+                                  id="isPrice_0" 
+                                  value="True" 
+                                  {% if EditEvent.isPrice.value == True %}checked{% endif %} 
+                                /> Oui
+                              </label>
+                              <br>
+                              <label for="isPrice_1">
+                                <input 
+                                  type="radio" 
+                                  class="radio" 
+                                  name="isPrice" 
+                                  id="isPrice_1" 
+                                  value="False" 
+                                  {% if EditEvent.isPrice.value == False %}checked{% endif %} 
+                                /> Non
+                              </label>
+                            <script>
+                                // Get the radio buttons
+                                const radioButtons = document.querySelectorAll('input[name="isPrice"]');
+
+                                // Add event listener to each radio button
+                                radioButtons.forEach((radioButton) => {
+                                    radioButton.addEventListener('change', () => {
+                                        // Set the value of EditEvent.isPrice based on the selected radio button
+                                        EditEvent.isPrice.value = radioButton.value;
+                                    });
+                                });
+                            </script>
+
                             {{EditEvent.poster.errors}}
                             <div class="input-title">Ajouter/modifier une image :</div>
                             {{EditEvent.poster}}
@@ -76,9 +118,48 @@
                             <div class="input-title">Club :</div>
                             {{EditEvent.club}}
 
+                            {{EditEvent.isShotgun.errors}}
+                            <div class="input-title">L'évènement est-il soumis à un shotgun ? (sur uPont ou non)</div>
+                            <label for="isShotgun_0">
+                                <input 
+                                  type="radio" 
+                                  class="radio" 
+                                  name="isShotgun" 
+                                  id="isShotgun_0" 
+                                  value="True" 
+                                  {% if EditEvent.isShotgun.value == True %}checked{% endif %} 
+                                /> Oui
+                              </label>
+                              <br>
+                              <label for="isShotgun_1">
+                                <input 
+                                  type="radio" 
+                                  class="radio" 
+                                  name="isShotgun" 
+                                  id="isShotgun_1" 
+                                  value="False" 
+                                  {% if EditEvent.isShotgun.value == False %}checked{% endif %} 
+                                /> Non
+                              </label>
+
+                            <script>
+                                // Get the radio buttons
+                                const radioButtons = document.querySelectorAll('input[name="isShotgun"]');
+
+                                // Add event listener to each radio button
+                                radioButtons.forEach((radioButton) => {
+                                    radioButton.addEventListener('change', () => {
+                                        // Set the value of EditEvent.isShotgun based on the selected radio button
+                                        EditEvent.isShotgun.value = radioButton.value;
+                                    });
+                                });
+                            </script>
+
                             {{EditEvent.shotgun.errors}}
                             <div class="input-title">Shotgun :</div>
                             {{EditEvent.shotgun}}
+
+
                         </div>
                     </div>
                     {% if event.poster %}
@@ -92,7 +173,9 @@
                         </div>
                     {% endif %}
                     <div class="centered-div">
-                        <a href="{% if event %}{% url 'news:event_detail' event.id %}{% else %}{% url 'news:events' %}{% endif %}"><button type="button" class="button red-button">Annuler</button></a>
+                        <a
+                            href="{% if event %}{% url 'news:event_detail' event.id %}{% else %}{% url 'news:events' %}{% endif %}"><button
+                                type="button" class="button red-button">Annuler</button></a>
                         <button class="button green-button" type="submit" name="Valider">Valider</button>
                         {% if Edit %}
                             <button class="button red-button" type="submit" name="Supprimer">Supprimer l'event</button>
@@ -106,4 +189,5 @@
 
     </div><!--End of Content-->
 </body><!--End of Body-->
+
 </html><!--End of Document-->

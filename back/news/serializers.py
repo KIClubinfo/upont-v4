@@ -302,6 +302,8 @@ class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
             "requires_motivation",
             "motivations_review_finished",
             "user_state",
+            "success_message",
+            "failure_message",
         ]
 
 
@@ -321,5 +323,8 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             "participants",
             "poster",
             "shotgun",
+            "isShotgun",
+            "isPrice",
             "id",
+            "organizer",
         ]
