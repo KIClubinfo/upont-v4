@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('news', '0007_auto_20231124_0943'),
+        ("news", "0007_auto_20231124_0943"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='isPrice',
-            field=models.BooleanField(choices=[(True, 'Yes'), (False, 'No')], default=False),
+            model_name="event",
+            name="isPrice",
+            field=models.BooleanField(
+                choices=[(True, "Yes"), (False, "No")], default=False
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='isShotgun',
-            field=models.BooleanField(choices=[(True, 'Yes'), (False, 'No')], default=False),
+            model_name="event",
+            name="isShotgun",
+            field=models.BooleanField(
+                choices=[(True, "Yes"), (False, "No")], default=False
+            ),
         ),
     ]

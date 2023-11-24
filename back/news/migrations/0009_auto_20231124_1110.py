@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('news', '0008_auto_20231124_1102'),
+        ("news", "0008_auto_20231124_1102"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='isPrice',
+            model_name="event",
+            name="isPrice",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='isShotgun',
+            model_name="event",
+            name="isShotgun",
             field=models.BooleanField(default=False),
         ),
     ]

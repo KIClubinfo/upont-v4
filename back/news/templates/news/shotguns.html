@@ -39,83 +39,83 @@
 
             <div class="centered-div mt-2">
                 {% if display_admin_button %}
-                <a href="{% url 'news:shotguns_admin' %}" style="text-decoration: none"><button
+                    <a href="{% url 'news:shotguns_admin' %}" style="text-decoration: none"><button
                         class="button blue-button">Administration des shotguns</button></a>
-                <br>
-                <a href="{% url 'news:new_shotgun' %}">
-                    <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un
-                        shotgun</button>
-                </a>
+                    <br>
+                    <a href="{% url 'news:new_shotgun' %}">
+                        <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un
+                            shotgun</button>
+                    </a>
                 {% endif %}
             </div>
 
             {% for shotgun in next_shotguns %}
-            <!--Box-->
-            <div class="box small-box">
-                <h5 class="section-title">{{shotgun.title}}</h5>
+                <!--Box-->
+                <div class="box small-box">
+                    <h5 class="section-title">{{shotgun.title}}</h5>
 
-                <ul class="">
-                    <li>
-                        <div class="text-bold mt-2">Organisateur : <strong
+                    <ul class="">
+                        <li>
+                            <div class="text-bold mt-2">Organisateur : <strong
                                 class="text-thin">{{shotgun.club.name}}</strong></div>
-                    </li>
-                    <li>
-                        <div class="text-bold mt-2">
-                            {%if shotgun.is_started%}
-                            Ce shotgun a commencé !
-                            {%elif not shotgun.is_ended%}
-                            Début du shotgun : <strong class="text-thin">{{shotgun.starting_date}}</strong>
-                            {%endif%}
-                        </div>
-                    </li>
-                    <li>
-                        <div class="text-bold mt-2">Fin du shotgun : <strong
+                        </li>
+                        <li>
+                            <div class="text-bold mt-2">
+                                {%if shotgun.is_started%}
+                                    Ce shotgun a commencé !
+                                {%elif not shotgun.is_ended%}
+                                    Début du shotgun : <strong class="text-thin">{{shotgun.starting_date}}</strong>
+                                {%endif%}
+                            </div>
+                        </li>
+                        <li>
+                            <div class="text-bold mt-2">Fin du shotgun : <strong
                                 class="text-thin">{{shotgun.ending_date}}</strong></div>
-                    </li>
-                    <li>
-                        <div class="text-bold mt-2">Motivation : <strong class="text-thin">
+                        </li>
+                        <li>
+                            <div class="text-bold mt-2">Motivation : <strong class="text-thin">
                                 {% if shotgun.requires_motivation %}Requise.{% else %}Non.{% endif %}</strong></div>
-                    </li>
-                    <li>
-                        <div class="text-bold mt-2">Nombre de places : <strong
+                        </li>
+                        <li>
+                            <div class="text-bold mt-2">Nombre de places : <strong
                                 class="text-thin">{{shotgun.size}}</strong></div>
-                    </li>
-                    <li>
-                        <div class="text-bold mt-2">Description : <strong class="text-thin">
+                        </li>
+                        <li>
+                            <div class="text-bold mt-2">Description : <strong class="text-thin">
                                 {{shotgun.content | markdownify}}</strong></div>
-                    </li>
-                </ul>
+                        </li>
+                    </ul>
 
-                <div class="centered-div">
-                    <a href="{% url 'news:shotgun_detail' shotgun.id %}"><button
+                    <div class="centered-div">
+                        <a href="{% url 'news:shotgun_detail' shotgun.id %}"><button
                             class="button blue-button">Participer</button></a>
-                </div>
-            </div><!--End of Box-->
+                    </div>
+                </div><!--End of Box-->
             {% empty %}
-            <!--Box-->
-            <div class="box small-box">
-                <h5 class="section-title">Aucun shotgun à venir.</h5>
-            </div><!--End of Box-->
+                <!--Box-->
+                <div class="box small-box">
+                    <h5 class="section-title">Aucun shotgun à venir.</h5>
+                </div><!--End of Box-->
             {% endfor %}
 
             <h3 class="page-title">Mes Shotguns</h3>
 
             {% for shotgun in user_shotguns %}
-            <!--Box-->
-            <div class="box small-box">
-                <a class="text-not-underlined" href="{% url 'news:shotgun_detail' shotgun.id %}">
-                    <h5 class="section-title">
-                        <strong class="text-bold">{{shotgun.title}}</strong>
-                        <br>
-                        <strong class="text-thin">Organisé par {{shotgun.club.name}}</strong>
-                    </h5>
-                </a>
-            </div><!--End of Box-->
+                <!--Box-->
+                <div class="box small-box">
+                    <a class="text-not-underlined" href="{% url 'news:shotgun_detail' shotgun.id %}">
+                        <h5 class="section-title">
+                            <strong class="text-bold">{{shotgun.title}}</strong>
+                            <br>
+                            <strong class="text-thin">Organisé par {{shotgun.club.name}}</strong>
+                        </h5>
+                    </a>
+                </div><!--End of Box-->
             {% empty %}
-            <!--Box-->
-            <div class="box small-box">
-                <h5 class="section-title">Tu n'as participé à aucun shotgun.</h5>
-            </div><!--End of Box-->
+                <!--Box-->
+                <div class="box small-box">
+                    <h5 class="section-title">Tu n'as participé à aucun shotgun.</h5>
+                </div><!--End of Box-->
             {% endfor %}
 
             <h3 class="page-title">Anciens Shotguns</h3>
@@ -124,23 +124,23 @@
             <div class="row">
 
                 {%for shotgun in old_shotguns%}
-                <!--Column-->
-                <div class="col-clublg-6">
-                    <div class="box small-box">
-                        <a class="text-not-underlined" href="{% url 'news:shotgun_detail' shotgun.id %}">
-                            <h5 class="section-title">
-                                <strong class="text-bold">{{shotgun.title}}</strong>
-                                <br>
-                                <strong class="text-thin">Organisé par {{shotgun.club.name}}</strong>
-                            </h5>
-                        </a>
-                    </div><!--End of Box-->
-                </div><!--End of column-->
+                    <!--Column-->
+                    <div class="col-clublg-6">
+                        <div class="box small-box">
+                            <a class="text-not-underlined" href="{% url 'news:shotgun_detail' shotgun.id %}">
+                                <h5 class="section-title">
+                                    <strong class="text-bold">{{shotgun.title}}</strong>
+                                    <br>
+                                    <strong class="text-thin">Organisé par {{shotgun.club.name}}</strong>
+                                </h5>
+                            </a>
+                        </div><!--End of Box-->
+                    </div><!--End of column-->
                 {% empty %}
-                <!--Box-->
-                <div class="box small-box mt-2">
-                    <h5 class="section-title">Aucun shotgun terminé.</h5>
-                </div><!--End of Box-->
+                    <!--Box-->
+                    <div class="box small-box mt-2">
+                        <h5 class="section-title">Aucun shotgun terminé.</h5>
+                    </div><!--End of Box-->
                 {% endfor %}
 
 

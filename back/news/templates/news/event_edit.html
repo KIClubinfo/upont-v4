@@ -75,28 +75,28 @@
 
                             {{EditEvent.isPrice.errors}}
                             <div class="input-title">L'évènement est-il payant ?</div>
-                            
+
                             <label for="isPrice_0">
-                                <input 
-                                  type="radio" 
-                                  class="radio" 
-                                  name="isPrice" 
-                                  id="isPrice_0" 
-                                  value="True" 
-                                  {% if EditEvent.isPrice.value == True %}checked{% endif %} 
+                                <input
+                                    type="radio"
+                                    class="radio"
+                                    name="isPrice"
+                                    id="isPrice_0"
+                                    value="True"
+                                    {% if EditEvent.isPrice.value == True %}checked{% endif %}
                                 /> Oui
-                              </label>
-                              <br>
-                              <label for="isPrice_1">
-                                <input 
-                                  type="radio" 
-                                  class="radio" 
-                                  name="isPrice" 
-                                  id="isPrice_1" 
-                                  value="False" 
-                                  {% if EditEvent.isPrice.value == False %}checked{% endif %} 
+                            </label>
+                            <br>
+                            <label for="isPrice_1">
+                                <input
+                                    type="radio"
+                                    class="radio"
+                                    name="isPrice"
+                                    id="isPrice_1"
+                                    value="False"
+                                    {% if EditEvent.isPrice.value == False %}checked{% endif %}
                                 /> Non
-                              </label>
+                            </label>
                             <script>
                                 // Get the radio buttons
                                 const radioButtons = document.querySelectorAll('input[name="isPrice"]');
@@ -121,26 +121,26 @@
                             {{EditEvent.isShotgun.errors}}
                             <div class="input-title">L'évènement est-il soumis à un shotgun ? (sur uPont ou non)</div>
                             <label for="isShotgun_0">
-                                <input 
-                                  type="radio" 
-                                  class="radio" 
-                                  name="isShotgun" 
-                                  id="isShotgun_0" 
-                                  value="True" 
-                                  {% if EditEvent.isShotgun.value == True %}checked{% endif %} 
+                                <input
+                                    type="radio"
+                                    class="radio"
+                                    name="isShotgun"
+                                    id="isShotgun_0"
+                                    value="True"
+                                    {% if EditEvent.isShotgun.value == True %}checked{% endif %}
                                 /> Oui
-                              </label>
-                              <br>
-                              <label for="isShotgun_1">
-                                <input 
-                                  type="radio" 
-                                  class="radio" 
-                                  name="isShotgun" 
-                                  id="isShotgun_1" 
-                                  value="False" 
-                                  {% if EditEvent.isShotgun.value == False %}checked{% endif %} 
+                            </label>
+                            <br>
+                            <label for="isShotgun_1">
+                                <input
+                                    type="radio"
+                                    class="radio"
+                                    name="isShotgun"
+                                    id="isShotgun_1"
+                                    value="False"
+                                    {% if EditEvent.isShotgun.value == False %}checked{% endif %}
                                 /> Non
-                              </label>
+                            </label>
 
                             <script>
                                 // Get the radio buttons

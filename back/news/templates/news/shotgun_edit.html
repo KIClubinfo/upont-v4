@@ -1,9 +1,9 @@
 {% load static %}
 <!--Header-->
 {% if edit %}
-{% include "header.html" with title="Modification du shotgun" %}
+    {% include "header.html" with title="Modification du shotgun" %}
 {% else %}
-{% include "header.html" with title="Nouveau shotgun" %}
+    {% include "header.html" with title="Nouveau shotgun" %}
 {% endif %}
 
 <!--Body-->
@@ -22,93 +22,93 @@
         <div class="content-main">
 
             {% if edit %}
-            <h3 class="page-title">Édition d'un shotgun</h3>
+                <h3 class="page-title">Édition d'un shotgun</h3>
             {% else %}
-            <h3 class="page-title">Nouveau Shotgun</h3>
+                <h3 class="page-title">Nouveau Shotgun</h3>
             {% endif %}
 
             <!--News Card-->
             <div class="news-card">
                 <div class="news-card-content">
                     {% if has_clubs_admins or edit %}
-                    {% if edit %}
-                    <form class="centered-div" action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" id="1">
+                        {% if edit %}
+                            <form class="centered-div" action="{% url 'news:edit_shotgun' shotgun.id %}" method="post" id="1">
                         {% else %}
-                        <form class="centered-div" action="{% url 'news:new_shotgun' %}" method="post" id="1">
-                            {% endif %}
-                            {% csrf_token %}
+                            <form class="centered-div" action="{% url 'news:new_shotgun' %}" method="post" id="1">
+                        {% endif %}
+                        {% csrf_token %}
 
-                            {{ form.non_field_errors }}
+                        {{ form.non_field_errors }}
 
-                            {{form.club.errors}}
-                            <div class="input-title">Club :</div>
-                            {{form.club}}
+                        {{form.club.errors}}
+                        <div class="input-title">Club :</div>
+                        {{form.club}}
 
-                            {{form.title.errors}}
-                            <div class="input-title">Titre :</div>
-                            {{form.title}}
+                        {{form.title.errors}}
+                        <div class="input-title">Titre :</div>
+                        {{form.title}}
 
-                            {{form.content.errors}}
-                            <div class="input-title">Description :</div>
-                            {{form.content}}<br><br>
-                            <p>Tu peux écrire en markdown, clique <a href="{% url 'news:markdown' %}"
-                                    target="_blank">sur ce lien</a> pour en savoir plus.</p>
+                        {{form.content.errors}}
+                        <div class="input-title">Description :</div>
+                        {{form.content}}<br><br>
+                        <p>Tu peux écrire en markdown, clique <a href="{% url 'news:markdown' %}"
+                            target="_blank">sur ce lien</a> pour en savoir plus.</p>
 
-                            {{form.starting_date.errors}}
-                            <div class="input-title">Date de début :</div>
-                            {{form.starting_date}}
-                            <script>
-                                $(function () {
-                                    $("#id_starting_date").datetimepicker({
-                                        format: 'd/m/Y H:i',
-                                    });
+                        {{form.starting_date.errors}}
+                        <div class="input-title">Date de début :</div>
+                        {{form.starting_date}}
+                        <script>
+                            $(function () {
+                                $("#id_starting_date").datetimepicker({
+                                    format: 'd/m/Y H:i',
                                 });
-                            </script>
+                            });
+                        </script>
 
-                            {{form.ending_date.errors}}
-                            <div class="input-title">Date de fin :</div>
-                            {{form.ending_date}}
-                            <script>
-                                $(function () {
-                                    $("#id_ending_date").datetimepicker({
-                                        format: 'd/m/Y H:i',
-                                    });
+                        {{form.ending_date.errors}}
+                        <div class="input-title">Date de fin :</div>
+                        {{form.ending_date}}
+                        <script>
+                            $(function () {
+                                $("#id_ending_date").datetimepicker({
+                                    format: 'd/m/Y H:i',
                                 });
-                            </script>
+                            });
+                        </script>
 
-                            {{form.size.errors}}
-                            <div class="input-title">Nombre de place :</div>
-                            {{form.size}}
+                        {{form.size.errors}}
+                        <div class="input-title">Nombre de place :</div>
+                        {{form.size}}
 
-                            {{form.success_message.errors}}
-                            <div class="input-title">Message en cas de succès :</div>
-                            {{form.success_message}}<br><br>
+                        {{form.success_message.errors}}
+                        <div class="input-title">Message en cas de succès :</div>
+                        {{form.success_message}}<br><br>
 
-                            {{form.failure_message.errors}}
-                            <div class="input-title">Message en cas d'échec :</div>
-                            {{form.failure_message}}<br><br>
+                        {{form.failure_message.errors}}
+                        <div class="input-title">Message en cas d'échec :</div>
+                        {{form.failure_message}}<br><br>
 
-                            <!-- {{form.requires_motivation.errors}}
+                        <!-- {{form.requires_motivation.errors}}
                         <div class="input-title">Requiert une motivation : {{form.requires_motivation}}</div> -->
 
-                            <div class="centered-div">
-                                {% if edit %}
+                        <div class="centered-div">
+                            {% if edit %}
                                 <button form=1 type="submit" value="Modifier" class="button green-button">Appliquer les
                                     modifications</button>
                                 <a href="{% url 'news:shotguns_admin_detail' shotgun.id %}"><button
-                                        class="button red-button">Annuler</button></a>
-                                {% else %}
+                                    class="button red-button">Annuler</button></a>
+                            {% else %}
                                 <button form=1 type="submit" value="Créer" class="button green-button">Créer</button>
                                 <a href="{% url 'news:shotguns' %}"><button type="button"
-                                        class="button red-button">Annuler</button></a>
-                                {% endif %}
+                                    class="button red-button">Annuler</button></a>
+                            {% endif %}
 
-                            </div>
+                        </div>
                         </form>
-                        {% else %}
+                    {% else %}
                         <p class="text-bold text-center mt-2">Tu dois être administrateur d'un club pour créer de
                             nouveaux shotguns.</p>
-                        {% endif %}
+                    {% endif %}
                 </div>
             </div><!--End of News Card-->
 

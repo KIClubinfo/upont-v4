@@ -86,190 +86,190 @@
                                 <div class="text-bold mt-2">Évènement avec shotgun : <strong class="text-thin">
                                     {% if event.isShotgun %}Oui{% else %}Non{% endif %}</strong></div>
                             </li>
-{% if event.shotgun %}
-    {% if event.shotgun.requires_motivation %}
-        <li>
-            <div class="text-bold mt-2">Shotgun : <strong class="text-thin">Cet évènement est soumis
-                à un shotgun avec motivation</strong></div>
-        </li>
-    {% else %}
-        <li>
-            <div class="text-bold mt-2">Shotgun : <strong class="text-thin">Cet évènement est soumis
-                à un shotgun sans motivation</strong></div>
-        </li>
-    {% endif %}
-{% endif %}
-</ul>
-
-<div class="centered-div">
-    {% if event.shotgun %}
-        <a href="{% url 'news:shotgun_detail' event.shotgun.pk%}"><button
-            class="button blue-button">Voir le shotgun</button></a>
-    {% else %}
-        {% if student in event.participants.all %}
-            <a href="{% url 'news:event_participate' event_id=event.id action='Unparticipate'%}"><button
-                class="button red-button">Je ne participe plus</button></a>
-        {% else %}
-            <a href="{% url 'news:event_participate' event_id=event.id action='Participate'%}"><button
-                class="button green-button">Je participe</button></a>
-        {% endif %}
-    {% endif %}
-    <a href="{% url 'news:events' %}"><button class="button blue-button">Retour à
-        l'index</button></a>
-    {% if is_member %} <a href="{% url 'news:event_edit' event_id=event.id%}"><button
-        class="button blue-button">Modifier</button></a>
-    {% endif %}
-</div>
-</div><!--End of Box-->
-
-</div><!--End of Column-->
-
-<!--Column-->
-<div class="col-detail-lg-6">
-    <h4 class="page-title">Posts liés à cet évènement</h4>
-    {% if is_member %}
-        <div class="centered-div mt-2">
-            <a href="{% url 'news:post_create_with_origin' event.id%}">
-                <button class="button blue-button "><i
-                    class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un post</button>
-            </a>
-        </div>
-    {% endif %}
-
-    {% if event_posts %}
-        {% for post in event_posts %}
-            <div class="news-card">
-                <div class="news-card-header">
-                    <!--Poster-Image-Name-and-Title-of-the-post-->
-                    {% if post.club %}
-                        <div class="news-card-header-image">
-                            <img class="image-centered"
-                                src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}">
-                        </div>
-                    {% else %}
-                        <div class="news-card-header-image">
-                            <img class="image-centered"
-                                src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
-                        </div>
-                    {% endif %}
-                    <div class="news-card-header-text">
-                        {%if post.club%}
-                            <a class="news-card-header-name" href="{% url 'social:club_detail' post.club.pk %}">
-                                {{post.club.name}}
-                            </a>
-                            {% if is_member %}
-                                <span class="news-card-header-date">
-                                    Publié par <a href="{% url 'social:profile_viewed' post.author.user.pk %}">
-                                        {{post.author.user.first_name}} {{post.author.user.last_name}}
-                                    </a>
-                                </span>
+                            {% if event.shotgun %}
+                                {% if event.shotgun.requires_motivation %}
+                                    <li>
+                                        <div class="text-bold mt-2">Shotgun : <strong class="text-thin">Cet évènement est soumis
+                                            à un shotgun avec motivation</strong></div>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <div class="text-bold mt-2">Shotgun : <strong class="text-thin">Cet évènement est soumis
+                                            à un shotgun sans motivation</strong></div>
+                                    </li>
+                                {% endif %}
                             {% endif %}
-                        {%else%}
-                            <a class="news-card-header-name"
-                                href="{% url 'social:profile_viewed' post.author.user.pk %}">
-                                {{post.author.user.first_name}} {{post.author.user.last_name}}
-                            </a>
-                        {% endif %}
-                        <span class="news-card-header-date">
-                            {{post.date|date:"D. d b. Y - G:i"}}
-                        </span>
-                    </div>
+                        </ul>
+
+                        <div class="centered-div">
+                            {% if event.shotgun %}
+                                <a href="{% url 'news:shotgun_detail' event.shotgun.pk%}"><button
+                                    class="button blue-button">Voir le shotgun</button></a>
+                            {% else %}
+                                {% if student in event.participants.all %}
+                                    <a href="{% url 'news:event_participate' event_id=event.id action='Unparticipate'%}"><button
+                                        class="button red-button">Je ne participe plus</button></a>
+                                {% else %}
+                                    <a href="{% url 'news:event_participate' event_id=event.id action='Participate'%}"><button
+                                        class="button green-button">Je participe</button></a>
+                                {% endif %}
+                            {% endif %}
+                            <a href="{% url 'news:events' %}"><button class="button blue-button">Retour à
+                                l'index</button></a>
+                            {% if is_member %} <a href="{% url 'news:event_edit' event_id=event.id%}"><button
+                                class="button blue-button">Modifier</button></a>
+                            {% endif %}
+                        </div>
+                    </div><!--End of Box-->
+
+                </div><!--End of Column-->
+
+                <!--Column-->
+                <div class="col-detail-lg-6">
+                    <h4 class="page-title">Posts liés à cet évènement</h4>
                     {% if is_member %}
-                        <div class="news-card-header-edit-button">
-                            <a href="{% url 'news:post_edit' post.id %}"><i class="fas fa-edit"></i></a>
+                        <div class="centered-div mt-2">
+                            <a href="{% url 'news:post_create_with_origin' event.id%}">
+                                <button class="button blue-button "><i
+                                    class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un post</button>
+                            </a>
                         </div>
                     {% endif %}
-                </div>
-                <div class="news-card-content">
-                    <div class="news-card-content-title">
-                        <span class="news-card-header-title">
-                            {{post.title}}
-                        </span>
-                    </div>
-                    <p>{{post.content | markdownify}}</p>
-                </div>
-                {%if post.illustration%}
-                    <div class="news-card-images">
-                        <!--All-Images-Linked-With-The-Post-->
-                        <div class="news-card-carousel centered-div">
-                            <div class="carousel-cell"><img class="news-card_image_sized"
-                                src="{{post.illustration.url}}" alt=""></div>
-                        </div>
-                    </div>
-                {%endif%}
-                <div class="news-card-actions">
-                    <span>
-                        {% if user.student in post.likes.all %}
-                            <a class=""><i class="fas fa-heart" style="color:red"></i></a>
+
+                    {% if event_posts %}
+                        {% for post in event_posts %}
+                            <div class="news-card">
+                                <div class="news-card-header">
+                                    <!--Poster-Image-Name-and-Title-of-the-post-->
+                                    {% if post.club %}
+                                        <div class="news-card-header-image">
+                                            <img class="image-centered"
+                                                src="{% if post.club.logo %}{{post.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}">
+                                        </div>
+                                    {% else %}
+                                        <div class="news-card-header-image">
+                                            <img class="image-centered"
+                                                src="{% if post.author.picture %}{{post.author.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}">
+                                        </div>
+                                    {% endif %}
+                                    <div class="news-card-header-text">
+                                        {%if post.club%}
+                                            <a class="news-card-header-name" href="{% url 'social:club_detail' post.club.pk %}">
+                                                {{post.club.name}}
+                                            </a>
+                                            {% if is_member %}
+                                                <span class="news-card-header-date">
+                                                    Publié par <a href="{% url 'social:profile_viewed' post.author.user.pk %}">
+                                                        {{post.author.user.first_name}} {{post.author.user.last_name}}
+                                                    </a>
+                                                </span>
+                                            {% endif %}
+                                        {%else%}
+                                            <a class="news-card-header-name"
+                                                href="{% url 'social:profile_viewed' post.author.user.pk %}">
+                                                {{post.author.user.first_name}} {{post.author.user.last_name}}
+                                            </a>
+                                        {% endif %}
+                                        <span class="news-card-header-date">
+                                            {{post.date|date:"D. d b. Y - G:i"}}
+                                        </span>
+                                    </div>
+                                    {% if is_member %}
+                                        <div class="news-card-header-edit-button">
+                                            <a href="{% url 'news:post_edit' post.id %}"><i class="fas fa-edit"></i></a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="news-card-content">
+                                    <div class="news-card-content-title">
+                                        <span class="news-card-header-title">
+                                            {{post.title}}
+                                        </span>
+                                    </div>
+                                    <p>{{post.content | markdownify}}</p>
+                                </div>
+                                {%if post.illustration%}
+                                    <div class="news-card-images">
+                                        <!--All-Images-Linked-With-The-Post-->
+                                        <div class="news-card-carousel centered-div">
+                                            <div class="carousel-cell"><img class="news-card_image_sized"
+                                                src="{{post.illustration.url}}" alt=""></div>
+                                        </div>
+                                    </div>
+                                {%endif%}
+                                <div class="news-card-actions">
+                                    <span>
+                                        {% if user.student in post.likes.all %}
+                                            <a class=""><i class="fas fa-heart" style="color:red"></i></a>
+                                        {% else %}
+                                            <a class=""><i class="far fa-heart"></i></a>
+                                        {% endif %}
+                                        {{post.total_likes}}
+                                    </span>
+                                    &ensp;
+                                    <span>
+                                        <i class="fas fa-comment"></i>
+                                        {{ post.total_comments }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div><!--End of Column-->
+
+                <!--Column-->
+                <div class="col-detail-lg-12">
+                    {% if event.shotgun %}
+                        {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
+                            <h4 class="page-title">Les participations acceptées ne sont pas disponibles pour le moment.</h4>
                         {% else %}
-                            <a class=""><i class="far fa-heart"></i></a>
+                            {% for participation in event.shotgun.accepted_participations %}
+                                <h4 class="page-title">Participations acceptées</h4>
+
+                                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                    <div class="user-card">
+                                        <div class="user-image"><img
+                                            src="{% if participation.participant.picture %}{{participation.participant.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"
+                                            alt=""></div>
+                                        <div class="user-information">
+                                            <span class="user-name">{{participation.participant.user.first_name}}
+                                                {{participation.participant.user.last_name}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <h4 class="page-title">Personne n'a réussi ce shotgun pour le moment.</h4>
+                            {% endfor %}
                         {% endif %}
-                        {{post.total_likes}}
-                    </span>
-                    &ensp;
-                    <span>
-                        <i class="fas fa-comment"></i>
-                        {{ post.total_comments }}
-                    </span>
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
-</div><!--End of Column-->
+                    {% else %}
+                        {% if event.participants.all %}
+                            <h4 class="page-title">Participants</h4>
+                            {% for participant in event.participants.all %}
+                                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+                                    <div class="user-card">
+                                        <div class="user-image"><img
+                                            src="{% if participant.picture %}{{participant.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"
+                                            alt=""></div>
+                                        <div class="user-information">
+                                            <span class="user-name">{{participant.user.first_name}}
+                                                {{participant.user.last_name}}</span>
+                                        </div>
+                                        <a href="{% url 'social:profile_viewed' participant.user.pk  %}" class="stretched-link"></a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <h4 class="page-title">Cet évènement n'a pas encore d'inscrits :(</h4>
+                        {% endif %}
+                    {% endif %}
+                </div><!--End of Column-->
 
-<!--Column-->
-<div class="col-detail-lg-12">
-    {% if event.shotgun %}
-        {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
-            <h4 class="page-title">Les participations acceptées ne sont pas disponibles pour le moment.</h4>
-        {% else %}
-            {% for participation in event.shotgun.accepted_participations %}
-                <h4 class="page-title">Participations acceptées</h4>
+            </div><!--End of Row-->
 
-                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
-                    <div class="user-card">
-                        <div class="user-image"><img
-                            src="{% if participation.participant.picture %}{{participation.participant.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"
-                            alt=""></div>
-                        <div class="user-information">
-                            <span class="user-name">{{participation.participant.user.first_name}}
-                                {{participation.participant.user.last_name}}</span>
-                        </div>
-                    </div>
-                </div>
-            {% empty %}
-                <h4 class="page-title">Personne n'a réussi ce shotgun pour le moment.</h4>
-            {% endfor %}
-        {% endif %}
-    {% else %}
-        {% if event.participants.all %}
-            <h4 class="page-title">Participants</h4>
-            {% for participant in event.participants.all %}
-                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
-                    <div class="user-card">
-                        <div class="user-image"><img
-                            src="{% if participant.picture %}{{participant.picture.url}}{% else %}{% static 'assets/img/user_default.png' %}{% endif %}"
-                            alt=""></div>
-                        <div class="user-information">
-                            <span class="user-name">{{participant.user.first_name}}
-                                {{participant.user.last_name}}</span>
-                        </div>
-                        <a href="{% url 'social:profile_viewed' participant.user.pk  %}" class="stretched-link"></a>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <h4 class="page-title">Cet évènement n'a pas encore d'inscrits :(</h4>
-        {% endif %}
-    {% endif %}
-</div><!--End of Column-->
+        </div><!--End of Main Content-->
 
-</div><!--End of Row-->
-
-</div><!--End of Main Content-->
-
-</div><!--End of Content-->
-<script src="{% static 'js/like_button.js' %}"></script>
+    </div><!--End of Content-->
+    <script src="{% static 'js/like_button.js' %}"></script>
 </body><!--End of Body-->
 
 </html><!--End of Document-->
