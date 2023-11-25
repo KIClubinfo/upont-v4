@@ -1,5 +1,4 @@
 from django import forms
-from django.forms.widgets import RadioSelect
 from django.shortcuts import get_object_or_404
 from social.models import Membership, Student
 
