@@ -104,8 +104,9 @@ class StudentMembershipView(APIView):
             club_data = serializer.data
             club_data["is_admin"] = membership.is_admin
             club_data["is_old"] = membership.is_old
+            club_data["role"] = membership.role.name
             data.append(club_data)
-        return Response({"is_member_of": data, "role": membership.role.name})
+        return Response({"is_member_of": data})
 
     @classmethod
     def get_extra_actions(cls):
