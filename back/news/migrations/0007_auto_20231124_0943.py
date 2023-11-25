@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("social", "0015_alter_student_biography"),
         ("news", "0006_post_bookmark"),
