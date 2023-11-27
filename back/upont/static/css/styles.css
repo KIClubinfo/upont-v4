@@ -1605,4 +1605,37 @@ a.text-green:hover{
 	display: flex;
 }
 
+.epicerie-basket {
+    margin: 1.5rem auto;
+	position: relative;
+	height: 20rem;
+    width: 30rem;
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+	display: flex;
+	align-items: center;
+	backdrop-filter: blur(10px);
+}
+
+.epicerie-basket .epicerie-basket-composition {
+    position: absolute;
+    justify-content: left;
+    text-align: left;
+    margin-left: 1rem;
+    font-size: 1rem;
+    top : 50px;
+    display: flex;
+}
+
+.epicerie-basket .epicerie-basket-price {
+    /*Centered text, 25 px above the bottom of the card*/
+    position: absolute;
+    text-align: center;
+    font-size: 1.5rem;
+    bottom: 25px;
+    display: flex;
+    
+}
+
 

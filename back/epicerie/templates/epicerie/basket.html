@@ -19,25 +19,65 @@
 
             <h3 class="page-title">Commande de Paniers</h3>
 
-                <div class="centered-div mt-2">
+                <div class="row">
                     
-                    <form action="{% url 'epicerie:commande_panier' %}" method = "post"> 
+                    <form action="{% url 'epicerie:commande_panier' %}" method = "post" > 
                         {% csrf_token %}
-                        <fieldset>
+                            <legend class="centered-div">Choisissez vos paniers</legend>
                         {% if basket_list %}
-                        <ul>
+                        
                             {% for basket in basket_list %}
-                                <input type="text" name="basket_quantity" id="basket{{ forloop.counter }}" value="0">
-                                <label for = "basket{{ forloop.counter }}"> {{basket}} </label><br>
+                                <!--Column-->
+                                <div class = "col-sm">
+                                    <div class = "epicerie-basket">
+                                        <div class = "epicerie-basket-composition">
+                                            <b> Compostion : </b> 
+                                            <ul>
+                                                {% for item in basket.listComposition %}
+                                                    <li>
+                                                        {{item}}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        <br>
+                                        <div class = "epicerie-basket-price">
+                                            {{basket.displayPrice}}
+                                        </div>
+                                        <input type="text" name="basket_quantity" id="basket{{ forloop.counter }}" value="0">
+                                        <br>
+                                        
+                                    </div>
+                                </div>
+                                <!--End of Column-->
                             {% endfor %}
                         {% else %}
                             <p> Il n'y a pas de panier</p>
                         {% endif %}
-                    </fieldset>
-                    <input type="submit" value="Commander">
+
+                    <div class = "centered-div">
+                        <input type="submit" value="Commander">
+                    </div>
+
                     </form>
 
                 </div>
+
+                <div class = "centered-div mt-2">
+                    {% if student_baskets %}
+                        <p> Vos commandes </p>
+                        <ul>
+                            {% for order in student_baskets %}
+                                <li> {{order}} </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p> Vous n'avez pas commandé de panier </p>
+                    {% endif %}
+                </div>
+
+
+
         </div>
 
 

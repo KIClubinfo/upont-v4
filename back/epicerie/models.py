@@ -14,6 +14,12 @@ class Basket(models.Model):
     def __str__(self):
         date = f"{self.pickup_date.day}/{self.pickup_date.month}"
         return f"panier à {self.price/100}€ du {date}"
+    
+    def displayPrice(self):
+        return f"{self.price/100}€"
+    
+    def listComposition(self):
+        return self.composition.split("\n")
 
 
 class Basket_Order(models.Model):
