@@ -18,50 +18,44 @@
         <div class="content-main">
             <h3 class="page-title">Epicerie</h3>
 
-
-            <div class="centered-div mt-2">
-                <a href="{% url 'epicerie:panier' %}">Panier</a>
-                <a href="{% url 'epicerie:vrac' %}">Vrac</a>
-                <a href="{% url 'epicerie:recettes' %}">Recettes</a>
-            </div>
-
             <div class="row">
 
                 <div class="col-sm">
-                    <div class="epicerie">
-                        <div>
-                            <div class = "epicerie-image">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-content">
+                            <div class="epicerie-card-image">
                                 <img class="image-centered" src="{% static 'assets/img/epicerie/basket.png' %}" alt="">
                             </div>
                         </div>
-                        <div><span> Panier </span></div>
+                        <div class="epicerie-card-title"><span> Panier </span></div>
                         <a href="{% url 'epicerie:panier' %}" class="stretched-link"></a>
                     </div>
                 </div><!--End of Column-->
 
                 <div class="col-sm">
-                    <div class="epicerie-link">
-                        <div class="epicerie-link-content">
-                            <div class="epicerie-link-image">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-content">
+                            <div class="epicerie-card-image">
                                 <img class="image-centered" src="{% static 'assets/img/epicerie/vrac.png' %}" alt="">
                             </div>
                         </div>
-                        <div class="epicerie-link-title"><span> Vrac </span></div>
+                        <div class="epicerie-card-title"><span> Vrac </span></div>
                         <a href="{% url 'epicerie:vrac' %}" class="stretched-link"></a>
                     </div>
                 </div><!--End of Column-->
 
                 <div class="col-sm">
-                    <div class="epicerie-link">
-                        <div class="epicerie-link-content">
-                            <div class="epicerie-link-image">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-content">
+                            <div class="epicerie-card-image">
                                 <img class="image-centered" src="{% static 'assets/img/epicerie/recipe.png' %}" alt="">
                             </div>
                         </div>
-                        <div class="epicerie-link-title"><span> Recettes </span></div>
+                        <div class="epicerie-card-title"><span> Recettes </span></div>
                         <a href="{% url 'epicerie:recettes' %}" class="stretched-link"></a>
                     </div>
                 </div><!--End of Column-->
+
 
             </div><!--End of Row-->
         </div>
