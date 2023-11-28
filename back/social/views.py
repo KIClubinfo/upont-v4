@@ -199,6 +199,22 @@ class SearchClub(APIView):
         return Response({"clubs": serializer.data})
 
 
+class StudentProfileEdit(APIView):
+    """
+    API endpoint that allows a student to edit his profile.
+    """
+
+    def post(self, request, format=None):
+        student = get_object_or_404(Student, user__id=request.user.id)
+
+        form = EditProfile(request.data, instance=student)
+        if form.is_valid():
+            form.save()
+            return Response({"status": "ok"})
+        else:
+            return Response({"status": "error", "errors": form.errors})
+
+
 class ProfilePicUpdate(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
@@ -361,6 +377,8 @@ def profile_edit(request):
         if "Annuler" in request.POST:
             return redirect("social:profile")
         elif "Valider" in request.POST:
+            print(request.POST)
+            print(request.FILES)
             form = EditProfile(
                 request.POST,
                 request.FILES,
