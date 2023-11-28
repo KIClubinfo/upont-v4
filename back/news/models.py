@@ -13,6 +13,13 @@ class Event(models.Model):
     date = models.DateTimeField()
     end = models.DateTimeField()
     location = models.CharField(max_length=50)
+    organizer = models.ForeignKey(
+        "social.Student",
+        verbose_name="organizer",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     participants = models.ManyToManyField(
         Student,
         related_name="events",
@@ -22,6 +29,9 @@ class Event(models.Model):
     shotgun = models.ForeignKey(
         "Shotgun", on_delete=models.SET_NULL, null=True, blank=True
     )
+
+    isShotgun = models.BooleanField(default=False)
+    isPrice = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -112,6 +122,8 @@ class Shotgun(models.Model):
     size = models.IntegerField(default=0)
     requires_motivation = models.BooleanField(default=False)
     motivations_review_finished = models.BooleanField(default=False)
+    success_message = models.TextField(null=True, blank=True)
+    failure_message = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.title

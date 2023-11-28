@@ -3,6 +3,7 @@
 {% include "header.html" with title="Markdown" %}
 {% load markdownify %}
 <!--Body-->
+
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
@@ -15,19 +16,47 @@
         <div class="content-header"></div>
         <div class="content-main">
             <h3 class="page-title">Tutoriel Markddown</h3>
-            <div class="content" >
-                <p>Un certain nombre de pages de uPont prennent en charge le markdown pour faire des jolis posts, donc un petit tutoriel s'impose.</p>
+            <div class="content">
+                <p>Un certain nombre de pages de uPont prennent en charge le markdown pour faire des jolis posts, donc
+                    un petit tutoriel s'impose.</p>
             </div>
-            <div class="content" >
+            <div class="content">
                 <p>Voici l'ensemble des fonctions disponibles:</p>
             </div>
             <style type="text/css">
-                .tg  {border-collapse:collapse;border-spacing:0;}
-                .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-                    overflow:hidden;padding:10px 5px;word-break:normal;}
-                .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-                    font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-                .tg .tg-c3ow{border-color:inherit;text-align:center;vertical-align:top}
+                .tg {
+                    border-collapse: collapse;
+                    border-spacing: 0;
+                }
+
+                .tg td {
+                    border-color: black;
+                    border-style: solid;
+                    border-width: 1px;
+                    font-family: Arial, sans-serif;
+                    font-size: 14px;
+                    overflow: hidden;
+                    padding: 10px 5px;
+                    word-break: normal;
+                }
+
+                .tg th {
+                    border-color: black;
+                    border-style: solid;
+                    border-width: 1px;
+                    font-family: Arial, sans-serif;
+                    font-size: 14px;
+                    font-weight: normal;
+                    overflow: hidden;
+                    padding: 10px 5px;
+                    word-break: normal;
+                }
+
+                .tg .tg-c3ow {
+                    border-color: inherit;
+                    text-align: center;
+                    vertical-align: top
+                }
             </style>
             <table class="tg">
                 <thead>
@@ -41,32 +70,44 @@
                     <tr>
                         <td class="tg-c3ow">Titre 1</td>
                         <td class="tg-c3ow"># Titre 1</td>
-                        <td class="tg-c3ow"><h1>Titre 1</h1></td>
+                        <td class="tg-c3ow">
+                            <h1>Titre 1</h1>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Titre 2</td>
                         <td class="tg-c3ow">## Titre 2</td>
-                        <td class="tg-c3ow"><h2>Titre 1</h2></td>
+                        <td class="tg-c3ow">
+                            <h2>Titre 1</h2>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Titre 3</td>
                         <td class="tg-c3ow">### Titre 3</td>
-                        <td class="tg-c3ow"><h3>Titre 1</h3></td>
+                        <td class="tg-c3ow">
+                            <h3>Titre 1</h3>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Titre 4</td>
                         <td class="tg-c3ow">#### Titre 4</td>
-                        <td class="tg-c3ow"><h4>Titre 1</h4></td>
+                        <td class="tg-c3ow">
+                            <h4>Titre 1</h4>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Titre 5</td>
                         <td class="tg-c3ow">##### Titre 5</td>
-                        <td class="tg-c3ow"><h5>Titre 1</h5></td>
+                        <td class="tg-c3ow">
+                            <h5>Titre 1</h5>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Titre 6</td>
                         <td class="tg-c3ow">###### Titre 6</td>
-                        <td class="tg-c3ow"><h6>Titre 1</h6></td>
+                        <td class="tg-c3ow">
+                            <h6>Titre 1</h6>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Gras</td>
@@ -81,17 +122,49 @@
                     <tr>
                         <td class="tg-c3ow">Liste ordonnée<br>(ne prend pas en compte les numéros)</td>
                         <td class="tg-c3ow">1. Element 1<br>2. Element 2<br>2. Element 3<br></td>
-                        <td class="tg-c3ow"><ol><li>Element 1</li><li> Element 2 </li><li> Element 3 </li></ol></td>
+                        <td class="tg-c3ow">
+                            <ol>
+                                <li>Element 1</li>
+                                <li> Element 2 </li>
+                                <li> Element 3 </li>
+                            </ol>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Liste désordonnée<br>(on peut utiliser * ou - indifférement)</td>
                         <td class="tg-c3ow">* Element 1<br>* Element 2<br>* Element 3<br></td>
-                        <td class="tg-c3ow"><ul><li>Element 1</li><li>Element 2 </li><li>Element 3 </li></ul></td>
+                        <td class="tg-c3ow">
+                            <ul>
+                                <li>Element 1</li>
+                                <li>Element 2 </li>
+                                <li>Element 3 </li>
+                            </ul>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Listes imbriquées<br>(mettre 3 espaces d'indentation)<br></td>
-                        <td class="tg-c3ow">1. Liste 1<br>   * Element 1<br>   * Element 2<br>   * Element 3<br><br>2. Liste 2<br>   * Element 1<br>   * Element 2<br>   * Element 3<br></td>
-                        <td class="tg-c3ow"><ol><li><p>Element 1</p><ul><li>Element 1</li><li>Element 2</li><li>Element 3</li></ul></li><li><p>Element 2</p><ul><li>Element 1</li><li>Element 2</li><li>Element 3</li></ul></li></ol></td>
+                        <td class="tg-c3ow">1. Liste 1<br> * Element 1<br> * Element 2<br> * Element 3<br><br>2. Liste
+                            2<br> * Element 1<br> * Element 2<br> * Element 3<br></td>
+                        <td class="tg-c3ow">
+                            <ol>
+                                <li>
+                                    <p>Element 1</p>
+                                    <ul>
+                                        <li>Element 1</li>
+                                        <li>Element 2</li>
+                                        <li>Element 3</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <p>Element 2</p>
+                                    <ul>
+                                        <li>Element 1</li>
+                                        <li>Element 2</li>
+                                        <li>Element 3</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Code</td>
@@ -101,12 +174,18 @@
                     <tr>
                         <td class="tg-c3ow">Citation</td>
                         <td class="tg-c3ow">&gt; Citation</td>
-                        <td class="tg-c3ow"><blockquote><p>Citation</p></blockquote></td>
+                        <td class="tg-c3ow">
+                            <blockquote>
+                                <p>Citation</p>
+                            </blockquote>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Ligne horizontale</td>
                         <td class="tg-c3ow">---</td>
-                        <td class="tg-c3ow"><hr></td>
+                        <td class="tg-c3ow">
+                            <hr>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Lien hypertexte</td>
@@ -121,7 +200,13 @@
                     <tr>
                         <td class="tg-c3ow">To do list</td>
                         <td class="tg-c3ow">* [ ] Element non coché<br>* [X] Element coché</td>
-                        <td class="tg-c3ow"><ul><li class="task-list-item"><input type="checkbox" disabled=""> Element non coché</li><li class="task-list-item"><input type="checkbox" disabled="" checked=""> Element coché</li></ul></td>
+                        <td class="tg-c3ow">
+                            <ul>
+                                <li class="task-list-item"><input type="checkbox" disabled=""> Element non coché</li>
+                                <li class="task-list-item"><input type="checkbox" disabled="" checked=""> Element coché
+                                </li>
+                            </ul>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tg-c3ow">Emoji</td>
@@ -132,7 +217,7 @@
             </table>
         </div>
         <hr>
-        <h2>Liste de tous les émojis:</h2>
+        <!-- <h2>Liste de tous les émojis:</h2>
 
         <p>Personnes :</p>
 
@@ -2202,6 +2287,9 @@
                     </td>
                     <td>🔻 <code>:small_red_triangle_down:</code>
                     </td>
-                </tr>
-            </tbody>
-        </table></div></html>
+                </tr> -->
+        <!-- </tbody> -->
+        <!-- </table> -->
+    </div>
+
+</html>
