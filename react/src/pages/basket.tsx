@@ -1,5 +1,5 @@
 import { render } from 'react-dom';
-import { Basket_order } from '../components/EpiceriePage/BasketComponents';
+import Baskets from '../components/EpiceriePage/BasketComponents';
 
 // @ts-ignore window.react_mount is declared in django template
-render(<Basket_order />, window.react_mount);
+render(<Baskets />, window.react_mount);
