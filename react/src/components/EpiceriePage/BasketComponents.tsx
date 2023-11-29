@@ -11,11 +11,25 @@ interface BasketProp {
   }
 }
 
+const BasketPrice : React.FC<BasketProp> = (prop : BasketProp) => {
+  const price = prop.basket.price
+  return (
+    <div className="epicerie-basket-price">
+      <span className="epicerie-basket-price-text">
+        Panier à {price / 100}€
+      </span>
+    </div>
+  )
+}
+
 const PrettyComposition : React.FC<BasketProp> = (prop : BasketProp) => {
   const composition = prop.basket.composition
   return (
-    <div className="epicerie-basket-composition">
-      Composition : 
+    <div className="epicerie-card-composition">
+      <div className="epicerie-basket-composition-title">
+        Composition :
+        </div>
+      <br></br>
       <ul>
         {composition.split("\n").map((line) => (
           <li>{line}</li>
@@ -27,8 +41,11 @@ const PrettyComposition : React.FC<BasketProp> = (prop : BasketProp) => {
 
 export const Basket: React.FC<BasketProp> = (prop : BasketProp) => (
     <div className="col-sm">
-      <div className="epicerie-basket">
-        <PrettyComposition basket = {prop.basket}/>
+      <div className="epicerie-card">
+        <div className="epicerie-card-content">
+          <BasketPrice basket = {prop.basket}/>
+          <PrettyComposition basket = {prop.basket}/>
+        </div>
       </div>
     </div>
 );

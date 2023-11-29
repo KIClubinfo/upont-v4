@@ -18,7 +18,15 @@ const baskets = [
     open_date : "2023-01-01",
     close_date : "2023-01-01",
     pickup_date : "2023-01-01",
-  }
+  },
+  // {
+  //   id: 3,
+  //   price : 300,
+  //   composition : "Nique \n la \n PEP",
+  //   open_date : "2023-01-01",
+  //   close_date : "2023-01-01",
+  //   pickup_date : "2023-01-01",
+  // }
 
 ]
 
@@ -27,10 +35,15 @@ class Baskets extends React.Component {
 
   render() {
     return (
-      <div className="row">
-        {baskets.map((basket) => (
-          <Basket basket={basket} key={basket.id} />
-        ))}
+      <div>
+        <div className="row">
+          {baskets.map((basket) => (
+            <Basket basket={basket} key={basket.id} />
+          ))}
+        </div>
+        <div className="centered-div">
+          <button className="button blue-button">Commander </button>
+        </div>
       </div>
     );
   }

@@ -1605,37 +1605,67 @@ a.text-green:hover{
 	display: flex;
 }
 
-.epicerie-basket {
-    margin: 1.5rem auto;
-	position: relative;
-	height: 20rem;
-    width: 30rem;
-	background: rgba(255, 255, 255, 0.05);
-	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-	border-radius: 15px;
-	display: flex;
-	align-items: center;
-	backdrop-filter: blur(10px);
-}
-
-.epicerie-basket .epicerie-basket-composition {
-    position: absolute;
-    justify-content: left;
-    text-align: left;
-    margin-left: 1rem;
-    font-size: 1rem;
-    top : 50px;
-    display: flex;
-}
-
-.epicerie-basket .epicerie-basket-price {
-    /*Centered text, 25 px above the bottom of the card*/
+.epicerie-card .epicerie-card-price {
     position: absolute;
     text-align: center;
     font-size: 1.5rem;
-    bottom: 25px;
+    bottom: 50px;
     display: flex;
-    
+}
+
+.epicerie-basket {
+    margin: 1.5rem auto 1.5rem auto;
+    width: 30rem;
+    min-height: 30rem;
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+	backdrop-filter: blur(10px);
+}
+
+.epicerie-basket-content {
+    margin : 1.5rem;
+    font-size: 1.2rem;
+}
+
+@media (min-width: 1200px) {
+    .epicerie-basket-content {
+        transform: translateY(0px);
+        transition: 0.5s;
+    }
+
+    .epicerie-basket:hover .epicerie-basket-content {
+        transform: translateY(-30px);
+    }
+}
+
+.epicerie-basket-composition {
+    margin: 1rem;
+}
+
+.epicerie-basket-composition-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.epicerie-basket-price {
+    /*Centered text, 25 px below the top of the card*/
+    margin : 1.5rem;
+    text-align: center; 
+}
+
+.epicerie-basket-price-text {
+    font-size: 1.7rem;
+    font-weight: 600;
+}
+
+.epicerie-basket-button {
+    margin: 1.5rem;
+    text-align: center;
+    background-color: #3DC1F3;
+    border-color: #3DC1F3;
 }
 
 
