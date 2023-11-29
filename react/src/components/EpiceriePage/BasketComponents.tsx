@@ -14,8 +14,8 @@ interface BasketProp {
 const BasketPrice : React.FC<BasketProp> = (prop : BasketProp) => {
   const price = prop.basket.price
   return (
-    <div className="epicerie-basket-price">
-      <span className="epicerie-basket-price-text">
+    <div className="epicerie-card-price">
+      <span className="epicerie-card-price-text">
         Panier à {price / 100}€
       </span>
     </div>

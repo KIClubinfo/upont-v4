@@ -1561,17 +1561,20 @@ a.text-green:hover{
 	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
 	border-radius: 15px;
 	display: flex;
+    flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	backdrop-filter: blur(10px);
 }
 
-.epicerie-card .epicerie-card-content {
+.epicerie-card-content {
+    margin : 1.5rem;
+    font-size: 1.2rem;
     transform: translateY(-40px);
 	transition: 0.5s;
 }
 
-@media(min-width:1200px){
+/* @media(min-width:1200px){
     .epicerie-card .epicerie-card-content {
         transform: translateY(0px);
         transition: 0.5s;
@@ -1580,9 +1583,9 @@ a.text-green:hover{
     .epicerie-card:hover .epicerie-card-content {
         transform: translateY(-40px);
     }
-}
+} */
 
-.epicerie-card .epicerie-card-content .epicerie-card-image{
+.epicerie-card-image{
     /* Positioning */
     display: flex;
     justify-content: center;
@@ -1597,20 +1600,12 @@ a.text-green:hover{
     transition: 0.5s;
 }
 
-.epicerie-card .epicerie-card-title {
+.epicerie-card-title {
     position: absolute;
     text-align: center;
     font-size: 1.5rem;
 	bottom: 50px;
 	display: flex;
-}
-
-.epicerie-card .epicerie-card-price {
-    position: absolute;
-    text-align: center;
-    font-size: 1.5rem;
-    bottom: 50px;
-    display: flex;
 }
 
 .epicerie-basket {
@@ -1625,47 +1620,24 @@ a.text-green:hover{
 	backdrop-filter: blur(10px);
 }
 
-.epicerie-basket-content {
-    margin : 1.5rem;
-    font-size: 1.2rem;
-}
-
-@media (min-width: 1200px) {
-    .epicerie-basket-content {
-        transform: translateY(0px);
-        transition: 0.5s;
-    }
-
-    .epicerie-basket:hover .epicerie-basket-content {
-        transform: translateY(-30px);
-    }
-}
-
-.epicerie-basket-composition {
+.epicerie-card-composition {
     margin: 1rem;
 }
 
-.epicerie-basket-composition-title {
+.epicerie-card-composition-title {
     font-size: 1.5rem;
     font-weight: 600;
 }
 
-.epicerie-basket-price {
+.epicerie-card-price {
     /*Centered text, 25 px below the top of the card*/
     margin : 1.5rem;
     text-align: center; 
 }
 
-.epicerie-basket-price-text {
+.epicerie-card-price-text {
     font-size: 1.7rem;
     font-weight: 600;
-}
-
-.epicerie-basket-button {
-    margin: 1.5rem;
-    text-align: center;
-    background-color: #3DC1F3;
-    border-color: #3DC1F3;
 }
 
 
