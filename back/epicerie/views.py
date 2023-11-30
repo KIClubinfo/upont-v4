@@ -16,7 +16,9 @@ def home(request):
 @login_required
 def basket(request):
     basket_list = Basket.objects.filter(is_active=True)
-    context = {"basket_list": basket_list}
+    student = get_object_or_404(Student, user__id=request.user.id)
+    student_baskets = Basket_Order.objects.filter(student=student)
+    context = {"basket_list": basket_list, "student_baskets": student_baskets}
     return render(request, "epicerie/basket.html", context)
 
 
