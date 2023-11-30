@@ -1,11 +1,30 @@
 from django.contrib.auth.decorators import login_required
-
-# Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from social.models import Student
 
+from rest_framework import viewsets
+
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+
 from .models import Basket, Basket_Order
+from .serializers import BasketSerializer
+
+
+class BasketViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows baskets to be viewed.
+    """
+
+    queryset = Basket.objects.all()
+    serializer_class = BasketSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Basket.objects.all()
+        queryset = queryset.filter(is_active=True)
+        return queryset
 
 
 @login_required
