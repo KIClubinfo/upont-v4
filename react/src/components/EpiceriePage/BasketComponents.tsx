@@ -4,7 +4,7 @@ interface BasketProp {
   basket :{
     id : number
     price : number
-    composition : string
+    composition : string[]
     open_date : string
     close_date : string
     pickup_date : string
@@ -31,10 +31,37 @@ const PrettyComposition : React.FC<BasketProp> = (prop : BasketProp) => {
         </div>
       <br></br>
       <ul>
-        {composition.split("\n").map((line) => (
-          <li>{line}</li>
+        {composition.map((line, index) => (
+          <li key={index}>{line}</li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+const QuantityButtons : React.FC = () => {
+  const [quantity, setQuantity] = React.useState(0)
+
+  function increment() {
+    setQuantity(quantity + 1)
+  }
+
+  function decrement() {
+    if (quantity > 0) {
+      setQuantity(quantity - 1)
+    }
+  }
+
+  return (
+    <div className="epicerie-card-quantity">
+      <div className="epicerie-card-quantity-title">
+        Quantité :
+      </div>
+      <div className="epicerie-card-quantity-buttons">
+        <button className="button blue-button" onClick={decrement}>- </button>
+        <span className="epicerie-card-quantity-text">{quantity}</span>
+        <button className="button blue-button" onClick={increment}> +</button>
+      </div>
     </div>
   )
 }
@@ -45,6 +72,7 @@ export const Basket: React.FC<BasketProp> = (prop : BasketProp) => (
         <div className="epicerie-card-content">
           <BasketPrice basket = {prop.basket}/>
           <PrettyComposition basket = {prop.basket}/>
+          <QuantityButtons/>
         </div>
       </div>
     </div>
