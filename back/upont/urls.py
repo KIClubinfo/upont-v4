@@ -60,6 +60,7 @@ from social.views import (
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
+from epicerie.views import BasketViewSet, BasketOrderViewSet
 
 from . import views
 from django.contrib import admin
@@ -107,6 +108,8 @@ router.register(r"groups", GroupViewSet, basename="group")
 router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
 router.register(r"clubs", ClubsViewSet)
+router.register(r"epicerie/baskets", BasketViewSet, basename="basket")
+router.register(r"epicerie/basket_orders", BasketOrderViewSet, basename="basket_order")
 
 
 urlpatterns += [
@@ -163,14 +166,11 @@ urlpatterns += [
         PochtronTransactions.as_view(),
         name="pochtron_transactions",
     ),
+    #path("api/epicerie/basket_orders", BasketOrderView.as_view(), name="basket_orders"),
 ]
 
 # Epicierie API
-from epicerie.views import BasketViewSet, BaskerOrderViewSet, BasketOrderCreateView
 
-router.register(r"epicerie/baskets", BasketViewSet, basename="basket")
-router.register(r"epicerie/basket_orders", BaskerOrderViewSet, basename="basket_order")
 
-urlpatterns += [
-    path("api/epicerie/create_basket_order", BasketOrderCreateView.as_view(), name="create_basket_order"),
-]
+
+

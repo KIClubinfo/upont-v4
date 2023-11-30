@@ -28,25 +28,31 @@ class BasketViewSet(viewsets.ModelViewSet):
         queryset = queryset.filter(is_active=True)
         return queryset
 
-class BaskerOrderViewSet(viewsets.ModelViewSet):
+class BasketOrderViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows baskets order to be viewed.
+    API endpoint that allows baskets order to be viewed and created.
+    POST request should be of the form:
+    {
+        "baskets": [
+            {
+                "basket_id": 1,
+                "quantity": 1
+            },
+            {
+                "basket_id": 2,
+                "quantity": 2
+            }
+        ]
+    }
     """
-
     queryset = Basket_Order.objects.all()
     serializer_class = BasketOrderSerializer
-    http_method_names = ["get"]
-
+    http_method_names = ["get", "post"]
     def get_queryset(self):
         queryset = Basket_Order.objects.all()
         return queryset
-    
-class BasketOrderCreateView(APIView):
-    """
-    API endpoint that allows baskets order to be created.
-    """
 
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         # For each basket in the request, create a basket order
         for order in request.data["baskets"]:
             basket = Basket.objects.get(id=order["basket_id"])
@@ -60,7 +66,7 @@ class BasketOrderCreateView(APIView):
             else:
                 return Response({"status": "error", "message": "Invalid basket order"})
         return Response({"status": "ok"})
-            
+        
 
 
 
