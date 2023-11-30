@@ -60,7 +60,7 @@ from social.views import (
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
-from epicerie.views import BasketViewSet
+from epicerie.views import BasketViewSet, BaskerOrderViewSet
 
 from . import views
 from django.contrib import admin
@@ -109,6 +109,7 @@ router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
 router.register(r"clubs", ClubsViewSet)
 router.register(r"epicerie/baskets", BasketViewSet, basename="basket")
+router.register(r"epicerie/basket_orders", BaskerOrderViewSet, basename="basket_order")
 
 urlpatterns += [
     path(

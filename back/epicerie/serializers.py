@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-from .models import Basket, Vegetable
+from social.serializers import UserSerializer
+
+from .models import Basket, Basket_Order
 
 
 
@@ -21,7 +23,43 @@ class BasketSerializer(serializers.ModelSerializer):
             "pickup_date",
             "is_active",
         ]
+
+class BasketSerializerLite(serializers.ModelSerializer):
+    simple_name = serializers.SerializerMethodField()
+
+    def get_simple_name(self, obj):
+        return obj.__str__()
+    
+    class Meta:
+        model = Basket
+        fields = [
+            "id",
+            "simple_name",
+        ]
        
+class BasketOrderSerializer(serializers.ModelSerializer):
+
+    student = serializers.SerializerMethodField()
+
+    def get_student(self, obj):
+        simplified_student = {}
+        simplified_student["id"] = obj.student.id
+        simplified_student["first_name"] = obj.student.user.first_name
+        simplified_student["last_name"] = obj.student.user.last_name
+        simplified_student["email"] = obj.student.user.email
+        simplified_student["phone_number"] = obj.student.phone_number
+        return simplified_student
+    
+    basket = BasketSerializerLite()
+    
+    class Meta:
+        model = Basket_Order
+        fields = [
+            "id",
+            "student",
+            "basket",
+            "quantity",
+        ]
 
 
 

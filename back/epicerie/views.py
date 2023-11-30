@@ -4,12 +4,14 @@ from django.shortcuts import get_object_or_404, render
 from social.models import Student
 
 from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 # from rest_framework.views import APIView
 # from rest_framework.response import Response
 
 from .models import Basket, Basket_Order
-from .serializers import BasketSerializer
+from .serializers import BasketSerializer, BasketOrderSerializer
 
 
 class BasketViewSet(viewsets.ModelViewSet):
@@ -26,6 +28,18 @@ class BasketViewSet(viewsets.ModelViewSet):
         queryset = queryset.filter(is_active=True)
         return queryset
 
+class BaskerOrderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows baskets order to be viewed.
+    """
+
+    queryset = Basket_Order.objects.all()
+    serializer_class = BasketOrderSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Basket_Order.objects.all()
+        return queryset
 
 @login_required
 def home(request):
