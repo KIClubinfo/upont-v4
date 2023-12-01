@@ -25,21 +25,6 @@
                 <!--Baskets for order are rendered in React-->
             </div>
 
-            <div class = "centered-div mt-2">
-                {% if student_baskets %}
-                    <p> Vos commandes </p>
-                    <ul>
-                        {% for order in student_baskets %}
-                            <li> {{order}} </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p> Vous n'avez pas commandé de panier </p>
-                {% endif %}
-            </div>
-
-
-
         </div><!--End of Content main-->
         
         

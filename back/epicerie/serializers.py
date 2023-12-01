@@ -25,16 +25,14 @@ class BasketSerializer(serializers.ModelSerializer):
         ]
 
 class BasketSerializerLite(serializers.ModelSerializer):
-    simple_name = serializers.SerializerMethodField()
-
-    def get_simple_name(self, obj):
-        return obj.__str__()
     
     class Meta:
         model = Basket
         fields = [
             "id",
-            "simple_name",
+            "price",
+            "pickup_date",
+
         ]
        
 class BasketOrderSerializer(serializers.ModelSerializer):

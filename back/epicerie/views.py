@@ -50,6 +50,8 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post"]
     def get_queryset(self):
         queryset = Basket_Order.objects.all()
+        queryset = queryset.filter(student__user__id=self.request.user.id)
+        queryset.order_by("-basket.pickup_date")
         return queryset
 
     def create(self, request, *args, **kwargs):

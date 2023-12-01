@@ -1570,7 +1570,7 @@ a.text-green:hover{
 .epicerie-card-content {
     margin : 1.5rem;
     font-size: 1.2rem;
-    transform: translateY(-40px);
+    transform: translateY(+25px);
 	transition: 0.5s;
 }
 
@@ -1603,8 +1603,9 @@ a.text-green:hover{
 .epicerie-card-title {
     position: absolute;
     text-align: center;
-    font-size: 1.5rem;
-	bottom: 50px;
+    margin : 1.5rem;
+    font-size: 1.7rem;
+	top: 50px;
 	display: flex;
 }
 
@@ -1626,17 +1627,6 @@ a.text-green:hover{
 
 .epicerie-card-composition-title {
     font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.epicerie-card-price {
-    top : 25px;
-    margin : 1.5rem;
-    text-align: center; 
-}
-
-.epicerie-card-price-text {
-    font-size: 1.7rem;
     font-weight: 600;
 }
 
