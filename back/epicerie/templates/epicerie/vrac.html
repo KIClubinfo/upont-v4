@@ -1,0 +1,49 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% include "header.html" with title="Commande de Paniers" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="epicerie" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <div class="content-main">
+
+            <h3 class="page-title">Commande de Vrac</h3>
+
+                <div class="centered-div mt-2">
+                    
+                    <form action="{% url 'epicerie:commande_vrac' %}" method = "post"> 
+                        {% csrf_token %}
+                        <fieldset>
+                        {% if vrac_list %}
+                        <ul>
+                            {% for vrac in vrac_list %}
+                                <label for = "vrac{{ forloop.counter }}"> {{vrac}} </label><br>
+                                {% for product in list_products %}
+                                    <input type="text" name="vrac_quantity" id="product{{ forloop.counter }}" value="0">
+                                    <label for = "product{{ forloop.counter }}"> {{product}} </label><br>
+                                {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            <p> Il n'y a pas de vrac</p>
+                        {% endif %}
+                    </fieldset>
+                    <input type="submit" value="Commander">
+                    </form>
+
+                </div>
+        </div>
+
+
+
+        
+    </div><!--End of Content-->
