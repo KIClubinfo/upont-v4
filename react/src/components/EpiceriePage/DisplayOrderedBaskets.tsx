@@ -36,11 +36,14 @@ export const DisplayExistingOrder : React.FC = () => {
                 </div>
                 <div className="epicerie-card-content">
                     <ul>
-                        {orders.map((order, index) => (
+                        {
+                        orders.map(
+                            (order, index) => (
                             <li key={index}>
                                 {order.quantity} {pluralize(order.quantity)} à {order.basket.price / 100}€
-                            </li>
-                        ))}
+                            </li>)
+                            )
+                        }
                     </ul>
                 </div>
             </div>
