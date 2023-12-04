@@ -2,22 +2,26 @@ from rest_framework import serializers
 
 from social.serializers import UserSerializer
 
-from .models import Product, Vrac, Vrac_Order
+from .models import Basket, Basket_Order
 
 
-class ProductSerializer(serializers.ModelSerializer):
+
+class BasketSerializer(serializers.ModelSerializer):
     composition = serializers.SerializerMethodField()
 
     def get_composition(self, obj):
         return [str(vegetable) for vegetable in obj.composition.all()]
     
     class Meta:
-        model = Product
+        model = Basket
         fields = [
-            "name",
-            "step",
-            "max",
+            "id",
             "price",
+            "composition",
+            "open_date",
+            "close_date",
+            "pickup_date",
+            "is_active",
         ]
 
 class BasketSerializerLite(serializers.ModelSerializer):
