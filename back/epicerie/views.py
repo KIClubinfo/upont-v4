@@ -3,6 +3,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from social.models import Student
 
+
+from .models import Basket, Basket_Order, Vrac, Vrac_Order, Product
+
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -71,7 +74,6 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
         
 
 
-
 @login_required
 def home(request):
     return render(request, "epicerie/epicerie.html")
@@ -120,7 +122,45 @@ def basket_order(request):
 
 @login_required
 def vrac(request):
-    return HttpResponse("This is the vrac page")
+    vrac_list = Vrac.objects.filter(is_active=True)
+    context = {"vrac_list": vrac_list}
+    return render(request, "epicerie/vrac.html", context)
+
+
+@login_required
+def vrac_detail(request, vrac_id):
+    vrac = get_object_or_404(Vrac, pk=vrac_id)
+    return HttpResponse(
+        f"This is vrac {vrac}, with composition {vrac.ListProducts}"
+    )
+
+import numpy as np
+@login_required
+def vrac_order(request):
+    if request.method == "POST":
+        vrac_list = Vrac.objects.filter(is_active=True)
+        student = get_object_or_404(Student, user__id=request.user.id)
+
+        for vrac in vrac_list:
+            list_products = vrac.ListProducts
+            try:
+                quantities = request.POST.getlist(f"vrac_quantity_{vrac.id}")
+            except KeyError:
+                quantities = np.zeros(list_products.count())
+            for i in range(list_products.count()):
+                if int(quantities[i]) > 0:
+                    vrac_order = Vrac_Order(
+                        vrac=vrac,
+                        student=student,
+                        product=list_products[i],
+                        quantity=int(quantities[i]),
+                    )
+                    if vrac_order.isValid():
+                        vrac_order.save()
+                        print("I'm saving an order")
+                    else:
+                        return HttpResponse("Error")
+        return HttpResponseRedirect("/epicerie/vrac/")
 
 
 @login_required
