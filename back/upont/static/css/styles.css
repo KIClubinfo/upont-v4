@@ -1552,11 +1552,82 @@ a.text-green:hover{
 /*--------------- EPICERIE COMPONENTS -------------*/
 /*-------------------------------------------------*/
 
-.epicerie {
-    background-color: yellow;
+.epicerie-card {
+    margin: 1.5rem auto;
+	position: relative;
+	height: 40rem;
+    width: 30rem;
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+	display: flex;
+    flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	backdrop-filter: blur(10px);
 }
 
-.epicerie image {
-    width: 50%;
-    height: 50%;
+.epicerie-card-content {
+    margin : 1.5rem;
+    font-size: 1.2rem;
+    transform: translateY(+25px);
+	transition: 0.5s;
 }
+
+/* @media(min-width:1200px){
+    .epicerie-card .epicerie-card-content {
+        transform: translateY(0px);
+        transition: 0.5s;
+    }
+
+    .epicerie-card:hover .epicerie-card-content {
+        transform: translateY(-40px);
+    }
+} */
+
+.epicerie-card-image{
+    /* Positioning */
+    display: flex;
+    justify-content: center;
+    /* Sizing */
+    margin: 1rem auto;
+    height: 25rem;
+    width: 25rem;
+    /* Styling */
+    border: 8px solid var(--primary-bg-color);
+    border-radius: 50%;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.epicerie-card-title {
+    position: absolute;
+    text-align: center;
+    margin : 1.5rem;
+    font-size: 1.7rem;
+	top: 50px;
+	display: flex;
+}
+
+.epicerie-basket {
+    margin: 1.5rem auto 1.5rem auto;
+    width: 30rem;
+    min-height: 30rem;
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+	backdrop-filter: blur(10px);
+}
+
+.epicerie-card-composition {
+    margin: 1rem;
+}
+
+.epicerie-card-composition-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+

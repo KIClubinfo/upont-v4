@@ -17,30 +17,27 @@
 
         <div class="content-main">
 
-            <h3 class="page-title">Commande de Paniers</h3>
+            <h3 class="page-title">
+                Commande de Paniers
+            </h3>
 
-                <div class="centered-div mt-2">
-                    
-                    <form action="{% url 'epicerie:commande_panier' %}" method = "post"> 
-                        {% csrf_token %}
-                        <fieldset>
-                        {% if basket_list %}
-                        <ul>
-                            {% for basket in basket_list %}
-                                <input type="text" name="basket_quantity" id="basket{{ forloop.counter }}" value="0">
-                                <label for = "basket{{ forloop.counter }}"> {{basket}} </label><br>
-                            {% endfor %}
-                        {% else %}
-                            <p> Il n'y a pas de panier</p>
-                        {% endif %}
-                    </fieldset>
-                    <input type="submit" value="Commander">
-                    </form>
+            <div id="baskets">
+                <!--Baskets for order are rendered in React-->
+            </div>
 
-                </div>
-        </div>
-
-
-
+        </div><!--End of Content main-->
+        
         
     </div><!--End of Content-->
+
+     <!--Scripts-->
+     <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+     <script>
+         window.react_mount = document.getElementById('baskets');
+     </script>
+     <script src="{% static 'react/basket.bundle.js' %}"></script>
+     <!--End of Scripts-->
+
+</body> <!--End of Body-->
+</html> <!--End of HTML-->
+```

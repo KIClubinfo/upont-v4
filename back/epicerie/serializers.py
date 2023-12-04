@@ -58,3 +58,4 @@ class BasketOrderSerializer(serializers.ModelSerializer):
             "basket",
             "quantity",
         ]
+
