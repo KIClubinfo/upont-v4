@@ -14,7 +14,7 @@ from rest_framework.response import Response
 # from rest_framework.response import Response
 
 from .models import Basket, Basket_Order
-from .serializers import BasketSerializer, BasketOrderSerializer
+from .serializers import BasketSerializer, BasketOrderSerializer, VracSerializer, VracOrderSerializer
 
 
 class BasketViewSet(viewsets.ModelViewSet):
@@ -119,6 +119,19 @@ def basket_order(request):
 
         return HttpResponseRedirect("/epicerie/panier/")
 
+class VracViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows vracs to be viewed.
+    """
+
+    queryset = Vrac.objects.all()
+    serializer_class = VracSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Vrac.objects.all()
+        queryset = queryset.filter(is_active=True)
+        return queryset
 
 @login_required
 def vrac(request):
