@@ -302,12 +302,24 @@ class ShotgunSerializer(serializers.HyperlinkedModelSerializer):
             "requires_motivation",
             "motivations_review_finished",
             "user_state",
+            "success_message",
+            "failure_message",
         ]
 
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
     club = ClubSerializerLite()
     shotgun = ShotgunSerializer()
+    organizer = serializers.SerializerMethodField()
+
+    def get_organizer(self, obj):
+        if obj.organizer is None:
+            return None
+        return {
+            "first_name": obj.organizer.user.first_name,
+            "last_name": obj.organizer.user.last_name,
+            "id": obj.organizer.pk,
+        }
 
     class Meta:
         model = Event
@@ -321,5 +333,8 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             "participants",
             "poster",
             "shotgun",
+            "isShotgun",
+            "isPrice",
             "id",
+            "organizer",
         ]

@@ -104,6 +104,7 @@ class StudentMembershipView(APIView):
             club_data = serializer.data
             club_data["is_admin"] = membership.is_admin
             club_data["is_old"] = membership.is_old
+            club_data["role"] = membership.role.name
             data.append(club_data)
         return Response({"is_member_of": data})
 
@@ -199,6 +200,22 @@ class SearchClub(APIView):
         return Response({"clubs": serializer.data})
 
 
+class StudentProfileEdit(APIView):
+    """
+    API endpoint that allows a student to edit his profile.
+    """
+
+    def post(self, request, format=None):
+        student = get_object_or_404(Student, user__id=request.user.id)
+
+        form = EditProfile(request.data, instance=student)
+        if form.is_valid():
+            form.save()
+            return Response({"status": "ok"})
+        else:
+            return Response({"status": "error", "errors": form.errors})
+
+
 class ProfilePicUpdate(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
@@ -259,6 +276,9 @@ def search(request):
         if request.GET["club"].strip():
             found_clubs, searched_expression = search_club(request)
             context["club_displayed_list"] = found_clubs
+            context["asso_club_list"] = found_clubs.filter(label=Club.Label.ASSO)
+            context["club_club_list"] = found_clubs.filter(label=Club.Label.CLUB)
+            context["liste_club_list"] = found_clubs.filter(label=Club.Label.LISTE)
         context["searched_expression"] = searched_expression
         return render(request, "social/index_clubs.html", context)
 
@@ -332,14 +352,13 @@ def search_club(request):
                     TrigramSimilarity("name", key_word),
                     TrigramSimilarity("nickname", key_word),
                     TrigramSimilarity("category__name", key_word),
-                    TrigramSimilarity("label__name", key_word),
                 )
             )
             partial_queryset = partial_queryset.filter(
                 Q(name__trigram_similar=key_word)
                 | Q(nickname__iexact=key_word)
                 | Q(category__name__iexact=key_word)
-                | Q(label__name__iexact=key_word),
+                | Q(label__iexact=key_word),
                 similarity__gt=0.3,
             )
         queryset |= partial_queryset.distinct("name")
@@ -361,6 +380,8 @@ def profile_edit(request):
         if "Annuler" in request.POST:
             return redirect("social:profile")
         elif "Valider" in request.POST:
+            print(request.POST)
+            print(request.FILES)
             form = EditProfile(
                 request.POST,
                 request.FILES,

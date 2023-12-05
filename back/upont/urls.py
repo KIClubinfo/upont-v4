@@ -41,6 +41,7 @@ from news.views import (
     ShotgunView,
 )
 from pochtron.views import (
+    CagnotteURL,
     PochtronBalance,
     PochtronId,
     PochtronTransactions,
@@ -59,6 +60,7 @@ from social.views import (
     SearchStudent,
     StudentCanPublishAs,
     StudentMembershipView,
+    StudentProfileEdit,
     StudentViewSet,
 )
 from the_calendar.views import CalendarData
@@ -158,11 +160,13 @@ urlpatterns += [
     path("api/membership/", StudentMembershipView.as_view(), name="membership"),
     path("api/club/", OneClubView.as_view(), name="club"),
     path("api/media/<path:path>", views.get_media_path, name="get_media_path"),
-    path("api/pochtron/balance", PochtronBalance.as_view(), name="pochtron_balance"),
+    path("api/pochtron/balance/", PochtronBalance.as_view(), name="pochtron_balance"),
     path(
-        "api/pochtron/transactions",
+        "api/pochtron/transactions/",
         PochtronTransactions.as_view(),
         name="pochtron_transactions",
     ),
+    path("api/pochtron/cagnotte_url/", CagnotteURL.as_view(), name="cagnotte_url"),
     path("api/test/", ProfilePicUpdate.as_view(), name="test"),
+    path("api/edit_profile/", StudentProfileEdit.as_view(), name="edit_profile"),
 ]

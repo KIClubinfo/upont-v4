@@ -807,6 +807,8 @@ def edit_shotgun(request, shotgun_id):
             form.fields["ending_date"].initial = shotgun.ending_date
             form.fields["size"].initial = shotgun.size
             form.fields["requires_motivation"].initial = shotgun.requires_motivation
+            form.fields["success_message"].initial = shotgun.success_message
+            form.fields["failure_message"].initial = shotgun.failure_message
             context = {
                 "shotgun": shotgun,
                 "form": form,

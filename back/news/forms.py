@@ -17,6 +17,9 @@ class EditEvent(forms.ModelForm):
             "poster",
             "club",
             "shotgun",
+            "isShotgun",
+            "isPrice",
+            "organizer",
         )
         widgets = {
             "name": forms.TextInput(attrs={"class": "profil-input"}),
@@ -27,6 +30,15 @@ class EditEvent(forms.ModelForm):
             "poster": forms.FileInput(attrs={"class": "profil-input"}),
             "club": forms.Select(attrs={"class": "profil-select"}),
             "shotgun": forms.Select(attrs={"class": "profil-select"}),
+            "isShotgun": forms.RadioSelect(
+                attrs={"class": "profil-select"},
+                choices=[(True, "Oui"), (False, "Non")],
+            ),
+            "isPrice": forms.RadioSelect(
+                attrs={"class": "profil-select"},
+                choices=[(True, "Oui"), (False, "Non")],
+            ),
+            "organizer": forms.Select(attrs={"class": "profil-select"}),
         }
 
     def __init__(self, user_id, *args, **kwargs):
@@ -122,14 +134,21 @@ class AddShotgun(forms.ModelForm):
             "ending_date",
             "size",
             "requires_motivation",
+            "success_message",
+            "failure_message",
         )
+
         widgets = {
             "club": forms.Select(attrs={"class": "profil-select"}),
             "title": forms.TextInput(attrs={"class": "profil-input"}),
             "content": forms.Textarea(attrs={"class": "text-input mt-2"}),
-            "starting_date": forms.TextInput(attrs={"class": "profil-input"}),
-            "ending_date": forms.TextInput(attrs={"class": "profil-input"}),
+            "starting_date": forms.DateTimeInput(attrs={"class": "profil-input"}),
+            "ending_date": forms.DateTimeInput(attrs={"class": "profil-input"}),
+            # "starting_date": forms.TextInput(attrs={"class": "profil-input"}),
+            # "ending_date": forms.TextInput(attrs={"class": "profil-input"}),
             "size": forms.TextInput(attrs={"class": "profil-input"}),
+            "success_message": forms.Textarea(attrs={"class": "text-input mt-2"}),
+            "failure_message": forms.Textarea(attrs={"class": "text-input mt-2"}),
         }
 
     def __init__(self, clubs, *args, **kwargs):

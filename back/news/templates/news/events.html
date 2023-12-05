@@ -3,6 +3,7 @@
 {% include "header.html" with title="Évènements" %}
 
 <!--Body-->
+
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
@@ -38,7 +39,8 @@
             {% if is_member %}
                 <div class="centered-div mt-2">
                     <a href="{% url 'news:event_create' %}">
-                        <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un évènement</button>
+                        <button class="button blue-button "><i class="fas fa-plus-circle fa-2x logo-button"></i>Ajouter un
+                            évènement</button>
                     </a>
                 </div>
             {% endif %}
@@ -48,7 +50,9 @@
                 <div class="news-card">
                     <div class="news-card-header">
                         <div class="news-card-header-image">
-                            <img class="image-centered" src="{% if event.club.logo %}{{event.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                            <img class="image-centered"
+                                src="{% if event.club.logo %}{{event.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                alt="">
                         </div>
                         <div class="news-card-header-text">
                             <span class="news-card-header-name">{{event.club.name}}</span>
@@ -57,27 +61,56 @@
                     </div>
                     <div class="news-card-content">
                         <ul>
-                            <li><div class="text-bold mt-1"><i class="fas fa-calendar-alt"></i>  Début de l'évènement : <strong class="text-thin">{{event.date}}</strong></div></li>
-                            <li><div class="text-bold mt-1"><i class="fas fa-calendar-alt"></i>  Fin de l'évènement : <strong class="text-thin">{{event.end}}</strong></div></li>
-                            <li><div class="text-bold mt-1"><i class="fas fa-map-marker-alt"></i> Lieu de l'évènement : <strong class="text-thin">{{event.location}}</strong></div></li>
-                            <li><div class="text-bold mt-1">
-                                <i class="fas fa-users"></i> Nombre de participants :
-                                <strong class="text-thin">
-                                    {% if event.shotgun %}
-                                        {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
-                                            0
+                            <li>
+                                <div class="text-bold mt-1"><i class="fas fa-calendar-alt"></i> Début de l'évènement :
+                                    <strong class="text-thin">{{event.date}}</strong>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-1"><i class="fas fa-calendar-alt"></i> Fin de l'évènement : <strong
+                                    class="text-thin">{{event.end}}</strong></div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-1"><i class="fas fa-map-marker-alt"></i> Lieu de l'évènement :
+                                    <strong class="text-thin">{{event.location}}</strong>
+                                </div>
+                            </li>
+                            {% if event.organizer %}
+                                <li>
+                                    <div class="text-bold mt-1"><i class="fas fa-user"></i> Elève référent :
+                                        <strong class="text-thin">{{event.organizer.user.first_name}} {{event.organizer.user.last_name}}</strong>
+                                    </div>
+                                </li>
+                            {% endif %}
+                            <li>
+                                <div class="text-bold mt-2">Évènement payant : <strong class="text-thin">
+                                    {% if event.isPrice %}Oui{% else %}Non{% endif %}</strong></div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-2">Évènement avec shotgun : <strong class="text-thin">
+                                    {% if event.isShotgun %}Oui{% else %}Non{% endif %}</strong></div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-1">
+                                    <i class="fas fa-users"></i> Nombre de participants :
+                                    <strong class="text-thin">
+                                        {% if event.shotgun %}
+                                            {% if event.shotgun.requires_motivation and not event.shotgun.motivations_review_finished %}
+                                                0
+                                            {% else %}
+                                                {{event.shotgun.accepted_participations.count}}
+                                            {% endif %}
                                         {% else %}
-                                            {{event.shotgun.accepted_participations.count}}
+                                            {{event.participants.count}}
                                         {% endif %}
-                                    {% else %}
-                                        {{event.participants.count}}
-                                    {% endif %}
-                                </strong>
-                            </div></li>
+                                    </strong>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                     <div class="centered-div">
-                        <a href="{% url 'news:event_detail' event.pk %}"><button class="button green-button">Voir plus</button></a>
+                        <a href="{% url 'news:event_detail' event.pk %}"><button class="button green-button">Voir
+                            plus</button></a>
                     </div>
                 </div><!--End of News Card-->
             {% endfor %}
@@ -86,4 +119,5 @@
 
     </div><!--End of Content-->
 </body><!--End of Body-->
+
 </html><!--End of Document-->
