@@ -772,7 +772,11 @@ def new_shotgun(request):
             request.FILES,
         )
         if form.is_valid():
-            form.save()
+            shotgun = form.save()
+            shotgun.content = split_then_markdownify(shotgun.content)
+            shotgun.success_message = split_then_markdownify(shotgun.success_message)
+            shotgun.failure_message = split_then_markdownify(shotgun.failure_message)
+            shotgun.save()
             return HttpResponseRedirect(reverse("news:shotguns"))
 
 
@@ -821,7 +825,15 @@ def edit_shotgun(request, shotgun_id):
                 [shotgun.club], request.POST, request.FILES, instance=shotgun
             )
             if form.is_valid():
-                form.save()
+                shotgun = form.save()
+                shotgun.content = split_then_markdownify(shotgun.content)
+                shotgun.success_message = split_then_markdownify(
+                    shotgun.success_message
+                )
+                shotgun.failure_message = split_then_markdownify(
+                    shotgun.failure_message
+                )
+                shotgun.save()
                 return HttpResponseRedirect(
                     reverse("news:shotguns_admin_detail", args=(shotgun.id,))
                 )
