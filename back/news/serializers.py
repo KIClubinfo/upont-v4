@@ -313,6 +313,8 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
     organizer = serializers.SerializerMethodField()
 
     def get_organizer(self, obj):
+        if obj.organizer is None:
+            return None
         return {
             "first_name": obj.organizer.user.first_name,
             "last_name": obj.organizer.user.last_name,
