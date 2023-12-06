@@ -426,10 +426,10 @@ def index_clubs(request):
         "all_clubs_list": all_clubs_list,
         "club_displayed_list": active_clubs_list,
         "inactive_clubs_list": inactive_clubs_list,
-        "ASSO_club_list": ASSO_club_list,
-        "CLUB_club_list": CLUB_club_list,
-        "LISTE_club_list": LISTE_club_list,
-        "POLE_club_list": POLE_club_list,
+        "asso_club_list": ASSO_club_list,
+        "club_club_list": CLUB_club_list,
+        "liste_club_list": LISTE_club_list,
+        "pole_club_list": POLE_club_list,
     }
     all_categories_list = Category.objects.order_by("name")
     context["all_categories_list"] = all_categories_list
