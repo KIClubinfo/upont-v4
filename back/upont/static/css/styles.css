@@ -1630,4 +1630,21 @@ a.text-green:hover{
     font-weight: 600;
 }
 
+.epicerie-card-quantity {
+    position: absolute;
+    bottom: 25px;
+    font-size: 1.5rem;
+}
+
+.epicerie-card-confirmation {
+    position: absolute;
+    bottom: 25px;
+}
+
+.epicerie-card-confirmation-title {
+    text-align: center;
+    position: relative;
+    bottom: 10px;
+    font-size: 1.8rem;
+}
 

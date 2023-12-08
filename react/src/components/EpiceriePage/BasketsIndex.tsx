@@ -1,10 +1,11 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import { Basket } from './BasketCardComponents'
-import { DisplayExistingOrder } from './DisplayOrderedBaskets'
+import { DisplayExistingOrder } from './OrderedBaskets'
+import { BasketValidation } from './BasketValidation'
 
 const Baskets : React.FC = () => {
-  
+  const [isValidationPage, setIsValidationPage] = useState(false);
   const [baskets, setBaskets] = useState([]);
   const [orders, setOrders] = useState([]);
 
@@ -48,31 +49,57 @@ const Baskets : React.FC = () => {
   };
 
   const handleOrderClick = () => {
-    console.log("Order clicked")
-    console.log(orders)
+    if (!orders.every(item => item === 0)) {
+      setIsValidationPage(true);
+    }
+  };
+
+  const prepareOrderConfirmationList = () => {
+    // Prepare the list of orders to be sent to the backend
+    return orders.map((order, index) => {
+      if (order > 0) {
+        return {
+          quantity: order,
+          basket: {
+            id: baskets[index].id,
+            price: baskets[index].price,
+            pickup_date: baskets[index].pickup_date
+          }
+        }
+      }
+    }).filter(item => item !== undefined)
   }
 
-  return (
-    <div>
-      <div className="row">
-        {baskets
-          .sort( (a, b) => a.price - b.price)
-          .map(
-            (basket, index) => (
-              <Basket basket={basket} key={index} quantity={{
-                count: orders[index],
-                increment: () => incrementOrderCount(index),
-                decrement: () => decrementOrderCount(index)
-            }}/>
-          ))
-        }
-        <DisplayExistingOrder />
+  if (!isValidationPage) {
+    return (
+      <div>
+        <div className="row">
+          {baskets
+            .sort( (a, b) => a.price - b.price)
+            .map(
+              (basket, index) => (
+                <Basket basket={basket} key={index} quantity={{
+                  count: orders[index],
+                  increment: () => incrementOrderCount(index),
+                  decrement: () => decrementOrderCount(index)
+              }}/>
+            ))
+          }
+          <DisplayExistingOrder />
+        </div>
+        <div className="centered-div">
+          <button className="button blue-button" onClick={handleOrderClick}>Commander </button>
+        </div>
       </div>
-      <div className="centered-div">
-        <button className="button blue-button" onClick={handleOrderClick}>Commander </button>
+    );
+  } else {
+    return (
+      <div>
+        <BasketValidation orders={prepareOrderConfirmationList()}/>
       </div>
-    </div>
-  );
+    )
+  }
+
 }
 
 export default Baskets;

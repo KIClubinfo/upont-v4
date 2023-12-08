@@ -38,7 +38,7 @@ const PrettyComposition : React.FC<BasketProp> = (prop : BasketProp) => {
   const composition = prop.basket.composition
   return (
     <div className="epicerie-card-composition">
-      <div className="epicerie-basket-composition-title">
+      <div className="epicerie-card-composition-title">
         Composition :
         </div>
       <br></br>
@@ -77,8 +77,8 @@ export const Basket: React.FC<Prop> = (prop : Prop) => {
         <BasketPrice basket = {prop.basket} />
         <div className="epicerie-card-content">
           <PrettyComposition basket = {prop.basket} />
-          <QuantityButtons quantity = {prop.quantity}/>
         </div>
+        <QuantityButtons quantity = {prop.quantity}/>
       </div>
     </div>
   );
