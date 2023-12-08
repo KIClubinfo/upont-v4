@@ -121,9 +121,9 @@ class SearchRole(APIView):
     def get(self, request):
         if "role" in request.GET and request.GET["role"].strip():
             query = request.GET.get("role", None)
-            roles = Role.objects.filter(name__icontains=query).order_by("-name")[:3]
+            roles = Role.objects.filter(name__icontains=query).order_by("-name")
         else:
-            roles = Role.objects.all().order_by("-name")[:3]
+            roles = Role.objects.all().order_by("-name")
         serializer = RoleSerializer(roles, many=True)
         return Response({"roles": serializer.data})
 
@@ -490,6 +490,8 @@ def club_edit(request, club_id):
         club__pk=club_id, is_old=False
     )
     all_old_club_memberships = get_old_members(club_id)
+    form_membership = AddMember()
+    form_role = AddRole()
     if not student_membership_club:  # If no match is found
         raise PermissionDenied
     if not student_membership_club[0].is_admin:  # If the user does not have the rights
@@ -601,8 +603,6 @@ def club_edit(request, club_id):
 
     else:
         form_club = EditClub()
-        form_membership = AddMember()
-        form_role = AddRole()
 
         form_club.fields["name"].initial = club.name
         form_club.fields["nickname"].initial = club.nickname
