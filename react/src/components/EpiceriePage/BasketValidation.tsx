@@ -51,7 +51,7 @@ const ConfirmationButton : React.FC<OrdersProp> = (prop : OrdersProp) => {
     return (
         <div className="epicerie-card-quantity-button">
             <button
-                className="btn btn-primary"
+                className="button green-button"
                 onClick={() => {
                     handleOrderPost(prop);
                 }
@@ -68,7 +68,7 @@ const CancelButton : React.FC = () => {
     return (
         <div className="epicerie-card-quantity-button">
             <button
-                className="btn btn-primary"
+                className="button red-button"
                 onClick={() => {
                     window.location.reload();
                 }
@@ -81,18 +81,62 @@ const CancelButton : React.FC = () => {
 }
 
 export const BasketValidation : React.FC<OrdersProp> = (prop : OrdersProp) => {
+    const pluralize = (quantity : number) => {
+        // Return the plural or singular form of the word "panier"
+        if (quantity > 1) {
+            return "paniers"
+        } else {
+            return "panier"
+        }
+    }
+
+    const totalPrice = () => {
+        // Return the total price of the order
+        let total = 0;
+        prop.orders.forEach((order) => {
+            total += order.quantity * order.basket.price
+        }
+        )
+        return total / 100
+    }
+
     return (
-        <div>
-        <h1>Recapitulatif de la commande</h1>
-        <ul>
-            {prop.orders.map((order, index) => (
-                <li key={index}>
-                    {order.quantity} paniers à {order.basket.price / 100}€
-                </li>
-            ))}
-        </ul>
-        <ConfirmationButton orders = {prop.orders} />
-        <CancelButton />
+        <div className="col-sm">
+            <div className="epicerie-card">
+                <div className="epicerie-card-title">
+                    Récapitulatif de ta commande
+                </div>
+                <div className="epicerie-card-content">
+                    <ul>
+                        {prop.orders.map((order, index) => {
+                            if (order.quantity > 0) {
+                                return (
+                                    <li key={index}>
+                                        <span>
+                                            {order.quantity} {pluralize(order.quantity)} à {order.basket.price / 100}€
+                                        </span>
+                                    </li>
+                                )
+                            } else {
+                                return null
+                            }
+                        })}
+                    </ul>
+                </div>
+                <div className="epicerie-card-confirmation">
+                    <div className="epicerie-card-confirmation-title">
+                        Pour un total de : {totalPrice()}€
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <CancelButton />
+                        </div>
+                        <div className="col">
+                            <ConfirmationButton orders={prop.orders}/>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
     };

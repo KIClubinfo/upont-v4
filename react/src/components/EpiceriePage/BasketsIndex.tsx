@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 
 import { Basket } from './BasketCardComponents'
-import { DisplayExistingOrder } from './DisplayOrderedBaskets'
+import { DisplayExistingOrder } from './OrderedBaskets'
 import { BasketValidation } from './BasketValidation'
 
 const Baskets : React.FC = () => {
