@@ -248,22 +248,32 @@ class PostCreateViewV2(APIView):
                 post.illustration = request.data["illustration"]
             post.save()
             print(request.data)
-            print(request.data["resources"])
-            if "resources" in request.data:
-                for resource in request.data["resources"]:
+            if (
+                "resources_count" in request.data
+                and int(request.data["resources_count"]) > 0
+            ):
+                resources = []
+                for i in range(0, int(request.data["resources_count"])):
+                    resources.append(
+                        {
+                            "type": request.data["resources-" + str(i) + "-type"],
+                            "data": request.data["resources-" + str(i) + "-data"],
+                        }
+                    )
+                for resource in resources:
                     if resource["type"] == "video":
                         resource = Resource(
                             title=request.data["title"],
                             post=post,
                             author=student,
-                            video_url=resource["url"],
+                            video_url=resource["data"],
                         )
                     elif resource["type"] == "image":
                         resource = Resource(
                             title=request.data["title"],
                             post=post,
                             author=student,
-                            file=resource["file"],
+                            file=resource["data"],
                         )
                     resource.save()
         else:
