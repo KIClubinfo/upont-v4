@@ -249,7 +249,8 @@ class PostCreateViewV2(APIView):
             post.save()
             if "resources" in request.data:
                 for resource in request.data["resources"]:
-                    if resource["type"] == "video":
+                    print(resource)
+                    if resource.get("type") == "video":
                         resource = Resource(
                             title=request.data["title"],
                             post=post,
