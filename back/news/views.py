@@ -273,7 +273,7 @@ class PostCreateViewV2(APIView):
                             title=request.data["title"],
                             post=post,
                             author=student,
-                            file=resource["data"],
+                            image=resource["data"],
                         )
                     resource.save()
         else:
