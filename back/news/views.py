@@ -16,7 +16,7 @@ from social.models import Club, Membership, Student
 from upont.regex import split_then_markdownify
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
-from .models import Comment, Event, Participation, Post, Shotgun
+from .models import Comment, Event, Participation, Post, Ressource, Shotgun
 from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
 
 
@@ -262,14 +262,14 @@ class PostCreateViewV2(APIView):
                     )
                 for resource in resources:
                     if resource["type"] == "video":
-                        resource = Resource(
+                        resource = Ressource(
                             title=request.data["title"],
                             post=post,
                             author=student,
                             video_url=resource["data"],
                         )
                     elif resource["type"] == "image":
-                        resource = Resource(
+                        resource = Ressource(
                             title=request.data["title"],
                             post=post,
                             author=student,
