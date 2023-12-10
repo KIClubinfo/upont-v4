@@ -247,6 +247,23 @@ class PostCreateViewV2(APIView):
             if "illustration" in request.data:
                 post.illustration = request.data["illustration"]
             post.save()
+            if "resources" in request.data:
+                for resource in request.data["resources"]:
+                    if resource["type"] == "video":
+                        resource = Resource(
+                            title=request.data["title"],
+                            post=post,
+                            author=student,
+                            video_url=resource["url"],
+                        )
+                    elif resource["type"] == "image":
+                        resource = Resource(
+                            title=request.data["title"],
+                            post=post,
+                            author=student,
+                            file=resource["file"],
+                        )
+                    resource.save()
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
             if club.is_member(student.id):
