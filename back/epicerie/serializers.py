@@ -68,6 +68,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "max",
             "price",
         ]
+        
 class VracSerializer(serializers.ModelSerializer):
     ListProducts = serializers.SerializerMethodField()
 

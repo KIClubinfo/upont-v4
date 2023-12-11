@@ -19,7 +19,7 @@ const Vracs : React.FC = () => {
 
   }, []);
 
-  const incrementQuantityCount = (event : Event , step : number) => {
+  const incrementQuantityCount = (index : number , step : number) => {
     //Increment the order count of the basket at index
     setQuantities(quantities.map((quantity, i) => {
       if (i === step) {
