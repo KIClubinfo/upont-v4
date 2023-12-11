@@ -1630,4 +1630,42 @@ a.text-green:hover{
     font-weight: 600;
 }
 
+.vrac-card {
+    margin: 1.5rem auto;
+	position: relative;
+	height: 20rem;
+    width: 30rem;
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+	display: flex;
+    flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	backdrop-filter: blur(10px);
+}
 
+.vrac-card-content {
+    margin : 1.5rem;
+    font-size: 1.2rem;
+    transform: translateY(+25px);
+	transition: 0.5s;
+}
+
+.vrac-card-title {
+    position: absolute;
+    text-align: center;
+    margin : 1.5rem;
+    font-size: 1.7rem;
+	top: 50px;
+	display: flex;
+}
+
+.vrac-card-composition {
+    margin: 1rem;
+}
+
+.vrac-card-composition-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
