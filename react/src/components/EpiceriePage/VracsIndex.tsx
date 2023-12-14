@@ -27,10 +27,10 @@ const Vracs : React.FC = () => {
     }
     , []);
 
-    const incrementQuantity = (index : number, step : number) => {
+    const incrementQuantity = (index : number, step : number, max : number) => {
         //Increment the quantity of the product at index
         setQuantities( quantities.map((quantity, i) => {
-            if (i === index) {
+            if (i === index && quantity <= max - step) {
                 return quantity + step
             } else {
                 return quantity
@@ -65,7 +65,7 @@ const Vracs : React.FC = () => {
                 {vrac.ListProducts.map((product, index) => (
                     <Product key={index} product={product} quantity={{
                         count: quantities[index],
-                        increment: () => incrementQuantity(index, product.step),
+                        increment: () => incrementQuantity(index, product.step, product.max),
                         decrement: () => decrementQuantity(index, product.step)
                     }} />
                 ))    
