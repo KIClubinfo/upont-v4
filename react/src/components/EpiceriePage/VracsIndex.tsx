@@ -16,7 +16,6 @@ const Vracs : React.FC = () => {
         .then((res) => res.json())
         .then((result) => {
             // Server should return only one vrac
-            console.log(result)
             setVrac(result)
             // Initialize quantities to 0
             setQuantities(new Array(result.ListProducts.length).fill(0))
@@ -24,8 +23,6 @@ const Vracs : React.FC = () => {
         .catch(console.error);
 
     useEffect(() => {
-        // @ts-ignore Urls is declared in the django template
-        console.log(Urls)
         getVrac();
     }
     , []);
