@@ -107,6 +107,7 @@ class VracViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def latest(self, request):
         queryset = self.get_queryset()
+        queryset = queryset.filter(is_active=True)
         latest_vrac = queryset.latest("pickup_date")
         serializer = VracSerializer(latest_vrac)
         return Response(serializer.data)

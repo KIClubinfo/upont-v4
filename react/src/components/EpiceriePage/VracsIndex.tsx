@@ -51,19 +51,26 @@ const Vracs : React.FC = () => {
         ))
     }
 
+    if (vrac.ListProducts.length === 0) {
+        return (
+            <div className="centered-div">
+                <h1>Il n'y a pas de vrac disponible pour le moment</h1>
+            </div>
+        )
+    }
+
     return (
-        <div>
-            {vrac.ListProducts
-            .map(
-                (product, index) => (
-                    <Product
-                    key={index} 
-                    product={product} 
-                    quantity={{count: quantities[index], 
-                                increment: () => incrementQuantity(index, product.step), 
-                                decrement: () => decrementQuantity(index, product.step)}}
-                    />
-                ))}
+        <div className="vrac">
+            <div className='row row-cols-5'>
+                {vrac.ListProducts.map((product, index) => (
+                    <Product key={index} product={product} quantity={{
+                        count: quantities[index],
+                        increment: () => incrementQuantity(index, product.step),
+                        decrement: () => decrementQuantity(index, product.step)
+                    }} />
+                ))    
+                }
+            </div>
         </div>
     );
 }
