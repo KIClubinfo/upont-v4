@@ -1,71 +1,74 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { Vrac } from './VracCardComponents'
+import { Product } from './VracCardComponents'
 
 const Vracs : React.FC = () => { 
-    const [vracs, setVracs] = useState([]);
+    const [vrac, setVrac] = useState(
+        {
+            ListProducts: [],
+            pickup_date: ""
+        }
+    );
     const [quantities, setQuantities] = useState([]);
 
-    const getVracs = () =>
-  // @ts-ignore Urls is declared in the django template
-    fetch(Urls.epicerieVracList())
-      .then((res) => res.json())
-      .then((result) => {
-        setVracs(result.results)
-      })
-      .catch(console.error);
-  
-  useEffect(() => {
-    getVracs();
+    const getVrac = () =>
+        // @ts-ignore Urls is declared in the django template
+        fetch(Urls.epicerieVracLatest())
+        .then((res) => res.json())
+        .then((result) => {
+            // Server should return only one vrac
+            console.log(result)
+            setVrac(result)
+            // Initialize quantities to 0
+            setQuantities(new Array(result.ListProducts.length).fill(0))
+        })
+        .catch(console.error);
 
-  }, []);
-
-  const incrementQuantityCount = (index : number , step : number) => {
-    //Increment the order count of the basket at index
-    setQuantities(quantities.map((quantity, i) => {
-      if (i === step) {
-        return quantity + step
-      } else {
-        return quantity
-      }
+    useEffect(() => {
+        // @ts-ignore Urls is declared in the django template
+        console.log(Urls)
+        getVrac();
     }
-    ))
-  };
+    , []);
 
-  const decrementQuantityCount = (event : Event , step : number) => {
-    //Increment the order count of the basket at index
-    setQuantities(quantities.map((quantity, i) => {
-      if (i === step) {
-        return quantity - step
-      } else {
-        return quantity
-      }
-    }
-    ))
-  };
-
-  const handleQuantityClick = () => {
-    console.log("Quantity clicked")
-    console.log(quantities)
-  }
-  return (
-    <div>
-      <div className="row">
-        {vracs
-          .map(
-            (vrac, index) => (
-                <Vrac vrac={vrac} key={index} quantity ={{
-                  count: quantities[index],
-                  increment: (event : Event) => incrementQuantityCount(event, index),
-                  decrement: (event : Event) => decrementQuantityCount(event, index)
-                }}/>
-          ))
+    const incrementQuantity = (index : number, step : number) => {
+        //Increment the quantity of the product at index
+        setQuantities( quantities.map((quantity, i) => {
+            if (i === index) {
+                return quantity + step
+            } else {
+                return quantity
+            }
         }
-      </div>
-      <div className="centered-div">
-      <button className="button blue-button" onClick={handleQuantityClick}>Commander </button>
-      </div>
-    </div>
-  );
+        ))
+    }
+
+    const decrementQuantity = (index : number, step : number) => {
+        //Decrement the quantity of the product at index, if it is > 0
+        setQuantities( quantities.map((quantity, i) => {
+            if (i === index && quantity >= step) {
+                return quantity - step
+            } else {
+                return quantity
+            }
+        }
+        ))
+    }
+
+    return (
+        <div>
+            {vrac.ListProducts
+            .map(
+                (product, index) => (
+                    <Product
+                    key={index} 
+                    product={product} 
+                    quantity={{count: quantities[index], 
+                                increment: () => incrementQuantity(index, product.step), 
+                                decrement: () => decrementQuantity(index, product.step)}}
+                    />
+                ))}
+        </div>
+    );
 }
 
 

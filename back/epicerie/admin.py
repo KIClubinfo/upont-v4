@@ -12,4 +12,3 @@ admin.site.register(Vrac_Order)
 admin.site.register(Product)
 
 admin.site.register(Vegetable)
-

@@ -1,44 +1,24 @@
 import React from "react"
 
 interface ProductProp {
-  id : number
-  name : string
-  step : number
-  max : number
+  product : {
+    name : string
+    price : number
+  }
   quantity : {
     count : number
-    increment : (event : Event, step : number) => void
-    decrement : (event : Event, step : number) => void
+    increment : () => void
+    decrement : () => void
   }
-  price : number
 }
 
-interface VracProp {
-  vrac :{
-    id : number
-    ListProducts : ProductProp[]
-    open_date : string
-    close_date : string
-    pickup_date : string
-  },
-}
-
-interface Prop extends VracProp {}
-
-const PrettyComposition : React.FC<VracProp> = (prop : VracProp) => {
+const PrettyComposition : React.FC<ProductProp> = (prop : ProductProp) => {
   // Display the composition of the basket in a list
-  const composition = prop.vrac.ListProducts
   return (
     <div className="vrac-card-composition">
-      <div className="vrac-composition-title">
-        Composition :
-        </div>
-      <br></br>
-      <ul>
-        {composition.map((line, index) => (
-          <li key={index}>{line}</li>
-        ))}
-      </ul>
+      <div className="vrac-card-composition-title">
+        {prop.product.name} : {prop.product.price / 100}€
+      </div>
     </div>
   )
 }
@@ -60,14 +40,15 @@ const QuantityButtons : React.FC<ProductProp>  = (prop : ProductProp) => {
   )
 }
 
-export const Vrac: React.FC<Prop> = (prop : Prop) => {
+export const Product: React.FC<ProductProp> = (prop : ProductProp) => {
   // Vrac card component
   return (
     <div className="col-sm">
       <div className="vrac-card">
         <div className="vrac-card-content">
-          <PrettyComposition vrac = {prop.vrac} />
+          <PrettyComposition product={prop.product} quantity={prop.quantity} />
         </div>
+        <QuantityButtons product={prop.product} quantity={prop.quantity} />
       </div>
     </div>
   );

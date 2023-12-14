@@ -9,12 +9,19 @@ from .models import Basket, Basket_Order, Vrac, Vrac_Order, Product
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
-# from rest_framework.views import APIView
+from rest_framework.views import APIView
+
 # from rest_framework.response import Response
 
 from .models import Basket, Basket_Order
-from .serializers import BasketSerializer, BasketOrderSerializer, VracSerializer, VracOrderSerializer
+from .serializers import (
+    BasketSerializer,
+    BasketOrderSerializer,
+    VracSerializer,
+    VracOrderSerializer,
+)
 
 
 class BasketViewSet(viewsets.ModelViewSet):
@@ -30,6 +37,7 @@ class BasketViewSet(viewsets.ModelViewSet):
         queryset = Basket.objects.all()
         queryset = queryset.filter(is_active=True)
         return queryset
+
 
 class BasketOrderViewSet(viewsets.ModelViewSet):
     """
@@ -48,13 +56,14 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
         ]
     }
     """
+
     queryset = Basket_Order.objects.all()
     serializer_class = BasketOrderSerializer
     http_method_names = ["get", "post"]
+
     def get_queryset(self):
         queryset = Basket_Order.objects.all()
         queryset = queryset.filter(student__user__id=self.request.user.id)
-        queryset.order_by("-basket.pickup_date")
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -71,8 +80,6 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
             else:
                 return Response({"status": "error", "message": "Invalid basket order"})
         return Response({"status": "ok"})
-        
-
 
 
 class VracViewSet(viewsets.ModelViewSet):
@@ -80,14 +87,29 @@ class VracViewSet(viewsets.ModelViewSet):
     API endpoint that allows vracs to be viewed.
     """
 
-    queryset = Vrac.objects.all()
-    serializer_class = VracSerializer
     http_method_names = ["get"]
 
     def get_queryset(self):
         queryset = Vrac.objects.all()
-        queryset = queryset.filter(is_active=True)
         return queryset
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = VracSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = self.get_queryset()
+        vrac = get_object_or_404(queryset, pk=pk)
+        serializer = VracSerializer(vrac)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def latest(self, request):
+        queryset = self.get_queryset()
+        latest_vrac = queryset.latest("pickup_date")
+        serializer = VracSerializer(latest_vrac)
+        return Response(serializer.data)
 
 
 @login_required

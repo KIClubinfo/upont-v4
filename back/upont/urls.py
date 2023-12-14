@@ -113,6 +113,7 @@ router.register(r"epicerie/basket_orders", BasketOrderViewSet, basename="epiceri
 router.register(r"epicerie/vracs", VracViewSet, basename="epicerie_vrac")
 
 
+
 urlpatterns += [
     path(
         "reverse.js", urls_js, name="reverse_js"
@@ -167,10 +168,8 @@ urlpatterns += [
         PochtronTransactions.as_view(),
         name="pochtron_transactions",
     ),
-    #path("api/epicerie/basket_orders", BasketOrderView.as_view(), name="basket_orders"),
+    
 ]
-
-# Epicierie API
 
 
 
