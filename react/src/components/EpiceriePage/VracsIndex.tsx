@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { Product } from './VracCardComponents'
-import { Confirmation} from './Confirmation'
+import { ValidationPage } from './VracValidation'
 
 const Vracs : React.FC = () => { 
 
@@ -69,9 +69,7 @@ const Vracs : React.FC = () => {
 
     if (isOrdering) {
         return (
-            <div className="centered-div">
-                <h1>Commande en cours</h1>
-            </div>
+            <ValidationPage/>
         )
     }
     return (
