@@ -56,12 +56,12 @@ const QuantityButtons : React.FC<QuantityProp>  = (prop : QuantityProp) => {
   // The data is handled in the parent component Basket
   return (
     <div className="epicerie-card-quantity">
-      <div className="epicerie-card-quantity-title">
+      <div>
         Quantité :
       </div>
-      <div className="epicerie-card-quantity-buttons">
+      <div>
         <button className="button blue-button" onClick={prop.quantity.decrement}>- </button>
-        <span className="epicerie-card-quantity-text">{prop.quantity.count}</span>
+        <span >{prop.quantity.count}</span>
         <button className="button blue-button" onClick={prop.quantity.increment}> +</button>
       </div>
     </div>

@@ -1,7 +1,9 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { Product } from './VracCardComponents'
+import { Confirmation} from './Confirmation'
 
 const Vracs : React.FC = () => { 
+
     const [vrac, setVrac] = useState(
         {
             ListProducts: [],
@@ -9,6 +11,8 @@ const Vracs : React.FC = () => {
         }
     );
     const [quantities, setQuantities] = useState([]);
+
+    const [isOrdering, setIsOrdering] = useState(false);
 
     const getVrac = () =>
         // @ts-ignore Urls is declared in the django template
@@ -59,6 +63,17 @@ const Vracs : React.FC = () => {
         )
     }
 
+    const handleOrderClick = () => {
+        setIsOrdering(true)
+    }
+
+    if (isOrdering) {
+        return (
+            <div className="centered-div">
+                <h1>Commande en cours</h1>
+            </div>
+        )
+    }
     return (
         <div className="vrac">
             <div className='row row-cols-5'>
@@ -70,6 +85,9 @@ const Vracs : React.FC = () => {
                     }} />
                 ))    
                 }
+            </div>
+            <div className="centered-div">
+                <button className="button blue-button" onClick={handleOrderClick}>Commander </button>
             </div>
         </div>
     );

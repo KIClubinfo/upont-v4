@@ -29,10 +29,10 @@ const QuantityButtons : React.FC<ProductProp>  = (prop : ProductProp) => {
   // Display the quantity of the vrac products and buttons to increment/decrement it
   // The data is handled in the parent component vrac
   return (
-    <div className="product-card-quantity">
+    <div className="epicerie-card-quantity">
       <div>
         <button className="button blue-button" onClick={prop.quantity.decrement}>-</button>
-        <span className="vrac-card-quantity-count">{prop.quantity.count}</span>
+        <span >{prop.quantity.count}</span>
         <button className="button blue-button" onClick={prop.quantity.increment}>+</button>
       </div>
     </div>
