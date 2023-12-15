@@ -88,6 +88,15 @@ class VracSerializer(serializers.ModelSerializer):
         ]
 
 
+class VracSerializerLite(serializers.ModelSerializer):
+    class Meta:
+        model = Vrac
+        fields = [
+            "id",
+            "pickup_date",
+        ]
+
+
 class VracOrderSerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField()
 
@@ -100,7 +109,7 @@ class VracOrderSerializer(serializers.ModelSerializer):
         simplified_student["phone_number"] = obj.student.phone_number
         return simplified_student
 
-    vrac = VracSerializer()
+    vrac = VracSerializerLite()
 
     class Meta:
         model = Vrac_Order

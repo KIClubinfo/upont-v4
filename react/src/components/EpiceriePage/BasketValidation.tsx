@@ -1,39 +1,34 @@
 import React from "react";
 import { getCookie } from '../utils/csrf';
 
-interface VracOrderProp {
-    vrac : {
-        id : number
-        quantityList : {
+interface BasketOrdersProp {
+    orders : {
+        quantity : number
+        basket : {
             id : number
-            name : string
             price : number
-            quantity : number
-        }[]
-    }
+            pickup_date : string
+        }
+    }[]
 }
 
-const handleVracOrderPost = (prop : VracOrderProp) => {
+const handleBasketOrderPost = (prop : BasketOrdersProp) => {
     // Formats the orders to the format expected by the backend
     // Send the order to the backend
     // Reload the page
-    const orderList = prop.vrac.quantityList.map((product) => {
+    const orderList = prop.orders.map((order) => {
         return {
-            quantity: product.quantity,
-            product_id: product.id
+            quantity: order.quantity,
+            basket_id: order.basket.id
         }
     }
     )
 
-    const data = { 
-        vrac_id : prop.vrac.id,
-        listProducts : orderList
-    };
-    
+    const data = { baskets : orderList };
     // Upload the order to the backend
     const csrfmiddlewaretoken = getCookie('csrftoken');
     // @ts-ignore Urls is declared in the django template
-    fetch(Urls.epicerieVracOrderList(), {
+    fetch(Urls.epicerieBasketOrderList(), {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
@@ -46,17 +41,19 @@ const handleVracOrderPost = (prop : VracOrderProp) => {
             console.log(result);
             window.location.reload();
         })
-        .catch(console.error); 
+        .catch(console.error);
+    
+    
 }
 
-const ConfirmationButton : React.FC<VracOrderProp> = (prop : VracOrderProp) => {
+const ConfirmationButton : React.FC<BasketOrdersProp> = (prop : BasketOrdersProp) => {
     // Display the button to confirm the order
     return (
         <div className="epicerie-card-quantity-button">
             <button
                 className="button green-button"
                 onClick={() => {
-                    handleVracOrderPost(prop);
+                    handleBasketOrderPost(prop);
                 }
                 }
             >
@@ -83,14 +80,23 @@ const CancelButton : React.FC = () => {
     )
 }
 
-export const ValidationPage : React.FC<VracOrderProp> = ( prop : VracOrderProp ) => {
+export const BasketValidation : React.FC<BasketOrdersProp> = (prop : BasketOrdersProp) => {
+    const pluralize = (quantity : number) => {
+        // Return the plural or singular form of the word "panier"
+        if (quantity > 1) {
+            return "paniers"
+        } else {
+            return "panier"
+        }
+    }
 
     const totalPrice = () => {
-        let total = 0; // In cents
-        prop.vrac.quantityList.forEach((product) => {
-            // product price in € / kg and quantity in grams
-            total += product.price / 1000 * product.quantity;
-        })
+        // Return the total price of the order
+        let total = 0;
+        prop.orders.forEach((order) => {
+            total += order.quantity * order.basket.price
+        }
+        )
         return total / 100
     }
 
@@ -98,16 +104,16 @@ export const ValidationPage : React.FC<VracOrderProp> = ( prop : VracOrderProp )
         <div className="col-sm">
             <div className="epicerie-card">
                 <div className="epicerie-card-title">
-                        Récapitulatif de ta commande
+                    Récapitulatif de ta commande
                 </div>
                 <div className="epicerie-card-content">
                     <ul>
-                        {prop.vrac.quantityList.map((product, index) => {
-                            if (product.quantity > 0) {
+                        {prop.orders.map((order, index) => {
+                            if (order.quantity > 0) {
                                 return (
                                     <li key={index}>
                                         <span>
-                                            {product.quantity} g de {product.name} ({product.price / 100}€ / kg)
+                                            {order.quantity} {pluralize(order.quantity)} à {order.basket.price / 100}€
                                         </span>
                                     </li>
                                 )
@@ -126,11 +132,11 @@ export const ValidationPage : React.FC<VracOrderProp> = ( prop : VracOrderProp )
                             <CancelButton />
                         </div>
                         <div className="col">
-                            <ConfirmationButton vrac={prop.vrac}/>
+                            <ConfirmationButton orders={prop.orders}/>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+    };

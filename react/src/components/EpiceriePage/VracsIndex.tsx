@@ -1,13 +1,23 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { Product } from './VracCardComponents'
 import { ValidationPage } from './VracValidation'
+import { number, string } from 'prop-types';
 
 const Vracs : React.FC = () => { 
 
     const [vrac, setVrac] = useState(
         {
-            ListProducts: [],
-            pickup_date: ""
+            id : 1,
+            ListProducts: [
+                {
+                    id: 1,
+                    name : "",
+                    price : 0,
+                    step : 1,
+                    max : 1,
+                }
+            ],
+            pickup_date: "",
         }
     );
     const [quantities, setQuantities] = useState([]);
@@ -67,9 +77,30 @@ const Vracs : React.FC = () => {
         setIsOrdering(true)
     }
 
+    const prepareVracOrderProp = () => {
+        let data = { 
+            id : vrac.id,
+            quantityList: vrac.ListProducts.map(
+                (product, index) => {
+                    return (
+                        {
+                            id : product.id,
+                            name : product.name,
+                            price : product.price,
+                            quantity : quantities[index],
+
+                        }
+                    )
+                }
+            )
+        }
+        return data
+    }
+
+
     if (isOrdering) {
         return (
-            <ValidationPage/>
+            <ValidationPage vrac = {prepareVracOrderProp()}/>
         )
     }
     return (

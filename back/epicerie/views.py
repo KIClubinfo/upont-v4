@@ -113,6 +113,46 @@ class VracViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+class VracOrderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows vracs order to be viewed and created.
+    POST request should be of the form:
+    {
+        "vrac_id": number,
+        "listProducts":
+            {
+                "product_id": number,
+                "quantity": number
+            }[]
+        
+    }
+    """
+    http_method_names = ["get", "post"]
+    serializer_class = VracOrderSerializer
+
+    def get_queryset(self):
+        queryset = Vrac_Order.objects.all()
+        queryset = queryset.filter(student__user__id=self.request.user.id)
+        return queryset
+    
+    def create(self, request):
+        # Create the vrac order with the list of products and quantities.
+        student = get_object_or_404(Student, user__id=request.user.id)
+        vrac = Vrac.objects.get(id=request.data["vrac_id"])
+        quantities = {}
+        for product in request.data["listProducts"]:
+            prod = get_object_or_404(Product, id=product["product_id"])
+            if product["quantity"] > 0 :
+                quantities[prod.name] = product["quantity"]
+
+        vrac_order = Vrac_Order(vrac=vrac, student=student, order=quantities)
+        if vrac_order.isValid():
+            vrac_order.save()
+        else:
+            return Response({"status": "error", "message": "Invalid vrac order"})
+        return Response({"status": "ok"})
+            
+
 @login_required
 def home(request):
     return render(request, "epicerie/epicerie.html")

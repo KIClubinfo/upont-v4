@@ -87,15 +87,12 @@ class Vrac(models.Model):
 class Vrac_Order(models.Model):
     vrac = models.ForeignKey(Vrac, on_delete=models.SET_NULL, null=True)
     student = models.ForeignKey("social.Student", on_delete=models.SET_NULL, null=True)
-    # order is a dictionnairy taking as key product and as value quantity
+    # order is a dictionnairy taking as key the product name and as value quantity
     order = models.JSONField(default=dict)
 
     def __str__(self):
-        return f"{self.quantity} {self.product} by {self.student}"
+        return f"{self.vrac} by {self.student}"
 
     def isValid(self):
-        bool = self.vrac is not None
-        bool = bool and self.student is not None
-        bool = bool and self.quantity >= 0 and isinstance(self.quantity, int)
-        bool = bool and self.product is not None
+        bool = all(quant > 0 for quant in self.order.values())
         return bool
