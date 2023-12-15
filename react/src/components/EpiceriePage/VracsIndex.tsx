@@ -1,10 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { Product } from './VracCardComponents'
 import { ValidationPage } from './VracValidation'
-import { number, string } from 'prop-types';
+import { ExistingOrder } from './DispayOrderedVrac'
 
 const Vracs : React.FC = () => { 
-
+    //Bool to tell if the user has already ordered a vrac
+    const [hasOrdered, sethasOrdered] = useState(false)
+    // Vrac data
     const [vrac, setVrac] = useState(
         {
             id : 1,
@@ -20,9 +22,20 @@ const Vracs : React.FC = () => {
             pickup_date: "",
         }
     );
+    // Quantities input by the user
     const [quantities, setQuantities] = useState([]);
-
+    //Is the user on the confirmation page ?
     const [isOrdering, setIsOrdering] = useState(false);
+
+    const getHasOrdered = () => 
+        // @ts-ignore Urls
+        fetch(Urls.epicerieVracOrderHasOrdered())
+        .then((res) => res.json())
+        .then((result) => {
+            sethasOrdered(result)
+        }
+        )
+        .catch(console.error);
 
     const getVrac = () =>
         // @ts-ignore Urls is declared in the django template
@@ -35,36 +48,18 @@ const Vracs : React.FC = () => {
             setQuantities(new Array(result.ListProducts.length).fill(0))
         })
         .catch(console.error);
-
+    // Load the data on loading the page.
     useEffect(() => {
+        // @ts-ignore Urls 
+        console.log(Urls)
+        getHasOrdered();
         getVrac();
     }
     , []);
 
-    const incrementQuantity = (index : number, step : number, max : number) => {
-        //Increment the quantity of the product at index
-        setQuantities( quantities.map((quantity, i) => {
-            if (i === index && quantity <= max - step) {
-                return quantity + step
-            } else {
-                return quantity
-            }
-        }
-        ))
+    if (hasOrdered) {
+        return 
     }
-
-    const decrementQuantity = (index : number, step : number) => {
-        //Decrement the quantity of the product at index, if it is > 0
-        setQuantities( quantities.map((quantity, i) => {
-            if (i === index && quantity >= step) {
-                return quantity - step
-            } else {
-                return quantity
-            }
-        }
-        ))
-    }
-
     if (vrac.ListProducts.length === 0) {
         return (
             <div className="centered-div">
@@ -103,6 +98,31 @@ const Vracs : React.FC = () => {
             <ValidationPage vrac = {prepareVracOrderProp()}/>
         )
     }
+
+    const incrementQuantity = (index : number, step : number, max : number) => {
+        //Increment the quantity of the product at index
+        setQuantities( quantities.map((quantity, i) => {
+            if (i === index && quantity <= max - step) {
+                return quantity + step
+            } else {
+                return quantity
+            }
+        }
+        ))
+    }
+
+    const decrementQuantity = (index : number, step : number) => {
+        //Decrement the quantity of the product at index, if it is > 0
+        setQuantities( quantities.map((quantity, i) => {
+            if (i === index && quantity >= step) {
+                return quantity - step
+            } else {
+                return quantity
+            }
+        }
+        ))
+    }
+    // If we are here, the user isn't ordering, there is an available vrac and the user is sure they want to order a new v
     return (
         <div className="vrac">
             <div className='row row-cols-5'>

@@ -89,10 +89,11 @@ class Vrac_Order(models.Model):
     student = models.ForeignKey("social.Student", on_delete=models.SET_NULL, null=True)
     # order is a dictionnairy taking as key the product name and as value quantity
     order = models.JSONField(default=dict)
+    total = models.IntegerField(default = 0)
 
     def __str__(self):
-        return f"{self.vrac} by {self.student}"
+        return f"Vrac du {self.vrac.pickup_date} by {self.student}, pour un total de {self.total}"
 
     def isValid(self):
-        bool = all(quant > 0 for quant in self.order.values())
+        quant_pos = all(quant > 0 for quant in self.order.values())
         return bool
