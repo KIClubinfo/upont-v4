@@ -72,7 +72,7 @@ export const ExistingOrder: React.FC<sethasOrderedProp> = (prop : sethasOrderedP
                                 onClick={() => {
                                     prop.sethasOrdered(false)
                                 }}>
-                                    Modifier ma commande
+                                    Commander à nouveau
                                 </button>
                             </div>
                         </div>

@@ -151,10 +151,11 @@ class VracOrderViewSet(viewsets.ModelViewSet):
                     return Response({"status": "error", "message": "Invalid product order"})
                 prodOrder.save()
             # Add the price of the product to the total
-            # Price is in cents per kg
-            total += (productObject.price / 100) * (productData["quantity"] / 1000) 
+            # Price is in cents per kg, total is in cents
+            total += (productObject.price) * (productData["quantity"] / 1000) 
             
         vrac_order.total = total
+        vrac_order.save()
         return Response({"status": "ok"})
     
     @action(detail=False, methods=["get"])
