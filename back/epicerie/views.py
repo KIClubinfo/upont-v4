@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from social.models import Student
 
 
-from .models import Basket, Basket_Order, Vrac, Vrac_Order, Product
+from .models import Basket, Basket_Order, Vrac, Vrac_Order, Product, ProductOrder
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -138,20 +138,23 @@ class VracOrderViewSet(viewsets.ModelViewSet):
     def create(self, request):
         # Create the vrac order with the list of products and quantities.
         student = get_object_or_404(Student, user__id=request.user.id)
-        vrac = Vrac.objects.get(id=request.data["vrac_id"])
-        quantities = {}
+        vrac = Vrac.objects.get(pk=request.data["vrac_id"])
+        vrac_order = Vrac_Order(vrac=vrac, student=student)
+        vrac_order.save()
         total = 0
-        for product in request.data["listProducts"]:
-            prod = get_object_or_404(Product, id=product["product_id"])
-            if product["quantity"] > 0 :
-                quantities[prod.name] = product["quantity"]
-                total += product["quantity"] * prod.price
 
-        vrac_order = Vrac_Order(vrac=vrac, student=student, order=quantities, total = total)
-        if vrac_order.isValid():
-            vrac_order.save()
-        else:
-            return Response({"status": "error", "message": "Invalid vrac order"})
+        for productData in request.data["listProducts"]:
+            productObject = get_object_or_404(Product, pk=productData["product_id"])
+            if productData["quantity"] > 0:
+                prodOrder = ProductOrder(product=productObject, quantity=productData["quantity"], vracOrder=vrac_order)
+                if not prodOrder.isValid():
+                    return Response({"status": "error", "message": "Invalid product order"})
+                prodOrder.save()
+            # Add the price of the product to the total
+            # Price is in cents per kg
+            total += (productObject.price / 100) * (productData["quantity"] / 1000) 
+            
+        vrac_order.total = total
         return Response({"status": "ok"})
     
     @action(detail=False, methods=["get"])

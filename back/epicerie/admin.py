@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Basket, Basket_Order, Vegetable, Vrac, Vrac_Order, Product
+from .models import Basket, Basket_Order, Vegetable, Vrac, Vrac_Order, Product, ProductOrder
 
 # Register your models here.
 
@@ -12,3 +12,5 @@ admin.site.register(Vrac_Order)
 admin.site.register(Product)
 
 admin.site.register(Vegetable)
+
+admin.site.register(ProductOrder)

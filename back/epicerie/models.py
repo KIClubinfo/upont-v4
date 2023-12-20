@@ -82,18 +82,28 @@ class Vrac(models.Model):
     def getproduct(self):
         # return a list of product
         return [product for product in self.ListProducts]
+    
+class ProductOrder(models.Model):
+    #Each order of one product is linked to a vrac order
+    vracOrder = models.ForeignKey("Vrac_Order", on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(default=0)
+
+    def isValid(self):
+        bool = self.product is not None
+        bool = bool and self.quantity >= 0 and isinstance(self.quantity, int)
+        return bool
 
 
 class Vrac_Order(models.Model):
     vrac = models.ForeignKey(Vrac, on_delete=models.SET_NULL, null=True)
     student = models.ForeignKey("social.Student", on_delete=models.SET_NULL, null=True)
     # order is a dictionnairy taking as key the product name and as value quantity
-    order = models.JSONField(default=dict)
     total = models.IntegerField(default = 0)
 
     def __str__(self):
         return f"Vrac du {self.vrac.pickup_date} by {self.student}, pour un total de {self.total}"
 
     def isValid(self):
-        quant_pos = all(quant > 0 for quant in self.order.values())
-        return bool
+        quant_pos = all(prodOrder.isValid() for prodOrder in self.order.all())
+        return quant_pos

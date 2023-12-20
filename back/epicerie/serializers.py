@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from social.serializers import UserSerializer
 
-from .models import Basket, Basket_Order, Product, Vrac, Vrac_Order, Vegetable
+from .models import Basket, Basket_Order, Product, Vrac, Vrac_Order, ProductOrder
 
 
 class BasketSerializer(serializers.ModelSerializer):
@@ -115,8 +115,12 @@ class VracOrderSerializer(serializers.ModelSerializer):
 
     def get_order(self, obj):
         return [
-            {"product": str(product), "quantity": quantity}
-            for product, quantity in obj.order.items()
+            {
+                "id": prodOrder.product.id,
+                "product": prodOrder.product.name,
+                "quantity": prodOrder.quantity,
+            }
+            for prodOrder in ProductOrder.objects.filter(vracOrder__pk = obj.id)
         ]
 
     class Meta:
