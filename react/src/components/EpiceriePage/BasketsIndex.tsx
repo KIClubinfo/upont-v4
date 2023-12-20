@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 
-import { Basket } from './BasketCardComponents'
-import { DisplayExistingOrder } from './DisplayOrderedBaskets'
+import { Basket } from './BasketCard'
+import { DisplayExistingOrder } from './OrderedBaskets'
 
 const Baskets : React.FC = () => {
   

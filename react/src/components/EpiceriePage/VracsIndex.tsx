@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { Product } from './VracCardComponents'
+import { Product } from './VracProductCard'
 import { ValidationPage } from './VracValidation'
-import { ExistingOrder } from './DispayOrderedVrac'
+import { ExistingOrder } from './OrderedVrac';
 
 const Vracs : React.FC = () => { 
     //Bool to tell if the user has already ordered a vrac
@@ -58,7 +58,7 @@ const Vracs : React.FC = () => {
     , []);
 
     if (hasOrdered) {
-        return 
+        return <ExistingOrder sethasOrdered={sethasOrdered}/>
     }
     if (vrac.ListProducts.length === 0) {
         return (

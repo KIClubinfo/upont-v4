@@ -111,6 +111,14 @@ class VracOrderSerializer(serializers.ModelSerializer):
 
     vrac = VracSerializerLite()
 
+    order = serializers.SerializerMethodField()
+
+    def get_order(self, obj):
+        return [
+            {"product": str(product), "quantity": quantity}
+            for product, quantity in obj.order.items()
+        ]
+
     class Meta:
         model = Vrac_Order
         fields = [
@@ -118,4 +126,5 @@ class VracOrderSerializer(serializers.ModelSerializer):
             "student",
             "vrac",
             "order",
+            "total",
         ]
