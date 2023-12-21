@@ -1,23 +1,24 @@
 import React from "react";
 import { getCookie } from '../utils/csrf';
+import { VracOrderPreparingProp } from "./EpicerieProps";
 
-interface VracOrderProp {
-    vrac : {
-        id : number
-        quantityList : {
-            id : number
-            name : string
-            price : number
-            quantity : number
-        }[]
-    }
-}
+// interface VracOrderPreparingProp {
+//     vrac : {
+//         id : number
+//         quantityList : {
+//             id : number
+//             name : string
+//             price : number
+//             quantity : number
+//         }[]
+//     }
+// }
 
-const handleVracOrderPost = (prop : VracOrderProp) => {
+const handleVracOrderPost = (prop : VracOrderPreparingProp) => {
     // Formats the orders to the format expected by the backend
     // Send the order to the backend
     // Reload the page
-    const orderList = prop.vrac.quantityList.map((product) => {
+    const orderList = prop.vracOrder.productQuantities.map((product) => {
         return {
             quantity: product.quantity,
             product_id: product.id
@@ -26,7 +27,7 @@ const handleVracOrderPost = (prop : VracOrderProp) => {
     )
 
     const data = { 
-        vrac_id : prop.vrac.id,
+        vrac_id : prop.vracOrder.vracId,
         listProducts : orderList
     };
     
@@ -49,7 +50,7 @@ const handleVracOrderPost = (prop : VracOrderProp) => {
         .catch(console.error); 
 }
 
-const ConfirmationButton : React.FC<VracOrderProp> = (prop : VracOrderProp) => {
+const ConfirmationButton : React.FC<VracOrderPreparingProp> = (prop : VracOrderPreparingProp) => {
     // Display the button to confirm the order
     return (
         <div className="epicerie-card-quantity-button">
@@ -83,11 +84,11 @@ const CancelButton : React.FC = () => {
     )
 }
 
-export const ValidationPage : React.FC<VracOrderProp> = ( prop : VracOrderProp ) => {
+export const ValidationPage : React.FC<VracOrderPreparingProp> = ( prop : VracOrderPreparingProp ) => {
 
     const totalPrice = () => {
         let total = 0; // In cents
-        prop.vrac.quantityList.forEach((product) => {
+        prop.vracOrder.productQuantities.forEach((product) => {
             // product price in € / kg and quantity in grams
             total += product.price / 1000 * product.quantity;
         })
@@ -102,7 +103,7 @@ export const ValidationPage : React.FC<VracOrderProp> = ( prop : VracOrderProp )
                 </div>
                 <div className="epicerie-card-content">
                     <ul>
-                        {prop.vrac.quantityList.map((product, index) => {
+                        {prop.vracOrder.productQuantities.map((product, index) => {
                             if (product.quantity > 0) {
                                 return (
                                     <li key={index}>
@@ -126,7 +127,7 @@ export const ValidationPage : React.FC<VracOrderProp> = ( prop : VracOrderProp )
                             <CancelButton />
                         </div>
                         <div className="col">
-                            <ConfirmationButton vrac={prop.vrac}/>
+                            <ConfirmationButton vracOrder={prop.vracOrder}/>
                         </div>
                     </div>
                 </div>

@@ -135,22 +135,30 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         return queryset
     
     def create(self, request):
-        # Create the vrac order with the list of products and quantities.
+        # Create the vrac order with the list of products and quantities
+        # Or update the vrac order if it already exists
         student = get_object_or_404(Student, user__id=request.user.id)
         vrac = Vrac.objects.get(pk=request.data["vrac_id"])
-        vrac_order = VracOrder(vrac=vrac, student=student)
+        try :
+            vrac_order = VracOrder.objects.get(vrac=vrac, student=student)
+        except VracOrder.DoesNotExist:
+            vrac_order = VracOrder(vrac=vrac, student=student)
         vrac_order.save()
         total = 0
 
         for productData in request.data["listProducts"]:
             productObject = get_object_or_404(Product, pk=productData["product_id"])
             if productData["quantity"] > 0:
-                prodOrder = ProductOrder(product=productObject, quantity=productData["quantity"], vracOrder=vrac_order)
+                try :
+                    prodOrder = ProductOrder.objects.get(product=productObject, vracOrder=vrac_order)
+                    prodOrder.quantity = productData["quantity"]
+                except ProductOrder.DoesNotExist:
+                    prodOrder = ProductOrder(product=productObject, quantity=productData["quantity"], vracOrder=vrac_order)
                 if not prodOrder.isValid():
                     return Response({"status": "error", "message": "Invalid product order"})
                 prodOrder.save()
             # Add the price of the product to the total
-            # Price is in cents per kg, total is in cents
+            # Price is in cents per kg, qunatity is in grams
             total += (productObject.price) * (productData["quantity"] / 1000) 
             
         vrac_order.total = total
@@ -159,9 +167,20 @@ class VracOrderViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=["get"])
     def hasOrdered(self, request):
-        queryset = Vrac_Order.objects.all()
+        queryset = VracOrder.objects.all()
         queryset.filter(student__user__id=self.request.user.id)
         return Response(bool(queryset))
+    
+    @action(detail=False, methods=["get"])
+    def latestVracOrder(self, request):
+        queryset = VracOrder.objects.all()
+        queryset = queryset.filter(student__user__id=self.request.user.id)
+        try:
+            latest_vrac_order = queryset.latest("vrac__pickup_date")
+        except VracOrder.DoesNotExist:
+            return Response({"status": "error", "message": "No vrac order found"})
+        serializer = VracOrderSerializer(latest_vrac_order)
+        return Response(serializer.data)
             
 
 @login_required
