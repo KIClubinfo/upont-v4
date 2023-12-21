@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from social.models import Student
 
 
-from .models import Basket, Basket_Order, Vrac, Vrac_Order, Product, ProductOrder
+from .models import Basket, BasketOrder, Vrac, VracOrder, Product, ProductOrder
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -15,7 +15,6 @@ from rest_framework.views import APIView
 
 # from rest_framework.response import Response
 
-from .models import Basket, Basket_Order
 from .serializers import (
     BasketSerializer,
     BasketOrderSerializer,
@@ -57,12 +56,12 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
     }
     """
 
-    queryset = Basket_Order.objects.all()
+    queryset = BasketOrder.objects.all()
     serializer_class = BasketOrderSerializer
     http_method_names = ["get", "post"]
 
     def get_queryset(self):
-        queryset = Basket_Order.objects.all()
+        queryset = BasketOrder.objects.all()
         queryset = queryset.filter(student__user__id=self.request.user.id)
         return queryset
 
@@ -72,7 +71,7 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
             basket = Basket.objects.get(id=order["basket_id"])
             student = get_object_or_404(Student, user__id=request.user.id)
             quantity = order["quantity"]
-            basket_order = Basket_Order(
+            basket_order = BasketOrder(
                 basket=basket, student=student, quantity=quantity
             )
             if basket_order.isValid():
@@ -131,7 +130,7 @@ class VracOrderViewSet(viewsets.ModelViewSet):
     serializer_class = VracOrderSerializer
 
     def get_queryset(self):
-        queryset = Vrac_Order.objects.all()
+        queryset = VracOrder.objects.all()
         queryset = queryset.filter(student__user__id=self.request.user.id)
         return queryset
     
@@ -139,7 +138,7 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         # Create the vrac order with the list of products and quantities.
         student = get_object_or_404(Student, user__id=request.user.id)
         vrac = Vrac.objects.get(pk=request.data["vrac_id"])
-        vrac_order = Vrac_Order(vrac=vrac, student=student)
+        vrac_order = VracOrder(vrac=vrac, student=student)
         vrac_order.save()
         total = 0
 

@@ -48,6 +48,7 @@ const Vracs : React.FC = () => {
             setQuantities(new Array(result.ListProducts.length).fill(0))
         })
         .catch(console.error);
+
     // Load the data on loading the page.
     useEffect(() => {
         // @ts-ignore Urls 

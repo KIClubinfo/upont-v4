@@ -30,7 +30,7 @@ class Basket(models.Model):
         return [str(v) for v in self.composition.all()]
 
 
-class Basket_Order(models.Model):
+class BasketOrder(models.Model):
     basket = models.ForeignKey(Basket, on_delete=models.SET_NULL, null=True)
     student = models.ForeignKey("social.Student", on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0)
@@ -85,7 +85,7 @@ class Vrac(models.Model):
     
 class ProductOrder(models.Model):
     #Each order of one product is linked to a vrac order
-    vracOrder = models.ForeignKey("Vrac_Order", on_delete=models.CASCADE, null=True)
+    vracOrder = models.ForeignKey("VracOrder", on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0)
 
@@ -95,11 +95,14 @@ class ProductOrder(models.Model):
         return bool
 
 
-class Vrac_Order(models.Model):
+class VracOrder(models.Model):
     vrac = models.ForeignKey(Vrac, on_delete=models.SET_NULL, null=True)
     student = models.ForeignKey("social.Student", on_delete=models.SET_NULL, null=True)
     # order is a dictionnairy taking as key the product name and as value quantity
     total = models.IntegerField(default = 0)
+
+    class Meta:
+        unique_together = ("vrac", "student")
 
     def __str__(self):
         return f"Vrac du {self.vrac.pickup_date} by {self.student}, pour un total de {self.total}"

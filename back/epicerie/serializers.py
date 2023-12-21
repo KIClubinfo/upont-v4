@@ -1,8 +1,6 @@
 from rest_framework import serializers
 
-from social.serializers import UserSerializer
-
-from .models import Basket, Basket_Order, Product, Vrac, Vrac_Order, ProductOrder
+from .models import Basket, BasketOrder, Product, Vrac, VracOrder, ProductOrder
 
 
 class BasketSerializer(serializers.ModelSerializer):
@@ -49,7 +47,7 @@ class BasketOrderSerializer(serializers.ModelSerializer):
     basket = BasketSerializerLite()
 
     class Meta:
-        model = Basket_Order
+        model = BasketOrder
         fields = [
             "id",
             "student",
@@ -124,7 +122,7 @@ class VracOrderSerializer(serializers.ModelSerializer):
         ]
 
     class Meta:
-        model = Vrac_Order
+        model = VracOrder
         fields = [
             "id",
             "student",
