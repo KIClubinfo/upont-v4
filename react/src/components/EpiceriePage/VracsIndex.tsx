@@ -3,6 +3,7 @@ import { Product } from './VracProductCard'
 import { ValidationPage } from './VracValidation'
 import { ExistingOrder } from './OrderedVrac';
 import { VracOrderProp, VracOrderPreparingProp, VracProp } from './EpicerieProps';
+import { DeletionPage } from './VracDeletionPage';
 
 const Vracs : React.FC = () => { 
     // Vrac data
@@ -15,6 +16,8 @@ const Vracs : React.FC = () => {
     const [isOrdering, setIsOrdering] = useState(true);
     // Is the user on the confirmation page ?
     const [isConfirming, setIsConfirming] = useState(false);
+    // Is the user about to delete the order ?
+    const [isDeleting, setIsDeleting] = useState(false);
 
 
     const getData = () => 
@@ -82,7 +85,14 @@ const Vracs : React.FC = () => {
     }
 
     const handleOrderClick = () => {
-        setIsConfirming(true)
+        console.log(quantities)
+        console.log(quantities.some( (ele) => ele > 0 ))
+        if (quantities.some( (ele) => ele > 0 )) {
+            setIsConfirming(true)
+        }
+        else if (vracOrder != null){
+            setIsDeleting(true)
+        }
     }
 
     const prepareVracOrderProp = () : VracOrderPreparingProp =>{
@@ -124,6 +134,12 @@ const Vracs : React.FC = () => {
             <div className="centered-div">
                 <h1>Il n'y a pas de vrac disponible pour le moment</h1>
             </div>
+        )
+    }
+
+    if (isDeleting) {
+        return (
+            <DeletionPage/>
         )
     }
 

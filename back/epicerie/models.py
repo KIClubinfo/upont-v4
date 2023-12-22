@@ -94,6 +94,9 @@ class ProductOrder(models.Model):
         bool = bool and self.quantity >= 0 and isinstance(self.quantity, int)
         return bool
 
+    def __str__(self) -> str:
+        string : str = f"{self.quantity} of {self.product.name}"
+        return string
 
 class VracOrder(models.Model):
     vrac = models.ForeignKey(Vrac, on_delete=models.SET_NULL, null=True)

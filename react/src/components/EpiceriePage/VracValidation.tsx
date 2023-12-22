@@ -30,7 +30,7 @@ const handleVracOrderPost = (prop : VracOrderPreparingProp) => {
         vrac_id : prop.vracOrder.vracId,
         listProducts : orderList
     };
-    
+    console.log(data)
     // Upload the order to the backend
     const csrfmiddlewaretoken = getCookie('csrftoken');
     // @ts-ignore Urls is declared in the django template

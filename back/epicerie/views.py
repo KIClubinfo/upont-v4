@@ -126,7 +126,7 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         
     }
     """
-    http_method_names = ["get", "post"]
+    http_method_names = ["get", "post", "delete"]
     serializer_class = VracOrderSerializer
 
     def get_queryset(self):
@@ -146,30 +146,33 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         vrac_order.save()
         total = 0
 
+        # Modify / create the productOrder objects
         for productData in request.data["listProducts"]:
             productObject = get_object_or_404(Product, pk=productData["product_id"])
-            if productData["quantity"] > 0:
-                try :
-                    prodOrder = ProductOrder.objects.get(product=productObject, vracOrder=vrac_order)
+            try :
+                prodOrder = ProductOrder.objects.get(product=productObject, vracOrder=vrac_order)
+                if productData["quantity"] == 0:
+                    prodOrder.delete()
+                else:
                     prodOrder.quantity = productData["quantity"]
-                except ProductOrder.DoesNotExist:
-                    prodOrder = ProductOrder(product=productObject, quantity=productData["quantity"], vracOrder=vrac_order)
-                if not prodOrder.isValid():
-                    return Response({"status": "error", "message": "Invalid product order"})
-                prodOrder.save()
+                    prodOrder.save()
+            except ProductOrder.DoesNotExist:
+                prodOrder = ProductOrder(product=productObject, quantity=productData["quantity"], vracOrder=vrac_order)
+                if prodOrder.quantity > 0:
+                    prodOrder.save()
             # Add the price of the product to the total
             # Price is in cents per kg, qunatity is in grams
             total += (productObject.price) * (productData["quantity"] / 1000) 
             
         vrac_order.total = total
         vrac_order.save()
+        # Check if the vrac order is now empty after modification
+        # If so, delete it.
+        queryset = ProductOrder.objects.all()
+        queryset.filter(vracOrder = vrac_order)
+        if not (queryset):
+            vrac_order.delete()
         return Response({"status": "ok"})
-    
-    @action(detail=False, methods=["get"])
-    def hasOrdered(self, request):
-        queryset = VracOrder.objects.all()
-        queryset.filter(student__user__id=self.request.user.id)
-        return Response(bool(queryset))
     
     @action(detail=False, methods=["get"])
     def latestVracOrder(self, request):
@@ -181,6 +184,15 @@ class VracOrderViewSet(viewsets.ModelViewSet):
             return Response({"status": "error", "message": "No vrac order found"})
         serializer = VracOrderSerializer(latest_vrac_order)
         return Response(serializer.data)
+    
+    def destroy(self, request):
+        """
+        Delete an order for the student in the request & the vrac_id
+        """
+        vracObject = Vrac.objects.get(pk = request.data["vrac_id"])
+        student = get_object_or_404(Student, user__id=request.user.id)
+        vrac_order = get_object_or_404(VracOrder, vrac = vracObject , student=student)
+        vrac_order.delete()
             
 
 @login_required
