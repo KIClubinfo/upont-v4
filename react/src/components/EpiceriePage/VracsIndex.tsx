@@ -5,22 +5,16 @@ import { ExistingOrder } from './OrderedVrac';
 import { VracOrderProp, VracOrderPreparingProp, VracProp } from './EpicerieProps';
 
 const Vracs : React.FC = () => { 
-    //Bool to tell if the user has already ordered a vrac
-    const [hasOrdered, sethasOrdered] = useState(false)
     // Vrac data
-    const [vrac, setVrac] = useState<VracProp["vrac"]>(
-        {
-            id : 0,
-            pickup_date : "",
-            ListProducts : []
-        }
-    );
+    const [vrac, setVrac] = useState<VracProp["vrac"] | null>(null);
     // Potential order already in the database
     const [vracOrder, setVracOrder ] = useState<VracOrderProp["vracOrder"] | null>(null);
     // Quantities input by the user
     const [quantities, setQuantities] = useState([]);
-    //Is the user on the confirmation page ?
-    const [isOrdering, setIsOrdering] = useState(false);
+    //Is the user on the order page ?
+    const [isOrdering, setIsOrdering] = useState(true);
+    // Is the user on the confirmation page ?
+    const [isConfirming, setIsConfirming] = useState(false);
 
 
     const getData = () => 
@@ -31,15 +25,20 @@ const Vracs : React.FC = () => {
         fetch(Urls.epicerieVracLatest())
         .then((res) => res.json())
         .then((vracResult) => {
-            setVrac(vracResult)
+            if (vracResult.status !== "error") {
+                setVrac(vracResult)
+            }
             // Then we load the order - the API only returns the order for the latest vrac for the current user
             // @ts-ignore Urls is declared in the django template
             fetch(Urls.epicerieVracOrderLatestVracOrder())
             .then((res2) => res2.json())
             .then((orderResult) => {
-                setVracOrder(orderResult)
+                if (orderResult.status !== "error") {
+                    setVracOrder(orderResult)
+                }
                 let newQuantities = new Array(vracResult.ListProducts.length).fill(0)
-                if (orderResult !== null) {
+                if (orderResult.status !== "error") {
+                    setIsOrdering(false)
                     orderResult.order.forEach((product) => {
                         const index = vracResult.ListProducts.findIndex((vracProduct) => vracProduct.id === product.id)
                         newQuantities[index] = product.quantity
@@ -49,17 +48,7 @@ const Vracs : React.FC = () => {
             })
             .catch(console.error);
         })
-        .catch(console.error)
-        .then(() => {
-            // @ts-ignore Urls is declared in the django template
-            fetch(Urls.epicerieVracOrderHasOrdered())
-            .then((res) => res.json())
-            .then((result) => {
-                sethasOrdered(result)
-            }
-            )
-            .catch(console.error);
-        })
+
         
     // Load the data on loading the page.
     useEffect(() => {
@@ -93,7 +82,7 @@ const Vracs : React.FC = () => {
     }
 
     const handleOrderClick = () => {
-        setIsOrdering(true)
+        setIsConfirming(true)
     }
 
     const prepareVracOrderProp = () : VracOrderPreparingProp =>{
@@ -113,11 +102,24 @@ const Vracs : React.FC = () => {
         }
     }
 
-    if (vracOrder !== null && hasOrdered) {
-        return <ExistingOrder sethasOrdered={sethasOrdered} vracOrder={vracOrder}/>
+    const orderButtonText = () => {
+        if (vracOrder === null ) {
+            return "Commander"
+            } 
+        else {
+            return "Modifier ma commande"
+            }
+        }
+
+    if (vracOrder !== null && !isOrdering) {
+        return (
+            <div className="vrac">
+                <ExistingOrder setIsOrdering={setIsOrdering} vracOrder={vracOrder}/>
+            </div>
+        )
     }
 
-    if (vrac.ListProducts.length === 0 || vrac === null) {
+    if (vrac === null || vrac.ListProducts.length === 0 ) {
         return (
             <div className="centered-div">
                 <h1>Il n'y a pas de vrac disponible pour le moment</h1>
@@ -126,7 +128,7 @@ const Vracs : React.FC = () => {
     }
 
 
-    if (isOrdering) {
+    if (isConfirming) {
         return (
             <ValidationPage vracOrder = {prepareVracOrderProp()["vracOrder"]}/>
         )
@@ -146,7 +148,9 @@ const Vracs : React.FC = () => {
                 }
             </div>
             <div className="centered-div">
-                <button className="button blue-button" onClick={handleOrderClick}>Commander </button>
+                <button className="button blue-button" onClick={handleOrderClick}>
+                    {orderButtonText()}
+                </button>
             </div>
         </div>
     );

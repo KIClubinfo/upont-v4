@@ -32,7 +32,7 @@ const QuantityButtons : React.FC<ProductProp>  = (prop : ProductProp) => {
     <div className="epicerie-card-quantity">
       <div>
         <button className="button blue-button" onClick={prop.quantity.decrement}>-</button>
-        <span >{prop.quantity.count}</span>
+        <span >{prop.quantity.count} g </span>
         <button className="button blue-button" onClick={prop.quantity.increment}>+</button>
       </div>
     </div>

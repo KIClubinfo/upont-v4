@@ -2,7 +2,7 @@ import React from "react";
 import { VracOrderProp } from "./EpicerieProps";
 
 interface sethasOrderedProp {
-    sethasOrdered: (hasOrdered: boolean) => void
+    setIsOrdering: (hasOrdered: boolean) => void
 }
 
 interface ExistingOrderProp extends sethasOrderedProp, VracOrderProp {}
@@ -10,7 +10,7 @@ interface ExistingOrderProp extends sethasOrderedProp, VracOrderProp {}
 export const ExistingOrder: React.FC<ExistingOrderProp> = (prop : ExistingOrderProp) => {
 
     return (
-        <div className="row row-cols-5">
+        <div className="col-sm">
             <div className="epicerie-card">
                 <div className="epicerie-card-title">
                     Tu as déjà commandé un panier !
@@ -22,7 +22,7 @@ export const ExistingOrder: React.FC<ExistingOrderProp> = (prop : ExistingOrderP
                     prop.vracOrder.order.map((product, subindex) => {
                         return (
                             <li key={subindex}>
-                                {product.product} : {product.quantity}
+                                {product.product} : {product.quantity} g
                             </li>
                         )})
                     }   
@@ -36,7 +36,7 @@ export const ExistingOrder: React.FC<ExistingOrderProp> = (prop : ExistingOrderP
                     </div>
                     <button className="button green-button"
                     onClick={() => {
-                        prop.sethasOrdered(false)
+                        prop.setIsOrdering(true)
                     }}>
                         Modifier ma commande
                     </button>

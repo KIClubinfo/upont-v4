@@ -1555,7 +1555,7 @@ a.text-green:hover{
 .epicerie-card {
     margin: 1.5rem auto;
 	position: relative;
-	height: 45rem;
+	height: 40rem;
     width: 30rem;
 	background: rgba(255, 255, 255, 0.05);
 	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -1605,7 +1605,7 @@ a.text-green:hover{
     text-align: center;
     margin : 1.5rem;
     font-size: 1.7rem;
-	top: 50px;
+	top: 20px;
 	display: flex;
 }
 
