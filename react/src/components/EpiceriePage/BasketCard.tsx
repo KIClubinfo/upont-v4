@@ -37,8 +37,8 @@ const PrettyComposition : React.FC<BasketProp> = (prop : BasketProp) => {
   // Display the composition of the basket in a list
   const composition = prop.basket.composition
   return (
-    <div className="epicerie-card-composition">
-      <div className="epicerie-card-composition-title">
+    <div className="epicerie-card-content">
+      <div >
         Composition :
         </div>
       <br></br>
@@ -55,13 +55,13 @@ const QuantityButtons : React.FC<QuantityProp>  = (prop : QuantityProp) => {
   // Display the quantity of the basket and buttons to increment/decrement it
   // The data is handled in the parent component Basket
   return (
-    <div className="epicerie-card-quantity">
-      <div className="epicerie-card-quantity-title">
+    <div className="epicerie-card-button">
+      <div>
         Quantité :
       </div>
-      <div className="epicerie-card-quantity-buttons">
+      <div>
         <button className="button blue-button" onClick={prop.quantity.decrement}>- </button>
-        <span className="epicerie-card-quantity-text">{prop.quantity.count}</span>
+        <span >{prop.quantity.count}</span>
         <button className="button blue-button" onClick={prop.quantity.increment}> +</button>
       </div>
     </div>
@@ -75,9 +75,7 @@ export const Basket: React.FC<Prop> = (prop : Prop) => {
     <div className="col-sm">
       <div className="epicerie-card">
         <BasketPrice basket = {prop.basket} />
-        <div className="epicerie-card-content">
-          <PrettyComposition basket = {prop.basket} />
-        </div>
+        <PrettyComposition basket = {prop.basket} />
         <QuantityButtons quantity = {prop.quantity}/>
       </div>
     </div>

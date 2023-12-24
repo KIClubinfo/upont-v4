@@ -1,9 +1,6 @@
 from rest_framework import serializers
 
-from social.serializers import UserSerializer
-
-from .models import Basket, Basket_Order
-
+from .models import Basket, BasketOrder, Product, Vrac, VracOrder, ProductOrder
 
 
 class BasketSerializer(serializers.ModelSerializer):
@@ -11,7 +8,7 @@ class BasketSerializer(serializers.ModelSerializer):
 
     def get_composition(self, obj):
         return [str(vegetable) for vegetable in obj.composition.all()]
-    
+
     class Meta:
         model = Basket
         fields = [
@@ -24,19 +21,18 @@ class BasketSerializer(serializers.ModelSerializer):
             "is_active",
         ]
 
+
 class BasketSerializerLite(serializers.ModelSerializer):
-    
     class Meta:
         model = Basket
         fields = [
             "id",
             "price",
             "pickup_date",
-
         ]
-       
-class BasketOrderSerializer(serializers.ModelSerializer):
 
+
+class BasketOrderSerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField()
 
     def get_student(self, obj):
@@ -47,11 +43,11 @@ class BasketOrderSerializer(serializers.ModelSerializer):
         simplified_student["email"] = obj.student.user.email
         simplified_student["phone_number"] = obj.student.phone_number
         return simplified_student
-    
+
     basket = BasketSerializerLite()
-    
+
     class Meta:
-        model = Basket_Order
+        model = BasketOrder
         fields = [
             "id",
             "student",
@@ -59,3 +55,78 @@ class BasketOrderSerializer(serializers.ModelSerializer):
             "quantity",
         ]
 
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "name",
+            "step",
+            "max",
+            "price",
+        ]
+
+
+class VracSerializer(serializers.ModelSerializer):
+    ListProducts = serializers.SerializerMethodField()
+
+    def get_ListProducts(self, obj):
+        return [ProductSerializer(product).data for product in obj.ListProducts.all()]
+
+    class Meta:
+        model = Vrac
+        fields = [
+            "id",
+            "ListProducts",
+            "open_date",
+            "close_date",
+            "pickup_date",
+            "is_active",
+        ]
+
+
+class VracSerializerLite(serializers.ModelSerializer):
+    class Meta:
+        model = Vrac
+        fields = [
+            "id",
+            "pickup_date",
+        ]
+
+
+class VracOrderSerializer(serializers.ModelSerializer):
+    student = serializers.SerializerMethodField()
+
+    def get_student(self, obj):
+        simplified_student = {}
+        simplified_student["id"] = obj.student.id
+        simplified_student["first_name"] = obj.student.user.first_name
+        simplified_student["last_name"] = obj.student.user.last_name
+        simplified_student["email"] = obj.student.user.email
+        simplified_student["phone_number"] = obj.student.phone_number
+        return simplified_student
+
+    vrac = VracSerializerLite()
+
+    order = serializers.SerializerMethodField()
+
+    def get_order(self, obj):
+        return [
+            {
+                "id": prodOrder.product.id,
+                "product": prodOrder.product.name,
+                "quantity": prodOrder.quantity,
+            }
+            for prodOrder in ProductOrder.objects.filter(vracOrder__pk = obj.id)
+        ]
+
+    class Meta:
+        model = VracOrder
+        fields = [
+            "id",
+            "student",
+            "vrac",
+            "order",
+            "total",
+        ]

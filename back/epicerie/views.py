@@ -4,17 +4,23 @@ from django.shortcuts import get_object_or_404, render
 from social.models import Student
 
 
-from .models import Basket, Basket_Order, Vrac, Vrac_Order, Product
+from .models import Basket, BasketOrder, Vrac, VracOrder, Product, ProductOrder
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
-# from rest_framework.views import APIView
+from rest_framework.views import APIView
+
 # from rest_framework.response import Response
 
-from .models import Basket, Basket_Order
-from .serializers import BasketSerializer, BasketOrderSerializer
+from .serializers import (
+    BasketSerializer,
+    BasketOrderSerializer,
+    VracSerializer,
+    VracOrderSerializer,
+)
 
 
 class BasketViewSet(viewsets.ModelViewSet):
@@ -30,6 +36,7 @@ class BasketViewSet(viewsets.ModelViewSet):
         queryset = Basket.objects.all()
         queryset = queryset.filter(is_active=True)
         return queryset
+
 
 class BasketOrderViewSet(viewsets.ModelViewSet):
     """
@@ -48,13 +55,14 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
         ]
     }
     """
-    queryset = Basket_Order.objects.all()
+
+    queryset = BasketOrder.objects.all()
     serializer_class = BasketOrderSerializer
     http_method_names = ["get", "post"]
+
     def get_queryset(self):
-        queryset = Basket_Order.objects.all()
+        queryset = BasketOrder.objects.all()
         queryset = queryset.filter(student__user__id=self.request.user.id)
-        queryset.order_by("-basket.pickup_date")
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -63,7 +71,7 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
             basket = Basket.objects.get(id=order["basket_id"])
             student = get_object_or_404(Student, user__id=request.user.id)
             quantity = order["quantity"]
-            basket_order = Basket_Order(
+            basket_order = BasketOrder(
                 basket=basket, student=student, quantity=quantity
             )
             if basket_order.isValid():
@@ -71,8 +79,123 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
             else:
                 return Response({"status": "error", "message": "Invalid basket order"})
         return Response({"status": "ok"})
-        
 
+
+class VracViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows vracs to be viewed.
+    """
+
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Vrac.objects.all()
+        return queryset
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = VracSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = self.get_queryset()
+        vrac = get_object_or_404(queryset, pk=pk)
+        serializer = VracSerializer(vrac)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def latest(self, request):
+        queryset = self.get_queryset()
+        queryset = queryset.filter(is_active=True)
+        latest_vrac = queryset.latest("pickup_date")
+        serializer = VracSerializer(latest_vrac)
+        return Response(serializer.data)
+
+
+class VracOrderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows vracs order to be viewed and created.
+    POST request should be of the form:
+    {
+        "vrac_id": number,
+        "listProducts":
+            {
+                "product_id": number,
+                "quantity": number
+            }[]
+        
+    }
+    """
+    http_method_names = ["get", "post"]
+    serializer_class = VracOrderSerializer
+
+    def get_queryset(self):
+        queryset = VracOrder.objects.all()
+        queryset = queryset.filter(student__user__id=self.request.user.id)
+        return queryset
+    
+    def create(self, request):
+        # Create the vrac order with the list of products and quantities
+        # Or update the vrac order if it already exists
+        student = get_object_or_404(Student, user__id=request.user.id)
+        vrac = Vrac.objects.get(pk=request.data["vrac_id"])
+        try :
+            vrac_order = VracOrder.objects.get(vrac=vrac, student=student)
+        except VracOrder.DoesNotExist:
+            vrac_order = VracOrder(vrac=vrac, student=student)
+        vrac_order.save()
+        total = 0
+
+        # Modify / create the productOrder objects
+        for productData in request.data["listProducts"]:
+            productObject = get_object_or_404(Product, pk=productData["product_id"])
+            try :
+                prodOrder = ProductOrder.objects.get(product=productObject, vracOrder=vrac_order)
+                if productData["quantity"] == 0:
+                    prodOrder.delete()
+                else:
+                    prodOrder.quantity = productData["quantity"]
+                    prodOrder.save()
+            except ProductOrder.DoesNotExist:
+                prodOrder = ProductOrder(product=productObject, quantity=productData["quantity"], vracOrder=vrac_order)
+                if prodOrder.quantity > 0:
+                    prodOrder.save()
+            # Add the price of the product to the total
+            # Price is in cents per kg, qunatity is in grams
+            total += (productObject.price) * (productData["quantity"] / 1000) 
+            
+        vrac_order.total = total
+        vrac_order.save()
+        # Check if the vrac order is now empty after modification
+        # If so, delete it.
+        queryset = ProductOrder.objects.all()
+        queryset.filter(vracOrder = vrac_order)
+        if not (queryset):
+            vrac_order.delete()
+        return Response({"status": "ok"})
+    
+    @action(detail=False, methods=["get"])
+    def latestVracOrder(self, request):
+        queryset = VracOrder.objects.all()
+        queryset = queryset.filter(student__user__id=self.request.user.id)
+        try:
+            latest_vrac_order = queryset.latest("vrac__pickup_date")
+        except VracOrder.DoesNotExist:
+            return Response({"status": "error", "message": "No vrac order found"})
+        serializer = VracOrderSerializer(latest_vrac_order)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["post"])
+    def deleteVracOrder(self, request):
+        """
+        Delete an order for the student making the request & the vrac_id
+        """
+        vracObject = Vrac.objects.get(pk = request.data["vracId"])
+        student = get_object_or_404(Student, user__id=request.user.id)
+        vrac_order = get_object_or_404(VracOrder, vrac = vracObject , student=student)
+        vrac_order.delete()
+        return Response({"status": "ok"})
+            
 
 @login_required
 def home(request):
@@ -81,86 +204,12 @@ def home(request):
 
 @login_required
 def basket(request):
-    basket_list = Basket.objects.filter(is_active=True)
-    student = get_object_or_404(Student, user__id=request.user.id)
-    student_baskets = Basket_Order.objects.filter(student=student)
-    context = {"basket_list": basket_list, "student_baskets": student_baskets}
-    return render(request, "epicerie/basket.html", context)
-
-
-@login_required
-def basket_detail(request, basket_id):
-    basket = get_object_or_404(Basket, pk=basket_id)
-    return HttpResponse(
-        f"This is basket {basket}, with composition {basket.composition}"
-    )
-
-
-@login_required
-def basket_order(request):
-    if request.method == "POST":
-        basket_list = Basket.objects.filter(is_active=True)
-        student = get_object_or_404(Student, user__id=request.user.id)
-        try:
-            quantities = request.POST.getlist("basket_quantity")
-        except KeyError:
-            quantities = [0] * len(basket_list)
-
-        for i, basket in enumerate(basket_list):
-            if int(quantities[i]) > 0:
-                basket_order = Basket_Order(
-                    basket=basket, student=student, quantity=int(quantities[i])
-                )
-                if basket_order.isValid():
-                    basket_order.save()
-                    print("I'm saving an order")
-                else:
-                    return HttpResponse("Error")
-
-        return HttpResponseRedirect("/epicerie/panier/")
+    return render(request, "epicerie/basket.html")
 
 
 @login_required
 def vrac(request):
-    vrac_list = Vrac.objects.filter(is_active=True)
-    context = {"vrac_list": vrac_list}
-    return render(request, "epicerie/vrac.html", context)
-
-
-@login_required
-def vrac_detail(request, vrac_id):
-    vrac = get_object_or_404(Vrac, pk=vrac_id)
-    return HttpResponse(
-        f"This is vrac {vrac}, with composition {vrac.ListProducts}"
-    )
-
-import numpy as np
-@login_required
-def vrac_order(request):
-    if request.method == "POST":
-        vrac_list = Vrac.objects.filter(is_active=True)
-        student = get_object_or_404(Student, user__id=request.user.id)
-
-        for vrac in vrac_list:
-            list_products = vrac.ListProducts
-            try:
-                quantities = request.POST.getlist(f"vrac_quantity_{vrac.id}")
-            except KeyError:
-                quantities = np.zeros(list_products.count())
-            for i in range(list_products.count()):
-                if int(quantities[i]) > 0:
-                    vrac_order = Vrac_Order(
-                        vrac=vrac,
-                        student=student,
-                        product=list_products[i],
-                        quantity=int(quantities[i]),
-                    )
-                    if vrac_order.isValid():
-                        vrac_order.save()
-                        print("I'm saving an order")
-                    else:
-                        return HttpResponse("Error")
-        return HttpResponseRedirect("/epicerie/vrac/")
+    return render(request, "epicerie/vrac.html")
 
 
 @login_required
