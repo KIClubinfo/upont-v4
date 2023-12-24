@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 
-import { Basket } from './BasketCardComponents'
+import { Basket } from './BasketCard'
 import { DisplayExistingOrder } from './OrderedBaskets'
 import { BasketValidation } from './BasketValidation'
 
