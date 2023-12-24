@@ -5,7 +5,11 @@ interface sethasOrderedProp {
     setIsOrdering: (hasOrdered: boolean) => void
 }
 
-interface ExistingOrderProp extends sethasOrderedProp, VracOrderProp {}
+interface setIsDeletingProp {
+    setIsDeleting: (isDeleting: boolean) => void
+}
+
+interface ExistingOrderProp extends sethasOrderedProp, VracOrderProp, setIsDeletingProp {}
 
 export const ExistingOrder: React.FC<ExistingOrderProp> = (prop : ExistingOrderProp) => {
 
@@ -29,17 +33,29 @@ export const ExistingOrder: React.FC<ExistingOrderProp> = (prop : ExistingOrderP
                 </div>
                 <div className="epicerie-card-button">
                     <div>
-                        Pour un total des :
+                        Total :
                     </div>
                     <div>
                         {prop.vracOrder.total / 100}€
                     </div>
-                    <button className="button green-button"
-                    onClick={() => {
-                        prop.setIsOrdering(true)
-                    }}>
-                        Modifier ma commande
-                    </button>
+                    <div className="row">
+                        <div className="col">
+                            <button className="button green-button"
+                            onClick={() => {
+                                prop.setIsOrdering(true)
+                            }}>
+                                Modifier ma commande
+                            </button>
+                        </div>
+                        <div className="col">
+                            <button className="button red-button"
+                            onClick={() => {
+                                prop.setIsDeleting(true)
+                            }}>
+                                Supprimer ma commande
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

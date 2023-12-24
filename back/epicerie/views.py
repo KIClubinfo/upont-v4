@@ -126,7 +126,7 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         
     }
     """
-    http_method_names = ["get", "post", "delete"]
+    http_method_names = ["get", "post"]
     serializer_class = VracOrderSerializer
 
     def get_queryset(self):
@@ -185,14 +185,16 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         serializer = VracOrderSerializer(latest_vrac_order)
         return Response(serializer.data)
     
-    def destroy(self, request):
+    @action(detail=False, methods=["post"])
+    def deleteVracOrder(self, request):
         """
-        Delete an order for the student in the request & the vrac_id
+        Delete an order for the student making the request & the vrac_id
         """
-        vracObject = Vrac.objects.get(pk = request.data["vrac_id"])
+        vracObject = Vrac.objects.get(pk = request.data["vracId"])
         student = get_object_or_404(Student, user__id=request.user.id)
         vrac_order = get_object_or_404(VracOrder, vrac = vracObject , student=student)
         vrac_order.delete()
+        return Response({"status": "ok"})
             
 
 @login_required

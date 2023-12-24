@@ -90,9 +90,6 @@ const Vracs : React.FC = () => {
         if (quantities.some( (ele) => ele > 0 )) {
             setIsConfirming(true)
         }
-        else if (vracOrder != null){
-            setIsDeleting(true)
-        }
     }
 
     const prepareVracOrderProp = () : VracOrderPreparingProp =>{
@@ -121,10 +118,16 @@ const Vracs : React.FC = () => {
             }
         }
 
+    if (isDeleting) {
+        return (
+            <DeletionPage vracOrder={prepareVracOrderProp()["vracOrder"]}/>
+        )
+    }
+
     if (vracOrder !== null && !isOrdering) {
         return (
             <div className="vrac">
-                <ExistingOrder setIsOrdering={setIsOrdering} vracOrder={vracOrder}/>
+                <ExistingOrder setIsOrdering={setIsOrdering} vracOrder={vracOrder} setIsDeleting={setIsDeleting}/>
             </div>
         )
     }
@@ -136,13 +139,6 @@ const Vracs : React.FC = () => {
             </div>
         )
     }
-
-    if (isDeleting) {
-        return (
-            <DeletionPage/>
-        )
-    }
-
 
     if (isConfirming) {
         return (

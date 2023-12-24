@@ -118,9 +118,11 @@ export const ValidationPage : React.FC<VracOrderPreparingProp> = ( prop : VracOr
                         })}
                     </ul>
                 </div>
-                <div className="epicerie-card-confirmation">
-                    <div className="epicerie-card-confirmation-title">
-                        Pour un total de : {totalPrice()}€
+                <div className="epicerie-card-button">
+                    <div>
+                        Total :
+                        <br/>
+                        {totalPrice()}€
                     </div>
                     <div className="row">
                         <div className="col">
