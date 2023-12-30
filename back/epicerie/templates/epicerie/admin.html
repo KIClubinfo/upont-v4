@@ -1,0 +1,43 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% include "header.html" with title="Commande de Paniers" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="epicerie" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <div class="content-main">
+
+            <h3 class="page-title">
+                Administration de l'épicerie
+            </h3>
+
+            <div id="admin">
+                <!--Admin page is rendered in React-->
+            </div>
+
+        </div><!--End of Content main-->
+        
+        
+    </div><!--End of Content-->
+
+     <!--Scripts-->
+     <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+     <script>
+         window.react_mount = document.getElementById('admin');
+     </script>
+     <script src="{% static 'react/epicerieAdmin.bundle.js' %}"></script>
+     <!--End of Scripts-->
+
+</body> <!--End of Body-->
+</html> <!--End of HTML-->
+```

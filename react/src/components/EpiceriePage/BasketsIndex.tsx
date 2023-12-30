@@ -11,11 +11,11 @@ const Baskets : React.FC = () => {
 
   const getBaskets = () =>
   // @ts-ignore Urls is declared in the django template
-    fetch(Urls.epicerieBasketList())
+    fetch(Urls.epicerieBasketActive())
       .then((res) => res.json())
       .then((result) => {
-        setBaskets(result.results)
-        setOrders(new Array(result.count).fill(0))
+        setBaskets(result)
+        setOrders(new Array(result.length).fill(0))
       })
       .catch(console.error);
   

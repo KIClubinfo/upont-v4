@@ -1,8 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
-from social.models import Student
-
+from social.models import Student, Club, Membership
 
 from .models import Basket, BasketOrder, Vrac, VracOrder, Product, ProductOrder
 
@@ -22,6 +21,8 @@ from .serializers import (
     VracOrderSerializer,
 )
 
+idEpicerie = 1
+
 
 class BasketViewSet(viewsets.ModelViewSet):
     """
@@ -34,8 +35,13 @@ class BasketViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Basket.objects.all()
-        queryset = queryset.filter(is_active=True)
         return queryset
+    
+    @action(detail=False, methods=['get'])
+    def active(self, request):
+        queryset = self.get_queryset()
+        queryset = queryset.filter(is_active=True)
+        return Response(BasketSerializer(queryset, many=True).data)
 
 
 class BasketOrderViewSet(viewsets.ModelViewSet):
@@ -199,7 +205,16 @@ class VracOrderViewSet(viewsets.ModelViewSet):
 
 @login_required
 def home(request):
-    return render(request, "epicerie/epicerie.html")
+    try:
+        clubEpicerie = Club.objects.get(id=idEpicerie)
+    except Club.DoesNotExist:
+        return HttpResponse("Club epicerie does not exist")
+    try:
+        student = get_object_or_404(Student, user__id=request.user.id)
+        Membership.objects.get(student=student, club=clubEpicerie)
+        return render(request, "epicerie/epicerie.html", {"isEpicier" : True})
+    except Membership.DoesNotExist:
+        return render(request, "epicerie/epicerie.html", {"isEpicier" : False})
 
 
 @login_required
@@ -215,3 +230,16 @@ def vrac(request):
 @login_required
 def recipes(request):
     return HttpResponse("This is the recettes page")
+
+def admin(request):
+    try:
+        clubEpicerie = Club.objects.get(id=idEpicerie)
+    except Club.DoesNotExist:
+        return HttpResponse("Club epicerie does not exist")
+    try:
+        student = get_object_or_404(Student, user__id=request.user.id)
+        Membership.objects.get(student=student, club=clubEpicerie)
+    except Membership.DoesNotExist:
+        raise Http404("You are not allowed to access this page")
+
+    return render(request, "epicerie/admin.html")
