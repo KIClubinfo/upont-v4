@@ -20,14 +20,17 @@ const Admin = () => {
                         </button>
                     </div>
                     <div className="row">
-                        <button className="button blue-button"
-                        onClick={ExportBasketOrders}>
-                            Exporter les commandes de paniers
+                        <button className="button blue-button">
+                            <a href="/api/epicerie/basket_orders/export" target="_blank" rel="noopener noreferrer">
+                                Exporter les commandes de paniers
+                            </a>
                         </button>
                     </div>
                     <div className="row">
                         <button className="button blue-button">
-                            Exporter les commandes de vrac
+                            <a href="/api/epicerie/vrac_orders/export" target="_blank" rel="noopener noreferrer">
+                                Exporter les commandes de vrac
+                            </a>
                         </button>
                     </div>
                 </div>

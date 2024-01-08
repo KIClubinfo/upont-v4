@@ -247,6 +247,42 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         vrac_order = get_object_or_404(VracOrder, vrac = vracObject , student=student)
         vrac_order.delete()
         return Response({"status": "ok"})
+    
+    @action(detail=False, methods=["get"])
+    @method_decorator(epicierOnly())
+    def export(self, request):
+        """
+        Export the vrac orders to a csv file
+        """
+        latest_vrac = Vrac.objects.filter(is_active=True).latest("pickup_date")
+        queryset = VracOrder.objects.all()
+        queryset = queryset.filter(vrac = latest_vrac)
+        # Create the csv file
+        response = HttpResponse(content_type='text/csv', 
+                                headers={'Content-Disposition': 'attachment; filename="CommandesVrac.csv"'})
+        writer = csv.writer(response)
+        headers = ['Nom', 'Prénom', 'Email', 'Téléphone', 'Total (€)']
+        # Dictionnary to keep track of the column index of each product
+        productToColumn = {}
+        for product in latest_vrac.ListProducts.all():
+            productToColumn[product] = len(headers)
+            headers.append(product.name)
+        writer.writerow(headers)
+        # Add the data for each student
+        for vracOrder in queryset:
+            student = vracOrder.student
+            row = [0 for i in range(len(headers))]
+            row[0] = student.user.last_name
+            row[1] = student.user.first_name
+            row[2] = student.user.email
+            row[3] = student.phone_number
+            row[4] = vracOrder.total / 100
+            productOrders = ProductOrder.objects.filter(vracOrder=vracOrder)
+            for productOrder in productOrders:
+                row[productToColumn[productOrder.product]] = productOrder.quantity
+            writer.writerow(row)
+        
+        return response
 
 @login_required
 def home(request):
