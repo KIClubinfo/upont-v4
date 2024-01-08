@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
+from django.utils.decorators import method_decorator
 from social.models import Student, Club, Membership
 
 from .models import Basket, BasketOrder, Vrac, VracOrder, Product, ProductOrder
@@ -90,23 +91,46 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
         return Response({"status": "ok"})
     
     @action(detail=False, methods=["get"])
+    @method_decorator(epicierOnly())
     def export(self, request):
-        baskets = Basket.objects.all()
-        baskets = baskets.filter(is_active=True)
+        """
+        Export the basket orders to a csv file
+        """
+        baskets = Basket.objects.filter(is_active=True)
         queryset = BasketOrder.objects.all()
-        queryset = queryset.filter(basket in baskets)
+        queryset = queryset.filter(basket__is_active=True)
+        queryset.query.group_by = ['student_id']
+
+        # Aggregate the basket orders by student
+        ordersByStudent = {}
+        for order in queryset:
+            if order.student.id not in ordersByStudent.keys():
+                ordersByStudent[order.student.id] = {}
+            ordersByStudent[order.student.id][order.basket.id] = order.quantity
+
+        print(ordersByStudent)
+        # Create the csv file
         response = HttpResponse(content_type='text/csv', 
                                 headers={'Content-Disposition': 'attachment; filename="CommandesPanier.csv"'})
         writer = csv.writer(response)
         writer.writerow(['Nom', 'Prénom', 'Email', 'Téléphone', str(baskets[0]), str(baskets[1]), 'Total'])
-        for order in queryset:
-            writer.writerow([order.student.user.first_name,
-                            order.student.user.last_name,
-                            order.student.user.email,
-                            order.student.phone_number,
-                            order.quantity,
-                            order.quantity,
-                            order.total])
+        for studentId, quantities in ordersByStudent.items():
+            print(studentId)
+            student = get_object_or_404(Student, pk=studentId)
+            quantity1 = quantities[baskets[0].id] if baskets[0].id in quantities.keys() else 0
+            quantity2 = quantities[baskets[1].id] if baskets[1].id in quantities.keys() else 0
+            price = (quantity1 * baskets[0].price + quantity2 * baskets[1].price) / 100
+            writer.writerow([
+                student.user.last_name,
+                student.user.first_name,
+                student.user.email,
+                student.phone_number,
+                quantity1,
+                quantity2,
+                price
+            ]
+            )
+        return response
 
 
 class VracViewSet(viewsets.ModelViewSet):
