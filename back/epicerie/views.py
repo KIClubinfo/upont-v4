@@ -113,23 +113,24 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
         response = HttpResponse(content_type='text/csv', 
                                 headers={'Content-Disposition': 'attachment; filename="CommandesPanier.csv"'})
         writer = csv.writer(response)
-        writer.writerow(['Nom', 'Prénom', 'Email', 'Téléphone', str(baskets[0]), str(baskets[1]), 'Total'])
+        headers = ['Nom', 'Prénom', 'Email', 'Téléphone']
+        for basket in baskets:
+            headers.append(str(basket))
+        headers.append('Total (€)')
+        writer.writerow(headers)
         for studentId, quantities in ordersByStudent.items():
             print(studentId)
             student = get_object_or_404(Student, pk=studentId)
-            quantity1 = quantities[baskets[0].id] if baskets[0].id in quantities.keys() else 0
-            quantity2 = quantities[baskets[1].id] if baskets[1].id in quantities.keys() else 0
-            price = (quantity1 * baskets[0].price + quantity2 * baskets[1].price) / 100
-            writer.writerow([
-                student.user.last_name,
-                student.user.first_name,
-                student.user.email,
-                student.phone_number,
-                quantity1,
-                quantity2,
-                price
-            ]
-            )
+            row = [student.user.last_name, student.user.first_name, student.user.email, student.phone_number]
+            total = 0
+            for basket in baskets:
+                if basket.id in quantities.keys():
+                    row.append(quantities[basket.id])
+                    total += quantities[basket.id] * basket.price
+                else:
+                    row.append(0)
+            row.append(total / 100)
+            writer.writerow(row)
         return response
 
 
