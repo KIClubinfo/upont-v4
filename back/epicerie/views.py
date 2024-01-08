@@ -21,6 +21,8 @@ from .serializers import (
     VracOrderSerializer,
 )
 
+from .decorators import epicierOnly, studentIsEpicier
+
 idEpicerie = 1
 
 
@@ -205,16 +207,8 @@ class VracOrderViewSet(viewsets.ModelViewSet):
 
 @login_required
 def home(request):
-    try:
-        clubEpicerie = Club.objects.get(id=idEpicerie)
-    except Club.DoesNotExist:
-        return HttpResponse("Club epicerie does not exist")
-    try:
-        student = get_object_or_404(Student, user__id=request.user.id)
-        Membership.objects.get(student=student, club=clubEpicerie)
-        return render(request, "epicerie/epicerie.html", {"isEpicier" : True})
-    except Membership.DoesNotExist:
-        return render(request, "epicerie/epicerie.html", {"isEpicier" : False})
+    isEpicier = studentIsEpicier(request.user)
+    return render(request, "epicerie/epicerie.html", {"isEpicier": isEpicier})
 
 
 @login_required
@@ -231,15 +225,6 @@ def vrac(request):
 def recipes(request):
     return HttpResponse("This is the recettes page")
 
+@epicierOnly()
 def admin(request):
-    try:
-        clubEpicerie = Club.objects.get(id=idEpicerie)
-    except Club.DoesNotExist:
-        return HttpResponse("Club epicerie does not exist")
-    try:
-        student = get_object_or_404(Student, user__id=request.user.id)
-        Membership.objects.get(student=student, club=clubEpicerie)
-    except Membership.DoesNotExist:
-        raise Http404("You are not allowed to access this page")
-
     return render(request, "epicerie/admin.html")
