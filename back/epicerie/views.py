@@ -22,6 +22,7 @@ from .serializers import (
 )
 
 from .decorators import epicierOnly, studentIsEpicier
+import csv
 
 idEpicerie = 1
 
@@ -87,6 +88,25 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
             else:
                 return Response({"status": "error", "message": "Invalid basket order"})
         return Response({"status": "ok"})
+    
+    @action(detail=False, methods=["get"])
+    def export(self, request):
+        baskets = Basket.objects.all()
+        baskets = baskets.filter(is_active=True)
+        queryset = BasketOrder.objects.all()
+        queryset = queryset.filter(basket in baskets)
+        response = HttpResponse(content_type='text/csv', 
+                                headers={'Content-Disposition': 'attachment; filename="CommandesPanier.csv"'})
+        writer = csv.writer(response)
+        writer.writerow(['Nom', 'Prénom', 'Email', 'Téléphone', str(baskets[0]), str(baskets[1]), 'Total'])
+        for order in queryset:
+            writer.writerow([order.student.user.first_name,
+                            order.student.user.last_name,
+                            order.student.user.email,
+                            order.student.phone_number,
+                            order.quantity,
+                            order.quantity,
+                            order.total])
 
 
 class VracViewSet(viewsets.ModelViewSet):
@@ -203,7 +223,6 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         vrac_order = get_object_or_404(VracOrder, vrac = vracObject , student=student)
         vrac_order.delete()
         return Response({"status": "ok"})
-            
 
 @login_required
 def home(request):
