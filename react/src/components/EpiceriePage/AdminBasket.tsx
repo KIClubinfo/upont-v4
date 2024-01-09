@@ -1,8 +1,26 @@
 import React from "react";
+import { useState, useEffect } from 'react';
 
 const AdminBasket = () => {
+    const [baskets, setBaskets] = useState([]);
+    const [index, setIndex] = useState(0);
+
+    const getBaskets = () =>
+        // @ts-ignore Urls is declared in the django template
+        fetch(Urls.epicerieBasketList())
+            .then((res) => res.json())
+            .then((result) => {
+                setBaskets(result.results)
+            })
+            .catch(console.error);
+
+    useEffect(() => {
+        getBaskets();
+    }
+    , []);
+
     return (
-        <div className="row row-cols-3">
+        <div className="row row-cols-2">
             <div className="col-sm">
                 <div className="epicerie-card">
                     <div className="epicerie-card-content">

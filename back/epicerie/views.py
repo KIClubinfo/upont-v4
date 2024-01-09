@@ -39,6 +39,7 @@ class BasketViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Basket.objects.all()
+        queryset.order_by("-pickup_date")
         return queryset
     
     @action(detail=False, methods=['get'])
