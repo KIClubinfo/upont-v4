@@ -308,3 +308,7 @@ def recipes(request):
 @epicierOnly()
 def admin(request):
     return render(request, "epicerie/admin.html")
+
+@epicierOnly()
+def adminBasket(request):
+    return render(request, "epicerie/adminBasket.html")

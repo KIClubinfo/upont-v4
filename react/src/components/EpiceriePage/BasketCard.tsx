@@ -1,25 +1,6 @@
 import React from "react"
 
-interface QuantityProp {
-  quantity : {
-    count : number
-    increment : () => void
-    decrement : () => void
-  }
-}
-
-interface BasketProp {
-  basket :{
-    id : number
-    price : number
-    composition : string[]
-    open_date : string
-    close_date : string
-    pickup_date : string
-  },
-}
-
-interface Prop extends BasketProp, QuantityProp {}
+import { BasketProp, BasketCardProp, QuantityProp } from "./EpicerieProps"
 
 const BasketPrice : React.FC<BasketProp> = (prop : BasketProp) => {
   // Display the price of the basket
@@ -69,7 +50,7 @@ const QuantityButtons : React.FC<QuantityProp>  = (prop : QuantityProp) => {
 }
 
 
-export const Basket: React.FC<Prop> = (prop : Prop) => {
+export const Basket: React.FC<BasketCardProp> = (prop : BasketCardProp) => {
   // Basket card component
   return (
     <div className="col-sm">

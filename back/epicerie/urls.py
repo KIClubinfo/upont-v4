@@ -9,4 +9,5 @@ urlpatterns = [
     path("vrac/", views.vrac, name="vrac"),
     path("recettes/", views.recipes, name="recettes"),
     path("admin/", views.admin, name="admin"),
+    path("admin/basket/", views.adminBasket, name="admin_basket"),
 ]

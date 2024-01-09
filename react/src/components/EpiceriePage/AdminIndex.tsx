@@ -11,7 +11,9 @@ const Admin = () => {
                 <div className="epicerie-card-content">
                     <div className="row">
                         <button className="button blue-button">
-                            Modifier les paniers
+                            <a href="basket">
+                                Gérer les paniers
+                            </a>
                         </button>
                     </div>
                     <div className="row">
