@@ -57,12 +57,18 @@ export interface QuantityProp {
       decrement : () => void
     }
   }
+
+export interface Vegetable {
+    id : number
+    name : string
+    quantity : number
+}
   
 export interface BasketProp {
     basket :{
       id : number
       price : number
-      composition : string[]
+      composition : Vegetable[]
       open_date : string
       close_date : string
       pickup_date : string

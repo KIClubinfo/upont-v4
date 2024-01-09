@@ -4,9 +4,11 @@ import { Basket } from './BasketCard'
 import { DisplayExistingOrder } from './OrderedBaskets'
 import { BasketValidation } from './BasketValidation'
 
+import { BasketProp, BasketCardProp, QuantityProp } from './EpicerieProps';
+
 const Baskets : React.FC = () => {
   const [isValidationPage, setIsValidationPage] = useState(false);
-  const [baskets, setBaskets] = useState([]);
+  const [baskets, setBaskets] = useState<BasketProp["basket"][]>([]);
   const [orders, setOrders] = useState([]);
 
   const getBaskets = () =>

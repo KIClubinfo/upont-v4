@@ -24,8 +24,8 @@ const PrettyComposition : React.FC<BasketProp> = (prop : BasketProp) => {
         </div>
       <br></br>
       <ul>
-        {composition.map((line, index) => (
-          <li key={index}>{line}</li>
+        {composition.map((vegetable, index) => (
+          <li key={index}>{vegetable.name}, {vegetable.quantity}g</li>
         ))}
       </ul>
     </div>
