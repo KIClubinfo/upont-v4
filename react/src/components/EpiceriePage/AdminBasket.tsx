@@ -1,9 +1,45 @@
 import React from "react";
 import { useState, useEffect } from 'react';
 
+import { BasketProp, BasketCardProp } from "./EpicerieProps"
+
+const deleteVegetable = (id : number) => {
+    // @ts-ignore Urls is declared in the django template
+    fetch(Urls.epicerieVegetableDetail(id), {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((res) => res.json())
+        .then((result) => {
+            console.log(result)
+        })
+        .catch(console.error);
+}
+
+const Composition : React.FC<BasketProp> = ( prop  : BasketProp) => {
+    return (
+        <div>
+            <p>Composition du panier</p>
+            <ul>
+                {prop.basket.composition.map((item) => (
+                    <li key={item.id}>
+                        {item.name} {item.quantity} g
+                        <button className="button red-button"
+                            onClick={() => deleteVegetable(item.id)}>
+                            Supprimer
+                        </button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+
 const AdminBasket = () => {
-    const [baskets, setBaskets] = useState([]);
-    const [index, setIndex] = useState(0);
+    const [baskets, setBaskets] = useState<BasketProp["basket"][]>([]);
+    const [index, setIndex] = useState(-1);
 
     const getBaskets = () =>
         // @ts-ignore Urls is declared in the django template
@@ -11,6 +47,8 @@ const AdminBasket = () => {
             .then((res) => res.json())
             .then((result) => {
                 setBaskets(result.results)
+                setIndex(0)
+                console.log(result.results)
             })
             .catch(console.error);
 
@@ -19,31 +57,50 @@ const AdminBasket = () => {
     }
     , []);
 
+    const previousBasket = () => {
+        if (index < baskets.length - 1) {
+            setIndex(index + 1)
+        }
+    }
+
+    const nextBasket = () => {
+        if (index > 0) {
+            setIndex(index - 1)
+        }
+    }
+
+    if (index === -1) {
+        return (
+            <div>
+                <p>Chargement...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="row row-cols-2">
-            <div className="col-sm">
+            <div className="col">
                 <div className="epicerie-card">
+                    <div className="epicerie-card-title">
+                        <span>
+                            Panier à {baskets[index].price / 100}€ du {new Date(baskets[index].pickup_date).toLocaleDateString("fr-FR")}
+                        </span>
+                    </div>  
                     <div className="epicerie-card-content">
-                        Here goes the basket display
+                        <Composition basket={baskets[index]} />
                     </div>
-                </div>
-            </div>
-            <div className="col-sm">
-                <div className="epicerie-card">
-                    <div className="epicerie-card-content">
-                        <div className="row">
-                            <button className="button blue-button">
-                                <a href="/api/epicerie/basket_orders/export" target="_blank" rel="noopener noreferrer">
-                                    Exporter les commandes de paniers
-                                </a>
-                            </button>
+
+                    <div className="epicerie-card-button">
+                        <div>
+                            <button className="button blue-button" onClick={previousBasket}> Précédent </button>
+                            <button className="button blue-button" onClick={nextBasket}> Suivant </button>
                         </div>
                     </div>
-                </div>
+                </div>  
             </div>
+                
         </div>
-
     );
-    }
+}
 
 export default AdminBasket;

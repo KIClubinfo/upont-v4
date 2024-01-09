@@ -69,10 +69,21 @@ export interface BasketProp {
       id : number
       price : number
       composition : Vegetable[]
-      open_date : string
-      close_date : string
-      pickup_date : string
+      open_date : Date
+      close_date : Date
+      pickup_date : Date
     },
   }
   
 export interface BasketCardProp extends BasketProp, QuantityProp {}
+
+export interface BasketOrdersProp {
+    orders : {
+        quantity : number
+        basket : {
+            id : number
+            price : number
+            pickup_date : Date
+        }
+    }[]
+}

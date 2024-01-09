@@ -5,10 +5,11 @@ import { BasketProp, BasketCardProp, QuantityProp } from "./EpicerieProps"
 const BasketPrice : React.FC<BasketProp> = (prop : BasketProp) => {
   // Display the price of the basket
   const price = prop.basket.price
+  const date = new Date(prop.basket.pickup_date)
   return (
     <div className="epicerie-card-title">
       <span>
-        Panier à {price / 100}€
+        Panier à {price / 100}€, du {date.toLocaleDateString("fr-FR")}
       </span>
     </div>
   )

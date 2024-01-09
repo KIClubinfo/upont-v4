@@ -4,7 +4,7 @@ import { Basket } from './BasketCard'
 import { DisplayExistingOrder } from './OrderedBaskets'
 import { BasketValidation } from './BasketValidation'
 
-import { BasketProp, BasketCardProp, QuantityProp } from './EpicerieProps';
+import { BasketProp, QuantityProp, BasketOrdersProp } from './EpicerieProps';
 
 const Baskets : React.FC = () => {
   const [isValidationPage, setIsValidationPage] = useState(false);
