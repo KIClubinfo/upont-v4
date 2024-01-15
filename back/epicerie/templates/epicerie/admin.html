@@ -47,25 +47,25 @@
                     <div class="epicerie-card">
                         <div class="epicerie-card-title">Importer le nouveau vrac </div>
                         <div class="epicerie-card-content">
-                            <form encType="multipart/form-data" action="" method="POST">
+                            <form encType="multipart/form-data" action="uploadVrac/" method="POST">
                                 {% csrf_token %}
                                 <div class="row">
-                                    {{ formVrac.file }}
+                                    <input id="file-input" name="file" type="file" class="button blue-button" accept="application/csv" required="True" />
                                 </div class="row">
                                 <br>
                                 <div class="row">
                                     <span> Date d'ouveture </span>
-                                    {{ formVrac.openDate }}
+                                    <input type="date" class="button blue-button" name="openDate" required = "True"/>
                                 </div class="row">
                                 <br>
                                 <div class="row">
                                     <span> Date de fermeture</span>
-                                    {{ formVrac.closeDate }}
+                                    <input type="date" class="button blue-button" name="closeDate" required="True"/>
                                 </div class="row">
                                 <br>
                                 <div class="row">
                                     <span> Pick-up</span>
-                                    {{ formVrac.pickupDate }}
+                                    <input type="date" class="button blue-button" name="pickupDate" required="True"/>
                                 </div class="row">
                                 <br>
                                 <div class="row">

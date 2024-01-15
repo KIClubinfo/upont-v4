@@ -25,7 +25,6 @@ from .serializers import (
 
 from .decorators import epicierOnly, studentIsEpicier
 
-from .forms import FileAndDatesForm
 import csv
 
 idEpicerie = 1
@@ -312,22 +311,51 @@ def recipes(request):
 
 @epicierOnly()
 def admin(request):
-    if request.method == 'POST':
-        print(request.POST)
-        formVrac = FileAndDatesForm(request.POST, request.FILES)
-        if formVrac.is_valid():
-            createBasketFromFile(request.FILES["file"])
-    else:
-        formVrac = FileAndDatesForm()
-    return render(request, "epicerie/admin.html", {"formVrac" : formVrac})
+    return render(request, "epicerie/admin.html"    )
 
 @epicierOnly()
 def uploadVrac(request):
-    
-        
-
-    
-    return render()
+    if request.method == 'POST':
+        file = request.FILES["file"]
+        if not file.name.endswith('.csv'):
+            return redirect(reverse("epicerie:admin"))
+        #if file is too large, return
+        if file.multiple_chunks():
+            return redirect(reverse("epicerie:admin"))
+        # Set all the old vracs to inactive
+        #Vrac.objects.all().update(is_active=False)
+        #read the file
+        vrac = Vrac(
+            open_date = request.POST["openDate"],
+            close_date = request.POST["closeDate"],
+            pickup_date = request.POST["pickupDate"],
+            is_active = True
+        )
+        file_data = file.read().decode("utf-8")
+        lines = file_data.split("\n")
+        for (i,line) in enumerate(lines):
+            if i == 0:
+                correspondance = {}
+                fields = line.split(",")
+                correspondance["Maximum"] = fields.index("Maximum")
+                correspondance["Step"] = fields.index("Step")
+                correspondance["Produit"] = fields.index("Produit")
+                correspondance["Prix"] = fields.index("Prix/Kg")
+                vrac.save()
+            else:
+                if line == "":
+                    continue
+                fields = line.split(",")
+                product = Product(
+                    vrac = vrac,
+                    name = fields[correspondance["Produit"]],
+                    price = fields[correspondance["Prix"]],
+                    max = fields[correspondance["Maximum"]],
+                    step = fields[correspondance["Step"]]
+                )
+                product.save()
+   
+    return redirect(reverse("epicerie:admin"))
 
 def createBasketFromFile(file, openDate, closeDate, pickupDate):
     pass

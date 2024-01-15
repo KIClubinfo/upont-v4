@@ -45,6 +45,9 @@ class BasketOrder(models.Model):
 
 
 class Product(models.Model):
+    # associated vrac
+    vrac = models.ForeignKey("Vrac", on_delete=models.CASCADE, null=True)
+    # name of the product
     name = models.CharField(max_length=100)
     # step in grams
     step = models.IntegerField(default=50)
@@ -58,8 +61,6 @@ class Product(models.Model):
 
 
 class Vrac(models.Model):
-    # list of products
-    ListProducts = models.ManyToManyField(Product)
     # open date for sale
     open_date = models.DateTimeField()
     # close date for sale
@@ -72,15 +73,15 @@ class Vrac(models.Model):
     def __str__(self):
         date = f"{self.pickup_date.day}/{self.pickup_date.month}"
         produits = ""
-        for product in self.ListProducts.all():
+        for product in Product.objects.filter(vrac=self):
             produits += f"{product.name}, "
         return (
-            f"vrac du {date} avec les {self.ListProducts.count()} produits {produits}"
+            f"vrac du {date} avec les {Product.objects.filter(vrac=self).count()} produits {produits}"
         )
 
     def getproduct(self):
         # return a list of product
-        return [product for product in self.ListProducts]
+        return [product for product in Product.objects.filter(vrac=self)]
     
 class ProductOrder(models.Model):
     #Each order of one product is linked to a vrac order
