@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404
-from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.decorators import method_decorator
 from social.models import Student, Club, Membership
+from django.urls import reverse
 
 from .models import Basket, BasketOrder, Vrac, VracOrder, Product, ProductOrder
 
@@ -23,6 +24,8 @@ from .serializers import (
 )
 
 from .decorators import epicierOnly, studentIsEpicier
+
+from .forms import FileAndDatesForm
 import csv
 
 idEpicerie = 1
@@ -47,6 +50,7 @@ class BasketViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         queryset = queryset.filter(is_active=True)
         return Response(BasketSerializer(queryset, many=True).data)
+
 
 
 class BasketOrderViewSet(viewsets.ModelViewSet):
@@ -308,8 +312,27 @@ def recipes(request):
 
 @epicierOnly()
 def admin(request):
-    return render(request, "epicerie/admin.html")
+    if request.method == 'POST':
+        print(request.POST)
+        formVrac = FileAndDatesForm(request.POST, request.FILES)
+        if formVrac.is_valid():
+            createBasketFromFile(request.FILES["file"])
+    else:
+        formVrac = FileAndDatesForm()
+    return render(request, "epicerie/admin.html", {"formVrac" : formVrac})
 
 @epicierOnly()
-def adminBasket(request):
-    return render(request, "epicerie/adminBasket.html")
+def uploadVrac(request):
+    
+        
+
+    
+    return render()
+
+def createBasketFromFile(file, openDate, closeDate, pickupDate):
+    pass
+
+def uploadBasket(request):
+    pass
+
+

@@ -2,7 +2,7 @@
 <!--Markdownify-->
 {% load markdownify %}
 <!--Header-->
-{% include "header.html" with title="Commande de Paniers" %}
+{% include "header.html" with title="Administration de l'épicerie" %}
 
 <!--Body-->
 <body>
@@ -21,8 +21,63 @@
                 Administration de l'épicerie
             </h3>
 
-            <div id="admin">
-                <!--Admin page is rendered in React-->
+            <div class="row row-cols-3">
+                <div class="col-sm">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-content">
+                            <div class="row">
+                                <button class="button blue-button">
+                                    <a href="/api/epicerie/basket_orders/export" target="_blank" rel="noopener noreferrer">
+                                        Exporter les commandes de paniers
+                                    </a>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <button class="button blue-button">
+                                    <a href="/api/epicerie/vrac_orders/export" target="_blank" rel="noopener noreferrer">
+                                        Exporter les commandes de vrac
+                                    </a>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="col-sm">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-title">Importer le nouveau vrac </div>
+                        <div class="epicerie-card-content">
+                            <form encType="multipart/form-data" action="" method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    {{ formVrac.file }}
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Date d'ouveture </span>
+                                    {{ formVrac.openDate }}
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Date de fermeture</span>
+                                    {{ formVrac.closeDate }}
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Pick-up</span>
+                                    {{ formVrac.pickupDate }}
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <input type="submit" class="button blue-button" value="Ajouter le nouveau vrac" />
+                                </div class="row">
+                                
+                            </form>
+                        </div>
+                        
+                    </div>
+                </div>
+    
             </div>
 
         </div><!--End of Content main-->
@@ -31,11 +86,7 @@
     </div><!--End of Content-->
 
      <!--Scripts-->
-     <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
-     <script>
-         window.react_mount = document.getElementById('admin');
-     </script>
-     <script src="{% static 'react/epicerieAdmin.bundle.js' %}"></script>
+
      <!--End of Scripts-->
 
 </body> <!--End of Body-->
