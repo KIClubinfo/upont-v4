@@ -30,8 +30,8 @@ class Vegetable(models.Model):
 
 
 class BasketOrder(models.Model):
-    basket = models.ForeignKey(Basket, on_delete=models.SET_NULL, null=True)
-    student = models.ForeignKey("social.Student", on_delete=models.SET_NULL, null=True)
+    basket = models.ForeignKey(Basket, on_delete=models.CASCADE, null=True)
+    student = models.ForeignKey("social.Student", on_delete=models.CASCADE, null=True)
     quantity = models.IntegerField(default=0)
 
     def __str__(self):
@@ -86,7 +86,7 @@ class Vrac(models.Model):
 class ProductOrder(models.Model):
     #Each order of one product is linked to a vrac order
     vracOrder = models.ForeignKey("VracOrder", on_delete=models.CASCADE, null=True)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.IntegerField(default=0)
 
     def isValid(self):
@@ -99,8 +99,8 @@ class ProductOrder(models.Model):
         return string
 
 class VracOrder(models.Model):
-    vrac = models.ForeignKey(Vrac, on_delete=models.SET_NULL, null=True)
-    student = models.ForeignKey("social.Student", on_delete=models.SET_NULL, null=True)
+    vrac = models.ForeignKey(Vrac, on_delete=models.CASCADE, null=True)
+    student = models.ForeignKey("social.Student", on_delete=models.CASCADE, null=True)
     # order is a dictionnairy taking as key the product name and as value quantity
     total = models.IntegerField(default = 0)
 

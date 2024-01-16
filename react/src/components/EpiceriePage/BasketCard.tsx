@@ -6,10 +6,15 @@ const BasketPrice : React.FC<BasketProp> = (prop : BasketProp) => {
   // Display the price of the basket
   const price = prop.basket.price
   const date = new Date(prop.basket.pickup_date)
+  const close_date = new Date(prop.basket.close_date)
   return (
     <div className="epicerie-card-title">
       <span>
         Panier à {price / 100}€, du {date.toLocaleDateString("fr-FR")}
+        <div style={{fontSize: "0.8em"}}>
+          <br/>
+          Commande possible jusqu'au {close_date.toLocaleDateString("fr-FR")}
+        </div>
       </span>
     </div>
   )

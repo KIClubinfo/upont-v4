@@ -73,7 +73,7 @@ class VracSerializer(serializers.ModelSerializer):
     ListProducts = serializers.SerializerMethodField()
 
     def get_ListProducts(self, obj):
-        return [ProductSerializer(product).data for product in obj.ListProducts.all()]
+        return [ProductSerializer(product).data for product in Product.objects.filter(vrac=obj)]
 
     class Meta:
         model = Vrac

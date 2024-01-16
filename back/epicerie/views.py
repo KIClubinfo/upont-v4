@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from social.models import Student, Club, Membership
 from django.urls import reverse
 
-from .models import Basket, BasketOrder, Vrac, VracOrder, Product, ProductOrder
+from .models import Basket, BasketOrder, Vrac, VracOrder, Product, ProductOrder, Vegetable
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -75,7 +75,7 @@ class BasketOrderViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post"]
 
     def get_queryset(self):
-        queryset = BasketOrder.objects.all()
+        queryset = BasketOrder.objects.all().filter(basket__is_active=True)
         queryset = queryset.filter(student__user__id=self.request.user.id)
         return queryset
 
@@ -187,7 +187,7 @@ class VracOrderViewSet(viewsets.ModelViewSet):
     serializer_class = VracOrderSerializer
 
     def get_queryset(self):
-        queryset = VracOrder.objects.all()
+        queryset = VracOrder.objects.all().filter(vrac__is_active=True)
         queryset = queryset.filter(student__user__id=self.request.user.id)
         return queryset
     
@@ -269,7 +269,7 @@ class VracOrderViewSet(viewsets.ModelViewSet):
         headers = ['Nom', 'Prénom', 'Email', 'Téléphone', 'Total (€)']
         # Dictionnary to keep track of the column index of each product
         productToColumn = {}
-        for product in latest_vrac.ListProducts.all():
+        for product in Product.objects.filter(vrac=latest_vrac):
             productToColumn[product] = len(headers)
             headers.append(product.name)
         writer.writerow(headers)
@@ -311,56 +311,116 @@ def recipes(request):
 
 @epicierOnly()
 def admin(request):
-    return render(request, "epicerie/admin.html"    )
+    return render(request, "epicerie/admin.html")
+
 
 @epicierOnly()
 def uploadVrac(request):
     if request.method == 'POST':
+        try:
+            file = request.FILES["file"]
+            if not file.name.endswith('.csv'):
+                context = {"message": "Le fichier doit être au format csv"}
+                return render(request, "epicerie/uploadResults.html", context)
+            #if file is too large, return
+            if file.multiple_chunks():
+                context = {"message": "Le fichier est trop gros"}
+                return render(request, "epicerie/uploadResults.html", context)
+            # Set all the old vracs to inactive
+            Vrac.objects.all().update(is_active=False)
+            #read the file
+            vrac = Vrac(
+                open_date = request.POST["openDate"],
+                close_date = request.POST["closeDate"],
+                pickup_date = request.POST["pickupDate"],
+                is_active = True
+            )
+            file_data = file.read().decode("utf-8")
+            lines = file_data.split("\n")
+            for (i,line) in enumerate(lines):
+                if i == 0:
+                    correspondance = {}
+                    fields = line.split(",")
+                    correspondance["Maximum"] = fields.index("Maximum")
+                    correspondance["Step"] = fields.index("Step")
+                    correspondance["Produit"] = fields.index("Produit")
+                    correspondance["Prix"] = fields.index("Prix/Kg(€)")
+                    print(correspondance)
+                    vrac.save()
+                else:
+                    if line == "":
+                        continue
+                    fields = line.split(",")
+                    product = Product(
+                        vrac = vrac,
+                        name = fields[correspondance["Produit"]],
+                        price = int(fields[correspondance["Prix"]]) * 100,
+                        max = fields[correspondance["Maximum"]],
+                        step = fields[correspondance["Step"]]
+                    )
+                    product.save()
+            context = {"message": "Mis en ligne avec succès"}
+            return render(request, "epicerie/uploadResults.html", context)
+        except Exception as e:
+            print
+            context = {"message": "Erreur lors de la mise en ligne"}
+            return render(request, "epicerie/uploadResults.html", context)
+    else:
+        return redirect(reverse("epicerie:admin"))
+
+
+@epicierOnly()
+def uploadBasket(request):
+    if request.method == "POST":
         file = request.FILES["file"]
         if not file.name.endswith('.csv'):
             return redirect(reverse("epicerie:admin"))
         #if file is too large, return
         if file.multiple_chunks():
-            return redirect(reverse("epicerie:admin"))
-        # Set all the old vracs to inactive
-        #Vrac.objects.all().update(is_active=False)
-        #read the file
-        vrac = Vrac(
-            open_date = request.POST["openDate"],
-            close_date = request.POST["closeDate"],
-            pickup_date = request.POST["pickupDate"],
-            is_active = True
-        )
-        file_data = file.read().decode("utf-8")
-        lines = file_data.split("\n")
-        for (i,line) in enumerate(lines):
-            if i == 0:
-                correspondance = {}
-                fields = line.split(",")
-                correspondance["Maximum"] = fields.index("Maximum")
-                correspondance["Step"] = fields.index("Step")
-                correspondance["Produit"] = fields.index("Produit")
-                correspondance["Prix"] = fields.index("Prix/Kg")
-                vrac.save()
-            else:
-                if line == "":
+            return redirect(reverse("epicerie:admin"))  
+        try:
+            Basket.objects.all().update(is_active=False)
+            #read the file
+            file_data = file.read().decode("utf-8")
+            lines = file_data.split("\n")
+            #We create baskets from the first line of the file
+            headers = lines[0].split(",")
+            prices = headers[2:]
+            baskets = [
+                Basket(
+                    price = int(price) * 100,
+                    open_date = request.POST["openDate"],
+                    close_date = request.POST["closeDate"],
+                    pickup_date = request.POST["pickupDate"],
+                    is_active = True
+                ) for price in prices
+            ]
+            # Save them to the database
+            for basket in baskets:
+                basket.save()
+            # We then add the vegetables to the baskets
+            for i in range(1, len(lines)):
+                if lines[i] == "":
                     continue
-                fields = line.split(",")
-                product = Product(
-                    vrac = vrac,
-                    name = fields[correspondance["Produit"]],
-                    price = fields[correspondance["Prix"]],
-                    max = fields[correspondance["Maximum"]],
-                    step = fields[correspondance["Step"]]
-                )
-                product.save()
+                fields = lines[i].split(",")
+                isInBasket = fields[2:]
+                for (i, word) in enumerate(isInBasket):
+                    if word == "Oui" or word == "oui" or word == "OUI":
+                        vegetable = Vegetable(
+                            basket = baskets[i],
+                            name = fields[0],
+                            quantity = int(fields[1])
+                        )
+                        vegetable.save()
+            context = {"message": "Mis en ligne avec succès"}
+            return render(request, "epicerie/uploadResults.html", context)
+
+        except Exception as e:
+            context = {"message": "Erreur lors de la mise en ligne"}
+            return render(request, "epicerie/uploadResults.html", context)
    
     return redirect(reverse("epicerie:admin"))
 
-def createBasketFromFile(file, openDate, closeDate, pickupDate):
-    pass
 
-def uploadBasket(request):
-    pass
 
 
