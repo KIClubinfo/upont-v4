@@ -4,18 +4,20 @@ import { Basket } from './BasketCard'
 import { DisplayExistingOrder } from './OrderedBaskets'
 import { BasketValidation } from './BasketValidation'
 
+import { BasketProp, QuantityProp, BasketOrdersProp } from './EpicerieProps';
+
 const Baskets : React.FC = () => {
   const [isValidationPage, setIsValidationPage] = useState(false);
-  const [baskets, setBaskets] = useState([]);
+  const [baskets, setBaskets] = useState<BasketProp["basket"][]>([]);
   const [orders, setOrders] = useState([]);
 
   const getBaskets = () =>
   // @ts-ignore Urls is declared in the django template
-    fetch(Urls.epicerieBasketList())
+    fetch(Urls.epicerieBasketActive())
       .then((res) => res.json())
       .then((result) => {
-        setBaskets(result.results)
-        setOrders(new Array(result.count).fill(0))
+        setBaskets(result)
+        setOrders(new Array(result.length).fill(0))
       })
       .catch(console.error);
   

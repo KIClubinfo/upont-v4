@@ -49,3 +49,41 @@ export interface VracProp {
         }[]
     }
 }
+
+export interface QuantityProp {
+    quantity : {
+      count : number
+      increment : () => void
+      decrement : () => void
+    }
+  }
+
+export interface Vegetable {
+    id : number
+    name : string
+    quantity : number
+}
+  
+export interface BasketProp {
+    basket :{
+      id : number
+      price : number
+      composition : Vegetable[]
+      open_date : Date
+      close_date : Date
+      pickup_date : Date
+    },
+  }
+  
+export interface BasketCardProp extends BasketProp, QuantityProp {}
+
+export interface BasketOrdersProp {
+    orders : {
+        quantity : number
+        basket : {
+            id : number
+            price : number
+            pickup_date : Date
+        }
+    }[]
+}

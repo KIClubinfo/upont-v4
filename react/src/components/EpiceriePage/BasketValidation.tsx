@@ -1,16 +1,7 @@
 import React from "react";
 import { getCookie } from '../utils/csrf';
 
-interface BasketOrdersProp {
-    orders : {
-        quantity : number
-        basket : {
-            id : number
-            price : number
-            pickup_date : string
-        }
-    }[]
-}
+import { BasketOrdersProp } from "./EpicerieProps"
 
 const handleBasketOrderPost = (prop : BasketOrdersProp) => {
     // Formats the orders to the format expected by the backend

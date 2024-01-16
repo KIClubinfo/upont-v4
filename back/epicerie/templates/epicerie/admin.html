@@ -1,0 +1,129 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% include "header.html" with title="Administration de l'épicerie" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="epicerie" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <div class="content-main">
+
+            <h3 class="page-title">
+                Administration de l'épicerie
+            </h3>
+
+            <div class="row row-cols-3">
+                <div class="col-sm">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-content">
+                            <div class="row">
+                                <button class="button blue-button">
+                                    <a href="/api/epicerie/basket_orders/export" target="_blank" rel="noopener noreferrer">
+                                        Exporter les commandes de paniers
+                                    </a>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <button class="button blue-button">
+                                    <a href="/api/epicerie/vrac_orders/export" target="_blank" rel="noopener noreferrer">
+                                        Exporter les commandes de vrac
+                                    </a>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-title">Importer les nouveaux paniers </div>
+                        <div class="epicerie-card-content">
+                            <form encType="multipart/form-data" action="uploadBasket/" method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <input id="file-input" name="file" type="file" class="button blue-button" accept="application/csv" required="True" />
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Date d'ouveture </span>
+                                    <input type="date" class="button blue-button" name="openDate" required = "True"/>
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Date de fermeture</span>
+                                    <input type="date" class="button blue-button" name="closeDate" required="True"/>
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Pick-up</span>
+                                    <input type="date" class="button blue-button" name="pickupDate" required="True"/>
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <input type="submit" class="button blue-button" value="Ajouter le nouveau vrac" />
+                                </div class="row">
+                                
+                            </form>
+                        </div>
+                        
+                    </div>
+                </div>
+    
+                <div class="col-sm">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-title">Importer le nouveau vrac </div>
+                        <div class="epicerie-card-content">
+                            <form encType="multipart/form-data" action="uploadVrac/" method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <input id="file-input" name="file" type="file" class="button blue-button" accept="application/csv" required="True" />
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Date d'ouveture </span>
+                                    <input type="date" class="button blue-button" name="openDate" required = "True"/>
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Date de fermeture</span>
+                                    <input type="date" class="button blue-button" name="closeDate" required="True"/>
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <span> Pick-up</span>
+                                    <input type="date" class="button blue-button" name="pickupDate" required="True"/>
+                                </div class="row">
+                                <br>
+                                <div class="row">
+                                    <input type="submit" class="button blue-button" value="Ajouter le nouveau vrac" />
+                                </div class="row">
+                                
+                            </form>
+                        </div>
+                        
+                    </div>
+                </div>
+    
+            </div>
+
+        </div><!--End of Content main-->
+        
+        
+    </div><!--End of Content-->
+
+     <!--Scripts-->
+
+     <!--End of Scripts-->
+
+</body> <!--End of Body-->
+</html> <!--End of HTML-->
+```

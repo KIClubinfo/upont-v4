@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
-from .models import Basket, BasketOrder, Product, Vrac, VracOrder, ProductOrder
+from .models import Basket, BasketOrder, Product, Vrac, VracOrder, ProductOrder, Vegetable
 
 
 class BasketSerializer(serializers.ModelSerializer):
     composition = serializers.SerializerMethodField()
 
     def get_composition(self, obj):
-        return [str(vegetable) for vegetable in obj.composition.all()]
+        return [{"id" : vegetable.id, "name" : vegetable.name, "quantity" : vegetable.quantity }
+                 for vegetable in Vegetable.objects.filter(basket=obj)]
 
     class Meta:
         model = Basket
@@ -72,7 +73,7 @@ class VracSerializer(serializers.ModelSerializer):
     ListProducts = serializers.SerializerMethodField()
 
     def get_ListProducts(self, obj):
-        return [ProductSerializer(product).data for product in obj.ListProducts.all()]
+        return [ProductSerializer(product).data for product in Product.objects.filter(vrac=obj)]
 
     class Meta:
         model = Vrac

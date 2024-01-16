@@ -1,33 +1,20 @@
 import React from "react"
 
-interface QuantityProp {
-  quantity : {
-    count : number
-    increment : () => void
-    decrement : () => void
-  }
-}
-
-interface BasketProp {
-  basket :{
-    id : number
-    price : number
-    composition : string[]
-    open_date : string
-    close_date : string
-    pickup_date : string
-  },
-}
-
-interface Prop extends BasketProp, QuantityProp {}
+import { BasketProp, BasketCardProp, QuantityProp } from "./EpicerieProps"
 
 const BasketPrice : React.FC<BasketProp> = (prop : BasketProp) => {
   // Display the price of the basket
   const price = prop.basket.price
+  const date = new Date(prop.basket.pickup_date)
+  const close_date = new Date(prop.basket.close_date)
   return (
     <div className="epicerie-card-title">
       <span>
-        Panier à {price / 100}€
+        Panier à {price / 100}€, du {date.toLocaleDateString("fr-FR")}
+        <div style={{fontSize: "0.8em"}}>
+          <br/>
+          Commande possible jusqu'au {close_date.toLocaleDateString("fr-FR")}
+        </div>
       </span>
     </div>
   )
@@ -43,8 +30,8 @@ const PrettyComposition : React.FC<BasketProp> = (prop : BasketProp) => {
         </div>
       <br></br>
       <ul>
-        {composition.map((line, index) => (
-          <li key={index}>{line}</li>
+        {composition.map((vegetable, index) => (
+          <li key={index}>{vegetable.name}, {vegetable.quantity}g</li>
         ))}
       </ul>
     </div>
@@ -69,7 +56,7 @@ const QuantityButtons : React.FC<QuantityProp>  = (prop : QuantityProp) => {
 }
 
 
-export const Basket: React.FC<Prop> = (prop : Prop) => {
+export const Basket: React.FC<BasketCardProp> = (prop : BasketCardProp) => {
   // Basket card component
   return (
     <div className="col-sm">
