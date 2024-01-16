@@ -39,6 +39,7 @@ export interface VracOrderPreparingProp {
 export interface VracProp {
     vrac : {
         id : number
+        close_date : string
         pickup_date : string
         ListProducts : {
             id : number

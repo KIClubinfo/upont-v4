@@ -5,6 +5,25 @@ import { ExistingOrder } from './OrderedVrac';
 import { VracOrderProp, VracOrderPreparingProp, VracProp } from './EpicerieProps';
 import { DeletionPage } from './VracDeletionPage';
 
+const VracTitle : React.FC<VracProp> = (prop : VracProp) => {
+    // Display the title of the vrac
+    const date = new Date(prop.vrac.pickup_date)
+    const close_date = new Date(prop.vrac.close_date)
+    return (
+        <div className="centered-div">
+                <span>
+                    <div style={{fontSize: "1.5em"}}>
+                        Vrac du {date.toLocaleDateString("fr-FR")}
+                    </div>
+                    <div style={{fontSize: "1.2em"}}>
+                        <br/>
+                        Commande possible jusqu'au {close_date.toLocaleDateString("fr-FR")}
+                    </div>
+                </span>
+        </div>
+    )
+}
+
 const Vracs : React.FC = () => { 
     // Vrac data
     const [vrac, setVrac] = useState<VracProp["vrac"] | null>(null);
@@ -145,11 +164,17 @@ const Vracs : React.FC = () => {
             <ValidationPage vracOrder = {prepareVracOrderProp()["vracOrder"]}/>
         )
     }
-
+    let pickupDate = new Date(vrac.pickup_date)
+    let closeDate = new Date(vrac.close_date)
     // If we are here, the user isn't ordering, there is an available vrac and the user is sure they want to order a new v
     return (
         <div className="vrac">
             <div className='row row-cols-5'>
+                <div className="col">
+                    <div className="product-card">
+                        <VracTitle vrac={vrac}/>
+                    </div>
+                </div>
                 {vrac.ListProducts.map((product, index) => (
                     <Product key={index} product={product} quantity={{
                         count: quantities[index],
