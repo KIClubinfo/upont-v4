@@ -35,14 +35,17 @@ class BasketViewSet(viewsets.ModelViewSet):
     API endpoint that allows baskets to be viewed.
     """
 
-    queryset = Basket.objects.all()
-    serializer_class = BasketSerializer
     http_method_names = ["get"]
 
     def get_queryset(self):
         queryset = Basket.objects.all()
         queryset.order_by("-pickup_date")
         return queryset
+    
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = BasketSerializer(queryset, many = True)
+        return Response(serializer.data)
     
     @action(detail=False, methods=['get'])
     def active(self, request):
