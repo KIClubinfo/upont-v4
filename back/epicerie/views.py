@@ -39,6 +39,11 @@ class BasketViewSet(viewsets.ModelViewSet):
     serializer_class = BasketSerializer
     http_method_names = ["get"]
 
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = BasketSerializer(queryset, many=True)
+        return Response(serializer.data)
+
     def get_queryset(self):
         queryset = Basket.objects.all()
         queryset.order_by("-pickup_date")
@@ -150,9 +155,8 @@ class VracViewSet(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request):
-        queryset = self.get_queryset()
-        serializer = VracSerializer(queryset, many=True)
-        return Response(serializer.data)
+        #Something is missing here ...
+        pass
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
