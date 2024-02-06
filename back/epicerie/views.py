@@ -155,8 +155,9 @@ class VracViewSet(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request):
-        #Something is missing here ...
-        pass
+        queryset = self.get_queryset()
+        serializer = VracSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
