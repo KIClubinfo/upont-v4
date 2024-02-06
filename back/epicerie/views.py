@@ -39,11 +39,6 @@ class BasketViewSet(viewsets.ModelViewSet):
     serializer_class = BasketSerializer
     http_method_names = ["get"]
 
-    def list(self, request):
-        queryset = self.get_queryset()
-        serializer = BasketSerializer(queryset, many=True)
-        return Response(serializer.data)
-
     def get_queryset(self):
         queryset = Basket.objects.all()
         queryset.order_by("-pickup_date")
@@ -167,8 +162,11 @@ class VracViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def latest(self, request):
-        # Something is missing here ...
-        pass
+        queryset = self.get_queryset()
+        queryset = queryset.filter(is_active=True)
+        latest_vrac = queryset.latest("pickup_date")
+        serializer = VracSerializer(latest_vrac)
+        return Response(serializer.data)
 
 
 class VracOrderViewSet(viewsets.ModelViewSet):
