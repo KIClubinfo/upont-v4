@@ -41,8 +41,6 @@ RUN apt-get update \
     # For checking when db is up
     netcat-traditional=1.10-47 \
     iputils-ping=3:20221126-1 \
-    # Install redis
-    redis=5:7.0.11-1 \
     # Add postgresql support
     python3-psycopg2=2.9.5-1+b1 \
     # Install sass
