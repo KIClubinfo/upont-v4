@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 import django_cas_ng.views
 from courses.views import (
     CourseViewSet,
@@ -76,6 +77,7 @@ urlpatterns = [
     path("pochtron/", include("pochtron.urls")),
     path("courses/", include("courses.urls")),
     path("the_calendar/", include("the_calendar.urls")),
+    path("ressource/", include("ressource.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo/", views.add, name="add_promo"),
