@@ -166,19 +166,3 @@ class Shotgun(models.Model):
             for participation in self.participations().order_by("shotgun_date")
             if participation not in self.accepted_participations()
         ]
-
-
-class Ressource(models.Model):
-    title = models.CharField(max_length=50)
-    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="resources")
-    author = models.ForeignKey(
-        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
-    )
-    image = models.ImageField(upload_to="news/ressources", null=True, blank=True)
-    video_url = models.URLField(null=True, blank=True)
-
-    def is_video(self):
-        return self.video_url is not None
-
-    def is_image(self):
-        return self.image is not None

@@ -16,7 +16,7 @@ from social.models import Club, Membership, Student
 from upont.regex import split_then_markdownify
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
-from .models import Comment, Event, Participation, Post, Ressource, Shotgun
+from .models import Comment, Event, Participation, Post, Shotgun
 from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
 
 
@@ -247,34 +247,6 @@ class PostCreateViewV2(APIView):
             if "illustration" in request.data:
                 post.illustration = request.data["illustration"]
             post.save()
-            if (
-                "resources_count" in request.data
-                and int(request.data["resources_count"]) > 0
-            ):
-                resources = []
-                for i in range(0, int(request.data["resources_count"])):
-                    resources.append(
-                        {
-                            "type": request.data["resources-" + str(i) + "-type"],
-                            "data": request.data["resources-" + str(i) + "-data"],
-                        }
-                    )
-                for resource in resources:
-                    if resource["type"] == "video":
-                        resource = Ressource(
-                            title=request.data["title"],
-                            post=post,
-                            author=student,
-                            video_url=resource["data"],
-                        )
-                    elif resource["type"] == "image":
-                        resource = Ressource(
-                            title=request.data["title"],
-                            post=post,
-                            author=student,
-                            image=resource["data"],
-                        )
-                    resource.save()
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
             if club.is_member(student.id):
@@ -525,24 +497,6 @@ def post_edit(request, post_id, course_id=None):
                 instance=Post.objects.get(id=post_id),
             )
             if form.is_valid():
-                if request.POST["video"] == "":
-                    resources = Ressource.objects.filter(post=post)
-                    resources.first().delete()
-                elif request.POST["video"] != "":
-                    resources = Ressource.objects.filter(
-                        post=post, video_url__isnull=False
-                    )
-                    if len(resources) >= 1:
-                        resources.first().video_url = request.POST["video"]
-                        resources.first().save()
-                    else:
-                        resource = Ressource(
-                            title=post.title,
-                            post=post,
-                            author=student,
-                            video_url=request.POST["video"],
-                        )
-                        resource.save()
                 if "illustration" in request.FILES:
                     post.illustration.delete()
                 if course_id is not None and form.cleaned_data["resource_file"]:
@@ -560,14 +514,11 @@ def post_edit(request, post_id, course_id=None):
 
     else:
         form = EditPost(request.user.id, instance=post)
-        resources = Ressource.objects.filter(post=post)
-        if len(resources) >= 1:
-            form.fields["video"].initial = resources.first().video_url
     context["EditPost"] = form
     context["post"] = post
     context["Edit"] = True
     context["course_id"] = course_id
-    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:posts"))
+    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     return render(request, "news/post_edit.html", context)
 
 
@@ -583,19 +534,10 @@ def post_create(request, event_id=None, course_id=None):
             )
             if form.is_valid():
                 post = form.save(commit=False)
-                student = Student.objects.get(user__id=request.user.id)
-                post.author = student
+                post.author = Student.objects.get(user__id=request.user.id)
                 post.date = timezone.now()
                 post.content = split_then_markdownify(post.content)
                 post.save()
-                if request.POST["video"] != "":
-                    resource = Ressource(
-                        title=post.title,
-                        post=post,
-                        author=student,
-                        video_url=request.POST["video"],
-                    )
-                    resource.save()
                 if course_id is not None:
                     course = get_object_or_404(Course, pk=course_id)
                     course.posts.add(post)
@@ -613,7 +555,7 @@ def post_create(request, event_id=None, course_id=None):
         form = EditPost(request.user.id)
         if event_id is not None:
             form.fields["event"].initial = get_object_or_404(Event, id=event_id)
-    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:posts"))
+    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
     context["EditPost"] = form
     context["Edit"] = False
     context["course_id"] = course_id

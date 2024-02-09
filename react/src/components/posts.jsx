@@ -13,7 +13,6 @@ import CommentForm from './commentForm';
 import { addZero } from './utils/utils';
 import { getCookie } from './utils/csrf';
 import Resource from './resource';
-import YouTube from 'react-youtube';
 
 function postLogo(state) {
   if (state.post.club) {
@@ -87,47 +86,23 @@ function postClubAuthor(state) {
 }
 
 function postIllustration(state) {
-  const temp = [];
-  for (const index in state.post.resources) {
-    if (state.post.resources[index].type === 'image') {
-      temp.push(
-        <div className="news-card-images">
-          <div className="news-card-carousel">
-            <div className="carousel-cell">
-              <img
-                className="news-card_image_sized"
-                src={state.post.resources[index].url}
-                alt=""
-              />
-            </div>
+  if (state.post.illustration_url) {
+    return (
+      <div className="news-card-images">
+        <div className="news-card-carousel">
+          <div className="carousel-cell">
+            <img
+              className="news-card_image_sized"
+              src={state.post.illustration_url}
+              alt=""
+            />
           </div>
-        </div>,
-      );
-    } else if (state.post.resources[index].type === 'video') {
-      var id = '';
-      var url = state.post.resources[index].url;
-      url = url
-        .replace(/(>|<)/gi, '')
-        .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-      if (url[2] !== undefined) {
-        id = url[2].split(/[^0-9a-z_\-]/i);
-        id = id[0];
-      } else {
-        id = url;
-      }
-      temp.push(
-        <div className="news-card-images">
-          <div className="news-card-carousel">
-            <div className="carousel-cell">
-              <YouTube videoId={id} />
-            </div>
-          </div>
-        </div>,
-      );
-    }
+        </div>
+      </div>
+    );
   }
 
-  return temp;
+  return null;
 }
 
 class Post extends React.Component {

@@ -5,7 +5,7 @@ from rest_framework import serializers
 from social.models import Student
 from social.serializers import ClubSerializerLite, StudentSerializer
 
-from .models import Comment, Event, Post, Ressource, Shotgun
+from .models import Comment, Event, Post, Shotgun
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -67,22 +67,6 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class PostResourceSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Ressource
-        fields = ["type", "url"]
-
-    type = serializers.SerializerMethodField()
-
-    def get_type(self, obj):
-        return "video" if obj.is_video() else "image"
-
-    url = serializers.SerializerMethodField()
-
-    def get_url(self, obj):
-        return obj.video_url if obj.is_video() else obj.image.url
-
-
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     author = StudentSerializer()
     club = ClubSerializerLite()
@@ -93,11 +77,6 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             return obj.illustration.url
         else:
             return False
-
-    resources = serializers.SerializerMethodField()
-
-    def get_resources(self, obj):
-        return PostResourceSerializer(obj.resources.all(), many=True).data
 
     event_url = serializers.SerializerMethodField()
 
@@ -279,7 +258,6 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "bookmark_url",
             "unbookmark_url",
             "user_bookmarked",
-            "resources",
         ]
 
 
