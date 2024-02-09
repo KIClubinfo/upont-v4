@@ -1,4 +1,5 @@
 import json
+import re
 
 from courses.models import Course, Resource
 from django.contrib.auth.decorators import login_required
@@ -18,6 +19,10 @@ from upont.regex import split_then_markdownify
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Ressource, Shotgun
 from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
+
+pattern = re.compile(
+    r"^(http(s)?:\/\/)?((w){3}.)?youtu(be\.com\/watch\?v=|\.be\/)([A-Za-z0-9_\-]{11})$"
+)
 
 
 @login_required
@@ -261,12 +266,14 @@ class PostCreateViewV2(APIView):
                     )
                 for resource in resources:
                     if resource["type"] == "video":
-                        resource = Ressource(
-                            title=request.data["title"],
-                            post=post,
-                            author=student,
-                            video_url=resource["data"],
-                        )
+                        if pattern.match(request.POST["video"]):
+                            resource = Ressource(
+                                title=request.data["title"],
+                                post=post,
+                                author=student,
+                                video_url=resource["data"],
+                            )
+                            resource.save()
                     elif resource["type"] == "image":
                         resource = Ressource(
                             title=request.data["title"],
@@ -274,7 +281,7 @@ class PostCreateViewV2(APIView):
                             author=student,
                             image=resource["data"],
                         )
-                    resource.save()
+                        resource.save()
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
             if club.is_member(student.id):
@@ -532,17 +539,19 @@ def post_edit(request, post_id, course_id=None):
                     resources = Ressource.objects.filter(
                         post=post, video_url__isnull=False
                     )
-                    if len(resources) >= 1:
-                        resources.first().video_url = request.POST["video"]
-                        resources.first().save()
-                    else:
-                        resource = Ressource(
-                            title=post.title,
-                            post=post,
-                            author=student,
-                            video_url=request.POST["video"],
-                        )
+                    if len(resources) >= 1 and pattern.match(request.POST["video"]):
+                        resource = resources.first()
+                        resource.video_url = request.POST["video"]
                         resource.save()
+                    else:
+                        if pattern.match(request.POST["video"]):
+                            resource = Ressource(
+                                title=post.title,
+                                post=post,
+                                author=student,
+                                video_url=request.POST["video"],
+                            )
+                            resource.save()
                 if "illustration" in request.FILES:
                     post.illustration.delete()
                 if course_id is not None and form.cleaned_data["resource_file"]:
@@ -589,13 +598,14 @@ def post_create(request, event_id=None, course_id=None):
                 post.content = split_then_markdownify(post.content)
                 post.save()
                 if request.POST["video"] != "":
-                    resource = Ressource(
-                        title=post.title,
-                        post=post,
-                        author=student,
-                        video_url=request.POST["video"],
-                    )
-                    resource.save()
+                    if pattern.match(request.POST["video"]):
+                        resource = Ressource(
+                            title=post.title,
+                            post=post,
+                            author=student,
+                            video_url=request.POST["video"],
+                        )
+                        resource.save()
                 if course_id is not None:
                     course = get_object_or_404(Course, pk=course_id)
                     course.posts.add(post)
