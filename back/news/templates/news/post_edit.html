@@ -68,6 +68,10 @@
                             <div class="input-title">Ajouter/modifier une image :</div>
                             {{EditPost.illustration}}<br>
 
+                            {{EditPost.video.errors}}
+                            <div class="input-title">Ajouter/modifier une vidéo :</div>
+                            {{EditPost.video}}<br>
+
                         </div>
                     </div>
                     {%if post.illustration%}
