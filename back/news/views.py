@@ -247,7 +247,6 @@ class PostCreateViewV2(APIView):
             if "illustration" in request.data:
                 post.illustration = request.data["illustration"]
             post.save()
-            print(request.data)
             if (
                 "resources_count" in request.data
                 and int(request.data["resources_count"]) > 0
@@ -526,6 +525,24 @@ def post_edit(request, post_id, course_id=None):
                 instance=Post.objects.get(id=post_id),
             )
             if form.is_valid():
+                if request.POST["video"] == "":
+                    resources = Ressource.objects.filter(post=post)
+                    resources.first().delete()
+                elif request.POST["video"] != "":
+                    resources = Ressource.objects.filter(
+                        post=post, video_url__isnull=False
+                    )
+                    if len(resources) >= 1:
+                        resources.first().video_url = request.POST["video"]
+                        resources.first().save()
+                    else:
+                        resource = Ressource(
+                            title=post.title,
+                            post=post,
+                            author=student,
+                            video_url=request.POST["video"],
+                        )
+                        resource.save()
                 if "illustration" in request.FILES:
                     post.illustration.delete()
                 if course_id is not None and form.cleaned_data["resource_file"]:
@@ -543,11 +560,14 @@ def post_edit(request, post_id, course_id=None):
 
     else:
         form = EditPost(request.user.id, instance=post)
+        resources = Ressource.objects.filter(post=post)
+        if len(resources) >= 1:
+            form.fields["video"].initial = resources.first().video_url
     context["EditPost"] = form
     context["post"] = post
     context["Edit"] = True
     context["course_id"] = course_id
-    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
+    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:posts"))
     return render(request, "news/post_edit.html", context)
 
 
@@ -563,10 +583,19 @@ def post_create(request, event_id=None, course_id=None):
             )
             if form.is_valid():
                 post = form.save(commit=False)
-                post.author = Student.objects.get(user__id=request.user.id)
+                student = Student.objects.get(user__id=request.user.id)
+                post.author = student
                 post.date = timezone.now()
                 post.content = split_then_markdownify(post.content)
                 post.save()
+                if request.POST["video"] != "":
+                    resource = Ressource(
+                        title=post.title,
+                        post=post,
+                        author=student,
+                        video_url=request.POST["video"],
+                    )
+                    resource.save()
                 if course_id is not None:
                     course = get_object_or_404(Course, pk=course_id)
                     course.posts.add(post)
@@ -584,7 +613,7 @@ def post_create(request, event_id=None, course_id=None):
         form = EditPost(request.user.id)
         if event_id is not None:
             form.fields["event"].initial = get_object_or_404(Event, id=event_id)
-    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
+    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:posts"))
     context["EditPost"] = form
     context["Edit"] = False
     context["course_id"] = course_id
