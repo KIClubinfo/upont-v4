@@ -85,6 +85,7 @@ class EditPost(forms.ModelForm):
             "content": forms.Textarea(attrs={"class": "text-input mt-2"}),
             "event": forms.Select(attrs={"class": "profil-select"}),
             "club": forms.Select(attrs={"class": "profil-select"}),
+            "video": forms.TextInput(attrs={"class": "profil-input"}),
         }
 
     def __init__(self, user_id, *args, **kwargs):
@@ -103,6 +104,9 @@ class EditPost(forms.ModelForm):
         ]
         self.fields["resource_file"] = forms.FileField(
             widget=forms.FileInput(attrs={"class": "profil-input"}), required=False
+        )
+        self.fields["video"] = forms.URLField(
+            widget=forms.TextInput(attrs={"class": "profil-input"}), required=False
         )
 
 
