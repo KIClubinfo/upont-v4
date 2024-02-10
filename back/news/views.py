@@ -237,7 +237,7 @@ class PostCreateViewV2(APIView):
     """
 
     def post(self, request):
-        process_img = False
+        process_img = True
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
         elif request.data["content"] == "":
@@ -256,7 +256,6 @@ class PostCreateViewV2(APIView):
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
             if club.is_member(student.id):
-                process_img = True
                 post = Post(
                     title=request.data["title"],
                     author=student,
@@ -268,6 +267,7 @@ class PostCreateViewV2(APIView):
                     post.illustration = request.data["illustration"]
                 post.save()
             else:
+                process_img = False
                 return Response({"status": "error", "message": "forbidden"})
 
         if (
