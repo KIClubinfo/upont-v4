@@ -181,4 +181,4 @@ class Ressource(models.Model):
         return self.video_url is not None
 
     def is_image(self):
-        return self.image is not None
+        return self.image != ""

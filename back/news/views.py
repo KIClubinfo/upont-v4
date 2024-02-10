@@ -550,12 +550,13 @@ def post_edit(request, post_id, course_id=None):
                     else:
                         if pattern.match(request.POST["video"]):
                             resource = Ressource(
-                                title=post.title,
+                                title=request.POST["title"],
                                 post=post,
                                 author=student,
                                 video_url=request.POST["video"],
                             )
                             resource.save()
+                resources = Ressource.objects.filter(post=post)
                 if "illustration" in request.FILES:
                     images = Ressource.objects.filter(post=post, image__isnull=False)
                     if len(images) >= 1:
@@ -571,9 +572,10 @@ def post_edit(request, post_id, course_id=None):
                         )
                         resource.save()
                 else:
-                    images = Ressource.objects.filter(post=post, image__isnull=False)
+                    images = Ressource.objects.filter(post=post)
+                    images = [image for image in images if image.is_image()]
                     if len(images) >= 1:
-                        images.first().delete()
+                        images[0].delete()
                 if course_id is not None and form.cleaned_data["resource_file"]:
                     post.resource.all().delete()
                     resource = Resource(
