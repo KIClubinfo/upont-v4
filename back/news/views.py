@@ -309,6 +309,7 @@ class PostEditView(APIView):
     """
 
     def post(self, request):
+        process_img = True
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
         elif request.data["content"] == "":
@@ -336,7 +337,39 @@ class PostEditView(APIView):
                     post.illustration = None
                 post.save()
             else:
+                process_img = False
                 return Response({"status": "error", "message": "forbidden"})
+
+        if (
+            "resources_count" in request.data
+            and int(request.data["resources_count"]) > 0
+            and process_img
+        ):
+            Ressource.objects.filter(post=post).delete()
+            resources = []
+            for i in range(0, int(request.data["resources_count"])):
+                resources.append(
+                    {
+                        "type": request.data["resources-" + str(i) + "-type"],
+                        "data": request.data["resources-" + str(i) + "-data"],
+                    }
+                )
+            for resource in resources:
+                if resource["type"] == "video":
+                    resource = Ressource(
+                        title=request.data["title"],
+                        post=post,
+                        author=student,
+                        video_url=resource["data"],
+                    )
+                elif resource["type"] == "image":
+                    resource = Ressource(
+                        title=request.data["title"],
+                        post=post,
+                        author=student,
+                        image=resource["data"],
+                    )
+                resource.save()
         return Response({"status": "ok"})
 
 
