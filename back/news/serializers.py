@@ -70,7 +70,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 class PostResourceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Ressource
-        fields = ["type", "url"]
+        fields = ["id", "type", "url"]
 
     type = serializers.SerializerMethodField()
 
