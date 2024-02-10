@@ -614,7 +614,6 @@ def club_edit(request, club_id):
         form_club.fields["category"].initial = [
             category.pk for category in club.category.all()
         ]
-        form_club.fields["label"].initial = club.label
 
     context["EditClub"] = form_club
     context["AddMember"] = form_membership
