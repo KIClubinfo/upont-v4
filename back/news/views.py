@@ -237,7 +237,7 @@ class PostCreateViewV2(APIView):
     """
 
     def post(self, request):
-        # process_img = True
+        process_img = False
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
         elif request.data["content"] == "":
@@ -256,6 +256,7 @@ class PostCreateViewV2(APIView):
         else:
             club = get_object_or_404(Club, id=request.data["publish_as"])
             if club.is_member(student.id):
+                process_img = True
                 post = Post(
                     title=request.data["title"],
                     author=student,
@@ -266,10 +267,39 @@ class PostCreateViewV2(APIView):
                 if "illustration" in request.data:
                     post.illustration = request.data["illustration"]
                 post.save()
-
             else:
-                # process_img = False
                 return Response({"status": "error", "message": "forbidden"})
+
+        if (
+            "resources_count" in request.data
+            and int(request.data["resources_count"]) > 0
+            and process_img
+        ):
+            resources = []
+            for i in range(0, int(request.data["resources_count"])):
+                resources.append(
+                    {
+                        "type": request.data["resources-" + str(i) + "-type"],
+                        "data": request.data["resources-" + str(i) + "-data"],
+                    }
+                )
+            for resource in resources:
+                if resource["type"] == "video":
+                    resource = Ressource(
+                        title=request.data["title"],
+                        post=post,
+                        author=student,
+                        video_url=resource["data"],
+                    )
+                elif resource["type"] == "image":
+                    resource = Ressource(
+                        title=request.data["title"],
+                        post=post,
+                        author=student,
+                        image=resource["data"],
+                    )
+                resource.save()
+
         return Response({"status": "ok"})
 
 
@@ -279,7 +309,6 @@ class PostEditView(APIView):
     """
 
     def post(self, request):
-        process_img = True
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
         elif request.data["content"] == "":
@@ -308,37 +337,6 @@ class PostEditView(APIView):
                 post.save()
             else:
                 return Response({"status": "error", "message": "forbidden"})
-        if (
-            "resources_count" in request.data
-            and int(request.data["resources_count"]) > 0
-            and process_img
-        ):
-            resources = []
-            for i in range(0, int(request.data["resources_count"])):
-                resources.append(
-                    {
-                        "type": request.data["resources-" + str(i) + "-type"],
-                        "data": request.data["resources-" + str(i) + "-data"],
-                    }
-                )
-            for resource in resources:
-                if resource["type"] == "video":
-                    if pattern.match(request.POST["video"]):
-                        resource = Ressource(
-                            title=request.data["title"],
-                            post=post,
-                            author=student,
-                            video_url=resource["data"],
-                        )
-                        resource.save()
-                elif resource["type"] == "image":
-                    resource = Ressource(
-                        title=request.data["title"],
-                        post=post,
-                        author=student,
-                        image=resource["data"],
-                    )
-                    resource.save()
         return Response({"status": "ok"})
 
 
