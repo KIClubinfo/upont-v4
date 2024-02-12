@@ -110,7 +110,7 @@ router.register(r"groups", GroupViewSet, basename="group")
 router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
 router.register(r"clubs", ClubsViewSet)
-router.register(r"contacts", ContactViewSet)
+router.register(r"contacts", ContactViewSet, basename="contacts")
 
 urlpatterns += [
     path(

@@ -236,8 +236,7 @@ class ProfilePicUpdate(APIView):
         student.save()
         return Response({"status": "ok"})
 
-    
-@login_required
+
 class ContactViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows contacts to be viewed.
