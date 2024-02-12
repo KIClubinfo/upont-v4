@@ -3,6 +3,7 @@
 {% include "header.html" with title="Gestion du shotgun" %}
 
 <!--Body-->
+
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
@@ -40,22 +41,54 @@
                     <div class="box small-box">
                         <h5 class="section-title">Information sur ce shotgun : {{shotgun.title}}</h5>
                         <ul class="">
-                            <li><div class="text-bold mt-2">Organisateur : <strong class="text-thin">{{shotgun.club.name}}</strong></div></li>
+                            <li>
+                                <div class="text-bold mt-2">Organisateur : <strong
+                                    class="text-thin">{{shotgun.club.name}}</strong></div>
+                            </li>
                             {%if shotgun.is_started%}
-                                <li><div class="text-bold mt-2">Ce shotgun a commencé !</div></li>
+                                <li>
+                                    <div class="text-bold mt-2">Ce shotgun a commencé !</div>
+                                </li>
                             {%elif not shotgun.is_ended%}
-                                <li><div class="text-bold mt-2">Début du shotgun : <strong class="text-thin">{{shotgun.starting_date}}</strong></div></li>
+                                <li>
+                                    <div class="text-bold mt-2">Début du shotgun : <strong
+                                        class="text-thin">{{shotgun.starting_date}}</strong></div>
+                                </li>
                             {%endif%}
-                            <li><div class="text-bold mt-2">Fin du shotgun : <strong class="text-thin">{{shotgun.ending_date}}</strong></div></li>
-                            <li><div class="text-bold mt-2">Motivation : <strong class="text-thin">{%if shotgun.requires_motivation%}Requise.{%else%}Non.{%endif%}</strong></div></li>
-                            <li><div class="text-bold mt-2">Nombre de places : <strong class="text-thin">{{shotgun.size}}</strong></div></li>
-                            <li><div class="text-bold mt-2">Description : <strong class="text-thin">{{shotgun.content}}</strong></div></li>
+                            <li>
+                                <div class="text-bold mt-2">Fin du shotgun : <strong
+                                    class="text-thin">{{shotgun.ending_date}}</strong></div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-2">Motivation : <strong class="text-thin">
+                                    {%if shotgun.requires_motivation%}Requise.{%else%}Non.{%endif%}
+                                </strong></div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-2">Nombre de places : <strong
+                                    class="text-thin">{{shotgun.size}}</strong></div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-2">Description : <strong
+                                    class="text-thin">{{shotgun.content}}</strong></div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-2">Message en cas de succès : <strong
+                                    class="text-thin">{{shotgun.success_message}}</strong></div>
+                            </li>
+                            <li>
+                                <div class="text-bold mt-2">Message en cas d'échec : <strong
+                                    class="text-thin">{{shotgun.failure_message}}</strong></div>
+                            </li>
                         </ul>
 
                         <div class="centered-div">
-                            <a href="{% url 'news:edit_shotgun' shotgun.id %}"><button class="button green-button">Éditer</button></a>
-                            <a href="{% url 'news:delete_shotgun' shotgun.id %}"><button class="button red-button">Supprimer</button></a>
-                            <a href="{% url 'news:shotgun_detail' shotgun.id %}"><button class="button blue-button">Retour</button></a>
+                            <a href="{% url 'news:edit_shotgun' shotgun.id %}"><button
+                                class="button green-button">Éditer</button></a>
+                            <a href="{% url 'news:delete_shotgun' shotgun.id %}"><button
+                                class="button red-button">Supprimer</button></a>
+                            <a href="{% url 'news:shotgun_detail' shotgun.id %}"><button
+                                class="button blue-button">Retour</button></a>
                         </div>
                     </div><!--End of Box-->
 
@@ -66,7 +99,13 @@
 
                     <h3 class="page-title mt-2">Participations</h3>
 
-                    {% if shotgun.is_ended and shotgun.requires_motivation%}
+                    {% if not shotgun.is_ended%}
+                        <div class="box small-box">
+                            <h5 class="section-title">
+                                <strong class="text-bold">Le shotgun n'est pas encore terminé.</strong>
+                            </h5>
+                        </div>
+                    {% else %}
                         <!--Box-->
                         <div class="box small-box">
                             {% if shotgun.motivations_review_finished %}
@@ -77,21 +116,18 @@
                                 </h5>
                             {% else %}
                                 <h5 class="section-title">
-                                    <strong class="text-bold">Les participations sont anonymes et s'affichent par ordre de shotgun.</strong>
+                                    <strong class="text-bold">Les participations sont anonymes et s'affichent par ordre de
+                                        shotgun.</strong>
                                     <br>
-                                    <strong class="text-thin">Les {{shotgun.size}} premières participations non recalées seront acceptées.</strong>
+                                    <strong class="text-thin">Les {{shotgun.size}} premières participations non recalées seront
+                                        acceptées.</strong>
                                 </h5>
                                 <div class="centered-div">
-                                    <a href="{% url 'news:publish_shotgun_results' shotgun.id %}"><button class="button red-button">Publier les résultats</button></a>
+                                    <a href="{% url 'news:publish_shotgun_results' shotgun.id %}"><button
+                                        class="button red-button">Publier les résultats</button></a>
                                 </div>
                             {% endif %}
                         </div><!--End of Box-->
-                    {% else %}
-                        <div class="box small-box">
-                            <h5 class="section-title">
-                                <strong class="text-bold">Les résultats pourront être publiés quand le shotgun sera terminé.</strong>
-                            </h5>
-                        </div>
                     {% endif %}
 
                     {% if shotgun.requires_motivation and not shotgun.motivations_review_finished %}
@@ -109,9 +145,11 @@
                                 <div class="centered-div mt-3">
                                     <div class="information-box">{{participation.motivation}}</div>
                                     {% if participation.failed_motivation %}
-                                        <a href="{% url 'news:unfail_participation' participation.id %}"><button class="button red-button">Annuler</button></a>
+                                        <a href="{% url 'news:unfail_participation' participation.id %}"><button
+                                            class="button red-button">Annuler</button></a>
                                     {% else %}
-                                        <a href="{% url 'news:fail_participation' participation.id %}"><button class="button red-button">Recaler</button></a>
+                                        <a href="{% url 'news:fail_participation' participation.id %}"><button
+                                            class="button red-button">Recaler</button></a>
                                     {% endif %}
                                 </div>
 
@@ -126,7 +164,8 @@
                         {% for participation in shotgun.accepted_participations %}
                             <!--Box-->
                             <div class="box small-box">
-                                <h5 class="section-title text-bold">{{participation.participant.user.first_name}} {{participation.participant.user.last_name}}</h5>
+                                <h5 class="section-title text-bold">{{participation.participant.user.first_name}}
+                                    {{participation.participant.user.last_name}}</h5>
                                 {% if shotgun.requires_motivation %}
                                     <div class="centered-div mt-3">
                                         <div class="information-box">{{participation.motivation}}</div>
@@ -141,7 +180,19 @@
                         {% endfor %}
                     {% endif %}
 
-
+                    <h3 class="page-title mt-2">Liste d'attente</h3>
+                    {% for participation in shotgun.denied %}
+                        <!--Box-->
+                        <div class="box small-box">
+                            <h5 class="section-title text-bold">{{participation.participant.user.first_name}}
+                                {{participation.participant.user.last_name}}</h5>
+                        </div><!--End of Box-->
+                    {% empty %}
+                        <!--Box-->
+                        <div class="box small-box">
+                            <h5 class="section-title">Personne n'est en ligne d'attente.</h5>
+                        </div><!--End of Box-->
+                    {% endfor %}
                 </div><!--End of Column-->
 
             </div><!--End of Row-->
@@ -151,4 +202,5 @@
     </div><!--End of Content-->
 
 </body><!--End of Body-->
+
 </html><!--End of Document-->

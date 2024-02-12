@@ -79,7 +79,7 @@ class Student(models.Model):
         validators=[phone_regex], max_length=17, null=True, blank=True
     )  # validators should be a list
     birthdate = models.DateField(max_length=12, null=True, blank=True)
-    biography = models.TextField(max_length=30, null=True, blank=True)
+    biography = models.TextField(max_length=300, null=True, blank=True)
     picture = models.ImageField(upload_to="pictures/", null=True, blank=True)
     nationality = models.ForeignKey(
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
@@ -120,7 +120,7 @@ class Category(models.Model):
 
 class Club(models.Model):
     name = models.CharField(max_length=50, default="Club")
-    nickname = models.CharField(max_length=10, default="", null=True, blank=True)
+    nickname = models.CharField(max_length=50, default="", null=True, blank=True)
     logo = models.ImageField(upload_to="logos/", null=True, blank=True)
     background_picture = models.ImageField(
         upload_to="background_pictures/", null=True, blank=True
@@ -139,6 +139,14 @@ class Club(models.Model):
         related_name="clubs",
         blank=True,
     )
+
+    class Label(models.TextChoices):
+        ASSO = "Association"
+        CLUB = "Club"
+        LISTE = "Liste"
+        POLE = "Pôle"
+
+    label = models.CharField(max_length=20, choices=Label.choices, default=Label.CLUB)
 
     def save(self, *args, **kwargs):
         if self.logo:

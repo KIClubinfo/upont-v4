@@ -6,6 +6,7 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import viewsets
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -80,7 +81,7 @@ class StudentCanPublishAs(APIView):
 
     def get(self, request):
         data = {"-1": "Élève"}
-        for membership in Membership.objects.filter(student__user__pk=request.user.id):
+        for membership in Membership.objects.filter(student__user__id=request.user.id):
             data[membership.club.id] = membership.club.name
         return Response({"can_publish_as": data})
 
@@ -95,14 +96,15 @@ class StudentMembershipView(APIView):
     """
 
     def get(self, request):
-        student = get_object_or_404(Student, user__id=request.GET["id"])
+        student = get_object_or_404(Student, user__pk=request.GET["id"])
         data = []
-        for membership in Membership.objects.filter(student__user__pk=student.id):
+        for membership in Membership.objects.filter(student__user__id=student.user.id):
             club = Club.objects.get(id=membership.club.id)
             serializer = ClubSerializerLite(club)
             club_data = serializer.data
             club_data["is_admin"] = membership.is_admin
             club_data["is_old"] = membership.is_old
+            club_data["role"] = membership.role.name
             data.append(club_data)
         return Response({"is_member_of": data})
 
@@ -119,9 +121,9 @@ class SearchRole(APIView):
     def get(self, request):
         if "role" in request.GET and request.GET["role"].strip():
             query = request.GET.get("role", None)
-            roles = Role.objects.filter(name__icontains=query).order_by("-name")[:3]
+            roles = Role.objects.filter(name__icontains=query).order_by("-name")
         else:
-            roles = Role.objects.all().order_by("-name")[:3]
+            roles = Role.objects.all().order_by("-name")
         serializer = RoleSerializer(roles, many=True)
         return Response({"roles": serializer.data})
 
@@ -163,7 +165,7 @@ class ClubsViewSet(viewsets.ModelViewSet):
     API endpoint that allows clubs to be viewed.
     """
 
-    queryset = Club.objects.all().order_by("name", "nickname")
+    queryset = Club.objects.all().order_by("label", "name", "nickname")
     serializer_class = ClubSerializer
     http_method_names = ["get"]
 
@@ -193,9 +195,37 @@ class SearchClub(APIView):
             clubs, searched_expression = search_club(request)
             clubs = clubs[:25]
         else:
-            clubs = Club.objects.all().order_by("name", "nickname")[:25]
+            clubs = Club.objects.all().order_by("label", "name", "nickname")[:25]
         serializer = ClubSerializer(clubs, many=True)
         return Response({"clubs": serializer.data})
+
+
+class StudentProfileEdit(APIView):
+    """
+    API endpoint that allows a student to edit his profile.
+    """
+
+    def post(self, request, format=None):
+        student = get_object_or_404(Student, user__id=request.user.id)
+
+        form = EditProfile(request.data, instance=student)
+        if form.is_valid():
+            form.save()
+            return Response({"status": "ok"})
+        else:
+            return Response({"status": "error", "errors": form.errors})
+
+
+class ProfilePicUpdate(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, format=None):
+        image = request.data["image"]
+        print(request.data)
+        student = get_object_or_404(Student, user__id=request.user.id)
+        student.picture = image
+        student.save()
+        return Response({"status": "ok"})
 
 
 @login_required
@@ -233,6 +263,7 @@ def search(request):
     if "club" in request.GET:
         all_clubs_list = Club.objects.order_by("name")
         all_categories_list = Category.objects.order_by("name")
+        all_label_list = Club.Label.choices
         my_memberships_list = Membership.objects.filter(
             student__user__id=request.user.id
         )
@@ -240,10 +271,14 @@ def search(request):
             "all_clubs_list": all_clubs_list,
             "all_categories_list": all_categories_list,
             "my_memberships_list": my_memberships_list,
+            "all_label_list": all_label_list,
         }
         if request.GET["club"].strip():
             found_clubs, searched_expression = search_club(request)
             context["club_displayed_list"] = found_clubs
+            context["asso_club_list"] = found_clubs.filter(label=Club.Label.ASSO)
+            context["club_club_list"] = found_clubs.filter(label=Club.Label.CLUB)
+            context["liste_club_list"] = found_clubs.filter(label=Club.Label.LISTE)
         context["searched_expression"] = searched_expression
         return render(request, "social/index_clubs.html", context)
 
@@ -322,7 +357,8 @@ def search_club(request):
             partial_queryset = partial_queryset.filter(
                 Q(name__trigram_similar=key_word)
                 | Q(nickname__iexact=key_word)
-                | Q(category__name__iexact=key_word),
+                | Q(category__name__iexact=key_word)
+                | Q(label__iexact=key_word),
                 similarity__gt=0.3,
             )
         queryset |= partial_queryset.distinct("name")
@@ -344,6 +380,8 @@ def profile_edit(request):
         if "Annuler" in request.POST:
             return redirect("social:profile")
         elif "Valider" in request.POST:
+            print(request.POST)
+            print(request.FILES)
             form = EditProfile(
                 request.POST,
                 request.FILES,
@@ -372,10 +410,26 @@ def index_clubs(request):
     all_clubs_list = Club.objects.order_by("name")
     active_clubs_list = Club.objects.filter(active=True).order_by("name")
     inactive_clubs_list = Club.objects.filter(active=False).order_by("name")
+    ASSO_club_list = Club.objects.filter(label=Club.Label.ASSO, active=True).order_by(
+        "name"
+    )
+    CLUB_club_list = Club.objects.filter(label=Club.Label.CLUB, active=True).order_by(
+        "name"
+    )
+    LISTE_club_list = Club.objects.filter(label=Club.Label.LISTE, active=True).order_by(
+        "name"
+    )
+    POLE_club_list = Club.objects.filter(label=Club.Label.POLE, active=True).order_by(
+        "name"
+    )
     context = {
         "all_clubs_list": all_clubs_list,
         "club_displayed_list": active_clubs_list,
         "inactive_clubs_list": inactive_clubs_list,
+        "asso_club_list": ASSO_club_list,
+        "club_club_list": CLUB_club_list,
+        "liste_club_list": LISTE_club_list,
+        "pole_club_list": POLE_club_list,
     }
     all_categories_list = Category.objects.order_by("name")
     context["all_categories_list"] = all_categories_list
@@ -436,6 +490,8 @@ def club_edit(request, club_id):
         club__pk=club_id, is_old=False
     )
     all_old_club_memberships = get_old_members(club_id)
+    form_membership = AddMember()
+    form_role = AddRole()
     if not student_membership_club:  # If no match is found
         raise PermissionDenied
     if not student_membership_club[0].is_admin:  # If the user does not have the rights
@@ -547,8 +603,6 @@ def club_edit(request, club_id):
 
     else:
         form_club = EditClub()
-        form_membership = AddMember()
-        form_role = AddRole()
 
         form_club.fields["name"].initial = club.name
         form_club.fields["nickname"].initial = club.nickname

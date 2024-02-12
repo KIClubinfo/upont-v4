@@ -1,4 +1,5 @@
 import json
+import re
 
 from courses.models import Course, Resource
 from django.contrib.auth.decorators import login_required
@@ -12,11 +13,16 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from social.models import Membership, Student
+from social.models import Club, Membership, Student
+from upont.regex import split_then_markdownify
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
-from .models import Comment, Event, Participation, Post, Shotgun
+from .models import Comment, Event, Participation, Post, Ressource, Shotgun
 from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
+
+pattern = re.compile(
+    r"^(http(s)?:\/\/)?((w){3}.)?youtu(be\.com\/watch\?v=|\.be\/)([A-Za-z0-9_\-]{11})$"
+)
 
 
 @login_required
@@ -57,7 +63,11 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.all()
         mode = self.request.GET.get("mode")
         bookmark = self.request.GET.get("bookmark")
+        club = self.request.GET.get("club")
         student = get_object_or_404(Student, user__id=self.request.user.id)
+        if club is not None:
+            club = get_object_or_404(Club, id=club)
+            queryset = queryset.filter(club=club)
         if mode is None:
             queryset = queryset.order_by("-date", "title")
         elif mode == "social":
@@ -204,17 +214,13 @@ class PostCommentView(APIView):
 
 
 class PostCreateView(APIView):
-    """
-    API endpoint that allows students to create posts
-    """
-
     def post(self, request):
         student = get_object_or_404(Student, user__id=request.user.id)
         post = Post(
             title=request.data["title"],
             author=student,
             date=timezone.now(),
-            content=request.data["content"],
+            content=split_then_markdownify(request.data["content"]),
         )
         if request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
@@ -222,6 +228,148 @@ class PostCreateView(APIView):
             return Response({"status": "error", "message": "empty_content"})
 
         post.save()
+        return Response({"status": "ok"})
+
+
+class PostCreateViewV2(APIView):
+    """
+    API endpoint that allows students to create posts
+    """
+
+    def post(self, request):
+        process_img = True
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
+        student = get_object_or_404(Student, user__id=request.user.id)
+        if request.data["publish_as"] == "-1":
+            post = Post(
+                title=request.data["title"],
+                author=student,
+                date=timezone.now(),
+                content=split_then_markdownify(request.data["content"]),
+            )
+            if "illustration" in request.data:
+                post.illustration = request.data["illustration"]
+            post.save()
+        else:
+            club = get_object_or_404(Club, id=request.data["publish_as"])
+            if club.is_member(student.id):
+                post = Post(
+                    title=request.data["title"],
+                    author=student,
+                    club=club,
+                    date=timezone.now(),
+                    content=split_then_markdownify(request.data["content"]),
+                )
+                if "illustration" in request.data:
+                    post.illustration = request.data["illustration"]
+                post.save()
+            else:
+                process_img = False
+                return Response({"status": "error", "message": "forbidden"})
+
+        if (
+            "resources_count" in request.data
+            and int(request.data["resources_count"]) > 0
+            and process_img
+        ):
+            resources = []
+            for i in range(0, int(request.data["resources_count"])):
+                resources.append(
+                    {
+                        "type": request.data["resources-" + str(i) + "-type"],
+                        "data": request.data["resources-" + str(i) + "-data"],
+                    }
+                )
+            for resource in resources:
+                if resource["type"] == "video":
+                    resource = Ressource(
+                        title=request.data["title"],
+                        post=post,
+                        author=student,
+                        video_url=resource["data"],
+                    )
+                elif resource["type"] == "image":
+                    resource = Ressource(
+                        title=request.data["title"],
+                        post=post,
+                        author=student,
+                        image=resource["data"],
+                    )
+                resource.save()
+
+        return Response({"status": "ok"})
+
+
+class PostEditView(APIView):
+    """
+    API endpoint that allows students to create posts
+    """
+
+    def post(self, request):
+        process_img = True
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
+        student = get_object_or_404(Student, user__id=request.user.id)
+        post = get_object_or_404(Post, id=request.data["post"])
+        if request.data["publish_as"] == "-1":
+            post.title = request.data["title"]
+            post.content = split_then_markdownify(request.data["content"])
+            post.club = None
+            if "illustration" in request.data:
+                post.illustration = request.data["illustration"]
+            else:
+                post.illustration = None
+            post.save()
+        else:
+            club = get_object_or_404(Club, id=request.data["publish_as"])
+            if club.is_member(student.id):
+                post.title = request.data["title"]
+                post.content = split_then_markdownify(request.data["content"])
+                post.club = club
+                if "illustration" in request.data:
+                    post.illustration = request.data["illustration"]
+                else:
+                    post.illustration = None
+                post.save()
+            else:
+                process_img = False
+                return Response({"status": "error", "message": "forbidden"})
+
+        if (
+            "resources_count" in request.data
+            and int(request.data["resources_count"]) > 0
+            and process_img
+        ):
+            Ressource.objects.filter(post=post).delete()
+            resources = []
+            for i in range(0, int(request.data["resources_count"])):
+                resources.append(
+                    {
+                        "type": request.data["resources-" + str(i) + "-type"],
+                        "data": request.data["resources-" + str(i) + "-data"],
+                    }
+                )
+            for resource in resources:
+                if resource["type"] == "video":
+                    resource = Ressource(
+                        title=request.data["title"],
+                        post=post,
+                        author=student,
+                        video_url=resource["data"],
+                    )
+                elif resource["type"] == "image":
+                    resource = Ressource(
+                        title=request.data["title"],
+                        post=post,
+                        author=student,
+                        image=resource["data"],
+                    )
+                resource.save()
         return Response({"status": "ok"})
 
 
@@ -419,8 +567,46 @@ def post_edit(request, post_id, course_id=None):
                 instance=Post.objects.get(id=post_id),
             )
             if form.is_valid():
+                videos = Ressource.objects.filter(post=post, video_url__isnull=False)
+                if request.POST["video"] == "" and len(videos) >= 1:
+                    videos.first().delete()
+                elif request.POST["video"] != "":
+                    resources = Ressource.objects.filter(
+                        post=post, video_url__isnull=False
+                    )
+                    if len(resources) >= 1 and pattern.match(request.POST["video"]):
+                        resource = resources.first()
+                        resource.video_url = request.POST["video"]
+                        resource.save()
+                    else:
+                        if pattern.match(request.POST["video"]):
+                            resource = Ressource(
+                                title=request.POST["title"],
+                                post=post,
+                                author=student,
+                                video_url=request.POST["video"],
+                            )
+                            resource.save()
+                resources = Ressource.objects.filter(post=post)
                 if "illustration" in request.FILES:
-                    post.illustration.delete()
+                    images = Ressource.objects.filter(post=post, image__isnull=False)
+                    if len(images) >= 1:
+                        image = images.first()
+                        image.image = request.FILES["illustration"]
+                        image.save()
+                    else:
+                        resource = Ressource(
+                            title=post.title,
+                            post=post,
+                            author=student,
+                            image=request.FILES["illustration"],
+                        )
+                        resource.save()
+                else:
+                    images = Ressource.objects.filter(post=post)
+                    images = [image for image in images if image.is_image()]
+                    if len(images) >= 1:
+                        images[0].delete()
                 if course_id is not None and form.cleaned_data["resource_file"]:
                     post.resource.all().delete()
                     resource = Resource(
@@ -432,15 +618,18 @@ def post_edit(request, post_id, course_id=None):
                     )
                     resource.save()
                 form.save()
-                return HttpResponseRedirect(request.session["origin"])
+                return redirect("news:posts")
 
     else:
         form = EditPost(request.user.id, instance=post)
+        resources = Ressource.objects.filter(post=post)
+        if len(resources) >= 1:
+            form.fields["video"].initial = resources.first().video_url
     context["EditPost"] = form
     context["post"] = post
     context["Edit"] = True
     context["course_id"] = course_id
-    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
+    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:posts"))
     return render(request, "news/post_edit.html", context)
 
 
@@ -454,12 +643,31 @@ def post_create(request, event_id=None, course_id=None):
                 request.POST,
                 request.FILES,
             )
-            print(request.POST)
             if form.is_valid():
                 post = form.save(commit=False)
-                post.author = Student.objects.get(user__id=request.user.id)
+                student = Student.objects.get(user__id=request.user.id)
+                post.author = student
                 post.date = timezone.now()
+                post.content = split_then_markdownify(post.content)
                 post.save()
+                if "illustration" in request.FILES:
+                    resource = Ressource(
+                        title=request.POST["title"],
+                        post=post,
+                        author=student,
+                        image=request.FILES["illustration"],
+                    )
+                    resource.save()
+
+                elif request.POST["video"] != "":
+                    if pattern.match(request.POST["video"]):
+                        resource = Ressource(
+                            title=post.title,
+                            post=post,
+                            author=student,
+                            video_url=request.POST["video"],
+                        )
+                        resource.save()
                 if course_id is not None:
                     course = get_object_or_404(Course, pk=course_id)
                     course.posts.add(post)
@@ -477,7 +685,7 @@ def post_create(request, event_id=None, course_id=None):
         form = EditPost(request.user.id)
         if event_id is not None:
             form.fields["event"].initial = get_object_or_404(Event, id=event_id)
-    request.session["origin"] = request.META.get("HTTP_REFERER", "news:posts")
+    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:posts"))
     context["EditPost"] = form
     context["Edit"] = False
     context["course_id"] = course_id
@@ -694,7 +902,11 @@ def new_shotgun(request):
             request.FILES,
         )
         if form.is_valid():
-            form.save()
+            shotgun = form.save()
+            shotgun.content = split_then_markdownify(shotgun.content)
+            shotgun.success_message = split_then_markdownify(shotgun.success_message)
+            shotgun.failure_message = split_then_markdownify(shotgun.failure_message)
+            shotgun.save()
             return HttpResponseRedirect(reverse("news:shotguns"))
 
 
@@ -729,6 +941,8 @@ def edit_shotgun(request, shotgun_id):
             form.fields["ending_date"].initial = shotgun.ending_date
             form.fields["size"].initial = shotgun.size
             form.fields["requires_motivation"].initial = shotgun.requires_motivation
+            form.fields["success_message"].initial = shotgun.success_message
+            form.fields["failure_message"].initial = shotgun.failure_message
             context = {
                 "shotgun": shotgun,
                 "form": form,
@@ -741,7 +955,15 @@ def edit_shotgun(request, shotgun_id):
                 [shotgun.club], request.POST, request.FILES, instance=shotgun
             )
             if form.is_valid():
-                form.save()
+                shotgun = form.save()
+                shotgun.content = split_then_markdownify(shotgun.content)
+                shotgun.success_message = split_then_markdownify(
+                    shotgun.success_message
+                )
+                shotgun.failure_message = split_then_markdownify(
+                    shotgun.failure_message
+                )
+                shotgun.save()
                 return HttpResponseRedirect(
                     reverse("news:shotguns_admin_detail", args=(shotgun.id,))
                 )

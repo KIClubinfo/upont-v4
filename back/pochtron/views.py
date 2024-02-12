@@ -13,7 +13,7 @@ from trade.forms import EditPrice, EditTradeAdmin
 from trade.models import TradeAdmin, Transaction
 
 from .forms import EditAlcohol
-from .models import Alcohol
+from .models import Alcohol, ConfigURL
 from .serializers import AlcoholSerializer
 
 
@@ -348,3 +348,13 @@ class PochtronTransactions(APIView):
             .order_by("-date")
         ]
         return Response({"transactions": transactions})
+
+
+class CagnotteURL(APIView):
+    """
+    API endpoint that returns the url of the current student
+    """
+
+    def get(self, request):
+        obj = get_object_or_404(ConfigURL, name="cagnottePochtron")
+        return Response({"url": obj.url})

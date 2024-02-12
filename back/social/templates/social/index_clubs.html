@@ -3,6 +3,7 @@
 {% include "header.html" with title="Clubs" %}
 
 <!--Body-->
+
 <body>
     <!--Feedback Button-->
     {% include "feedback.html" %}
@@ -36,21 +37,65 @@
                     {% if club_displayed_list %}
                         <!--Row-->
                         <div class="row">
-
-                            {% for club in club_displayed_list %}
-                                <!--Column-->
-                                <div class="col-clubmd-4 col-clubsm-6">
-                                    <div class="club-card">
-                                        <div class="club-card-content">
-                                            <div class="club-card-image">
-                                                <img class="image-centered" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                            {% if asso_club_list %}
+                                {% for club in asso_club_list %}
+                                    <!--Column-->
+                                    <div class="col-clubmd-4 col-clubsm-6">
+                                        <div class="club-card">
+                                            <div class="club-card-content">
+                                                <div class="club-card-image">
+                                                    <img class="image-centered"
+                                                        src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                        alt="">
+                                                </div>
                                             </div>
+                                            <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
+                                                ({{club.nickname}}) {% endif %}</span></div>
+                                            <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
                                         </div>
-                                        <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span></div>
-                                        <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
-                                    </div>
-                                </div><!--End of Column-->
-                            {% endfor %}
+                                    </div><!--End of Column-->
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if club_club_list %}
+                                {% for club in club_club_list %}
+                                    <!--Column-->
+                                    <div class="col-clubmd-4 col-clubsm-6">
+                                        <div class="club-card">
+                                            <div class="club-card-content">
+                                                <div class="club-card-image">
+                                                    <img class="image-centered"
+                                                        src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                        alt="">
+                                                </div>
+                                            </div>
+                                            <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
+                                                ({{club.nickname}}) {% endif %}</span></div>
+                                            <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                        </div>
+                                    </div><!--End of Column-->
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if liste_club_list %}
+                                {% for club in liste_club_list %}
+                                    <!--Column-->
+                                    <div class="col-clubmd-4 col-clubsm-6">
+                                        <div class="club-card">
+                                            <div class="club-card-content">
+                                                <div class="club-card-image">
+                                                    <img class="image-centered"
+                                                        src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                        alt="">
+                                                </div>
+                                            </div>
+                                            <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
+                                                ({{club.nickname}}) {% endif %}</span></div>
+                                            <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
+                                        </div>
+                                    </div><!--End of Column-->
+                                {% endfor %}
+                            {% endif %}
 
                             <div class="col-clubmd-4 col-clubsm-6">
                                 <div class="club-card">
@@ -82,7 +127,9 @@
                                 <div class="col-12">
                                     <div class="vignette-club-mini">
                                         <div class="vignette-image-mini">
-                                            <img class="image-centered" src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                                            <img class="image-centered"
+                                                src="{% if membership.club.logo %}{{membership.club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                alt="">
                                         </div>
                                         <div class="vignette-mini-title">
                                             <span>{{membership.club.name}}</span>
@@ -112,10 +159,13 @@
                                     <div class="club-card">
                                         <div class="club-card-content">
                                             <div class="club-card-image">
-                                                <img class="image-centered" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}" alt="">
+                                                <img class="image-centered"
+                                                    src="{% if club.logo %}{{club.logo.url}}{% else %}{% static 'assets/img/logo_default.png' %}{% endif %}"
+                                                    alt="">
                                             </div>
                                         </div>
-                                        <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %} ({{club.nickname}}) {% endif %}</span></div>
+                                        <div class="club-card-title"><span>{{club.name}} <br> {% if club.nickname %}
+                                            ({{club.nickname}}) {% endif %}</span></div>
                                         <a href="{% url 'social:club_detail' club.id %}" class="stretched-link"></a>
                                     </div>
                                 </div><!--End of Column-->
@@ -125,6 +175,8 @@
 
 
             </div><!--End of Column-->
+
+
         </div><!--End of Row-->
     </div><!--End of Main Content-->
 
