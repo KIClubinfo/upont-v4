@@ -19,7 +19,8 @@ class Basket(models.Model):
 
     def listComposition(self):
         return [str(v) for v in Vegetable.objects.filter(basket=self)]
-    
+
+
 class Vegetable(models.Model):
     basket = models.ForeignKey(Basket, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=50)  # Name of the vegetable
@@ -75,16 +76,15 @@ class Vrac(models.Model):
         produits = ""
         for product in Product.objects.filter(vrac=self):
             produits += f"{product.name}, "
-        return (
-            f"vrac du {date} avec les {Product.objects.filter(vrac=self).count()} produits {produits}"
-        )
+        return f"vrac du {date} avec les {Product.objects.filter(vrac=self).count()} produits {produits}"
 
     def getproduct(self):
         # return a list of product
         return [product for product in Product.objects.filter(vrac=self)]
-    
+
+
 class ProductOrder(models.Model):
-    #Each order of one product is linked to a vrac order
+    # Each order of one product is linked to a vrac order
     vracOrder = models.ForeignKey("VracOrder", on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.IntegerField(default=0)
@@ -95,14 +95,15 @@ class ProductOrder(models.Model):
         return bool
 
     def __str__(self) -> str:
-        string : str = f"{self.quantity} of {self.product.name}"
+        string: str = f"{self.quantity} of {self.product.name}"
         return string
+
 
 class VracOrder(models.Model):
     vrac = models.ForeignKey(Vrac, on_delete=models.CASCADE, null=True)
     student = models.ForeignKey("social.Student", on_delete=models.CASCADE, null=True)
     # order is a dictionnairy taking as key the product name and as value quantity
-    total = models.IntegerField(default = 0)
+    total = models.IntegerField(default=0)
 
     class Meta:
         unique_together = ("vrac", "student")

@@ -1,6 +1,14 @@
 from django.contrib import admin
 
-from .models import Basket, BasketOrder, Vegetable, Vrac, VracOrder, Product, ProductOrder
+from .models import (
+    Basket,
+    BasketOrder,
+    Vegetable,
+    Vrac,
+    VracOrder,
+    Product,
+    ProductOrder,
+)
 
 # Register your models here.
 

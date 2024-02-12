@@ -5,15 +5,18 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('epicerie', '0007_rename_prodcutorder_productorder'),
+        ("epicerie", "0007_rename_prodcutorder_productorder"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='productorder',
-            name='vracOrder',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='epicerie.vrac_order'),
+            model_name="productorder",
+            name="vracOrder",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="epicerie.vrac_order",
+            ),
         ),
     ]

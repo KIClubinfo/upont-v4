@@ -4,23 +4,22 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('social', '0012_student_is_moderator'),
-        ('epicerie', '0008_alter_productorder_vracorder'),
+        ("social", "0012_student_is_moderator"),
+        ("epicerie", "0008_alter_productorder_vracorder"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='Basket_Order',
-            new_name='BasketOrder',
+            old_name="Basket_Order",
+            new_name="BasketOrder",
         ),
         migrations.RenameModel(
-            old_name='Vrac_Order',
-            new_name='VracOrder',
+            old_name="Vrac_Order",
+            new_name="VracOrder",
         ),
         migrations.AlterUniqueTogether(
-            name='vracorder',
-            unique_together={('vrac', 'student')},
+            name="vracorder",
+            unique_together={("vrac", "student")},
         ),
     ]

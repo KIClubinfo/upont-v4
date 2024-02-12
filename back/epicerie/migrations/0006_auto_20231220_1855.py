@@ -5,19 +5,22 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('epicerie', '0005_auto_20231220_1830'),
+        ("epicerie", "0005_auto_20231220_1830"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='vrac_order',
-            name='order',
+            model_name="vrac_order",
+            name="order",
         ),
         migrations.AddField(
-            model_name='prodcutorder',
-            name='vracOrder',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='epicerie.vrac_order'),
+            model_name="prodcutorder",
+            name="vracOrder",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="epicerie.vrac_order",
+            ),
         ),
     ]

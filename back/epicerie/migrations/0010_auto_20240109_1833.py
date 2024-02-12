@@ -5,19 +5,22 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('epicerie', '0009_auto_20231221_1141'),
+        ("epicerie", "0009_auto_20231221_1141"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='basket',
-            name='composition',
+            model_name="basket",
+            name="composition",
         ),
         migrations.AddField(
-            model_name='vegetable',
-            name='basket',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='epicerie.basket'),
+            model_name="vegetable",
+            name="basket",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="epicerie.basket",
+            ),
         ),
     ]
