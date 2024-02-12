@@ -3,7 +3,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from rest_framework import serializers
 
-from .models import Club, Membership, Promotion, Role, Student
+from .models import Club, Membership, Promotion, Role, Student, Contact
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -133,3 +133,9 @@ class ClubSerializerLite(
             "background_picture_url",
             "label",
         ]
+
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = ["name", "email", "phone_number"]

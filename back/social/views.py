@@ -11,12 +11,21 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, NotificationToken, Role, Student
+from .models import (
+    Category,
+    Club,
+    Membership,
+    NotificationToken,
+    Role,
+    Student,
+    Contact,
+)
 from .serializers import (
     ClubSerializer,
     ClubSerializerLite,
     RoleSerializer,
     StudentSerializer,
+    ContactSerializer
 )
 
 
@@ -226,6 +235,17 @@ class ProfilePicUpdate(APIView):
         student.picture = image
         student.save()
         return Response({"status": "ok"})
+
+    
+@login_required
+class ContactViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows contacts to be viewed.
+    """
+
+    queryset = Contact.objects.all().order_by("name")
+    serializer_class = ContactSerializer
+    http_method_names = ["get"]
 
 
 @login_required
@@ -642,3 +662,4 @@ def club_request(request):
         form = ClubRequestForm()
     context["ClubRequest"] = form
     return render(request, "social/club_request.html", context)
+

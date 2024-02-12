@@ -10,6 +10,7 @@ from .models import (
     Promotion,
     Role,
     Student,
+    Contact
 )
 
 
@@ -44,3 +45,4 @@ admin.site.register(Category)
 admin.site.register(Club, ClubAdmin)
 admin.site.register(ClubRequest, ClubRequestAdmin)
 admin.site.register(NotificationToken, NotificationTokenAdmin)
+admin.site.register(Contact)
