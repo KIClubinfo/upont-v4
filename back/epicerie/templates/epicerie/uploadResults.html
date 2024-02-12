@@ -1,0 +1,42 @@
+{% load static %}
+<!--Header-->
+{% include "header.html" with title="Commande de Paniers" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="epicerie" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <div class="content-main">
+
+           <div class="row">
+                <div class = "col-sm">
+                    <div class="epicerie-card">
+                        <div class="epicerie-card-title"> {{ message }} </div>
+                        <div class="epicerie-card-buttons">
+                            <button class="button blue-button">
+                                <a href="{% url 'epicerie:admin' %}" target="_self">
+                                    Retourner à la page d'administration
+                                </a>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+           </div>
+
+            
+
+        </div><!--End of Content main-->
+        
+        
+    </div><!--End of Content-->
+
+</body> <!--End of Body-->
+</html> <!--End of HTML-->
+```

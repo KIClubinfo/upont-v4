@@ -1,0 +1,43 @@
+{% load static %}
+<!--Markdownify-->
+{% load markdownify %}
+<!--Header-->
+{% include "header.html" with title="Commande de Paniers" %}
+
+<!--Body-->
+<body>
+    <!--Feedback Button-->
+    {% include "feedback.html" %}
+
+    <!--Sidenav-->
+    {% include "sidenav.html" with active_link="epicerie" %}
+
+    <!--Content-->
+    <div class="content">
+
+        <div class="content-main">
+
+            <h3 class="page-title">
+                Commande de Paniers
+            </h3>
+
+            <div id="baskets">
+                <!--Baskets for order are rendered in React-->
+            </div>
+
+        </div><!--End of Content main-->
+        
+        
+    </div><!--End of Content-->
+
+     <!--Scripts-->
+     <script src="{% url 'reverse_js' %}" type="text/javascript"></script> <!--Put this script before any react script to be able to reverse django urls in react-->
+     <script>
+         window.react_mount = document.getElementById('baskets');
+     </script>
+     <script src="{% static 'react/basket.bundle.js' %}"></script>
+     <!--End of Scripts-->
+
+</body> <!--End of Body-->
+</html> <!--End of HTML-->
+```

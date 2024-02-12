@@ -65,8 +65,16 @@ from social.views import (
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
+from epicerie.views import (
+    BasketViewSet,
+    BasketOrderViewSet,
+    VracViewSet,
+    VracOrderViewSet,
+)
 
 from . import views
+from django.contrib import admin
+from django.urls import include, path
 
 # ---- MAIN URLS ----#
 
@@ -76,6 +84,7 @@ urlpatterns = [
     path("pochtron/", include("pochtron.urls")),
     path("courses/", include("courses.urls")),
     path("the_calendar/", include("the_calendar.urls")),
+    path("epicerie/", include("epicerie.urls")),
     path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo/", views.add, name="add_promo"),
@@ -109,6 +118,15 @@ router.register(r"groups", GroupViewSet, basename="group")
 router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
 router.register(r"clubs", ClubsViewSet)
+router.register(r"epicerie/baskets", BasketViewSet, basename="epicerie_basket")
+router.register(
+    r"epicerie/basket_orders", BasketOrderViewSet, basename="epicerie_basket_order"
+)
+router.register(r"epicerie/vracs", VracViewSet, basename="epicerie_vrac")
+router.register(
+    r"epicerie/vrac_orders", VracOrderViewSet, basename="epicerie_vrac_order"
+)
+
 
 urlpatterns += [
     path(
