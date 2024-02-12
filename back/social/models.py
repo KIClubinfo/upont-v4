@@ -224,7 +224,9 @@ def compress_image(image, quality, name):
 
 
 class Contact(models.Model):
+    picture = models.ImageField(upload_to="contact_photo/", null=True, blank=True)
     name = models.CharField(max_length=100)
+    function = models.CharField(max_length=200, blank=True, default="")
     phone_regex = RegexValidator(
         regex=r"^\+?\d{9,16}$",
         message=(
@@ -233,9 +235,11 @@ class Contact(models.Model):
         ),
     )
     phone_number = models.CharField(
-        validators=[phone_regex], max_length=17, null=True, blank=True
+        validators=[phone_regex], max_length=17, null=True, blank=True,
     )  # validators should be a list
-    email = models.EmailField()
+    email = models.EmailField(null=True, blank=True)
+
+    student = models.ForeignKey(to=Student, on_delete = models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name

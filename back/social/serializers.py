@@ -136,6 +136,23 @@ class ClubSerializerLite(
 
 
 class ContactSerializer(serializers.ModelSerializer):
+    student = StudentSerializer()
+    picture_url = serializers.SerializerMethodField()
+
+    def get_picture_url(self, obj):
+        if obj.picture:
+            return obj.picture.url
+        else:
+            return static("assets/img/user_default.png")
+    
     class Meta:
         model = Contact
-        fields = ["name", "email", "phone_number"]
+        fields = [
+            "id",
+            "name",
+            "function",
+            "email",
+            "phone_number",
+            "student",
+            "picture_url",
+        ]
