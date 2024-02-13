@@ -167,7 +167,6 @@ class ShotgunParticipateView(APIView):
 
 
 class PostReactionView(APIView):
-
     """
     API endpoint that allows users to react to posts.
     """
