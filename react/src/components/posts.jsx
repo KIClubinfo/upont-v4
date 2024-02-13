@@ -8,12 +8,12 @@ import InfiniteScroll from 'react-infinite-scroller';
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 import emoji from 'remark-emoji';
+import YouTube from 'react-youtube';
 import Comment from './comment';
 import CommentForm from './commentForm';
 import { addZero } from './utils/utils';
 import { getCookie } from './utils/csrf';
 import Resource from './resource';
-import YouTube from 'react-youtube';
 
 function postLogo(state) {
   if (state.post.club) {
@@ -104,8 +104,8 @@ function postIllustration(state) {
         </div>,
       );
     } else if (state.post.resources[index].type === 'video') {
-      var id = '';
-      var url = state.post.resources[index].url;
+      let id = '';
+      let {url} = state.post.resources[index];
       url = url
         .replace(/(>|<)/gi, '')
         .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
