@@ -10,7 +10,7 @@ from .models import (
     Promotion,
     Role,
     Student,
-    Contact
+    Contact,
 )
 
 
