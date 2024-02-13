@@ -110,7 +110,9 @@ function postIllustration(state) {
         .replace(/(>|<)/gi, '')
         .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
       if (url[2] !== undefined) {
+        // eslint-disable-next-line
         id = url[2].split(/[^0-9a-z_\-]/i);
+        // eslint-disable-next-line
         id = id[0];
       } else {
         id = url;
