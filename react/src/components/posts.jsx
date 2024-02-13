@@ -105,7 +105,7 @@ function postIllustration(state) {
       );
     } else if (state.post.resources[index].type === 'video') {
       let id = '';
-      let {url} = state.post.resources[index];
+      let { url } = state.post.resources[index];
       url = url
         .replace(/(>|<)/gi, '')
         .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
