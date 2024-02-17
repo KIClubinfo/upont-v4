@@ -6,6 +6,7 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -42,6 +43,17 @@ class StudentViewSet(viewsets.ModelViewSet):
     )
     serializer_class = StudentSerializer
     http_method_names = ["get"]
+
+    @action(url_path="profile/update", detail=False, methods=["post"])
+    def update_profile(self, request, *args, **kwargs):
+        super().update(request, *args, **kwargs)
+        student = get_object_or_404(Student, user__id=request.user.id)
+        form = EditProfile(request.data, instance=student)
+        if form.is_valid():
+            form.save()
+            return Response({"status": "ok"})
+        else:
+            return Response({"status": "error", "errors": form.errors})
 
 
 class OneStudentView(APIView):
@@ -527,9 +539,9 @@ def club_edit(request, club_id):
                 not request.POST["student"].isdigit()
                 or not request.POST["role"].isdigit()
             ):
-                context["error"] = (
-                    "Fais bien attention à sélectionner l'élève ET le rôle"
-                )
+                context[
+                    "error"
+                ] = "Fais bien attention à sélectionner l'élève ET le rôle"
                 context["AddMember"] = AddMember()
                 return render(request, "social/club_edit.html", context)
 

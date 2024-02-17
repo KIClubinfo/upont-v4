@@ -26,7 +26,6 @@ class EditProfile(forms.ModelForm):
             "department": forms.Select(attrs={"class": "profil-select"}),
             "picture": forms.FileInput(attrs={"class": "profil-input"}),
             "gender": forms.Select(attrs={"class": "profil-select"}),
-            # "birthdate": forms.DateField(widget=forms.SelectDateWidget, input_formats = 'dd/mm/yyyy'),
             "birthdate": forms.DateInput(
                 format="%d/%m/%Y", attrs={"class": "profil-input"}
             ),
@@ -45,8 +44,6 @@ class EditProfile(forms.ModelForm):
         ]
         self.fields["phone_number"].placeholder = "False"
         self.fields["birthdate"].required = False
-        # self.fields["birthdate"].placeholder = False
-        # self.fields["biography"].placeholder = False
 
 
 class EditClub(forms.ModelForm):
