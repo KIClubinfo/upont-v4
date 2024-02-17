@@ -46,6 +46,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "birthdate",
             "biography",
             "phone_number",
+            "gender",
         ]
 
 

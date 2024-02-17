@@ -42,17 +42,22 @@ class StudentViewSet(viewsets.ModelViewSet):
         "-promo__year", "user__first_name", "user__last_name"
     )
     serializer_class = StudentSerializer
-    http_method_names = ["get"]
 
     @action(url_path="profile/update", detail=False, methods=["post"])
     def update_profile(self, request, *args, **kwargs):
-        super().update(request, *args, **kwargs)
+        print("mskdf")
         student = get_object_or_404(Student, user__id=request.user.id)
         form = EditProfile(request.data, instance=student)
+        print(request.data)
         if form.is_valid():
+            if "picture" in request.data:
+                student.picture.delete(save=False)
+                student.picture = request.data["picture"]
+                student.save()
             form.save()
             return Response({"status": "ok"})
         else:
+            print(form.errors)
             return Response({"status": "error", "errors": form.errors})
 
 
@@ -539,9 +544,9 @@ def club_edit(request, club_id):
                 not request.POST["student"].isdigit()
                 or not request.POST["role"].isdigit()
             ):
-                context[
-                    "error"
-                ] = "Fais bien attention à sélectionner l'élève ET le rôle"
+                context["error"] = (
+                    "Fais bien attention à sélectionner l'élève ET le rôle"
+                )
                 context["AddMember"] = AddMember()
                 return render(request, "social/club_edit.html", context)
 
