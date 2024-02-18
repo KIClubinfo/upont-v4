@@ -601,11 +601,6 @@ def post_edit(request, post_id, course_id=None):
                             image=request.FILES["illustration"],
                         )
                         resource.save()
-                else:
-                    images = Ressource.objects.filter(post=post)
-                    images = [image for image in images if image.is_image()]
-                    if len(images) >= 1:
-                        images[0].delete()
                 if course_id is not None and form.cleaned_data["resource_file"]:
                     post.resource.all().delete()
                     resource = Resource(

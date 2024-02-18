@@ -70,7 +70,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 class PostResourceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Ressource
-        fields = ["id", "type", "url"]
+        fields = ["id", "type", "url", "width", "height"]
 
     type = serializers.SerializerMethodField()
 
@@ -81,7 +81,22 @@ class PostResourceSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_url(self, obj):
         return obj.video_url if obj.is_video() else obj.image.url
+    
+    width = serializers.SerializerMethodField()
 
+    def get_width(self, obj):
+        if obj.is_video():
+            return 0
+        else:
+            return obj.image.width
+
+    height = serializers.SerializerMethodField()
+    
+    def get_height(self, obj):
+        if obj.is_video():
+            return 0
+        else:
+            return obj.image.height
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     author = StudentSerializer()
