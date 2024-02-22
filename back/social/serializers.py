@@ -46,7 +46,10 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "birthdate",
             "biography",
             "phone_number",
+            "gender",
         ]
+
+    birthdate = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
 
 
 class RoleSerializer(serializers.HyperlinkedModelSerializer):
