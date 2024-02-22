@@ -38,80 +38,17 @@ body{
 /*---------------------------------- SIDE-NAV ----------------------------------*/
 /*------------------------------------------------------------------------------*/
 
-.sidenav-container{
-    /* Positioning */
-    position: fixed;
-    left: 0%;
-    top: 0%;
-    right: auto;
-    bottom: 0%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    /* Sizing */
-    min-height: 100vh;
-    /* Styling */
-    background-color:var(--primary-bg-color);
-    border-right: solid var(--border-color) var(--border-width);
-    /* Z-Positioning */
-    z-index: 2;
+.navbar-nav li a {
+    padding:0 15px;
+    line-height:3.2rem;
+}
+.navbar-header a {
+    padding:0 15px;
+    line-height:3.2rem;
 }
 
-.sidenav{
-    /* Positioning */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    /* Sizing */
-    min-width: var(--sidenav-width);
-    height: 95%;
-}
-
-.sidenav-links{
-    /* Positioning */
-    display: flex;
-    flex-direction: column;
-}
-
-.sidenav-link{
-    /* Sizing */
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    /* Styling */
-    text-decoration: none;
-    text-align: center;
-    font-size: 1.5rem;
-    color: var(--disabled-link-color);
-    /* Animating */
-    transition: 0.2s;
-}
-
-.sidenav-link.active{
-    color: var(--active-link-color);
-}
-
-@media(min-width:856px){
-    /* Les propriétés de hover ne sont utils que pour ordi */
-    .sidenav-link:hover{
-        /* Styling*/
-        color: var(--hover-link-color);
-        /* Animating */
-        transform: scale(1.1);
-    }
-    .sidenav-link{
-        text-align: left;
-    }
-}
-
-.sidenav-first-link{
-    /* Positioning */
-    display: flex;
-    justify-content: center;
-    /* Sizing */
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+.nav-link {
+    font-size: 1.2rem;
 }
 
 img.logo{
@@ -142,66 +79,6 @@ img.logo-svg{
 
 @media(max-width:856px){
 
-    .sidenav-container{
-        /* Positioning */
-        position: fixed;
-        left: 0%;
-        top: 0%;
-        right: 0%;
-        bottom: auto;
-        /* Sizing */
-        min-height: 0;
-        /* Styling */
-        border-style: none; /* Faut etre sur la aussi */
-    }
-
-    .sidenav{
-        /* Sizing */
-        min-width: 100vw;
-    }
-
-    .show-border{
-        /* Styling */
-        border-bottom: solid var(--border-color) var(--border-width);
-    }
-
-    .sidenav-link{
-        /* Sizing */
-        padding-top: 0rem;
-        padding-bottom: 0rem;
-        /* Styling */
-        font-size: 0rem;
-    }
-
-    .show-link{
-        /* Sizing */
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        /* Styling */
-        font-size: 1rem;
-    }
-
-    .sidenav-first-link{
-        /* Positioning */
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        /* Sizing */
-        padding-left: 1rem;
-        padding-right: 1rem;
-        /* Styling */
-        border-bottom: solid var(--border-color) var(--border-width);
-    }
-
-    .show-last-link{
-        /* Sizing */
-        margin: 0rem 4rem;
-        /* Styling */
-        border-top: solid var(--border-color) var(--border-width);
-    }
-
-
     img.logo{
         /* Sizing */
         height: 2rem;
@@ -209,15 +86,6 @@ img.logo-svg{
     }
 
     img.logo-svg{
-        /* Sizing */
-        vertical-align: middle;
-        padding-left: 0rem;
-        padding-right: 0rem;
-        height: 0rem;
-        width: 0rem;
-    }
-
-    img.show-logo-svg{
         /* Sizing */
         vertical-align: middle;
         padding-left: 0.5rem;
@@ -241,8 +109,7 @@ img.logo-svg{
     /* Positioning */
     position: relative;
     /* Sizing */
-    margin-left: var(--sidenav-width);
-    padding: 0rem 2rem;
+    padding: 1rem 1rem;
     /* Styling */
     color: white;
     background-color:transparent;
@@ -270,9 +137,7 @@ img.logo-svg{
 @media(max-width:856px){
     .content{
         /* Sizing */
-        margin-top: 4rem;
-        margin-left: 0rem;
-        padding: 0rem 1rem;
+        padding: 1rem 1rem;
     }
 }
 
