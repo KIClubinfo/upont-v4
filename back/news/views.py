@@ -309,12 +309,16 @@ class PostEditView(APIView):
 
     def post(self, request):
         process_img = True
-        if request.data["title"] == "":
+        if "title" not in request.data or request.data["title"] == "":
             return Response({"status": "error", "message": "empty_title"})
-        elif request.data["content"] == "":
+        elif "content" not in request.data or request.data["content"] == "":
             return Response({"status": "error", "message": "empty_content"})
+        elif "post" not in request.data:
+            return Response({"status": "error", "message": "no_post"})
         student = get_object_or_404(Student, user__id=request.user.id)
         post = get_object_or_404(Post, id=request.data["post"])
+        if "publish_as" not in request.data:
+            return Response({"status": "error", "message": "no_publish_as"})
         if request.data["publish_as"] == "-1":
             post.title = request.data["title"]
             post.content = split_then_markdownify(request.data["content"])
@@ -369,6 +373,11 @@ class PostEditView(APIView):
                         image=resource["data"],
                     )
                 resource.save()
+        if "kept_resources" in request.data and process_img:
+            current_resources = Ressource.objects.all().filter(post=post)
+            for resource in current_resources:
+                if resource.id not in request.data["kept_resources"]:
+                    resource.delete()
         return Response({"status": "ok"})
 
 

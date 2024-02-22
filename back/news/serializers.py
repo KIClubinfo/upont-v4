@@ -81,7 +81,7 @@ class PostResourceSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_url(self, obj):
         return obj.video_url if obj.is_video() else obj.image.url
-    
+
     width = serializers.SerializerMethodField()
 
     def get_width(self, obj):
@@ -91,12 +91,13 @@ class PostResourceSerializer(serializers.HyperlinkedModelSerializer):
             return obj.image.width
 
     height = serializers.SerializerMethodField()
-    
+
     def get_height(self, obj):
         if obj.is_video():
             return 0
         else:
             return obj.image.height
+
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     author = StudentSerializer()
