@@ -6,6 +6,7 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -41,7 +42,23 @@ class StudentViewSet(viewsets.ModelViewSet):
         "-promo__year", "user__first_name", "user__last_name"
     )
     serializer_class = StudentSerializer
-    http_method_names = ["get"]
+
+    @action(url_path="profile/update", detail=False, methods=["post"])
+    def update_profile(self, request, *args, **kwargs):
+        print("mskdf")
+        student = get_object_or_404(Student, user__id=request.user.id)
+        form = EditProfile(request.data, instance=student)
+        print(request.data)
+        if form.is_valid():
+            if "picture" in request.data:
+                student.picture.delete(save=False)
+                student.picture = request.data["picture"]
+                student.save()
+            form.save()
+            return Response({"status": "ok"})
+        else:
+            print(form.errors)
+            return Response({"status": "error", "errors": form.errors})
 
 
 class OneStudentView(APIView):
