@@ -86,7 +86,7 @@ class PostResourceSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_width(self, obj):
         if obj.is_video():
-            return 0
+            return 1920
         else:
             return obj.image.width
 
@@ -94,7 +94,7 @@ class PostResourceSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_height(self, obj):
         if obj.is_video():
-            return 0
+            return 1080
         else:
             return obj.image.height
 
