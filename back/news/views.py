@@ -1,5 +1,7 @@
 import json
+import operator
 import re
+from functools import reduce
 
 from courses.models import Course, Resource
 from django.contrib.auth.decorators import login_required
@@ -15,9 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from social.models import Club, Membership, Student
 from upont.regex import split_then_markdownify
-from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q
-from django.db.models.functions import Greatest
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
 from .models import Comment, Event, Participation, Post, Ressource, Shotgun, Partnership
@@ -508,36 +508,35 @@ class SearchPost(APIView):
 def search_post(request):
     searched_expression = request.GET.get("post", None)
     key_words_list = [word.strip() for word in searched_expression.split()]
-    all_possible_lists = [key_words_list]
-    if len(key_words_list) > 1:
-        all_possible_lists += [
-            possible_list for possible_list in partition(key_words_list)
-        ]
 
-    queryset = Post.objects.none()
+    if not key_words_list:
+        return Post.objects.none(), searched_expression
 
-    for possible_list in all_possible_lists:
-        partial_queryset = Post.objects.all()
+    # Créer des conditions pour chaque mot-clé
+    content_conditions = [Q(content__icontains=word) for word in key_words_list]
+    title_conditions = [Q(title__icontains=word) for word in key_words_list]
 
-        for key_word in possible_list:
-            partial_queryset = partial_queryset.annotate(
-                similarity=Greatest(
-                    TrigramSimilarity("title", key_word),
-                    TrigramSimilarity("content", key_word),
-                    TrigramSimilarity("club__name", key_word),
-                    TrigramSimilarity("club__nickname", key_word),
-                )
-            )
-            partial_queryset = partial_queryset.filter(
-                Q(name__trigram_similar=key_word)
-                | Q(nickname__iexact=key_word)
-                | Q(category__name__iexact=key_word)
-                | Q(label__iexact=key_word),
-                similarity__gt=0.3,
-            )
-        queryset |= partial_queryset.distinct()
-    found_posts = queryset.order_by("-date")
-    return found_posts, searched_expression
+    # Combiner les conditions avec OR pour chaque champ
+    content_query = reduce(operator.or_, content_conditions)
+    title_query = reduce(operator.or_, title_conditions)
+
+    # Combiner les requêtes de contenu et de titre avec OR
+    combined_query = content_query | title_query
+
+    # Effectuer la recherche
+    found_items = Post.objects.filter(combined_query).distinct()
+
+    # Trier les résultats par pertinence
+    # On compte combien de mots-clés sont présents dans le contenu et le titre
+    for item in found_items:
+        item.relevance = sum(
+            word.lower() in item.content.lower() or word.lower() in item.title.lower()
+            for word in key_words_list
+        )
+
+    found_items = sorted(found_items, key=lambda x: x.relevance, reverse=True)
+
+    return found_items, searched_expression
 
 
 @login_required
