@@ -40,6 +40,8 @@ from news.views import (
     PostViewSet,
     ShotgunParticipateView,
     ShotgunView,
+    SearchPost,
+    PartnershipViewSet
 )
 from pochtron.views import (
     CagnotteURL,
@@ -66,6 +68,7 @@ from social.views import (
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
+from services.views import BikesViewSet
 
 from . import views
 
@@ -110,6 +113,8 @@ router.register(r"groups", GroupViewSet, basename="group")
 router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
 router.register(r"clubs", ClubsViewSet)
+router.register(r"services/bikes", BikesViewSet, basename="bikes")
+router.register(r"partnerships", PartnershipViewSet, basename="partnership")
 
 urlpatterns += [
     path(
@@ -127,6 +132,7 @@ urlpatterns += [
     path("api/search/students/", SearchStudent.as_view(), name="search_students"),
     path("api/search/clubs/", SearchClub.as_view(), name="search_clubs"),
     path("api/search/alcohols/", SearchAlcohol.as_view(), name="search_alcohols"),
+    path("api/search/posts/", SearchPost.as_view(), name="search_posts"),
     path("api/id/pochtron/", PochtronId.as_view(), name="pochtron_id"),
     path(
         "api/course_departments/",

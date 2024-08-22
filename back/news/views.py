@@ -15,14 +15,32 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from social.models import Club, Membership, Student
 from upont.regex import split_then_markdownify
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Q
+from django.db.models.functions import Greatest
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
-from .models import Comment, Event, Participation, Post, Ressource, Shotgun
-from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
+from .models import Comment, Event, Participation, Post, Ressource, Shotgun, Partnership
+from .serializers import EventSerializer, PostSerializer, ShotgunSerializer, PartnershipSerializer
 
 pattern = re.compile(
     r"^(http(s)?:\/\/)?((w){3}.)?youtu(be\.com\/watch\?v=|\.be\/)([A-Za-z0-9_\-]{11})$"
 )
+
+""" Utility function, same as in social -> views.py """
+
+
+def partition(words):
+    gaps = len(words) - 1  # one gap less than words (fencepost problem)
+    for i in range(1, 1 << gaps):  # the 2^n possible partitions
+        result = words[:1]  # The result starts with the first word
+        for word in words[1:]:
+            if i & 1:
+                result.append(word)  # If "1" split at the gap
+            else:
+                result[-1] += " " + word  # If "0", don't split at the gap
+            i >>= 1  # Next 0 or 1 indicating split or don't split
+        yield result  # cough up r
 
 
 @login_required
@@ -270,9 +288,9 @@ class PostCreateViewV2(APIView):
                 return Response({"status": "error", "message": "forbidden"})
 
         if (
-            "resources_count" in request.data
-            and int(request.data["resources_count"]) > 0
-            and process_img
+                "resources_count" in request.data
+                and int(request.data["resources_count"]) > 0
+                and process_img
         ):
             resources = []
             for i in range(0, int(request.data["resources_count"])):
@@ -344,9 +362,9 @@ class PostEditView(APIView):
                 return Response({"status": "error", "message": "forbidden"})
 
         if (
-            "resources_count" in request.data
-            and int(request.data["resources_count"]) > 0
-            and process_img
+                "resources_count" in request.data
+                and int(request.data["resources_count"]) > 0
+                and process_img
         ):
             Ressource.objects.filter(post=post).delete()
             resources = []
@@ -390,9 +408,9 @@ class PostDeleteView(APIView):
         student = get_object_or_404(Student, user__id=request.user.id)
         post = get_object_or_404(Post, id=request.data["post"])
         if (
-            post.author == student
-            or (post.club is not None and post.club.is_admin(student.id))
-            or student.is_moderator
+                post.author == student
+                or (post.club is not None and post.club.is_admin(student.id))
+                or student.is_moderator
         ):
             post.delete()
             return Response({"status": "ok"})
@@ -409,14 +427,27 @@ class DeleteCommentView(APIView):
         student = get_object_or_404(Student, user__id=request.user.id)
         comment = get_object_or_404(Comment, id=request.data["comment"])
         if (
-            comment.author == student
-            or (comment.club is not None and comment.club.is_admin(student.id))
-            or student.is_moderator
+                comment.author == student
+                or (comment.club is not None and comment.club.is_admin(student.id))
+                or student.is_moderator
         ):
             comment.delete()
             return Response({"status": "ok"})
         else:
             return Response({"status": "error", "message": "not_allowed"})
+
+
+class PartnershipViewSet(viewsets.ModelViewSet):
+    serializer_class = PartnershipSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Partnership.objects.all()
+        club = self.request.GET.get("club")
+        if club is not None:
+            club = get_object_or_404(Club, id=club)
+            queryset = queryset.filter(club=club)
+        return queryset
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -457,6 +488,56 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
 
         return queryset.order_by("date", "name").filter(end__gte=timezone.now())
+
+
+class SearchPost(APIView):
+    """
+    API endpoint that returns the posts whose content or title contains the query.
+    """
+
+    def get(self, request):
+        if "post" in request.GET and request.GET["post"].strip():
+            found_posts, searched_expression = search_post(request)
+            result = found_posts[:15]
+        else:
+            result = Post.objects.all().order_by("-date")[:15]
+        serializer = PostSerializer(result, many=True)
+        return Response({"posts": serializer.data})
+
+
+def search_post(request):
+    searched_expression = request.GET.get("post", None)
+    key_words_list = [word.strip() for word in searched_expression.split()]
+    all_possible_lists = [key_words_list]
+    if len(key_words_list) > 1:
+        all_possible_lists += [
+            possible_list for possible_list in partition(key_words_list)
+        ]
+
+    queryset = Post.objects.none()
+
+    for possible_list in all_possible_lists:
+        partial_queryset = Post.objects.all()
+
+        for key_word in possible_list:
+            partial_queryset = partial_queryset.annotate(
+                similarity=Greatest(
+                    TrigramSimilarity("title", key_word),
+                    TrigramSimilarity("content", key_word),
+                    TrigramSimilarity("club__name", key_word),
+                    TrigramSimilarity("club__nickname", key_word),
+                )
+            )
+            partial_queryset = partial_queryset.filter(
+                Q(name__trigram_similar=key_word)
+                | Q(nickname__iexact=key_word)
+                | Q(category__name__iexact=key_word)
+                | Q(label__iexact=key_word),
+                similarity__gt=0.3,
+            )
+        queryset |= partial_queryset.distinct()
+    found_posts = queryset.order_by("-date")
+    return found_posts, searched_expression
 
 
 @login_required
@@ -753,7 +834,7 @@ def shotguns(request):
 
     # check is user is admin of at least one club :
     display_admin_button = (
-        len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
+            len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
     )
 
     context = {
