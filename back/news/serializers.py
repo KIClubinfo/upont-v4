@@ -356,6 +356,7 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
         return {
             "first_name": obj.organizer.user.first_name,
             "last_name": obj.organizer.user.last_name,
+            "gender": obj.organizer.gender,
             "id": obj.organizer.pk,
         }
 
