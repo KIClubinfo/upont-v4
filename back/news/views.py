@@ -30,19 +30,6 @@ pattern = re.compile(
 """ Utility function, same as in social -> views.py """
 
 
-def partition(words):
-    gaps = len(words) - 1  # one gap less than words (fencepost problem)
-    for i in range(1, 1 << gaps):  # the 2^n possible partitions
-        result = words[:1]  # The result starts with the first word
-        for word in words[1:]:
-            if i & 1:
-                result.append(word)  # If "1" split at the gap
-            else:
-                result[-1] += " " + word  # If "0", don't split at the gap
-            i >>= 1  # Next 0 or 1 indicating split or don't split
-        yield result  # cough up r
-
-
 @login_required
 def posts(request):
     if request.method == "GET":
