@@ -501,7 +501,7 @@ class SearchPost(APIView):
             result = found_posts[:15]
         else:
             result = Post.objects.all().order_by("-date")[:15]
-        serializer = PostSerializer(result, many=True)
+        serializer = PostSerializer(result, many=True, context={'request': request})
         return Response({"posts": serializer.data})
 
 
