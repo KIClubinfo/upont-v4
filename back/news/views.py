@@ -1,10 +1,13 @@
 import json
+import operator
 import re
+from datetime import datetime
+from functools import reduce
 
 from courses.models import Course, Resource
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -13,16 +16,23 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from social.models import Club, Membership, Student
+from social.models import Club, Membership, Promotion, Student
 from upont.regex import split_then_markdownify
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
-from .models import Comment, Event, Participation, Post, Ressource, Shotgun
-from .serializers import EventSerializer, PostSerializer, ShotgunSerializer
+from .models import Comment, Event, Participation, Partnership, Post, Ressource, Shotgun
+from .serializers import (
+    EventSerializer,
+    PartnershipSerializer,
+    PostSerializer,
+    ShotgunSerializer,
+)
 
 pattern = re.compile(
     r"^(http(s)?:\/\/)?((w){3}.)?youtu(be\.com\/watch\?v=|\.be\/)([A-Za-z0-9_\-]{11})$"
 )
+
+""" Utility function, same as in social -> views.py """
 
 
 @login_required
@@ -60,11 +70,13 @@ class PostViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
     def get_queryset(self):
-        queryset = Post.objects.all()
+        student = get_object_or_404(Student, user__id=self.request.user.id)
+        promo = get_object_or_404(Promotion, pk=student.promo)
+        filter_date = datetime(promo.year, 8, 20, tzinfo=timezone.utc)
+        queryset = Post.objects.filter(date__gt=filter_date)
         mode = self.request.GET.get("mode")
         bookmark = self.request.GET.get("bookmark")
         club = self.request.GET.get("club")
-        student = get_object_or_404(Student, user__id=self.request.user.id)
         if club is not None:
             club = get_object_or_404(Club, id=club)
             queryset = queryset.filter(club=club)
@@ -419,6 +431,19 @@ class DeleteCommentView(APIView):
             return Response({"status": "error", "message": "not_allowed"})
 
 
+class PartnershipViewSet(viewsets.ModelViewSet):
+    serializer_class = PartnershipSerializer
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        queryset = Partnership.objects.all()
+        club = self.request.GET.get("club")
+        if club is not None:
+            club = get_object_or_404(Club, id=club)
+            queryset = queryset.filter(club=club)
+        return queryset
+
+
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed
@@ -457,6 +482,58 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
 
         return queryset.order_by("date", "name").filter(end__gte=timezone.now())
+
+
+class SearchPost(APIView):
+    """
+    API endpoint that returns the posts whose content or title contains the query.
+    """
+
+    def get(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        promo = get_object_or_404(Promotion, pk=student.promo)
+        filter_date = datetime(promo.year, 8, 20, tzinfo=timezone.utc)
+        if "post" in request.GET and request.GET["post"].strip():
+            found_posts, searched_expression = search_post(request)
+            result = [post for post in found_posts if post.date > filter_date][:15]
+        else:
+            result = Post.objects.filter(date__gt=filter_date).order_by("-date")[:15]
+        serializer = PostSerializer(result, many=True, context={"request": request})
+        return Response({"posts": serializer.data})
+
+
+def search_post(request):
+    searched_expression = request.GET.get("post", None)
+    key_words_list = [word.strip() for word in searched_expression.split()]
+
+    if not key_words_list:
+        return Post.objects.none(), searched_expression
+
+    # Créer des conditions pour chaque mot-clé
+    content_conditions = [Q(content__icontains=word) for word in key_words_list]
+    title_conditions = [Q(title__icontains=word) for word in key_words_list]
+
+    # Combiner les conditions avec OR pour chaque champ
+    content_query = reduce(operator.or_, content_conditions)
+    title_query = reduce(operator.or_, title_conditions)
+
+    # Combiner les requêtes de contenu et de titre avec OR
+    combined_query = content_query | title_query
+
+    # Effectuer la recherche
+    found_items = Post.objects.filter(combined_query).distinct()
+
+    # Trier les résultats par pertinence
+    # On compte combien de mots-clés sont présents dans le contenu et le titre
+    for item in found_items:
+        item.relevance = sum(
+            word.lower() in item.content.lower() or word.lower() in item.title.lower()
+            for word in key_words_list
+        )
+
+    found_items = sorted(found_items, key=lambda x: x.relevance, reverse=True)
+
+    return found_items, searched_expression
 
 
 @login_required

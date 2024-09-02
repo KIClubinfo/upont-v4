@@ -182,3 +182,18 @@ class Ressource(models.Model):
 
     def is_image(self):
         return self.image != ""
+
+
+class Partnership(models.Model):
+    partner = models.CharField(max_length=50)
+    product_url = models.URLField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    club = models.ForeignKey(
+        "social.Club",
+        verbose_name="partnership club",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    def __str__(self):
+        return self.partner

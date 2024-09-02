@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from .models import Comment, Event, Participation, Post, Ressource, Shotgun
+from .models import Comment, Event, Participation, Partnership, Post, Ressource, Shotgun
+
+admin.site.register(Partnership)
 
 
 class EventsAdmin(admin.ModelAdmin):

@@ -31,6 +31,7 @@ from django_reverse_js.views import urls_js
 from news.views import (
     DeleteCommentView,
     EventViewSet,
+    PartnershipViewSet,
     PostCommentView,
     PostCreateView,
     PostCreateViewV2,
@@ -38,6 +39,7 @@ from news.views import (
     PostEditView,
     PostReactionView,
     PostViewSet,
+    SearchPost,
     ShotgunParticipateView,
     ShotgunView,
 )
@@ -49,6 +51,7 @@ from pochtron.views import (
     SearchAlcohol,
 )
 from rest_framework import routers
+from services.views import BikesViewSet
 from social.views import (
     ClubsViewSet,
     CurrentStudentView,
@@ -110,6 +113,8 @@ router.register(r"groups", GroupViewSet, basename="group")
 router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
 router.register(r"clubs", ClubsViewSet)
+router.register(r"services/bikes", BikesViewSet, basename="bikes")
+router.register(r"partnerships", PartnershipViewSet, basename="partnership")
 
 urlpatterns += [
     path(
@@ -127,6 +132,7 @@ urlpatterns += [
     path("api/search/students/", SearchStudent.as_view(), name="search_students"),
     path("api/search/clubs/", SearchClub.as_view(), name="search_clubs"),
     path("api/search/alcohols/", SearchAlcohol.as_view(), name="search_alcohols"),
+    path("api/search/posts/", SearchPost.as_view(), name="search_posts"),
     path("api/id/pochtron/", PochtronId.as_view(), name="pochtron_id"),
     path(
         "api/course_departments/",

@@ -70,12 +70,9 @@ services:
       - cache_link
       - nginx_link
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      webinstaller:
-        condition: service_started
+      - db
+      - redis
+      - webinstaller
 
   nginx:
     build: ./nginx
