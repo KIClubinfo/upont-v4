@@ -1,6 +1,7 @@
 import json
 import operator
 import re
+from datetime import datetime
 from functools import reduce
 
 from courses.models import Course, Resource
@@ -15,7 +16,7 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from social.models import Club, Membership, Student
+from social.models import Club, Membership, Student, Promotion
 from upont.regex import split_then_markdownify
 from django.db.models import Q
 
@@ -65,11 +66,13 @@ class PostViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
     def get_queryset(self):
-        queryset = Post.objects.all()
+        student = get_object_or_404(Student, user__id=self.request.user.id)
+        promo = get_object_or_404(Promotion, pk=student.promo)
+        filter_date = datetime(promo.year, 8, 20, tzinfo=timezone.utc)
+        queryset = Post.objects.filter(date__gt=filter_date)
         mode = self.request.GET.get("mode")
         bookmark = self.request.GET.get("bookmark")
         club = self.request.GET.get("club")
-        student = get_object_or_404(Student, user__id=self.request.user.id)
         if club is not None:
             club = get_object_or_404(Club, id=club)
             queryset = queryset.filter(club=club)
@@ -483,11 +486,14 @@ class SearchPost(APIView):
     """
 
     def get(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        promo = get_object_or_404(Promotion, pk=student.promo)
+        filter_date = datetime(promo.year, 8, 20, tzinfo=timezone.utc)
         if "post" in request.GET and request.GET["post"].strip():
             found_posts, searched_expression = search_post(request)
-            result = found_posts[:15]
+            result = [post for post in found_posts if post.date > filter_date][:15]
         else:
-            result = Post.objects.all().order_by("-date")[:15]
+            result = Post.objects.filter(date__gt=filter_date).order_by("-date")[:15]
         serializer = PostSerializer(result, many=True, context={'request': request})
         return Response({"posts": serializer.data})
 
