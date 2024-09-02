@@ -71,8 +71,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         student = get_object_or_404(Student, user__id=self.request.user.id)
-        promo = get_object_or_404(Promotion, pk=student.promo)
-        filter_date = datetime(promo.year, 8, 20, tzinfo=timezone.utc)
+        promo = get_object_or_404(Promotion, pk=student.promo.pk)
+        filter_date = datetime(promo.year + 2000 - 3, 8, 20, tzinfo=timezone.utc)
         queryset = Post.objects.filter(date__gt=filter_date)
         mode = self.request.GET.get("mode")
         bookmark = self.request.GET.get("bookmark")
@@ -491,8 +491,8 @@ class SearchPost(APIView):
 
     def get(self, request):
         student = get_object_or_404(Student, user__id=request.user.id)
-        promo = get_object_or_404(Promotion, pk=student.promo)
-        filter_date = datetime(promo.year, 8, 20, tzinfo=timezone.utc)
+        promo = get_object_or_404(Promotion, pk=student.promo.pk)
+        filter_date = datetime(promo.year + 2000 - 3, 8, 20, tzinfo=timezone.utc)
         if "post" in request.GET and request.GET["post"].strip():
             found_posts, searched_expression = search_post(request)
             result = [post for post in found_posts if post.date > filter_date][:15]
