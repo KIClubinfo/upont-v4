@@ -7,7 +7,7 @@ from functools import reduce
 from courses.models import Course, Resource
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -16,13 +16,17 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from social.models import Club, Membership, Student, Promotion
+from social.models import Club, Membership, Promotion, Student
 from upont.regex import split_then_markdownify
-from django.db.models import Q
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost
-from .models import Comment, Event, Participation, Post, Ressource, Shotgun, Partnership
-from .serializers import EventSerializer, PostSerializer, ShotgunSerializer, PartnershipSerializer
+from .models import Comment, Event, Participation, Partnership, Post, Ressource, Shotgun
+from .serializers import (
+    EventSerializer,
+    PartnershipSerializer,
+    PostSerializer,
+    ShotgunSerializer,
+)
 
 pattern = re.compile(
     r"^(http(s)?:\/\/)?((w){3}.)?youtu(be\.com\/watch\?v=|\.be\/)([A-Za-z0-9_\-]{11})$"
@@ -278,9 +282,9 @@ class PostCreateViewV2(APIView):
                 return Response({"status": "error", "message": "forbidden"})
 
         if (
-                "resources_count" in request.data
-                and int(request.data["resources_count"]) > 0
-                and process_img
+            "resources_count" in request.data
+            and int(request.data["resources_count"]) > 0
+            and process_img
         ):
             resources = []
             for i in range(0, int(request.data["resources_count"])):
@@ -352,9 +356,9 @@ class PostEditView(APIView):
                 return Response({"status": "error", "message": "forbidden"})
 
         if (
-                "resources_count" in request.data
-                and int(request.data["resources_count"]) > 0
-                and process_img
+            "resources_count" in request.data
+            and int(request.data["resources_count"]) > 0
+            and process_img
         ):
             Ressource.objects.filter(post=post).delete()
             resources = []
@@ -398,9 +402,9 @@ class PostDeleteView(APIView):
         student = get_object_or_404(Student, user__id=request.user.id)
         post = get_object_or_404(Post, id=request.data["post"])
         if (
-                post.author == student
-                or (post.club is not None and post.club.is_admin(student.id))
-                or student.is_moderator
+            post.author == student
+            or (post.club is not None and post.club.is_admin(student.id))
+            or student.is_moderator
         ):
             post.delete()
             return Response({"status": "ok"})
@@ -417,9 +421,9 @@ class DeleteCommentView(APIView):
         student = get_object_or_404(Student, user__id=request.user.id)
         comment = get_object_or_404(Comment, id=request.data["comment"])
         if (
-                comment.author == student
-                or (comment.club is not None and comment.club.is_admin(student.id))
-                or student.is_moderator
+            comment.author == student
+            or (comment.club is not None and comment.club.is_admin(student.id))
+            or student.is_moderator
         ):
             comment.delete()
             return Response({"status": "ok"})
@@ -494,7 +498,7 @@ class SearchPost(APIView):
             result = [post for post in found_posts if post.date > filter_date][:15]
         else:
             result = Post.objects.filter(date__gt=filter_date).order_by("-date")[:15]
-        serializer = PostSerializer(result, many=True, context={'request': request})
+        serializer = PostSerializer(result, many=True, context={"request": request})
         return Response({"posts": serializer.data})
 
 
@@ -826,7 +830,7 @@ def shotguns(request):
 
     # check is user is admin of at least one club :
     display_admin_button = (
-            len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
+        len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
     )
 
     context = {

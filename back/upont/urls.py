@@ -31,6 +31,7 @@ from django_reverse_js.views import urls_js
 from news.views import (
     DeleteCommentView,
     EventViewSet,
+    PartnershipViewSet,
     PostCommentView,
     PostCreateView,
     PostCreateViewV2,
@@ -38,10 +39,9 @@ from news.views import (
     PostEditView,
     PostReactionView,
     PostViewSet,
+    SearchPost,
     ShotgunParticipateView,
     ShotgunView,
-    SearchPost,
-    PartnershipViewSet
 )
 from pochtron.views import (
     CagnotteURL,
@@ -51,6 +51,7 @@ from pochtron.views import (
     SearchAlcohol,
 )
 from rest_framework import routers
+from services.views import BikesViewSet
 from social.views import (
     ClubsViewSet,
     CurrentStudentView,
@@ -68,7 +69,6 @@ from social.views import (
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
-from services.views import BikesViewSet
 
 from . import views
 

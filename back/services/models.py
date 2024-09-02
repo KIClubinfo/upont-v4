@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth import models as models2
 
 
 class Bike(models.Model):

@@ -5,7 +5,7 @@ from rest_framework import serializers
 from social.models import Student
 from social.serializers import ClubSerializerLite, StudentSerializer
 
-from .models import Comment, Event, Post, Ressource, Shotgun, Partnership
+from .models import Comment, Event, Partnership, Post, Ressource, Shotgun
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -384,9 +384,4 @@ class PartnershipSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Partnership
-        fields = [
-            "partner",
-            "product_url",
-            "description",
-            "club"
-        ]
+        fields = ["partner", "product_url", "description", "club"]

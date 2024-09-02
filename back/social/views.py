@@ -544,9 +544,9 @@ def club_edit(request, club_id):
                 not request.POST["student"].isdigit()
                 or not request.POST["role"].isdigit()
             ):
-                context["error"] = (
-                    "Fais bien attention à sélectionner l'élève ET le rôle"
-                )
+                context[
+                    "error"
+                ] = "Fais bien attention à sélectionner l'élève ET le rôle"
                 context["AddMember"] = AddMember()
                 return render(request, "social/club_edit.html", context)
 
