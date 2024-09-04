@@ -522,16 +522,7 @@ def search_post(request):
 
     # Effectuer la recherche
     found_items = Post.objects.filter(combined_query).distinct()
-
-    # Trier les résultats par pertinence
-    # On compte combien de mots-clés sont présents dans le contenu et le titre
-    for item in found_items:
-        item.relevance = sum(
-            word.lower() in item.content.lower() or word.lower() in item.title.lower()
-            for word in key_words_list
-        )
-
-    found_items = sorted(found_items, key=lambda x: x.relevance, reverse=True)
+    found_items = found_items.order_by("-date")
 
     return found_items, searched_expression
 
