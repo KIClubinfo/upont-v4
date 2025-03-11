@@ -79,7 +79,12 @@ class OrderViewSet(ModelViewSet):
         """
         Returns a list of all orders with their summaries
         """
-        orders = Order.objects.all()
+        user = request.user
+        if Membership.objects.filter(student__user=user, club__name="Ecoponts").exists():
+            orders = Order.objects.all()
+        else:
+            orders = Order.objects.filter(id_user=user.id)
+        
         serializer = OrderSummarySerializer(orders, many=True)
         return Response(serializer.data)
 
