@@ -83,6 +83,13 @@ class OrderViewSet(ModelViewSet):
         serializer = OrderSummarySerializer(orders, many=True)
         return Response(serializer.data)
 
+    def has_permission(self, user, order):
+        # Check if the user is the owner of the order
+        if order.id_user == user.id:
+            return True
+        # Check if the user has a membership in the club "Ecoponts"
+        return Membership.objects.filter(student__user=user, club__name="Ecoponts").exists()
+
     @action(detail=True, methods=["post"])
     @transaction.atomic
     def confirm_order(self, request, pk=None):
@@ -92,6 +99,12 @@ class OrderViewSet(ModelViewSet):
         try:
             # Récupérer la commande
             order = self.get_object()
+            
+            if not self.has_permission(request.user, order):
+                return Response(
+                    {"error": "Vous n'êtes pas autorisé à confirmer cette commande"},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
             # Pour chaque item de la commande
             for order_item in order.orderitem_set.all():
@@ -129,6 +142,12 @@ class OrderViewSet(ModelViewSet):
         try:
             # Récupérer la commande
             order = self.get_object()
+
+            if not self.has_permission(request.user, order):
+                return Response(
+                    {"error": "Vous n'êtes pas autorisé à confirmer cette commande"},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
             # Pour chaque item de la commande
             for order_item in order.orderitem_set.all():

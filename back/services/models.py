@@ -266,6 +266,7 @@ class OrderItem(models.Model):
 
 class Order(models.Model):
     name = models.CharField(max_length=100)
+    id_user = models.IntegerField(default=-1)
     products = models.ManyToManyField(Vrac, through="OrderItem", related_name="orders")
 
     def __str__(self):
