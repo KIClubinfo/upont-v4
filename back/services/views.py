@@ -10,6 +10,7 @@ from .serializers import (
     CreateOrderSerializer,
     OrderSummarySerializer,
     VracSerializer,
+    VracUpdateSerializer
 )
 
 
@@ -23,6 +24,52 @@ class BikesViewSet(ModelViewSet):
 class VracViewSet(ModelViewSet):
     serializer_class = VracSerializer
     queryset = Vrac.objects.all()
+
+    @action(detail=False, methods=["post"])
+    @transaction.atomic
+    def update_stock(self, request):
+        """
+        Vérifie si l'utilisateur est membre d'Ecoponts et met à jour le stock
+        """
+        user = request.user
+
+        # Vérifier si l'utilisateur est membre d'Ecoponts
+        if not Membership.objects.filter(student__user=user, club__name="Ecoponts").exists():
+            return Response(
+                {"error": "Vous n'êtes pas autorisé à effectuer cette opération"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Valider les données d'entrée
+        serializer = VracUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        name = serializer.validated_data["name"]
+        type = serializer.validated_data["type"]
+        price = serializer.validated_data["price"]
+        quantity = serializer.validated_data["quantity"]
+
+        try:
+            # Vérifier si le produit existe
+            vrac = Vrac.objects.get(name=name)
+            # Ajouter au stock existant
+            vrac.add_stock([price], [quantity])
+            message = f"Le stock de {name} a été mis à jour avec succès"
+        except Vrac.DoesNotExist:
+            # Créer un nouveau produit
+            Vrac.objects.create(
+                name=name,
+                type=type,
+                price=[price],
+                stock=[quantity],
+                stock_available=[quantity],
+            )
+            message = f"Le produit {name} a été créé avec succès"
+
+        return Response({"message": message}, status=status.HTTP_200_OK)
+
+
 
 
 class OrderViewSet(ModelViewSet):

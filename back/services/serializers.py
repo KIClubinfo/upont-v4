@@ -14,6 +14,12 @@ class VracSerializer(serializers.ModelSerializer):
         model = Vrac
         fields = ["id", "name", "type", "price", "stock", "stock_available"]
 
+class VracUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=100)
+    type = serializers.ChoiceField(choices=[("vrac", "Vrac"), ("unite", "Unité")])
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    quantity = serializers.IntegerField(min_value=0)
+
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
