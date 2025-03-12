@@ -1,16 +1,21 @@
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Order, OrderItem, Vrac
+from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike
+from social.models import Membership
+
 from .serializers import (
     BikeSerializer,
     CreateOrderSerializer,
     OrderSummarySerializer,
     VracSerializer,
-    VracUpdateSerializer
+    VracUpdateSerializer,
+    RequestFormSerializer,
+    ReservationBikeSerializer
 )
 
 
@@ -229,3 +234,114 @@ class OrderViewSet(ModelViewSet):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+class RequestFormViewSet(ModelViewSet):
+    serializer_class = RequestFormSerializer
+    queryset = RequestForm.objects.all()
+
+    @action(detail=False, methods=["get"])
+    def list_requests(self, request):
+        """
+        Returns a list of all RequestForm instances for a specific service
+        based on the user's membership in a specific club.
+        """
+        user = request.user
+        service = request.query_params.get("service")
+
+        if service == "musique" and Membership.objects.filter(student__user=user, club__name="Décibel").exists():
+            requests = RequestForm.objects.filter(service="musique", status="pending")
+        elif service in ["vracs", "velos"] and Membership.objects.filter(student__user=user, club__name="Ecoponts").exists():
+            requests = RequestForm.objects.filter(service=service, status="pending")
+        else:
+            return Response(
+                {"error": "Vous n'êtes pas autorisé à accéder à ces demandes"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = RequestFormSerializer(requests, many=True)
+        return Response(serializer.data)
+    @action(detail=False, methods=["post"])
+    def create_request(self, request):
+        """
+        Creates a new RequestForm instance with the status 'pending'
+        """
+        serializer = RequestFormSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(status="pending")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=["post"])
+    def mark_as_done(self, request, pk=None):
+        """
+        Changes the status of a RequestForm instance from 'pending' to 'done'
+        """
+        try:
+            request_form = self.get_object()
+            if request_form.status == "pending":
+                request_form.status = "done"
+                request_form.save()
+                return Response({"message": "Request marked as done"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Request is not in 'pending' status"}, status=status.HTTP_400_BAD_REQUEST)
+        except RequestForm.DoesNotExist:
+            return Response({"error": "RequestForm not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class ReservationBikeViewSet(ModelViewSet):
+    serializer_class = ReservationBikeSerializer
+    queryset = ReservationBike.objects.all()
+
+    @action(detail=True, methods=["post"])
+    def get_nth_last_log(self, request, pk=None):
+        """
+        Returns the n-th last line of the logs of the reservation of bike with the given id
+        """
+        serializer = ReservationBikeSerializer(data=request.data)
+        if serializer.is_valid():
+            n = serializer.validated_data["n"]
+            try:
+                reservation = self.get_object()
+                logs = reservation.logs.splitlines()
+                if n > len(logs):
+                    n = len(logs)
+                nth_last_log = logs[-n]
+                data = {}
+                for i in range(len(nth_last_log)):
+                    data[i] = str(nth_last_log[i])
+                return Response(data, status=status.HTTP_200_OK)
+            except ReservationBike.DoesNotExist:
+                return Response({"error": "ReservationBike not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=["post"])
+    def create_log(self, request):
+        """
+        Creates a new log entry for the reservation of a bike
+        """
+        bike_id = request.data.get("bike_id")
+        name = request.data.get("name")
+        try:
+            bike = Bike.objects.get(pk=bike_id)
+            log = ReservationBike.objects.create(
+                bike=bike,
+                name=name,
+                start_date=timezone.now(),
+                end_date=None
+            )
+            serializer = ReservationBikeSerializer(log)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Bike.DoesNotExist:
+            return Response({"error": "Bike not found"}, status=status.HTTP_404_NOT_FOUND)
+    @action(detail=False, methods=["post"])
+    def update_log(self, request):
+        """
+        Updates an existing log entry for the reservation of a bike by setting end_date to now
+        """
+        bike_id = request.data.get("bike_id")
+        name = request.data.get("name")
+        try:
+            log = ReservationBike.objects.get(bike_id=bike_id, name=name, end_date__isnull=True)
+            log.end_date = timezone.now()
+            log.save()
+            serializer = ReservationBikeSerializer(log)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ReservationBike.DoesNotExist:
+            return Response({"error": "Active reservation not found"}, status=status.HTTP_404_NOT_FOUND)

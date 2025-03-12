@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Bike, Order, OrderItem, Vrac
+from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike
 
 
 class BikeSerializer(serializers.ModelSerializer):
@@ -79,3 +79,13 @@ class OrderSummarySerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         return obj.get_total_price()
+
+class RequestFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestForm
+        fields = ["id", "name", "message", "service", "status"]
+
+class ReservationBikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReservationBike
+        fields = ["id", "bike", "borrower_id", "name", "start_date", "end_date"]

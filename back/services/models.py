@@ -306,3 +306,48 @@ class Bike(models.Model):
 
     def __str__(self):
         return self.name.__str__()
+
+
+
+class RequestForm(models.Model):
+    SERVICE_CHOICES = [
+        ("velos", "Vélos"),
+        ("vracs", "Vracs"),
+        ("musique", "Musique"),
+    ]
+
+    STATUS_CHOICES = [
+        ("pending", "En attente"),
+        ("done", "Lue"),
+    ]
+
+    name = models.CharField(max_length=100)
+    message = models.TextField()
+    service = models.CharField(max_length=100, choices=SERVICE_CHOICES)
+    status = models.CharField(max_length=100, default="pending", choices=STATUS_CHOICES)
+
+    def __str__(self):
+        return self.name
+
+    def mark_as_done(self):
+        """
+        Change the status from 'pending' to 'done'
+        """
+        if self.status == "pending":
+            self.status = "done"
+            self.save()
+
+
+
+class ReservationBike(models.Model):
+    """
+    Logs of bike reservations
+    """
+    bike = models.ForeignKey(Bike, on_delete=models.CASCADE)
+    borrower_id = models.IntegerField(default=-1)
+    name = models.CharField(max_length=100)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True, blank=True) # Null if ongoing
+    def __str__(self):
+        end_date_str = self.end_date.strftime("%Y-%m-%d %H:%M:%S") if self.end_date else "Ongoing"
+        return f"Réservation de {self.bike.name} par {self.name} - Start: {self.start_date.strftime('%Y-%m-%d %H:%M:%S')}, End: {end_date_str}"
