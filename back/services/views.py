@@ -1,11 +1,12 @@
 from django.db import transaction
 from django.utils import timezone
+from datetime import timedelta
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike
+from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom
 from social.models import Membership
 
 from .serializers import (
@@ -15,7 +16,9 @@ from .serializers import (
     VracSerializer,
     VracUpdateSerializer,
     RequestFormSerializer,
-    ReservationBikeSerializer
+    ReservationBikeSerializer,
+    ReservationMusicRoomSerializer,
+    CreateMusicRoomReservationSerializer
 )
 
 
@@ -345,3 +348,54 @@ class ReservationBikeViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except ReservationBike.DoesNotExist:
             return Response({"error": "Active reservation not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class ReservationMusicRoomViewSet(ModelViewSet):
+    serializer_class = ReservationMusicRoomSerializer
+    queryset = ReservationMusicRoom.objects.all()
+
+    @action(detail=False, methods=["get"])
+    def upcoming_reservations(self, request):
+        """
+        Returns a list of all upcoming reservations
+        """
+        now = timezone.now()
+        upcoming_reservations = ReservationMusicRoom.objects.filter(start_date__gt=now).order_by('start_date')
+        serializer = ReservationMusicRoomSerializer(upcoming_reservations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"])
+    def create_reservation(self, request):
+        """
+        Creates a new reservation for the music room if there are no conflicts
+        """
+        serializer = CreateMusicRoomReservationSerializer(data=request.data)
+        if serializer.is_valid():
+            borrower_id = serializer.validated_data["borrower_id"]
+            name = serializer.validated_data["name"]
+            start_date = serializer.validated_data["start_date"]
+            duration = serializer.validated_data["duration"]
+            end_date = start_date + timedelta(hours=duration)
+
+            reservation = ReservationMusicRoom.objects.create(
+                borrower_id=borrower_id,
+                name=name,
+                start_date=start_date,
+                end_date=end_date
+            )
+            reservation_serializer = ReservationMusicRoomSerializer(reservation)
+            return Response(reservation_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=["post"])
+    def cancel_reservation(self, request, pk=None):
+        """
+        Cancels a reservation for the music room if the user is the one who created it
+        """
+        try:
+            reservation = self.get_object()
+            if reservation.borrower_id != request.user.id:
+                return Response({"error": "You are not authorized to cancel this reservation"}, status=status.HTTP_403_FORBIDDEN)
+            reservation.delete()
+            return Response({"message": "Reservation cancelled successfully"}, status=status.HTTP_200_OK)
+        except ReservationMusicRoom.DoesNotExist:
+            return Response({"error": "Reservation not found"}, status=status.HTTP_404_NOT_FOUND)
+

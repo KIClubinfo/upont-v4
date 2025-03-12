@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike
+from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom
 
 
 class BikeSerializer(serializers.ModelSerializer):
@@ -89,3 +89,26 @@ class ReservationBikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReservationBike
         fields = ["id", "bike", "borrower_id", "name", "start_date", "end_date"]
+
+class ReservationMusicRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReservationMusicRoom
+        fields = ["id", "borrower_id", "name", "start_date", "end_date"]
+
+class CreateMusicRoomReservationSerializer(serializers.Serializer):
+    borrower_id = serializers.IntegerField()
+    name = serializers.CharField(max_length=100)
+    start_date = serializers.DateTimeField()
+    duration = serializers.IntegerField(min_value=1)
+
+    def validate(self, data):
+        start_date = data["start_date"]
+        end_date = start_date + timedelta(hours=data["duration"])
+
+        # Check for conflicts
+        if ReservationMusicRoom.objects.filter(
+            start_date__lt=end_date, end_date__gt=start_date
+        ).exists():
+            raise serializers.ValidationError("There is a conflict with an existing reservation.")
+
+        return data

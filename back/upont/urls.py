@@ -51,7 +51,7 @@ from pochtron.views import (
     SearchAlcohol,
 )
 from rest_framework import routers
-from services.views import BikesViewSet, OrderViewSet, VracViewSet, RequestFormViewSet, ReservationBikeViewSet
+from services.views import BikesViewSet, OrderViewSet, VracViewSet, RequestFormViewSet, ReservationBikeViewSet, ReservationMusicRoomViewSet
 from social.views import (
     ClubsViewSet,
     CurrentStudentView,
@@ -118,6 +118,7 @@ router.register(r"services/orders", OrderViewSet, basename="order")
 router.register(r"services/vrac", VracViewSet, basename="vrac")
 router.register(r"services/requests", RequestFormViewSet, basename="requests")
 router.register(r"services/reservations", ReservationBikeViewSet, basename="reservations")
+router.register(r"services/musicroom", ReservationMusicRoomViewSet, basename="musicroom")
 
 router.register(r"partnerships", PartnershipViewSet, basename="partnership")
 

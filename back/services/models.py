@@ -351,3 +351,15 @@ class ReservationBike(models.Model):
     def __str__(self):
         end_date_str = self.end_date.strftime("%Y-%m-%d %H:%M:%S") if self.end_date else "Ongoing"
         return f"Réservation de {self.bike.name} par {self.name} - Start: {self.start_date.strftime('%Y-%m-%d %H:%M:%S')}, End: {end_date_str}"
+    
+
+class ReservationMusicRoom(models.Model):
+    """
+    Logs of music room reservations
+    """
+    borrower_id = models.IntegerField(default=-1)
+    name = models.CharField(max_length=100)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    def __str__(self):
+        return f"Réservation de salle de musique par {self.borrower_id} - Start: {self.start_date.strftime('%Y-%m-%d %H:%M:%S')}, End: {self.end_date.strftime('%Y-%m-%d %H:%M:%S')}"
