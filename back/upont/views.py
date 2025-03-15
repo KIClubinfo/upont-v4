@@ -5,6 +5,7 @@ import os
 from urllib.parse import unquote
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -16,7 +17,7 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.urls import reverse
-from django_cas_ng.backends import CASBackend
+from django_cas_ng.utils import get_cas_client
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -25,6 +26,8 @@ from social.models import Promotion, Student
 from upont.auth import EmailBackend
 
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
+
+User = get_user_model()
 
 
 def root_redirect(request):
@@ -182,22 +185,29 @@ def get_token(request):
 @permission_classes([AllowAny])
 def get_sso_token(request):
     """
-    Permet de récupérer un token d'authentification via SSO.
-    La requête doit contenir un paramètre 'ticket' (ticket CAS obtenu après authentification).
+    Permet à un utilisateur de se connecter via SSO CAS.
+    Reçoit un ticket CAS en paramètre et renvoie un token d'authentification Django.
     """
     ticket = request.GET.get("ticket")
     if not ticket:
-        return Response({"error": "Le ticket CAS est requis."}, status=400)
+        return Response({"error": "Ticket CAS manquant"}, status=400)
 
-    service = request.data.get("service", settings.CAS_REDIRECT_URL)
+    cas_client = get_cas_client(service_url=request.build_absolute_uri())
+    user_authenticated = cas_client.verify_ticket(ticket)
 
-    user = CASBackend().authenticate(request, ticket=ticket, service=service)
-    if user is None:
-        return Response(
-            {"error": "Ticket CAS invalide ou authentification échouée."}, status=400
-        )
+    if not user_authenticated:
+        return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
-    token, created = Token.objects.get_or_create(user=user)
+    # Vérifie si l'utilisateur existe déjà
+    user, created = User.objects.get_or_create(username=user_authenticated)
+
+    if created:
+        # Si l'utilisateur est nouveau, on peut lui assigner des valeurs par défaut
+        return Response({"error": "L'utilisateur n'existe pas"}, status=403)
+
+    # Génère un token d'authentification pour l'API
+    token, _ = Token.objects.get_or_create(user=user)
+
     return Response({"token": token.key})
 
 
