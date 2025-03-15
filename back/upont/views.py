@@ -185,32 +185,38 @@ def get_token(request):
 @permission_classes([AllowAny])
 def get_sso_token(request):
     """
-    Permet à un utilisateur de se connecter via SSO CAS.
-    Reçoit un ticket CAS en paramètre et renvoie un token d'authentification Django.
+    Authentifie un utilisateur via SSO CAS et retourne un token d'authentification Django.
+    Redirige l'utilisateur vers l'application mobile avec le token.
     """
     ticket = request.GET.get("ticket")
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
     cas_client = get_cas_client(service_url=request.build_absolute_uri())
-    user_authenticated = cas_client.verify_ticket(ticket)
+    username = cas_client.verify_ticket(ticket)
 
-    if not user_authenticated:
+    if not username:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
-    # Vérifie si l'utilisateur existe déjà
-    user, created = User.objects.get_or_create(username=user_authenticated)
+    user, created = User.objects.get_or_create(
+        username=username, defaults={"email": f"{username}@enpc.fr"}
+    )
 
-    if created:
-        # Si l'utilisateur est nouveau, on peut lui assigner des valeurs par défaut
-        return Response({"error": "L'utilisateur n'existe pas"}, status=403)
-
-    # Génère un token d'authentification pour l'API
     token, _ = Token.objects.get_or_create(user=user)
 
-    redirect_url = f"upont://login?token={token.key}"
+    redirect_url = f"upont://un={username}!user={user}login?token={token.key}"
+
     return HttpResponse(
-        f'<html><head><meta http-equiv="refresh" content="0;url={redirect_url}"></head></html>'
+        f"""
+        <html>
+        <head>
+            <meta http-equiv="refresh" content="0;url={redirect_url}">
+        </head>
+        <body>
+            <p>Si vous n'êtes pas redirigé, <a href="{redirect_url}">cliquez ici</a>.</p>
+        </body>
+        </html>
+        """
     )
 
 
