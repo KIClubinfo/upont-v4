@@ -209,7 +209,9 @@ def get_sso_token(request):
     token, _ = Token.objects.get_or_create(user=user)
 
     redirect_url = f"upont://login?token={token.key}"
-    return HttpResponseRedirect(redirect_url)
+    return HttpResponse(
+        f'<html><head><meta http-equiv="refresh" content="0;url={redirect_url}"></head></html>'
+    )
 
 
 def privacy(request):
