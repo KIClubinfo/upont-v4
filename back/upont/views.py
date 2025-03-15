@@ -189,12 +189,11 @@ def get_sso_token(request):
     Redirige l'utilisateur vers l'application mobile avec le token.
     """
     ticket = request.GET.get("ticket")
+    service_url = request.build_absolute_uri()
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
-    user = CASBackend().authenticate(
-        request, ticket=ticket, service="https://cas.enpc.fr"
-    )
+    user = CASBackend().authenticate(request, ticket=ticket, service=service_url)
 
     if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
