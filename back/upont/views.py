@@ -192,7 +192,7 @@ def get_sso_token(request):
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
-    user = CASBackend.authenticate(
+    user = CASBackend().authenticate(
         request, ticket=ticket, service="https://cas.enpc.fr"
     )
 
