@@ -185,7 +185,7 @@ def get_sso_token(request):
     Permet de récupérer un token d'authentification via SSO.
     La requête doit contenir un paramètre 'ticket' (ticket CAS obtenu après authentification).
     """
-    ticket = request.data.get("ticket")
+    ticket = request.GET.get("ticket")
     if not ticket:
         return Response({"error": "Le ticket CAS est requis."}, status=400)
 
