@@ -204,7 +204,7 @@ def get_sso_token(request):
 
     token, _ = Token.objects.get_or_create(user=user)
 
-    redirect_url = f"upont://un={username}!user={user}login?token={token.key}"
+    redirect_url = f"upont://un={str(username)}!user={str(user)}login?token={token.key}"
 
     return HttpResponse(
         f"""
