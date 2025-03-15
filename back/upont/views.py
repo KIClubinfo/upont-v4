@@ -16,6 +16,7 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.urls import reverse
+from django_cas_ng.backends import CASBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -173,6 +174,29 @@ def get_token(request):
     )
     if user is None:
         return Response({"error": "Invalid credentials"})
+    token, created = Token.objects.get_or_create(user=user)
+    return Response({"token": token.key})
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def get_sso_token(request):
+    """
+    Permet de récupérer un token d'authentification via SSO.
+    La requête doit contenir un paramètre 'ticket' (ticket CAS obtenu après authentification).
+    """
+    ticket = request.data.get("ticket")
+    if not ticket:
+        return Response({"error": "Le ticket CAS est requis."}, status=400)
+
+    service = request.data.get("service", settings.CAS_REDIRECT_URL)
+
+    user = CASBackend().authenticate(request, ticket=ticket, service=service)
+    if user is None:
+        return Response(
+            {"error": "Ticket CAS invalide ou authentification échouée."}, status=400
+        )
+
     token, created = Token.objects.get_or_create(user=user)
     return Response({"token": token.key})
 
