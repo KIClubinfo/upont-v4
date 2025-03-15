@@ -208,7 +208,8 @@ def get_sso_token(request):
     # Génère un token d'authentification pour l'API
     token, _ = Token.objects.get_or_create(user=user)
 
-    return Response({"token": token.key})
+    redirect_url = f"upont://login?token={token.key}"
+    return HttpResponseRedirect(redirect_url)
 
 
 def privacy(request):
