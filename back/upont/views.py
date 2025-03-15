@@ -178,7 +178,7 @@ def get_token(request):
     return Response({"token": token.key})
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def get_sso_token(request):
     """
