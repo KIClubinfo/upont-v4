@@ -195,6 +195,7 @@ def get_sso_token(request):
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
     client = get_cas_client(service_url=service_url, request=request)
+    print("Response: " + str(client.get_verification_response(ticket)))
     username, attributes, pgtiou = client.verify_ticket(ticket)
 
     print("Ticket: " + str(ticket))
