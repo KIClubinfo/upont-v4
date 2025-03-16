@@ -5,7 +5,7 @@ import os
 from urllib.parse import unquote
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -17,7 +17,7 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.urls import reverse
-from django_cas_ng.backends import CASBackend
+from django_cas_ng.utils import get_service_url
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -189,11 +189,12 @@ def get_sso_token(request):
     Redirige l'utilisateur vers l'application mobile avec le token.
     """
     ticket = request.GET.get("ticket")
-    service_url = request.build_absolute_uri()
+    service_url = get_service_url(request)
+
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
-    user = CASBackend().authenticate(request, ticket=ticket, service=service_url)
+    user = authenticate(ticket=ticket, service=service_url, request=request)
 
     if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
