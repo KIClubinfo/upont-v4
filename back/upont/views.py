@@ -5,7 +5,6 @@ import os
 from urllib.parse import unquote
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -26,8 +25,6 @@ from social.models import Promotion, Student
 from upont.auth import EmailBackend
 
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
-
-User = get_user_model()
 
 
 def root_redirect(request):
@@ -189,14 +186,12 @@ def get_sso_token(request):
     Redirige l'utilisateur vers l'application mobile avec le token.
     """
     ticket = request.GET.get("ticket")
+    service = request.build_absolute_uri(request.path)
 
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
-    user = CASBackend().authenticate(
-        request, ticket=ticket, service="https://dev.upont.enpc.org/api/get_sso_token/"
-    )
-    print(str(user))
+    user = CASBackend().authenticate(request, ticket=ticket, service=service)
 
     if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
