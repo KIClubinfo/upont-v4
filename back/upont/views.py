@@ -17,7 +17,7 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.urls import reverse
-from django_cas_ng.utils import get_cas_client
+from django_cas_ng.backends import CASBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -193,20 +193,15 @@ def get_sso_token(request):
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
-    client = get_cas_client(
-        service_url="https://dev.upont.enpc.org/api/get_sso_token/", request=request
+    user = CASBackend().authenticate(
+        request, ticket=ticket, service="https://dev.upont.enpc.org/api/get_sso_token/"
     )
-    print("Response: " + str(client.get_verification_response(ticket)))
-    username, attributes, pgtiou = client.verify_ticket(ticket)
+    print(str(user))
 
-    print("Ticket: " + str(ticket))
-    print("Client: " + str(client))
-    print("Username: " + str(username))
-
-    if not username:
+    if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
-    token, _ = Token.objects.get_or_create(user=username)
+    token, _ = Token.objects.get_or_create(user=user)
 
     redirect_url = f"upont://login?token={token.key}"
 
