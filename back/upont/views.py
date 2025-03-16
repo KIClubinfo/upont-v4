@@ -17,8 +17,7 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.urls import reverse
-from django_cas_ng.backends import CASBackend
-from django_cas_ng.utils import get_service_url
+from django_cas_ng.utils import get_cas_client, get_service_url
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -195,14 +194,18 @@ def get_sso_token(request):
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
-    user = CASBackend().authenticate(
-        ticket=ticket, service=service_url, request=request
-    )
+    client = get_cas_client(service_url=service_url, request=request)
+    username, attributes, pgtiou = client.verify_ticket(ticket)
 
-    if not user:
+    print("Ticket: " + str(ticket))
+    print("Service: " + str(service_url))
+    print("Client: " + str(client))
+    print("Username: " + str(username))
+
+    if not username:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
-    token, _ = Token.objects.get_or_create(user=user)
+    token, _ = Token.objects.get_or_create(user=username)
 
     redirect_url = f"upont://login?token={token.key}"
 
