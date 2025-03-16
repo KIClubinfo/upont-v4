@@ -187,7 +187,7 @@ def get_sso_token(request):
     """
     ticket = request.GET.get("ticket")
     service = request.build_absolute_uri(request.path)
-    print("Service: " + str(service))
+    service = service.replace("http://", "https://")
 
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
