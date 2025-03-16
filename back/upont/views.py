@@ -5,7 +5,7 @@ import os
 from urllib.parse import unquote
 
 from django.conf import settings
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -17,6 +17,7 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.urls import reverse
+from django_cas_ng.backends import CASBackend
 from django_cas_ng.utils import get_service_url
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -194,7 +195,9 @@ def get_sso_token(request):
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
-    user = authenticate(ticket=ticket, service=service_url, request=request)
+    user = CASBackend().authenticate(
+        ticket=ticket, service=service_url, request=request
+    )
 
     if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
