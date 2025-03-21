@@ -1,9 +1,10 @@
 from decimal import Decimal
-
+from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.core.exceptions import ImproperlyConfigured
 
 
 class Vrac(models.Model):
@@ -228,6 +229,35 @@ class Vrac(models.Model):
             self.stock_available[idx] += quantity
 
         self.save()
+    
+    def update_quantity(self, quantity):
+        """
+        Met à jour la quantité disponible pour un prix donné
+        Args:
+            price: prix à chercher
+            quantity: nouvelle quantité
+        Raises:
+            ValidationError: si le prix n'est pas trouvé ou si la quantité est invalide
+        """
+        if quantity < self.get_total_stock() - self.get_total_stock_available():
+            raise ValidationError("Problème de stock, pas assez de stock disponible pour gérer les commandes")
+        else:
+            quantity -= self.get_total_stock()
+            if quantity < 0: #Perte de stock
+                for i in range(len(self.stock)):
+                    if self.stock_available[i] > 0:
+                        reduce = min(self.stock_available[i], quantity)
+                        self.reduce_stock_available([self.price[i]], [reduce])
+                        self.reduce_stock([self.price[i]], [reduce])
+                        quantity -= reduce
+                        if quantity == 0:
+                            break
+            if quantity > 0:
+                self.add_stock([self.price[0]], [quantity])
+                self.add_stock_available([self.price[0]], [quantity])
+        
+
+        self.save()
 
 
 class OrderItem(models.Model):
@@ -323,8 +353,8 @@ class RequestForm(models.Model):
 
     name = models.CharField(max_length=100)
     message = models.TextField()
-    service = models.CharField(max_length=100, choices=SERVICE_CHOICES)
-    status = models.CharField(max_length=100, default="pending", choices=STATUS_CHOICES)
+    service = models.CharField(max_length=10, choices=SERVICE_CHOICES)
+    status = models.CharField(max_length=10, default="pending", choices=STATUS_CHOICES)
 
     def __str__(self):
         return self.name
@@ -363,3 +393,58 @@ class ReservationMusicRoom(models.Model):
     end_date = models.DateTimeField()
     def __str__(self):
         return f"Réservation de salle de musique par {self.borrower_id} - Start: {self.start_date.strftime('%Y-%m-%d %H:%M:%S')}, End: {self.end_date.strftime('%Y-%m-%d %H:%M:%S')}"
+    
+
+
+class Mediatek(models.Model):
+    is_open = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if Mediatek.objects.exists() and not self.pk:
+            raise ImproperlyConfigured("Only one Mediatek instance allowed")
+        super(Mediatek, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return "Med ouverte" if self.is_open else "Med fermée"
+    
+    def open(self):
+        self.is_open = True
+        self.save()
+
+    def close(self):
+        self.is_open = False
+        self.save()
+    
+
+class MedItem(models.Model):
+    TYPE_CHOICES = [
+        ("roman", "Roman"),
+        ("manga", "Manga"),
+        ("bd", "Bande dessinée"),
+        ("jeu", "Jeu")
+    ]
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    title = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
+    year = models.IntegerField(blank=True, null=True)
+    is_available = models.BooleanField(default=True)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to="media", blank=True)
+    borrowed_by = models.IntegerField(default=-1)
+    borrowed_date = models.DateTimeField(null=True, blank=True)
+    def __str__(self):
+        return f"{self.title} ({self.type}) - {self.author} - {self.year}"
+    
+    def borrow(self, borrower_id):
+        if not self.is_available:
+            raise ValidationError("Item not available")
+        self.is_available = False
+        self.borrowed_by = borrower_id
+        self.borrowed_date = timezone.now()
+        self.save()
+
+    def return_item(self):
+        self.is_available = True
+        self.borrowed_by = -1
+        self.borrowed_date = None
+        self.save()

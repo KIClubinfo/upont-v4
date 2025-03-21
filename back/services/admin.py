@@ -3,7 +3,7 @@ from decimal import Decimal
 from django import forms
 from django.contrib import admin
 
-from .models import Bike, Order, OrderItem, Vrac, RequestForm,  ReservationMusicRoom
+from .models import Bike, Order, OrderItem, Vrac, RequestForm,  ReservationMusicRoom, MedItem, Mediatek
 
 
 class VracAdminForm(forms.ModelForm):
@@ -128,7 +128,23 @@ class ReservationMusicRoomAdmin(admin.ModelAdmin):
     list_filter = ("start_date", "end_date")
     search_fields = ("borrower_id", "name")
 
+
+@admin.register(Mediatek)
+class MediatekAdmin(admin.ModelAdmin):
+    list_display = ("is_open",)
+    list_filter = ("is_open",)
+    search_fields = ("is_open",)
+
+@admin.register(MedItem)
+class MedItemAdmin(admin.ModelAdmin):
+    list_display = ("title", "type", "author", "year", "is_available")
+    list_filter = ("type", "is_available", "year")
+    search_fields = ("title", "author", "year")
+
+
+
 # Register other models
 admin.site.register(Bike)
 admin.site.register(Order)
 admin.site.register(OrderItem)
+

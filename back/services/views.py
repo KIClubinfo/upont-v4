@@ -1,12 +1,16 @@
 from django.db import transaction
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+from django.core.exceptions import ValidationError
 from datetime import timedelta
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom
+
+from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, Mediatek, MedItem
 from social.models import Membership
 
 from .serializers import (
@@ -18,7 +22,10 @@ from .serializers import (
     RequestFormSerializer,
     ReservationBikeSerializer,
     ReservationMusicRoomSerializer,
-    CreateMusicRoomReservationSerializer
+    CreateMusicRoomReservationSerializer,
+    MediatekSerializer,
+    MedItemSerializer,
+    MedItemSummarySerializer
 )
 
 
@@ -76,7 +83,47 @@ class VracViewSet(ModelViewSet):
             message = f"Le produit {name} a été créé avec succès"
 
         return Response({"message": message}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["post"])
+    @transaction.atomic
+    def regularize_stock(self, request):
+        """
+        Vérifie si l'utilisateur est membre d'Ecoponts et met à jour le stock
+        """
+        user = request.user
 
+        # Vérifier si l'utilisateur est membre d'Ecoponts
+        if not Membership.objects.filter(student__user=user, club__name="Ecoponts").exists():
+            return Response(
+                {"error": "Vous n'êtes pas autorisé à effectuer cette opération"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Valider les données d'entrée
+        serializer = VracUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        name = serializer.validated_data["name"]
+        quantity = serializer.validated_data["quantity"]
+
+        try:
+            # Vérifier si le produit existe
+            vrac = Vrac.objects.get(name=name)
+            # Ajouter au stock existant
+            vrac.update_quantity(quantity)
+            message = f"Le stock de {name} a été mis à jour avec succès"
+        except Vrac.DoesNotExist:
+            # Créer un nouveau produit
+            return Response({"error": "Le produit n'existe pas"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({"message": message}, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Disable the default create method
+        """
+        return Response({"error": "Method Not Allowed, Post data on /update_data"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 
@@ -237,6 +284,13 @@ class OrderViewSet(ModelViewSet):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+    def create(self, request, *args, **kwargs):
+        """
+        Disable the default create method
+        """
+        return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+
 class RequestFormViewSet(ModelViewSet):
     serializer_class = RequestFormSerializer
     queryset = RequestForm.objects.all()
@@ -288,6 +342,11 @@ class RequestFormViewSet(ModelViewSet):
                 return Response({"error": "Request is not in 'pending' status"}, status=status.HTTP_400_BAD_REQUEST)
         except RequestForm.DoesNotExist:
             return Response({"error": "RequestForm not found"}, status=status.HTTP_404_NOT_FOUND)
+    def create(self, request, *args, **kwargs):
+        """
+        Disable the default create method
+        """
+        return Response({"error": "Method Not Allowed, Post data on /update_data"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         
 class ReservationBikeViewSet(ModelViewSet):
     serializer_class = ReservationBikeSerializer
@@ -348,6 +407,11 @@ class ReservationBikeViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except ReservationBike.DoesNotExist:
             return Response({"error": "Active reservation not found"}, status=status.HTTP_404_NOT_FOUND)
+    def create(self, request, *args, **kwargs):
+        """
+        Disable the default create method
+        """
+        return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         
 class ReservationMusicRoomViewSet(ModelViewSet):
     serializer_class = ReservationMusicRoomSerializer
@@ -398,4 +462,121 @@ class ReservationMusicRoomViewSet(ModelViewSet):
             return Response({"message": "Reservation cancelled successfully"}, status=status.HTTP_200_OK)
         except ReservationMusicRoom.DoesNotExist:
             return Response({"error": "Reservation not found"}, status=status.HTTP_404_NOT_FOUND)
+    def create(self, request, *args, **kwargs):
+        """
+        Disable the default create method
+        """
+        return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        
+class MediatekViewSet(ModelViewSet):
+    serializer_class = MediatekSerializer
+    queryset = Mediatek.objects.all()
 
+    @action(detail=False, methods=["post"])
+    def open_mediatek(self, request):
+        """
+        Opens the mediatek if the user is a member of "La Mediatek et Du Ponts et Des Jeux"
+        """
+        user = request.user
+        if not Membership.objects.filter(student__user=user, club__name="La Mediatek et Du Ponts et Des Jeux").exists():
+            return Response({"error": "Vous n'êtes pas autorisé à effectuer cette opération"}, status=status.HTTP_403_FORBIDDEN)
+
+        mediatek = get_object_or_404(Mediatek)
+        mediatek.open()
+        return Response({"message": "La mediatek est maintenant ouverte"}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"])
+    def close_mediatek(self, request):
+        """
+        Closes the mediatek if the user is a member of "La Mediatek et Du Ponts et Des Jeux"
+        """
+        user = request.user
+        if not Membership.objects.filter(student__user=user, club__name="La Mediatek et Du Ponts et Des Jeux").exists():
+            return Response({"error": "Vous n'êtes pas autorisé à effectuer cette opération"}, status=status.HTTP_403_FORBIDDEN)
+
+        mediatek = get_object_or_404(Mediatek)
+        mediatek.close()
+        return Response({"message": "La mediatek est maintenant fermée"}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["get"])
+    def status(self, request):
+        """
+        Returns the status of the mediatek (open or closed)
+        """
+        mediatek = get_object_or_404(Mediatek)
+        status = str(mediatek)
+        return Response({"status": status}, status=status.HTTP_200_OK)
+    def create(self, request, *args, **kwargs):
+        """
+        Disable the default create method
+        """
+        return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class MedItemViewSet(ModelViewSet):
+    serializer_class = MedItemSerializer
+    queryset = MedItem.objects.all()
+
+    @action(detail=True, methods=["post"])
+    def borrow_item(self, request, pk=None):
+        """
+        Borrows an item if it is available
+        """
+        item = get_object_or_404(MedItem, pk=pk)
+        borrower_id = request.data.get("borrower_id")
+
+        if not borrower_id:
+            return Response({"error": "Borrower ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            item.borrow(borrower_id)
+            return Response({"message": "Item borrowed successfully"}, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=["post"])
+    def return_item(self, request, pk=None):
+        """
+        Returns an item if the user is the one who borrowed it or is a member of "La Mediatek et Du Ponts et Des Jeux"
+        """
+        item = get_object_or_404(MedItem, pk=pk)
+        returner_id = request.data.get("returner_id")
+
+        if not returner_id:
+            return Response({"error": "Returner ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if item.borrowed_by != returner_id and not Membership.objects.filter(student__user=request.user, club__name="La Mediatek et Du Ponts et Des Jeux").exists():
+            return Response({"error": "You are not authorized to return this item"}, status=status.HTTP_403_FORBIDDEN)
+
+        item.return_item()
+        return Response({"message": "Item returned successfully"}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=["get"])
+    def detail(self, request, pk=None):
+        """
+        Returns all the information of a MedItem
+        """
+        item = get_object_or_404(MedItem, pk=pk)
+        serializer = MedItemSerializer(item)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["get"])
+    def filter(self, request):
+        """
+        Filters the MedItem database based on type and availability
+        """
+        item_type = request.query_params.get("type", None)
+        available = request.query_params.get("available", None)
+
+        filters = Q()
+        if item_type:
+            filters &= Q(type=item_type)
+        if available is not None:
+            if available == "1":
+                filters &= Q(is_available=True)
+            elif available == "0":
+                filters &= Q(is_available=False)
+
+        items = MedItem.objects.filter(filters)
+        serializer = MedItemSummarySerializer(items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

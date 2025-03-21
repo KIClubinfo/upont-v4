@@ -1,6 +1,6 @@
 from rest_framework import serializers
-
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom
+from datetime import timedelta
+from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, Mediatek, MedItem
 
 
 class BikeSerializer(serializers.ModelSerializer):
@@ -112,3 +112,19 @@ class CreateMusicRoomReservationSerializer(serializers.Serializer):
             raise serializers.ValidationError("There is a conflict with an existing reservation.")
 
         return data
+
+
+class MediatekSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mediatek
+        fields = ["is_open"]
+
+class MedItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedItem
+        fields = ["id", "type", "title", "author", "year", "is_available", "description", "image", "borrowed_by", "borrowed_date"]
+
+class MedItemSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedItem
+        fields = ["id", "name", "type", "is_available"]
