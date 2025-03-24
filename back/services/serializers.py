@@ -83,6 +83,16 @@ class OrderSummarySerializer(serializers.ModelSerializer):
 class RequestFormSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestForm
+        fields = ["message", "service"]
+
+class RequestFormCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestForm
+        fields = ["message", "service"]
+
+class RequestFormListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestForm
         fields = ["id", "name", "message", "service", "status"]
 
 class ReservationBikeSerializer(serializers.ModelSerializer):

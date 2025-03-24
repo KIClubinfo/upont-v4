@@ -25,7 +25,9 @@ from .serializers import (
     CreateMusicRoomReservationSerializer,
     MediatekSerializer,
     MedItemSerializer,
-    MedItemSummarySerializer
+    MedItemSummarySerializer,
+    RequestFormCreateSerializer,
+    RequestFormListSerializer
 )
 
 
@@ -292,8 +294,12 @@ class OrderViewSet(ModelViewSet):
     
 
 class RequestFormViewSet(ModelViewSet):
-    serializer_class = RequestFormSerializer
     queryset = RequestForm.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'create_request':
+            return RequestFormCreateSerializer
+        return RequestFormListSerializer
 
     @action(detail=False, methods=["get"])
     def list_requests(self, request):
@@ -314,16 +320,21 @@ class RequestFormViewSet(ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        serializer = RequestFormSerializer(requests, many=True)
+        serializer = RequestFormListSerializer(requests, many=True)
         return Response(serializer.data)
+    
     @action(detail=False, methods=["post"])
     def create_request(self, request):
         """
         Creates a new RequestForm instance with the status 'pending'
         """
-        serializer = RequestFormSerializer(data=request.data)
+        serializer = RequestFormCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(status="pending")
+            RequestForm.objects.create(
+                name=request.user.username,  # Assuming the user is authenticated
+                status="pending",
+                **serializer.validated_data
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
