@@ -28,28 +28,13 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class CreateOrderSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=100)
     products = serializers.ListField(child=serializers.CharField(max_length=100))
-    prices = serializers.ListField(
-        child=serializers.ListField(
-            child=serializers.DecimalField(max_digits=10, decimal_places=2)
-        )
-    )
-    quantities = serializers.ListField(
-        child=serializers.ListField(child=serializers.IntegerField(min_value=0))
-    )
+    total_quantities = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
     def validate(self, data):
-        if not (
-            len(data["products"]) == len(data["prices"]) == len(data["quantities"])
-        ):
+        if len(data["products"]) != len(data["total_quantities"]):
             raise serializers.ValidationError(
-                "Les listes products, prices et quantities doivent avoir la même taille"
-            )
-
-        if "Thé" in data["products"]:
-            raise serializers.ValidationError(
-                {"error": "I'm an epicier, not a teapot!"}, code=418
+                "Les listes products et total_quantities doivent avoir la même taille"
             )
 
         # Vérifier que chaque produit existe
@@ -80,10 +65,6 @@ class OrderSummarySerializer(serializers.ModelSerializer):
     def get_total_price(self, obj):
         return obj.get_total_price()
 
-class RequestFormSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RequestForm
-        fields = ["message", "service"]
 
 class RequestFormCreateSerializer(serializers.ModelSerializer):
     class Meta:

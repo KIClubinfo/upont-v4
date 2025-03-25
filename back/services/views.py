@@ -145,17 +145,31 @@ class OrderViewSet(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            user = request.user
             # Créer la commande
-            order = Order.objects.create(name=serializer.validated_data["name"])
+            order = Order.objects.create(name=user.username, id_user=user.id)
 
             # Pour chaque produit
-            for product_name, prices, quantities in zip(
+            for product_name, total_quantity in zip(
                 serializer.validated_data["products"],
-                serializer.validated_data["prices"],
-                serializer.validated_data["quantities"],
+                serializer.validated_data["total_quantities"],
             ):
                 # Récupérer le produit
                 vrac = Vrac.objects.get(name=product_name)
+
+                # Générer les listes de prix et quantités
+                prices = []
+                quantities = []
+                remaining_quantity = total_quantity
+
+                for price, available in zip(vrac.price, vrac.stock_available):
+                    if remaining_quantity <= 0:
+                        break
+
+                    quantity_from_this_batch = min(available, remaining_quantity)
+                    prices.append(price)
+                    quantities.append(quantity_from_this_batch)
+                    remaining_quantity -= quantity_from_this_batch
 
                 # Réduire le stock disponible
                 vrac.reduce_stock_available(prices, quantities)
@@ -384,40 +398,40 @@ class ReservationBikeViewSet(ModelViewSet):
             except ReservationBike.DoesNotExist:
                 return Response({"error": "ReservationBike not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=False, methods=["post"])
-    def create_log(self, request):
+    def log_reservation(self, request):
         """
-        Creates a new log entry for the reservation of a bike
+        Creates or updates a log entry for the reservation of a bike
         """
         bike_id = request.data.get("bike_id")
-        name = request.data.get("name")
+        user = request.user
+
         try:
             bike = Bike.objects.get(pk=bike_id)
-            log = ReservationBike.objects.create(
-                bike=bike,
-                name=name,
-                start_date=timezone.now(),
-                end_date=None
-            )
-            serializer = ReservationBikeSerializer(log)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            last_log = ReservationBike.objects.filter(bike=bike).order_by('-start_date').first()
+
+            if last_log and last_log.end_date is None:
+                # Update the existing log entry
+                last_log.end_date = timezone.now()
+                last_log.save()
+                serializer = ReservationBikeSerializer(last_log)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                # Create a new log entry
+                log = ReservationBike.objects.create(
+                    bike=bike,
+                    borrower_id=user.id,
+                    name=user.username,
+                    start_date=timezone.now(),
+                    end_date=None
+                )
+                serializer = ReservationBikeSerializer(log)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         except Bike.DoesNotExist:
             return Response({"error": "Bike not found"}, status=status.HTTP_404_NOT_FOUND)
-    @action(detail=False, methods=["post"])
-    def update_log(self, request):
-        """
-        Updates an existing log entry for the reservation of a bike by setting end_date to now
-        """
-        bike_id = request.data.get("bike_id")
-        name = request.data.get("name")
-        try:
-            log = ReservationBike.objects.get(bike_id=bike_id, name=name, end_date__isnull=True)
-            log.end_date = timezone.now()
-            log.save()
-            serializer = ReservationBikeSerializer(log)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ReservationBike.DoesNotExist:
-            return Response({"error": "Active reservation not found"}, status=status.HTTP_404_NOT_FOUND)
+
     def create(self, request, *args, **kwargs):
         """
         Disable the default create method
@@ -445,21 +459,21 @@ class ReservationMusicRoomViewSet(ModelViewSet):
         """
         serializer = CreateMusicRoomReservationSerializer(data=request.data)
         if serializer.is_valid():
-            borrower_id = serializer.validated_data["borrower_id"]
-            name = serializer.validated_data["name"]
+            user = request.user
             start_date = serializer.validated_data["start_date"]
             duration = serializer.validated_data["duration"]
             end_date = start_date + timedelta(hours=duration)
 
             reservation = ReservationMusicRoom.objects.create(
-                borrower_id=borrower_id,
-                name=name,
+                borrower_id=user.id,
+                name=user.username,
                 start_date=start_date,
                 end_date=end_date
             )
             reservation_serializer = ReservationMusicRoomSerializer(reservation)
             return Response(reservation_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=True, methods=["post"])
     def cancel_reservation(self, request, pk=None):
         """
@@ -534,13 +548,10 @@ class MedItemViewSet(ModelViewSet):
         Borrows an item if it is available
         """
         item = get_object_or_404(MedItem, pk=pk)
-        borrower_id = request.data.get("borrower_id")
-
-        if not borrower_id:
-            return Response({"error": "Borrower ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        user = request.user
 
         try:
-            item.borrow(borrower_id)
+            item.borrow(user.id)
             return Response({"message": "Item borrowed successfully"}, status=status.HTTP_200_OK)
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -551,12 +562,9 @@ class MedItemViewSet(ModelViewSet):
         Returns an item if the user is the one who borrowed it or is a member of "La Mediatek et Du Ponts et Des Jeux"
         """
         item = get_object_or_404(MedItem, pk=pk)
-        returner_id = request.data.get("returner_id")
+        user = request.user
 
-        if not returner_id:
-            return Response({"error": "Returner ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if item.borrowed_by != returner_id and not Membership.objects.filter(student__user=request.user, club__name="La Mediatek et Du Ponts et Des Jeux").exists():
+        if item.borrowed_by != user.id and not Membership.objects.filter(student__user=user, club__name="La Mediatek et Du Ponts et Des Jeux").exists():
             return Response({"error": "You are not authorized to return this item"}, status=status.HTTP_403_FORBIDDEN)
 
         item.return_item()
