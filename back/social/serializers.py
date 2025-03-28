@@ -7,8 +7,8 @@ from .models import Club, Membership, Promotion, Role, Student
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    last_login = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
-    date_joined = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    last_login = serializers.DateTimeField()
+    date_joined = serializers.DateTimeField()
 
     class Meta:
         model = User
