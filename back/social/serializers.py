@@ -7,9 +7,12 @@ from .models import Club, Membership, Promotion, Role, Student
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    last_login = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    date_joined = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "id"]
+        fields = ["first_name", "last_name", "id", "last_login", "date_joined"]
 
 
 class PromotionSerializer(serializers.HyperlinkedModelSerializer):
@@ -47,6 +50,9 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "biography",
             "phone_number",
             "gender",
+            "first_connection",
+            "is_validated",
+            "is_moderator",
         ]
 
     birthdate = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])

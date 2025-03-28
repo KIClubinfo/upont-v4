@@ -84,6 +84,7 @@ class Student(models.Model):
     nationality = models.ForeignKey(
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
     )
+    first_connection = models.BooleanField(default=True)
     is_validated = models.BooleanField(default=True)
     is_moderator = models.BooleanField(default=False)
 
