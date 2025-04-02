@@ -58,13 +58,6 @@ class StudentViewSet(viewsets.ModelViewSet):
         form = EditProfile(request.data, instance=student)
         print(request.data)
         if form.is_valid():
-            if "picture" in request.data:
-                student.picture.delete(save=False)
-                student.picture = request.data["picture"]
-                student.save()
-            if "first_connection" in request.data:
-                student.first_connection = request.data["first_connection"]
-                student.save()
             if "promo" in request.data:
                 try:
                     promotion = Promotion.objects.get(nickname=request.data["promo"])
@@ -77,6 +70,13 @@ class StudentViewSet(viewsets.ModelViewSet):
                             "errors": {"promotion": ["Promotion invalide !"]},
                         }
                     )
+            if "picture" in request.data:
+                student.picture.delete(save=False)
+                student.picture = request.data["picture"]
+                student.save()
+            if "first_connection" in request.data:
+                student.first_connection = request.data["first_connection"]
+                student.save()
             form.save()
             return Response({"status": "ok"})
         else:
