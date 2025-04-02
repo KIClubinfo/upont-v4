@@ -5,6 +5,7 @@ import os
 from urllib.parse import unquote
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -25,6 +26,8 @@ from social.models import Promotion, Student
 from upont.auth import EmailBackend
 
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
+
+User = get_user_model()
 
 
 def root_redirect(request):
@@ -196,6 +199,19 @@ def get_sso_token(request):
 
     if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
+
+    if not User.objects.filter(email=user.email).exists():
+        first_name, last_name = (
+            user.username.split(".", 1) if "." in user.username else (user.username, "")
+        )
+        latest_promotion = Promotion.objects.order_by("-nickname").first()
+        user = User.objects.create_user(
+            username=user.username,
+            email=user.email or "",
+            first_name=first_name,
+            last_name=last_name,
+        )
+        Student.objects.create(user=user, promo=latest_promotion, is_validated=False)
 
     token, _ = Token.objects.get_or_create(user=user)
 
