@@ -74,7 +74,7 @@ class StudentViewSet(viewsets.ModelViewSet):
                     return Response(
                         {
                             "status": "error",
-                            "errors": {"promotion": "Promotion invalide !"},
+                            "errors": {"promotion": ["Promotion invalide !"]},
                         }
                     )
             form.save()
