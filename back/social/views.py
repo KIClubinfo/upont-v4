@@ -12,7 +12,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, NotificationToken, Role, Student
+from .models import (
+    Category,
+    Club,
+    Membership,
+    NotificationToken,
+    Promotion,
+    Role,
+    Student,
+)
 from .serializers import (
     ClubSerializer,
     ClubSerializerLite,
@@ -54,6 +62,21 @@ class StudentViewSet(viewsets.ModelViewSet):
                 student.picture.delete(save=False)
                 student.picture = request.data["picture"]
                 student.save()
+            if "first_connection" in request.data:
+                student.first_connection = request.data["first_connection"]
+                student.save()
+            if "promo" in request.data:
+                try:
+                    promotion = Promotion.objects.get(nickname=request.data["promo"])
+                    student.promo = promotion
+                    student.save()
+                except Promotion.DoesNotExist:
+                    return Response(
+                        {
+                            "status": "error",
+                            "errors": {"promotion": "Promotion invalide !"},
+                        }
+                    )
             form.save()
             return Response({"status": "ok"})
         else:
