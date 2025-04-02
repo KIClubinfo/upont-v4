@@ -18,6 +18,7 @@ from django.http import (
 from django.shortcuts import render
 from django.urls import reverse
 from django_cas_ng.backends import CASBackend
+from django_cas_ng.signals import cas_user_authenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -195,22 +196,29 @@ def get_sso_token(request):
     if not ticket:
         return Response({"error": "Ticket CAS manquant"}, status=400)
 
+    created_flag = {"value": False}  # Use a mutable object to capture changes
+
+    # Define a simple inline signal handler and authenticate the user
+    def user_authenticated_handler(sender, user, created, **kwargs):
+        if created:
+            created_flag["value"] = True
+
+    cas_user_authenticated.connect(user_authenticated_handler, weak=False)
     user = CASBackend().authenticate(request, ticket=ticket, service=service)
+    cas_user_authenticated.disconnect(user_authenticated_handler)
 
     if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
-    if not User.objects.filter(email=user.email).exists():
+    if created_flag["value"]:
         first_name, last_name = (
             user.username.split(".", 1) if "." in user.username else (user.username, "")
         )
         latest_promotion = Promotion.objects.order_by("-nickname").first()
-        user = User.objects.create_user(
-            username=user.username,
-            email=user.email or "",
-            first_name=first_name,
-            last_name=last_name,
-        )
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = f"{user.username}@enpc.fr"
+        user.save()
         Student.objects.create(user=user, promo=latest_promotion, is_validated=False)
 
     token, _ = Token.objects.get_or_create(user=user)
