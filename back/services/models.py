@@ -105,7 +105,7 @@ class Vrac(models.Model):
         for price, quantity in zip(prices, quantities):
             try:
                 idx = self.price.index(price)
-                if self.stock_available[idx] < quantity:
+                if self.stock[idx] < quantity:
                     raise ValidationError(f"Stock insuffisant pour le prix {price}")
             except ValueError:
                 raise ValidationError(f"Prix {price} non trouvé dans le stock")
@@ -117,7 +117,7 @@ class Vrac(models.Model):
             self.stock[idx] -= quantity
 
             # Si le stock tombe à 0, on marque l'index pour suppression
-            if self.stock[idx] == 0:
+            if self.stock[idx] < 100:
                 indices_to_remove.append(idx)
 
         # Suppression des éléments avec stock = 0 (en ordre décroissant pour ne pas perturber les indices)
@@ -246,10 +246,10 @@ class Vrac(models.Model):
             if quantity < 0: #Perte de stock
                 for i in range(len(self.stock)):
                     if self.stock_available[i] > 0:
-                        reduce = min(self.stock_available[i], quantity)
+                        reduce = min(self.stock_available[i], -1*quantity)
                         self.reduce_stock_available([self.price[i]], [reduce])
                         self.reduce_stock([self.price[i]], [reduce])
-                        quantity -= reduce
+                        quantity += reduce
                         if quantity == 0:
                             break
             if quantity > 0:

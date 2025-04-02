@@ -19,7 +19,6 @@ from .serializers import (
     OrderSummarySerializer,
     VracSerializer,
     VracUpdateSerializer,
-    RequestFormSerializer,
     ReservationBikeSerializer,
     ReservationMusicRoomSerializer,
     CreateMusicRoomReservationSerializer,
@@ -170,6 +169,9 @@ class OrderViewSet(ModelViewSet):
                     prices.append(price)
                     quantities.append(quantity_from_this_batch)
                     remaining_quantity -= quantity_from_this_batch
+                
+                if remaining_quantity > 0:
+                    raise ValueError
 
                 # Réduire le stock disponible
                 vrac.reduce_stock_available(prices, quantities)
