@@ -87,14 +87,13 @@ class ReservationMusicRoomSerializer(serializers.ModelSerializer):
         fields = ["id", "borrower_id", "name", "start_date", "end_date"]
 
 class CreateMusicRoomReservationSerializer(serializers.Serializer):
-    borrower_id = serializers.IntegerField()
     name = serializers.CharField(max_length=100)
     start_date = serializers.DateTimeField()
     duration = serializers.IntegerField(min_value=1)
 
     def validate(self, data):
         start_date = data["start_date"]
-        end_date = start_date + timedelta(hours=data["duration"])
+        end_date = data["end_date"]
 
         # Check for conflicts
         if ReservationMusicRoom.objects.filter(

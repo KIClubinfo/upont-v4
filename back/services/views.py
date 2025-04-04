@@ -462,13 +462,13 @@ class ReservationMusicRoomViewSet(ModelViewSet):
         serializer = CreateMusicRoomReservationSerializer(data=request.data)
         if serializer.is_valid():
             user = request.user
+            name = serializer.validated_data["name"]
             start_date = serializer.validated_data["start_date"]
-            duration = serializer.validated_data["duration"]
-            end_date = start_date + timedelta(hours=duration)
+            end_date = serializer.validated_data["end_date"]
 
             reservation = ReservationMusicRoom.objects.create(
                 borrower_id=user.id,
-                name=user.username,
+                name=name,
                 start_date=start_date,
                 end_date=end_date
             )
@@ -483,7 +483,7 @@ class ReservationMusicRoomViewSet(ModelViewSet):
         """
         try:
             reservation = self.get_object()
-            if reservation.borrower_id != request.user.id:
+            if reservation.borrower_id != request.user.id or Membership.objects.filter(student__user=request.user, club__name="Décibel").exists():
                 return Response({"error": "You are not authorized to cancel this reservation"}, status=status.HTTP_403_FORBIDDEN)
             reservation.delete()
             return Response({"message": "Reservation cancelled successfully"}, status=status.HTTP_200_OK)
