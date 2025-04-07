@@ -89,6 +89,7 @@ urlpatterns = [
     ),  # forces redirection of already authenticated users
     path("", include("django.contrib.auth.urls")),
     path("", views.root_redirect),
+    path("internal/auth-check/", views.auth_check, name="internal_auth_check"),
     path("cas/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
     path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
     path("page_not_created/", views.page_not_created, name="page_not_created"),

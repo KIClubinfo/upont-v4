@@ -38,6 +38,13 @@ def root_redirect(request):
         return HttpResponseRedirect(reverse(LOGIN_URL))
 
 
+def auth_check(request):
+    if request.user.is_authenticated:
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseForbidden()
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_media_path(request, path):
