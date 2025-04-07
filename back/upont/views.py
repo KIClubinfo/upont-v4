@@ -19,8 +19,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from django_cas_ng.backends import CASBackend
 from django_cas_ng.signals import cas_user_authenticated
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from social.models import Promotion, Student
@@ -38,11 +43,12 @@ def root_redirect(request):
         return HttpResponseRedirect(reverse(LOGIN_URL))
 
 
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def auth_check(request):
-    if request.user.is_authenticated:
-        return HttpResponse(status=200)
-    else:
-        return HttpResponseForbidden()
+    print(f"DEBUG: Token auth successful for user: {request.user}")
+    return HttpResponse(status=200)
 
 
 @api_view(["GET"])
