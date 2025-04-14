@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from datetime import timedelta
 from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, Mediatek, MedItem
-
+from django.utils.timezone import make_aware
 
 class BikeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,6 +81,7 @@ class ReservationBikeSerializer(serializers.ModelSerializer):
         model = ReservationBike
         fields = ["id", "bike", "borrower_id", "name", "start_date", "end_date"]
 
+
 class ReservationMusicRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReservationMusicRoom
@@ -89,11 +90,12 @@ class ReservationMusicRoomSerializer(serializers.ModelSerializer):
 class CreateMusicRoomReservationSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
     start_date = serializers.DateTimeField()
-    duration = serializers.IntegerField(min_value=1)
+    end_date = serializers.DateTimeField()
 
     def validate(self, data):
         start_date = data["start_date"]
         end_date = data["end_date"]
+
 
         # Check for conflicts
         if ReservationMusicRoom.objects.filter(

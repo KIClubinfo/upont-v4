@@ -382,24 +382,25 @@ class ReservationBikeViewSet(ModelViewSet):
     @action(detail=True, methods=["post"])
     def get_nth_last_log(self, request, pk=None):
         """
-        Returns the n-th last line of the logs of the reservation of bike with the given id
+        Returns the n-th last line of the logs of the reservation of the bike with the given bike_id
         """
-        serializer = ReservationBikeSerializer(data=request.data)
-        if serializer.is_valid():
-            n = serializer.validated_data["n"]
-            try:
-                reservation = self.get_object()
-                logs = reservation.logs.splitlines()
-                if n > len(logs):
-                    n = len(logs)
-                nth_last_log = logs[-n]
-                data = {}
-                for i in range(len(nth_last_log)):
-                    data[i] = str(nth_last_log[i])
-                return Response(data, status=status.HTTP_200_OK)
-            except ReservationBike.DoesNotExist:
-                return Response({"error": "ReservationBike not found"}, status=status.HTTP_404_NOT_FOUND)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        n = request.data.get("n")
+        bike_id = request.data.get("bike_id")
+        try:
+            reservation = self.get_object()
+            if reservation.bike_id != bike_id:
+                return Response({"error": "No logs found for the specified bike_id"}, status=status.HTTP_404_NOT_FOUND)
+            
+            logs = reservation.logs.splitlines()
+            if n > len(logs):
+                n = len(logs)
+            nth_last_log = logs[-n]
+            data = {"nth_last_log": nth_last_log}
+            return Response(data, status=status.HTTP_200_OK)
+        except ReservationBike.DoesNotExist:
+            return Response({"error": "ReservationBike not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["post"])
     def log_reservation(self, request):
