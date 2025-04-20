@@ -194,5 +194,5 @@ urlpatterns += [
     path("api/pochtron/cagnotte_url/", CagnotteURL.as_view(), name="cagnotte_url"),
     path("api/test/", ProfilePicUpdate.as_view(), name="test"),
     path("api/edit_profile/", StudentProfileEdit.as_view(), name="edit_profile"),
-    path("api/validate-student/", views.validate_student, name="validate_student"),
+    path("api/validate-student/", validate_student, name="validate_student"),
 ]
