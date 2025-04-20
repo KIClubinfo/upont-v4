@@ -380,7 +380,7 @@ class ReservationBikeViewSet(ModelViewSet):
     queryset = ReservationBike.objects.all()
 
     # Keep url_path='logs' if your frontend expects it, or change if desired
-    @action(detail=False, methods=["post"], url_path='logs')
+    @action(detail=False, methods=["post"])
     def get_nth_last_log(self, request):
         """
         Retrieves the string representation (str) of the N-th most recent
@@ -424,7 +424,7 @@ class ReservationBikeViewSet(ModelViewSet):
 
             # 3. Select the N-th item (using 0-based index n-1)
             # This directly fetches only the required object from the database
-            nth_last_reservation = reservations_qs[n-1] # Use n-1 because list/queryset indexing is 0-based
+            nth_last_reservation = reservations_qs[min(n-1, reservations_qs.count()-1)] # Use n-1 because list/queryset indexing is 0-based
 
             # --- End Query Logic ---
 
