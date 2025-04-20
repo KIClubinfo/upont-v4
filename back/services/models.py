@@ -344,6 +344,8 @@ class RequestForm(models.Model):
         ("velos", "Vélos"),
         ("vracs", "Vracs"),
         ("musique", "Musique"),
+        ("ki", "KI"),
+        ("med", "Med"),
     ]
 
     STATUS_CHOICES = [
