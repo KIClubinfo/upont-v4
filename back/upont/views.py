@@ -16,6 +16,7 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.urls import reverse
+from rest_framework import viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -190,6 +191,22 @@ def check_admin_status(request):
         'is_staff': user.is_staff,
     }
     return Response(status)
+
+
+class AdminStatusViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def list(self, request):
+        """
+        Returns the admin status of the currently authenticated user.
+        Includes superuser and staff status information.
+        """
+        user = request.user
+        status = {
+            'is_superuser': user.is_superuser,
+            'is_staff': user.is_staff,
+        }
+        return Response(status)
 
 
 def privacy(request):

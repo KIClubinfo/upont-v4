@@ -115,7 +115,7 @@ else:
 # ---- API URLS ----#
 
 router = routers.DefaultRouter()
-router.register(r"admin-status/", views.check_admin_status, basename="check-admin-status")
+router.register(r"admin-status", views.AdminStatusViewSet, basename="check-admin-status")
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet, basename="post")
 router.register(r"events", EventViewSet, basename="event")
