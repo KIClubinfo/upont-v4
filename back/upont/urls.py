@@ -75,6 +75,7 @@ from social.views import (
     StudentMembershipView,
     StudentProfileEdit,
     StudentViewSet,
+    validate_student,
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
@@ -114,6 +115,7 @@ else:
 # ---- API URLS ----#
 
 router = routers.DefaultRouter()
+router.register(r"admin-status/", views.check_admin_status, basename="check-admin-status")
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet, basename="post")
 router.register(r"events", EventViewSet, basename="event")
@@ -192,4 +194,5 @@ urlpatterns += [
     path("api/pochtron/cagnotte_url/", CagnotteURL.as_view(), name="cagnotte_url"),
     path("api/test/", ProfilePicUpdate.as_view(), name="test"),
     path("api/edit_profile/", StudentProfileEdit.as_view(), name="edit_profile"),
+    path("api/validate-student/", views.validate_student, name="validate_student"),
 ]

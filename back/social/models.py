@@ -85,6 +85,7 @@ class Student(models.Model):
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
     )
     is_moderator = models.BooleanField(default=False)
+    is_validated = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.picture:

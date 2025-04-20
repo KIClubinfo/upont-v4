@@ -6,8 +6,9 @@ from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -59,6 +60,18 @@ class StudentViewSet(viewsets.ModelViewSet):
         else:
             print(form.errors)
             return Response({"status": "error", "errors": form.errors})
+
+    @action(detail=False, methods=['get'])
+    def unvalidated(self, request):
+        """Returns list of unvalidated students"""
+        if not (request.user.is_superuser or request.user.is_staff):
+            return Response({"error": "Permission denied"}, status=403)
+            
+        unvalidated = Student.objects.filter(is_validated=False).order_by(
+            "-promo__year", "user__first_name", "user__last_name"
+        )
+        serializer = StudentSerializer(unvalidated, many=True)
+        return Response(serializer.data)
 
 
 class OneStudentView(APIView):
@@ -659,3 +672,32 @@ def club_request(request):
         form = ClubRequestForm()
     context["ClubRequest"] = form
     return render(request, "social/club_request.html", context)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def validate_student(request):
+    """
+    Validates a student. Only accessible by superusers and staff members.
+    Expects a student_id in the POST data.
+    """
+    # Check if user has permission
+    if not (request.user.is_superuser or request.user.is_staff):
+        return Response({"error": "Permission denied"}, status=403)
+    
+    # Get student_id from request data
+    student_id = request.data.get('student_id')
+    if not student_id:
+        return Response({"error": "student_id is required"}, status=400)
+    
+    # Get and update student
+    try:
+        student = get_object_or_404(Student, id=student_id)
+        student.is_validated = True
+        student.save()
+        return Response({
+            "success": True,
+            "message": f"Student {student.user.first_name} {student.user.last_name} has been validated"
+        })
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
