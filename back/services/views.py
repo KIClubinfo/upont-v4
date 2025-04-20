@@ -379,58 +379,74 @@ class ReservationBikeViewSet(ModelViewSet):
     serializer_class = ReservationBikeSerializer
     queryset = ReservationBike.objects.all()
 
-    @action(detail=False, methods=["post"], url_path='get-nth-last-log') # Explicit url_path is good practice
+    # Keep url_path='logs' if your frontend expects it, or change if desired
+    @action(detail=False, methods=["post"], url_path='logs')
     def get_nth_last_log(self, request):
         """
-        Returns the n-th last log entry from the most recent reservation
-        associated with the given bike_id.
+        Retrieves the string representation (str) of the N-th most recent
+        ReservationBike instance associated with the given bike_id.
         """
         n_str = request.data.get("n")
         bike_id = request.data.get("bike_id")
 
         # --- Input Validation ---
-        if bike_id is None: # Check if bike_id was provided
+        if bike_id is None:
              return Response({"error": "Missing 'bike_id' in request body"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if n_str is None: # Check if n was provided
+        # Attempt to convert bike_id to integer if needed, depending on your Bike model's PK type
+        try:
+            bike_id_int = int(bike_id)
+        except (ValueError, TypeError):
+             return Response({"error": "'bike_id' must be a valid integer."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        if n_str is None:
             return Response({"error": "Missing 'n' in request body"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             n = int(n_str) # Convert n to integer
             if n <= 0:
-                 raise ValueError("'n' must be a positive integer.")
+                 # N must be 1 or greater (1st last, 2nd last, etc.)
+                 raise ValueError("'n' must be a positive integer (1 or greater).")
         except (ValueError, TypeError):
-            return Response({"error": "'n' must be a positive integer."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "'n' must be a positive integer (1 or greater)."}, status=status.HTTP_400_BAD_REQUEST)
         # --- End Input Validation ---
 
         try:
-            reservation = ReservationBike.objects.filter(bike_id=bike_id).latest('start_time')
+            # --- Query Logic ---
+            # 1. Filter by bike_id
+            # 2. Order by start_date descending (most recent first)
+            reservations_qs = ReservationBike.objects.filter(bike_id=bike_id_int).order_by('-start_date')
 
-            logs = reservation.logs.splitlines() if reservation.logs else [] 
+            # Check if any reservations exist for this bike
+            if not reservations_qs.exists():
+                 return Response({"error": f"No reservations found for bike_id {bike_id_int}"}, status=status.HTTP_404_NOT_FOUND)
 
-            if not logs:
-                # It's better to return success with empty/message than 404 if reservation exists but has no logs
-                return Response({"nth_last_log": None, "message": "No logs found for this reservation."}, status=status.HTTP_200_OK)
+            # 3. Select the N-th item (using 0-based index n-1)
+            # This directly fetches only the required object from the database
+            nth_last_reservation = reservations_qs[n-1] # Use n-1 because list/queryset indexing is 0-based
 
-            # Ensure n is not out of bounds
-            actual_n = min(n, len(logs))
+            # --- End Query Logic ---
 
-            # Get the n-th item from the *end* of the list
-            # Python negative indexing starts at -1 for the last item.
-            # So, logs[-1] is the last, logs[-2] is second last, ..., logs[-actual_n] is the n-th last.
-            nth_last_log = logs[-actual_n]
+            # 4. Get the string representation
+            reservation_string = str(nth_last_reservation)
 
-            data = {"nth_last_log": nth_last_log}
+            # Use the key 'nth_last_log' as before, although the value is now the reservation string
+            data = {"nth_last_log": reservation_string}
             return Response(data, status=status.HTTP_200_OK)
 
-        except ReservationBike.DoesNotExist:
-            # This means NO reservation was found for the given bike_id
-            return Response({"error": f"No reservation found for bike_id {bike_id}"}, status=status.HTTP_404_NOT_FOUND)
+        except IndexError:
+            # This occurs if n is greater than the total number of reservations found
+            # E.g., asking for the 10th last when only 5 exist.
+            count = reservations_qs.count() # Get the count (efficient if already evaluated or needed here)
+            return Response({"error": f"Cannot retrieve the {n}-th last reservation: Only {count} reservation(s) found for bike_id {bike_id_int}."}, status=status.HTTP_404_NOT_FOUND)
+
         except Exception as e:
             # Log the actual error for debugging on the server
-            print(f"Unexpected error in get_nth_last_log for bike_id {bike_id}: {e}")
+            print(f"Unexpected error in get_nth_last_log (str mode) for bike_id {bike_id_int}: {e}")
             # Return a generic server error for the client
-            return Response({"error": "An unexpected server error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) # Use 500 for unexpected errors
+            return Response({"error": "An unexpected server error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
     @action(detail=False, methods=["post"])
     def log_reservation(self, request):
         """
