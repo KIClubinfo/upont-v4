@@ -427,12 +427,15 @@ class ReservationBikeViewSet(ModelViewSet):
             nth_last_reservation = reservations_qs[min(n-1, reservations_qs.count()-1)] # Use n-1 because list/queryset indexing is 0-based
 
             # --- End Query Logic ---
-
+            data = {}
             # 4. Get the string representation
-            reservation_string = str(nth_last_reservation)
+            for i in range(min(n-1, reservations_qs.count()-1)):
+                reserv = reservations_qs[i]
+                data[f"reservation_{i+1}"] = str(reserv)
+
+
 
             # Use the key 'nth_last_log' as before, although the value is now the reservation string
-            data = {"nth_last_log": reservation_string}
             return Response(data, status=status.HTTP_200_OK)
 
         except IndexError:
