@@ -424,12 +424,12 @@ class ReservationBikeViewSet(ModelViewSet):
 
             # 3. Select the N-th item (using 0-based index n-1)
             # This directly fetches only the required object from the database
-            nth_last_reservation = reservations_qs[min(n-1, reservations_qs.count()-1)] # Use n-1 because list/queryset indexing is 0-based
+            nth_last_reservation = reservations_qs[min(n-1, reservations_qs.count()-1)] 
 
             # --- End Query Logic ---
             data = {}
             # 4. Get the string representation
-            for i in range(min(n-1, reservations_qs.count()-1)):
+            for i in range(min(n, reservations_qs.count())):
                 reserv = reservations_qs[i]
                 data[f"reservation_{i+1}"] = str(reserv)
 
