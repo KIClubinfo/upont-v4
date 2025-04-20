@@ -379,29 +379,58 @@ class ReservationBikeViewSet(ModelViewSet):
     serializer_class = ReservationBikeSerializer
     queryset = ReservationBike.objects.all()
 
-    @action(detail=True, methods=["post"])
-    def get_nth_last_log(self, request, pk=None):
+    @action(detail=False, methods=["post"], url_path='get-nth-last-log') # Explicit url_path is good practice
+    def get_nth_last_log(self, request):
         """
-        Returns the n-th last line of the logs of the reservation of the bike with the given bike_id
+        Returns the n-th last log entry from the most recent reservation
+        associated with the given bike_id.
         """
-        n = request.data.get("n")
+        n_str = request.data.get("n")
         bike_id = request.data.get("bike_id")
+
+        # --- Input Validation ---
+        if bike_id is None: # Check if bike_id was provided
+             return Response({"error": "Missing 'bike_id' in request body"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if n_str is None: # Check if n was provided
+            return Response({"error": "Missing 'n' in request body"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            reservation = self.get_object()
-            if reservation.bike_id != bike_id:
-                return Response({"error": "No logs found for the specified bike_id"}, status=status.HTTP_404_NOT_FOUND)
-            
-            logs = reservation.logs.splitlines()
-            if n > len(logs):
-                n = len(logs)
-            nth_last_log = logs[-n]
+            n = int(n_str) # Convert n to integer
+            if n <= 0:
+                 raise ValueError("'n' must be a positive integer.")
+        except (ValueError, TypeError):
+            return Response({"error": "'n' must be a positive integer."}, status=status.HTTP_400_BAD_REQUEST)
+        # --- End Input Validation ---
+
+        try:
+            reservation = ReservationBike.objects.filter(bike_id=bike_id).latest('start_time')
+
+            logs = reservation.logs.splitlines() if reservation.logs else [] 
+
+            if not logs:
+                # It's better to return success with empty/message than 404 if reservation exists but has no logs
+                return Response({"nth_last_log": None, "message": "No logs found for this reservation."}, status=status.HTTP_200_OK)
+
+            # Ensure n is not out of bounds
+            actual_n = min(n, len(logs))
+
+            # Get the n-th item from the *end* of the list
+            # Python negative indexing starts at -1 for the last item.
+            # So, logs[-1] is the last, logs[-2] is second last, ..., logs[-actual_n] is the n-th last.
+            nth_last_log = logs[-actual_n]
+
             data = {"nth_last_log": nth_last_log}
             return Response(data, status=status.HTTP_200_OK)
-        except ReservationBike.DoesNotExist:
-            return Response({"error": "ReservationBike not found"}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        except ReservationBike.DoesNotExist:
+            # This means NO reservation was found for the given bike_id
+            return Response({"error": f"No reservation found for bike_id {bike_id}"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            # Log the actual error for debugging on the server
+            print(f"Unexpected error in get_nth_last_log for bike_id {bike_id}: {e}")
+            # Return a generic server error for the client
+            return Response({"error": "An unexpected server error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) # Use 500 for unexpected errors
     @action(detail=False, methods=["post"])
     def log_reservation(self, request):
         """
