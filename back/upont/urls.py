@@ -58,7 +58,7 @@ from services.views import (
     RequestFormViewSet,
     ReservationBikeViewSet,
     ReservationMusicRoomViewSet,
-    MediatekViewSet,
+    LocalViewSet,  # Replace MediatekViewSet with LocalViewSet
     MedItemViewSet,
 )
 from social.views import (
@@ -130,7 +130,7 @@ router.register(r"services/vrac", VracViewSet, basename="vrac")
 router.register(r"services/requests", RequestFormViewSet, basename="requests")
 router.register(r"services/reservations", ReservationBikeViewSet, basename="reservations")
 router.register(r"services/musicroom", ReservationMusicRoomViewSet, basename="musicroom")
-router.register(r"services/mediatek", MediatekViewSet, basename="mediatek")
+router.register(r"services/locals", LocalViewSet, basename="local")
 
 router.register(r"partnerships", PartnershipViewSet, basename="partnership")
 

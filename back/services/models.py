@@ -450,3 +450,41 @@ class MedItem(models.Model):
         self.borrowed_by = -1
         self.borrowed_date = None
         self.save()
+
+
+class Local(models.Model):
+    TYPE_CHOICES = [
+        ("med", "Médiathèque"),
+        ("ki", "KI"),
+        ("musique", "Salle de musique"),
+        ("bde", "BDE"),
+        ("bds", "BDS"),
+        ("bda", "BDA"),
+        ("foyer", "Foyer"),
+        ("pep", "PEP"),
+        ("jardin", "Jardin"),
+        ("dvp", "DVP"),
+        ("trium", "Trium"),
+        ("bitum", "Bitum"),
+    ]
+    
+    name = models.CharField(max_length=50, choices=TYPE_CHOICES, unique=True)
+    is_open = models.BooleanField(default=False)
+    description = models.TextField(blank=True)
+
+    def save(self, *args, **kwargs):
+        # Ensure only one instance per local type
+        if Local.objects.filter(name=self.name).exists() and not self.pk:
+            raise ImproperlyConfigured(f"Only one {self.get_name_display()} instance allowed")
+        super(Local, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.get_name_display()} - {'ouvert' if self.is_open else 'fermé'}"
+    
+    def open(self):
+        self.is_open = True
+        self.save()
+
+    def close(self):
+        self.is_open = False
+        self.save()

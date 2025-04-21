@@ -73,6 +73,23 @@ class StudentViewSet(viewsets.ModelViewSet):
         serializer = StudentSerializer(unvalidated, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def birthdays_today(self, request):
+        """Returns list of students whose birthday is today"""
+        from datetime import datetime
+        
+        # Extract month and day from today's date
+        today = datetime.now()
+        
+        # Filter students whose birthday matches today's month and day
+        birthday_students = Student.objects.filter(
+            birthdate__month=today.month,
+            birthdate__day=today.day
+        ).order_by('-promo__year', 'user__first_name', 'user__last_name')
+        
+        serializer = StudentSerializer(birthday_students, many=True)
+        return Response(serializer.data)
+
 
 class OneStudentView(APIView):
     """

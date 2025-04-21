@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, Mediatek, MedItem
+from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, Mediatek, MedItem, Local
 from social.models import Membership
 
 from .serializers import (
@@ -22,11 +22,11 @@ from .serializers import (
     ReservationBikeSerializer,
     ReservationMusicRoomSerializer,
     CreateMusicRoomReservationSerializer,
-    MediatekSerializer,
     MedItemSerializer,
     MedItemSummarySerializer,
     RequestFormCreateSerializer,
-    RequestFormListSerializer
+    RequestFormListSerializer,
+    LocalSerializer
 )
 
 
@@ -544,49 +544,6 @@ class ReservationMusicRoomViewSet(ModelViewSet):
         """
         return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         
-class MediatekViewSet(ModelViewSet):
-    serializer_class = MediatekSerializer
-    queryset = Mediatek.objects.all()
-
-    @action(detail=False, methods=["post"])
-    def open_mediatek(self, request):
-        """
-        Opens the mediatek if the user is a member of "La Mediatek et Du Ponts et Des Jeux"
-        """
-        user = request.user
-        if not Membership.objects.filter(student__user=user, club__name="La Mediatek et Du Ponts et Des Jeux").exists():
-            return Response({"error": "Vous n'êtes pas autorisé à effectuer cette opération"}, status=status.HTTP_403_FORBIDDEN)
-
-        mediatek = get_object_or_404(Mediatek)
-        mediatek.open()
-        return Response({"message": "La mediatek est maintenant ouverte"}, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=["post"])
-    def close_mediatek(self, request):
-        """
-        Closes the mediatek if the user is a member of "La Mediatek et Du Ponts et Des Jeux"
-        """
-        user = request.user
-        if not Membership.objects.filter(student__user=user, club__name="La Mediatek et Du Ponts et Des Jeux").exists():
-            return Response({"error": "Vous n'êtes pas autorisé à effectuer cette opération"}, status=status.HTTP_403_FORBIDDEN)
-
-        mediatek = get_object_or_404(Mediatek)
-        mediatek.close()
-        return Response({"message": "La mediatek est maintenant fermée"}, status=status.HTTP_200_OK)
-    
-    @action(detail=False, methods=["get"])
-    def status(self, request):
-        """
-        Returns the status of the mediatek (open or closed)
-        """
-        mediatek = get_object_or_404(Mediatek)
-        status = str(mediatek)
-        return Response({"status": status}, status=status.HTTP_200_OK)
-    def create(self, request, *args, **kwargs):
-        """
-        Disable the default create method
-        """
-        return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class MedItemViewSet(ModelViewSet):
@@ -650,3 +607,132 @@ class MedItemViewSet(ModelViewSet):
         items = MedItem.objects.filter(filters)
         serializer = MedItemSummarySerializer(items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class LocalViewSet(ModelViewSet):
+    serializer_class = LocalSerializer
+    queryset = Local.objects.all()
+
+    LOCAL_CLUB_MAP = {
+        "med": "La Mediatek et Du Ponts et Des Jeux",
+        "ki": "Club Informatique",
+        "musique": "Décibel",
+        "bde": "Bureau des élèves",
+        "bds": "Bureau des sports",
+        "bda": "Bureau des Arts",
+        "foyer": "Foyer",
+        "pep": "Ponts Etudes Projets",
+        "jardin": "Ecoponts",
+        "dvp": "Dévelop'Ponts",
+        "trium": "Trium",
+        "bitum": "BiTuM",
+    }
+
+    @action(detail=False, methods=["post"])
+    def change_status(self, request):
+        """
+        Changes the status (open/close) of a local if the user has the right permissions
+        """
+        user = request.user
+        local_name = request.query_params.get('local')
+
+        if not local_name:
+            return Response(
+                {"error": "Local name is required in query parameters"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+
+        # Check if the local exists and the user has permission
+        try:
+            local = get_object_or_404(Local, name=local_name)
+            required_club = self.LOCAL_CLUB_MAP.get(local_name)
+            
+            if not required_club or not Membership.objects.filter(
+                student__user=user, 
+                club__name=required_club
+            ).exists():
+                return Response(
+                    {"error": "You are not authorized to change this local's status"}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Toggle the status
+            if local.is_open:
+                local.close()
+                message = f"{local.get_name_display()} est maintenant fermé"
+            else:
+                local.open()
+                message = f"{local.get_name_display()} est maintenant ouvert"
+
+            return Response({"message": message}, status=status.HTTP_200_OK)
+
+        except Local.DoesNotExist:
+            return Response(
+                {"error": f"Local '{local_name}' not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    @action(detail=False, methods=["get"])
+    def status(self, request):
+        """
+        Returns the status of all locals or a specific local if specified in query params
+        """
+        local_name = request.query_params.get('local')
+        
+        if local_name:
+            local = get_object_or_404(Local, name=local_name)
+            return Response(
+                {"status": str(local)}, 
+                status=status.HTTP_200_OK
+            )
+        
+        # If no specific local requested, return all locals' status
+        locals = Local.objects.all()
+        status_dict = {
+            local.name: str(local) for local in locals
+        }
+        return Response(status_dict, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"])
+    def open_locals(self, request):
+        """
+        Returns a list of all open locals
+        """
+        open_locals = Local.objects.filter(is_open=True)
+        serializer = LocalSerializer(open_locals, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"])
+    def available_locals(self, request):
+        """
+        Returns a list of closed locals that the user has permission to open
+        """
+        user = request.user
+        
+        # Get user's club memberships
+        user_clubs = set(
+            membership.club.name 
+            for membership in Membership.objects.filter(student__user=user)
+        )
+
+        # Get closed locals
+        closed_locals = Local.objects.filter(is_open=False)
+        
+        # Filter locals based on user's permissions
+        available_locals = [
+            local for local in closed_locals
+            if self.LOCAL_CLUB_MAP.get(local.name) in user_clubs
+        ]
+
+        serializer = LocalSerializer(available_locals, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Disable the default create method
+        """
+        return Response(
+            {"error": "Method Not Allowed"}, 
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )

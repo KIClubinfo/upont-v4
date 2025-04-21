@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from datetime import timedelta
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, Mediatek, MedItem
+from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, MedItem, Local
 from django.utils.timezone import make_aware
 
 class BikeSerializer(serializers.ModelSerializer):
@@ -106,10 +106,10 @@ class CreateMusicRoomReservationSerializer(serializers.Serializer):
         return data
 
 
-class MediatekSerializer(serializers.ModelSerializer):
+class LocalSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Mediatek
-        fields = ["is_open"]
+        model = Local
+        fields = ["name", "is_open", "description"]
 
 class MedItemSerializer(serializers.ModelSerializer):
     class Meta:
