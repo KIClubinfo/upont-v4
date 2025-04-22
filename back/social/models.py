@@ -87,6 +87,7 @@ class Student(models.Model):
     first_connection = models.BooleanField(default=True)
     is_validated = models.BooleanField(default=True)
     is_moderator = models.BooleanField(default=False)
+    is_validated = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.picture:
