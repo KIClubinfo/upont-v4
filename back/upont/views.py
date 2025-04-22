@@ -224,12 +224,20 @@ def get_sso_token(request):
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
     if created_flag["value"]:
+
+        def capitalize_name_parts(name_str):
+            if not name_str:
+                return ""
+            parts = name_str.split("-")
+            capitalized_parts = [part.capitalize() for part in parts if part]
+            return "-".join(capitalized_parts)
+
         first_name, last_name = (
             user.username.split(".", 1) if "." in user.username else (user.username, "")
         )
         latest_promotion = Promotion.objects.order_by("-nickname").first()
-        user.first_name = first_name
-        user.last_name = last_name
+        user.first_name = capitalize_name_parts(first_name)
+        user.last_name = capitalize_name_parts(last_name)
         user.email = f"{user.username}@enpc.fr"
         user.save()
         Student.objects.create(user=user, promo=latest_promotion, is_validated=False)
