@@ -5,6 +5,7 @@ import os
 from urllib.parse import unquote
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -16,9 +17,16 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.urls import reverse
+from django_cas_ng.backends import CASBackend
+from django_cas_ng.signals import cas_user_authenticated
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from social.models import Promotion, Student
@@ -26,12 +34,22 @@ from upont.auth import EmailBackend
 
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
 
+User = get_user_model()
+
 
 def root_redirect(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse(LOGIN_REDIRECT_URL))
     else:
         return HttpResponseRedirect(reverse(LOGIN_URL))
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def auth_check(request):
+    print(f"DEBUG: Token auth successful for user: {request.user}")
+    return HttpResponse(status=200)
 
 
 @api_view(["GET"])
@@ -178,7 +196,72 @@ def get_token(request):
     return Response({"token": token.key})
 
 
-@api_view(['GET'])
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_sso_token(request):
+    """
+    Authentifie un utilisateur via SSO CAS et retourne un token d'authentification Django.
+    Redirige l'utilisateur vers l'application mobile avec le token.
+    """
+    ticket = request.GET.get("ticket")
+    service = request.build_absolute_uri(request.path)
+    service = service.replace("http://", "https://")
+
+    if not ticket:
+        return Response({"error": "Ticket CAS manquant"}, status=400)
+
+    created_flag = {"value": False}  # Use a mutable object to capture changes
+
+    # Define a simple inline signal handler and authenticate the user
+    def user_authenticated_handler(sender, user, created, **kwargs):
+        if created:
+            created_flag["value"] = True
+
+    cas_user_authenticated.connect(user_authenticated_handler, weak=False)
+    user = CASBackend().authenticate(request, ticket=ticket, service=service)
+    cas_user_authenticated.disconnect(user_authenticated_handler)
+
+    if not user:
+        return Response({"error": "Échec de l'authentification CAS"}, status=403)
+
+    if created_flag["value"]:
+
+        def capitalize_name_parts(name_str):
+            if not name_str:
+                return ""
+            parts = name_str.split("-")
+            capitalized_parts = [part.capitalize() for part in parts if part]
+            return "-".join(capitalized_parts)
+
+        first_name, last_name = (
+            user.username.split(".", 1) if "." in user.username else (user.username, "")
+        )
+        latest_promotion = Promotion.objects.order_by("-nickname").first()
+        user.first_name = capitalize_name_parts(first_name)
+        user.last_name = capitalize_name_parts(last_name)
+        user.email = f"{user.username}@enpc.fr"
+        user.save()
+        Student.objects.create(user=user, promo=latest_promotion, is_validated=False)
+
+    token, _ = Token.objects.get_or_create(user=user)
+
+    redirect_url = f"upont://login?token={token.key}"
+
+    return HttpResponse(
+        f"""
+        <html>
+        <head>
+            <meta http-equiv="refresh" content="0;url={redirect_url}">
+        </head>
+        <body>
+            <p>Si vous n'êtes pas redirigé, <a href="{redirect_url}">cliquez ici</a>.</p>
+        </body>
+        </html>
+        """
+    )
+
+
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def check_admin_status(request):
     """
@@ -187,15 +270,15 @@ def check_admin_status(request):
     """
     user = request.user
     status = {
-        'is_superuser': user.is_superuser,
-        'is_staff': user.is_staff,
+        "is_superuser": user.is_superuser,
+        "is_staff": user.is_staff,
     }
     return Response(status)
 
 
 class AdminStatusViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
-    
+
     def list(self, request):
         """
         Returns the admin status of the currently authenticated user.
@@ -203,8 +286,8 @@ class AdminStatusViewSet(viewsets.ViewSet):
         """
         user = request.user
         status = {
-            'is_superuser': user.is_superuser,
-            'is_staff': user.is_staff,
+            "is_superuser": user.is_superuser,
+            "is_staff": user.is_staff,
         }
         return Response(status)
 

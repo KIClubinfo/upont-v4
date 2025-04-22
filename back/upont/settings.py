@@ -259,7 +259,7 @@ LOGGING = {
 
 # SSO CONNECT
 CAS_SERVER_URL = "http://cas.enpc.fr/cas/"
-CAS_CREATE_USER = False
+CAS_CREATE_USER = True
 CAS_CHECK_NEXT = False
 CAS_REDIRECT_URL = "/"
 CAS_ADMIN_PREFIX = "admin/"

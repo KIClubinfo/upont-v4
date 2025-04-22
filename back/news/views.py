@@ -5,12 +5,14 @@ from datetime import datetime
 from functools import reduce
 
 from courses.models import Course, Resource
+from django.contrib import messages
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
@@ -37,6 +39,21 @@ pattern = re.compile(
 
 @login_required
 def posts(request):
+    try:
+        student = Student.objects.get(user=request.user)
+        if not student.is_validated:
+            logout(request)
+            messages.warning(
+                request,
+                "Votre compte étudiant n'est pas encore validé. Veuillez attendre la validation par un administrateur.",
+            )
+            return redirect(reverse_lazy("login"))
+    except Student.DoesNotExist:
+        user_to_delete = request.user
+        user_to_delete.delete()
+        logout(request)
+        messages.warning(request, "Vous n'êtes pas autorisé à accéder à ce site.")
+        return redirect(reverse_lazy("login"))
     if request.method == "GET":
         return render(request, "news/posts.html")
 
