@@ -5,12 +5,13 @@ from datetime import datetime
 from functools import reduce
 
 from courses.models import Course, Resource
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
@@ -37,6 +38,13 @@ pattern = re.compile(
 
 @login_required
 def posts(request):
+    try:
+        Student.objects.get(user=request.user)
+    except Student.DoesNotExist:
+        user_to_delete = request.user
+        user_to_delete.delete()
+        logout(request)
+        return redirect(reverse_lazy("login"))
     if request.method == "GET":
         return render(request, "news/posts.html")
 
