@@ -325,15 +325,30 @@ class RequestFormViewSet(ModelViewSet):
         """
         user = request.user
         service = request.query_params.get("service")
+        club_service_map = {
+            "musique": "Décibel",
+            "vracs": "Ecoponts",
+            "velos": "Ecoponts",
+            "med": "La Mediatek et Du Ponts et Des Jeux",
+            "bde": "Bureau des élèves",
+            "bds": "Bureau des sports",
+            "bda": "Bureau des Arts",
+            "foyer": "Foyer",
+            "pep": "Ponts Etudes Projets",
+            "ki": "Club Informatique",
+            "trium": "Trium",
+            "bitum": "BiTuM",
+            "dvp": "Dévelop'Ponts",
+            "jardin": "Ecoponts",
+        }
 
-        if service == "musique" and Membership.objects.filter(student__user=user, club__name="Décibel").exists():
-            requests = RequestForm.objects.filter(service="musique", status="pending")
-        elif service in ["vracs", "velos"] and Membership.objects.filter(student__user=user, club__name="Ecoponts").exists():
+        club_name = club_service_map.get(service)
+        if club_name and Membership.objects.filter(student__user=user, club__name=club_name).exists():
             requests = RequestForm.objects.filter(service=service, status="pending")
         else:
             return Response(
-                {"error": "Vous n'êtes pas autorisé à accéder à ces demandes"},
-                status=status.HTTP_403_FORBIDDEN,
+            {"error": "Vous n'êtes pas autorisé à accéder à ces demandes"},
+            status=status.HTTP_403_FORBIDDEN,
             )
 
         serializer = RequestFormListSerializer(requests, many=True)
