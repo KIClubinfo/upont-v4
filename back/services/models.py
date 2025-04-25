@@ -346,6 +346,15 @@ class RequestForm(models.Model):
         ("musique", "Musique"),
         ("ki", "KI"),
         ("med", "Med"),
+        ("bde", "BDE"),
+        ("bds", "BDS"),
+        ("bda", "BDA"),
+        ("foyer", "Foyer"),
+        ("pep", "PEP"),
+        ("jardin", "Jardin"),
+        ("dvp", "DVP"),
+        ("trium", "Trium"),
+        ("bitum", "Bitum"),
     ]
 
     STATUS_CHOICES = [
