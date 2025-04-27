@@ -17,7 +17,7 @@ session.headers.update(
 
 
 def send_push_message_to_all_students(title, message, extra=None):
-    students = Student.objects.all()
+    students = Student.objects.filter(is_validated=True)
     send_push_message_to_group.delay(
         [student.user.username for student in students], title, message, extra
     )
