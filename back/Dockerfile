@@ -14,8 +14,9 @@ ENV PYTHONUNBUFFERED=1 \
     # Env
     PYSETUP_PATH="/opt/pysetup"
 
-# Install Poetry
+# Install Poetry and cryptography
 RUN pip install --no-cache-dir poetry==1.6.1
+RUN pip install cryptography
 
 WORKDIR $PYSETUP_PATH
 
@@ -40,18 +41,21 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
     # For checking when db is up
     netcat-traditional=1.10-47 \
-    iputils-ping=3:20221126-1 \
+    # iputils-ping=3:20221126-1 \
     # Add postgresql support
     python3-psycopg2=2.9.5-1+b1 \
+    cargo \
     # Install sass
     npm=9.2.0~ds1-1 \
     && npm install -g sass@1.54.3 \
     && rm -rf /var/lib/apt/lists/*
+    
 
 # ======================== DEV ENVIRONMENT ========================
 # `development` image is used during development / testing
 FROM runtime-base as development
 
+RUN pip install cryptography
 COPY ./entrypoint.dev.sh /usr/local/bin/
 RUN mkdir -p /src/upont/static/react \
     && chmod 777 /src/upont/static/react \

@@ -5,14 +5,22 @@ from django.db.models import Q
 from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+
+import os
+import base64
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, NotificationToken, Role, Student
+from .models import Category, Club, Membership, NotificationToken, Role, Student, Channel, Message, ChannelEncryptedKey
 from .serializers import (
     ClubSerializer,
     ClubSerializerLite,
@@ -243,8 +251,88 @@ class ProfilePicUpdate(APIView):
         student.picture = image
         student.save()
         return Response({"status": "ok"})
+    
+class CreateChannel(APIView):
+    """
+    API endpoint that allows a student to create a channel
+    """
+    def post(self, request):
+        members = [get_object_or_404(Student, user__id=user_id) for user_id in request.data["members"]]
+        admins = [get_object_or_404(Student, user__id=user_id) for user_id in request.data["admins"]]
+        #Symmetric key to encrypt message in the channel
+        key = os.urandom(32)
+        key_base64 = base64.b64encode(key).decode('utf-8')
+        encrypted_keys = []
+        for user_id in request.data["members"]:
+            student = get_object_or_404(Student, user__id=user_id)
+            public_key_pem = student.public_key.encode('utf-8')
+            public_key = serialization.load_pem_public_key(public_key_pem, backend=default_backend())
+            encrypted_key = public_key.encrypt(
+            key_base64,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+                )
+            )
+            encrypted_key_save = ChannelEncryptedKey(
+                key = base64.b64encode(encrypted_key).decode('utf-8'),
+                student = student,
+            )
+            encrypted_key_save.save()
+            encrypted_keys.append(encrypted_key_save)
 
 
+        
+        if request.data["channel_of"] == "-1":
+            club = club = get_object_or_404(Club, id=request.data["channel_of"])
+            channel = Channel(
+                name = request.data["name"],
+                date = timezone.now(),
+                creator = get_object_or_404(Student, user__id=request.user.id),
+                members = members,
+                admins = admins,
+                encrypted_keys = encrypted_keys,
+            )
+        else:
+            channel = Channel(
+                name = request.data["name"],
+                date = timezone.now(),
+                creator = get_object_or_404(Student, user__id=request.user.id),
+                club = club,
+                members = members,
+                admins = admins,
+                encrypted_keys = encrypted_keys,
+            )
+        channel.save()
+        return Response({"status": "ok"})
+    
+
+class CreateMessage(APIView):
+    def post(self, request):
+        if request.data["by_club"] == "-1":
+            message = Message(
+                channel = get_object_or_404(Channel, id = request.data["channel"]),
+                date = timezone.now(),
+                author = get_object_or_404(Student, user__id=request.user.id),
+                content = request.data["content"]
+
+            )
+        else:
+            club = club = get_object_or_404(Club, id=request.data["channel_of"])
+            message = Message(
+                channel = get_object_or_404(Channel, id = request.data["channel"]),
+                date = timezone.now(),
+                author = get_object_or_404(Student, user__id=request.user.id),
+                club = club,
+                content = request.data["content"]
+            )
+        message.save()
+
+
+""" class ViewMessage(APIView):
+
+ """
 @login_required
 def profile(request, user_id=None):
     if user_id is None:

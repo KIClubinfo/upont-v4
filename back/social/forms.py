@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Club, ClubRequest, Membership, Role, Student
+from .models import Club, ClubRequest, Membership, Role, Student, Message
 
 # from django.forms import extras
 
@@ -15,6 +15,7 @@ class EditProfile(forms.ModelForm):
             "gender",
             "birthdate",
             "biography",
+            "public_key",
         )
         widgets = {
             "phone_number": forms.TextInput(
@@ -114,3 +115,25 @@ class ClubRequestForm(forms.ModelForm):
             "name": forms.TextInput(attrs={"class": "profil-input"}),
             "content": forms.Textarea(attrs={"class": "text-input"}),
         }
+
+class EditMessage(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = (
+            "channel",
+            "date",
+            "author",
+            "club",
+            "content",
+        )
+        widgets = {
+            "content": forms.TextInput(attrs={"class": "profil-input"}),
+            "date": forms.DateInput(
+                format="%d/%m/%Y", attrs={"class": "profil-input"}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(EditClub, self).__init__(*args, **kwargs)
+        self.fields["channel"].required = False
+        self.fields["date"].required = False

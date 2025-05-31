@@ -31,10 +31,13 @@ DEBUG = env("DEBUG", default=False)
 
 if DEBUG:
     ALLOWED_HOSTS = [
+        "192.168.130.59",
         "localhost",
         "127.0.0.1",
         "back",
     ]
+    CSRF_TRUSTED_ORIGINS = ['http://192.168.1.42:8000']
+
 else:
     ALLOWED_HOSTS = [env("DOMAIN_NAME", default="upont.enpc.org")]
 
