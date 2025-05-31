@@ -107,6 +107,10 @@ class Participation(models.Model):
     motivation = models.TextField(null=True)
     failed_motivation = models.BooleanField(default=False)
 
+    # Empêche quelqu'un de participer deux fois au même shotgun
+    class Meta:
+        unique_together = (("participant", "shotgun"),)
+
 
 class Shotgun(models.Model):
     title = models.CharField(max_length=50)

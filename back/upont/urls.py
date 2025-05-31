@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
 import django_cas_ng.views
 from courses.views import (
     CourseViewSet,
@@ -51,7 +50,16 @@ from pochtron.views import (
     SearchAlcohol,
 )
 from rest_framework import routers
-from services.views import BikesViewSet
+from services.views import (
+    BikesViewSet, 
+    OrderViewSet,
+    VracViewSet,
+    RequestFormViewSet,
+    ReservationBikeViewSet,
+    ReservationMusicRoomViewSet,
+    LocalViewSet,  # Replace MediatekViewSet with LocalViewSet
+    MedItemViewSet,
+)
 from social.views import (
     ClubsViewSet,
     CurrentStudentView,
@@ -66,6 +74,7 @@ from social.views import (
     StudentMembershipView,
     StudentProfileEdit,
     StudentViewSet,
+    validate_student,
 )
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
@@ -90,6 +99,7 @@ urlpatterns = [
     ),  # forces redirection of already authenticated users
     path("", include("django.contrib.auth.urls")),
     path("", views.root_redirect),
+    path("internal/auth-check/", views.auth_check, name="internal_auth_check"),
     path("cas/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
     path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
     path("page_not_created/", views.page_not_created, name="page_not_created"),
@@ -105,6 +115,7 @@ else:
 # ---- API URLS ----#
 
 router = routers.DefaultRouter()
+router.register(r"admin-status", views.AdminStatusViewSet, basename="check-admin-status")
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet, basename="post")
 router.register(r"events", EventViewSet, basename="event")
@@ -114,6 +125,13 @@ router.register(r"timeslots", TimeslotViewSet, basename="timeslot")
 router.register(r"resources", ResourceViewSet, basename="resource")
 router.register(r"clubs", ClubsViewSet)
 router.register(r"services/bikes", BikesViewSet, basename="bikes")
+router.register(r"services/orders", OrderViewSet, basename="order")
+router.register(r"services/vrac", VracViewSet, basename="vrac")
+router.register(r"services/requests", RequestFormViewSet, basename="requests")
+router.register(r"services/reservations", ReservationBikeViewSet, basename="reservations")
+router.register(r"services/musicroom", ReservationMusicRoomViewSet, basename="musicroom")
+router.register(r"services/locals", LocalViewSet, basename="local")
+
 router.register(r"partnerships", PartnershipViewSet, basename="partnership")
 
 urlpatterns += [
@@ -141,6 +159,7 @@ urlpatterns += [
     ),
     path("api/calendar_data/", CalendarData.as_view(), name="calendar_data"),
     path("api/get_token/", views.get_token, name="get_token"),
+    path("api/get_sso_token/", views.get_sso_token, name="get_sso_token"),
     path("api/shotguns/", ShotgunView.as_view(), name="shotgun"),
     path(
         "api/shotgun/participate/",
@@ -176,4 +195,5 @@ urlpatterns += [
     path("api/pochtron/cagnotte_url/", CagnotteURL.as_view(), name="cagnotte_url"),
     path("api/test/", ProfilePicUpdate.as_view(), name="test"),
     path("api/edit_profile/", StudentProfileEdit.as_view(), name="edit_profile"),
+    path("api/validate-student/", validate_student, name="validate_student"),
 ]

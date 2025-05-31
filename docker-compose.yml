@@ -2,7 +2,7 @@ version: "3.6"
 
 services:
   db:
-    image: postgres:bookworm
+    image: postgres:13.12-bookworm
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -72,6 +72,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   webinstaller:
     build:

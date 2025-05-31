@@ -7,8 +7,9 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from cryptography.hazmat.primitives import serialization
@@ -20,7 +21,18 @@ import os
 import base64
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import Category, Club, Membership, NotificationToken, Role, Student, Channel, Message, ChannelEncryptedKey
+from .models import (
+    Category,
+    Club,
+    Membership,
+    NotificationToken,
+    Promotion,
+    Role,
+    Student,
+    Channel, 
+    Message, 
+    ChannelEncryptedKey
+)
 from .serializers import (
     ClubSerializer,
     ClubSerializerLite,
@@ -58,15 +70,59 @@ class StudentViewSet(viewsets.ModelViewSet):
         form = EditProfile(request.data, instance=student)
         print(request.data)
         if form.is_valid():
+            if "promo" in request.data:
+                try:
+                    promotion = Promotion.objects.get(nickname=request.data["promo"])
+                    student.promo = promotion
+                    student.save()
+                except Promotion.DoesNotExist:
+                    return Response(
+                        {
+                            "status": "error",
+                            "errors": {"promotion": ["Promotion invalide !"]},
+                        }
+                    )
             if "picture" in request.data:
                 student.picture.delete(save=False)
                 student.picture = request.data["picture"]
+                student.save()
+            if "first_connection" in request.data:
+                student.first_connection = request.data["first_connection"]
                 student.save()
             form.save()
             return Response({"status": "ok"})
         else:
             print(form.errors)
             return Response({"status": "error", "errors": form.errors})
+
+    @action(detail=False, methods=['get'])
+    def unvalidated(self, request):
+        """Returns list of unvalidated students"""
+        if not (request.user.is_superuser or request.user.is_staff):
+            return Response({"error": "Permission denied"}, status=403)
+            
+        unvalidated = Student.objects.filter(is_validated=False).order_by(
+            "-promo__year", "user__first_name", "user__last_name"
+        )
+        serializer = StudentSerializer(unvalidated, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def birthdays_today(self, request):
+        """Returns list of students whose birthday is today"""
+        from datetime import datetime
+        
+        # Extract month and day from today's date
+        today = datetime.now()
+        
+        # Filter students whose birthday matches today's month and day
+        birthday_students = Student.objects.filter(
+            birthdate__month=today.month,
+            birthdate__day=today.day
+        ).order_by('-promo__year', 'user__first_name', 'user__last_name')
+        
+        serializer = StudentSerializer(birthday_students, many=True)
+        return Response(serializer.data)
 
 
 class OneStudentView(APIView):
@@ -747,3 +803,32 @@ def club_request(request):
         form = ClubRequestForm()
     context["ClubRequest"] = form
     return render(request, "social/club_request.html", context)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def validate_student(request):
+    """
+    Validates a student. Only accessible by superusers and staff members.
+    Expects a student_id in the POST data.
+    """
+    # Check if user has permission
+    if not (request.user.is_superuser or request.user.is_staff):
+        return Response({"error": "Permission denied"}, status=403)
+    
+    # Get student_id from request data
+    student_id = request.data.get('student_id')
+    if not student_id:
+        return Response({"error": "student_id is required"}, status=400)
+    
+    # Get and update student
+    try:
+        student = get_object_or_404(Student, id=student_id)
+        student.is_validated = True
+        student.save()
+        return Response({
+            "success": True,
+            "message": f"Student {student.user.first_name} {student.user.last_name} has been validated"
+        })
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
