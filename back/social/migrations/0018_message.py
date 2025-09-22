@@ -22,4 +22,5 @@ class Migration(migrations.Migration):
                 ('promo', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='social.promotion')),
             ],
         ),
+        
     ]

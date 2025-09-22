@@ -7,6 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
+        ("social", "0018_message"),
         ('social', '0016_alter_club_nickname'),
         ('news', '0012_partnership'),
     ]
@@ -45,5 +46,9 @@ class Migration(migrations.Migration):
             model_name='optionsondage',
             name='sondage',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='news.sondage'),
+        ),
+        migrations.AlterUniqueTogether(
+            name="participation",
+            unique_together={("participant", "shotgun")},
         ),
     ]

@@ -381,6 +381,69 @@ class PostCreateViewV2(APIView):
         return Response({"status": "ok"})
 
 
+class ShotgunCreateView(APIView):
+    """
+    API endpoint to create a shotgun (only for club admins).
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+
+        # Vérifier les clubs où l'étudiant est admin
+        admin_clubs_memberships = Membership.objects.filter(
+            student__pk=student.id, is_admin=True
+        )
+        admin_clubs = []
+        for membership in admin_clubs_memberships:
+            admin_clubs.append(membership.club)
+
+        if not admin_clubs:
+            return Response({"status": "error", "message": "not_admin"})
+
+        # Champs obligatoires
+        title = request.data["title"]
+        content = request.data["content"]
+        club_id = request.data["club"]
+
+        if not title:
+            return Response({"status": "error", "message": "empty_title"})
+        if not content:
+            return Response({"status": "error", "message": "empty_content"})
+        if not club_id:
+            return Response({"status": "error", "message": "no_club"})
+
+        club = get_object_or_404(Club, id=club_id)
+
+        # Vérifier que l’étudiant est admin du club choisi
+        if club not in admin_clubs:
+            return Response({"status": "error", "message": "forbidden"})
+
+        # Création du shotgun
+        shotgun = Shotgun(
+            club=club,
+            title=title,
+            content=split_then_markdownify(content),
+            starting_date=request.data.get("starting_date", timezone.now()),
+            ending_date=request.data["ending_date"],
+            requires_motivation=request.data["requires_motivation"],
+            success_message=split_then_markdownify(
+                request.data["success_message"]
+            ),
+            failure_message=split_then_markdownify(
+                request.data["failure_message"]
+            ),
+        )
+        shotgun.save()
+
+        return Response(
+            {
+                "status": "ok",
+                "shotgun_id": shotgun.id,
+                "message": "shotgun_created",
+            }
+        )
+    
+
 class PostEditView(APIView):
     """
     API endpoint that allows students to edit posts

@@ -237,25 +237,41 @@ if DEBUG:
     DJANGO_LOG_LEVEL = "DEBUG"
 else:
     DJANGO_LOG_LEVEL = "INFO"
+if DEBUG:
+    DJANGO_LOG_LEVEL = "DEBUG"
+else:
+    DJANGO_LOG_LEVEL = "INFO"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
     "handlers": {
         "console": {
-            "level": "DEBUG",
+            "level": "DEBUG",  # envoie tout dans stdout
             "class": "logging.StreamHandler",
+            "formatter": "verbose",
         },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": DJANGO_LOG_LEVEL,
     },
     "loggers": {
         "django": {
-            "handers": ["console"],
-            "level": "INFO",
-            "propagate": True,
-        },
-        "myapp": {
             "handlers": ["console"],
             "level": DJANGO_LOG_LEVEL,
-            "propagate": True,
+            "propagate": False,
+        },
+        "upont": {  # ton projet
+            "handlers": ["console"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": False,
         },
     },
 }

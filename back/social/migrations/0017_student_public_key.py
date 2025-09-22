@@ -15,4 +15,9 @@ class Migration(migrations.Migration):
             name='public_key',
             field=models.TextField(max_length=100, null=True),
         ),
+        migrations.AddField(
+            model_name="student",
+            name="is_validated",
+            field=models.BooleanField(default=True),
+        ),
     ]
