@@ -7,29 +7,67 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('social', '0018_message'),
+        ("social", "0018_message"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='message',
-            name='promo',
+            model_name="message",
+            name="promo",
         ),
         migrations.CreateModel(
-            name='Channel',
+            name="Channel",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('date', models.DateTimeField()),
-                ('admins', models.ManyToManyField(related_name='channels_admin', to='social.Student')),
-                ('club', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='social.club')),
-                ('creator', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='social.student', verbose_name='author')),
-                ('members', models.ManyToManyField(related_name='channels', to='social.Student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("date", models.DateTimeField()),
+                (
+                    "admins",
+                    models.ManyToManyField(
+                        related_name="channels_admin", to="social.Student"
+                    ),
+                ),
+                (
+                    "club",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="social.club",
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="social.student",
+                        verbose_name="author",
+                    ),
+                ),
+                (
+                    "members",
+                    models.ManyToManyField(
+                        related_name="channels", to="social.Student"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='message',
-            name='channel',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='social.channel'),
+            model_name="message",
+            name="channel",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="social.channel",
+            ),
         ),
     ]

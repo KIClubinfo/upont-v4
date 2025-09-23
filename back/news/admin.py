@@ -1,6 +1,14 @@
 from django.contrib import admin
 
-from .models import Comment, Event, Participation, Partnership, Post, Ressource, Shotgun#, Sondage, OptionSondage, VoteSondage
+from .models import (
+    Comment,
+    Event,
+    Participation,
+    Partnership,
+    Post,
+    Ressource,
+    Shotgun,
+)  # , Sondage, OptionSondage, VoteSondage
 
 admin.site.register(Partnership)
 
@@ -15,11 +23,14 @@ class PostsAdmin(admin.ModelAdmin):
     list_display = ("title", "author", "date")
     ordering = ("date",)
 
+
 """ class SondageAdmin(admin.ModelAdmin):
     list_display = ("title", "author", "date")
     ordering = ("date",)
 
  """
+
+
 class ParticipationAdmin(admin.ModelAdmin):
     list_display = ("participant", "shotgun", "shotgun_date")
     ordering = ("shotgun_date",)
@@ -29,6 +40,7 @@ class ShotgunAdmin(admin.ModelAdmin):
     list_display = ("title", "club", "starting_date", "ending_date")
     list_filter = ("club",)
     ordering = ("starting_date",)
+
 
 """ admin.site.register(OptionSondage)
 admin.site.register(VoteSondage)

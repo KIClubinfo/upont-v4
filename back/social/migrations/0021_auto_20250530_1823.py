@@ -7,22 +7,27 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('social', '0020_channelencryptedkey'),
+        ("social", "0020_channelencryptedkey"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='channelencryptedkey',
-            name='channel',
+            model_name="channelencryptedkey",
+            name="channel",
         ),
         migrations.AddField(
-            model_name='channel',
-            name='encrypted_keys',
-            field=models.ManyToManyField(to='social.ChannelEncryptedKey'),
+            model_name="channel",
+            name="encrypted_keys",
+            field=models.ManyToManyField(to="social.ChannelEncryptedKey"),
         ),
         migrations.AddField(
-            model_name='channelencryptedkey',
-            name='student',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='encrypted_channel_keys', to='social.student'),
+            model_name="channelencryptedkey",
+            name="student",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="encrypted_channel_keys",
+                to="social.student",
+            ),
         ),
     ]

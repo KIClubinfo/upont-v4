@@ -36,14 +36,17 @@ class ClubRequestAdmin(admin.ModelAdmin):
 class NotificationTokenAdmin(admin.ModelAdmin):
     list_display = ("student", "token")
 
+
 class MessageAdmin(admin.ModelAdmin):
     list_display = ("channel", "club", "author", "date")
     ordering = ("date",)
     list_filter = ("channel",)
 
+
 class ChannelAdmin(admin.ModelAdmin):
     list_display = ("name", "club", "creator", "date")
     ordering = ("name",)
+
 
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Channel, ChannelAdmin)

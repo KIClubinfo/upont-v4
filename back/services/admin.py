@@ -3,7 +3,17 @@ from decimal import Decimal
 from django import forms
 from django.contrib import admin
 
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationMusicRoom, Local, MedItem, Mediatek
+from .models import (
+    Bike,
+    Order,
+    OrderItem,
+    Vrac,
+    RequestForm,
+    ReservationMusicRoom,
+    Local,
+    MedItem,
+    Mediatek,
+)
 
 
 class VracAdminForm(forms.ModelForm):
@@ -110,6 +120,7 @@ class VracAdmin(admin.ModelAdmin):
 
     display_stock_available.short_description = "Stock Available"
 
+
 @admin.register(RequestForm)
 class RequestFormAdmin(admin.ModelAdmin):
     list_display = ("name", "service", "status")
@@ -120,7 +131,9 @@ class RequestFormAdmin(admin.ModelAdmin):
 
     def mark_as_done(self, request, queryset):
         queryset.update(status="done")
+
     mark_as_done.short_description = "Mark selected requests as done"
+
 
 @admin.register(ReservationMusicRoom)
 class ReservationMusicRoomAdmin(admin.ModelAdmin):
@@ -136,7 +149,6 @@ class LocalAdmin(admin.ModelAdmin):
     search_fields = ("name", "description")
 
 
-
 @admin.register(MedItem)
 class MedItemAdmin(admin.ModelAdmin):
     list_display = ("title", "type", "author", "year", "is_available")
@@ -144,9 +156,7 @@ class MedItemAdmin(admin.ModelAdmin):
     search_fields = ("title", "author", "year")
 
 
-
 # Register other models
 admin.site.register(Bike)
 admin.site.register(Order)
 admin.site.register(OrderItem)
-

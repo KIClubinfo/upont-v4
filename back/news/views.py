@@ -21,8 +21,16 @@ from rest_framework.views import APIView
 from social.models import Club, Membership, Promotion, Student
 from upont.regex import split_then_markdownify
 
-from .forms import AddShotgun, CommentForm, EditEvent, EditPost#, EditSondage
-from .models import Comment, Event, Participation, Partnership, Post, Ressource, Shotgun#, Sondage, OptionSondage
+from .forms import AddShotgun, CommentForm, EditEvent, EditPost  # , EditSondage
+from .models import (
+    Comment,
+    Event,
+    Participation,
+    Partnership,
+    Post,
+    Ressource,
+    Shotgun,
+)  # , Sondage, OptionSondage
 from .serializers import (
     EventSerializer,
     PartnershipSerializer,
@@ -258,6 +266,7 @@ class PostCreateView(APIView):
         post.save()
         return Response({"status": "ok"})
 
+
 """ 
 class SondageCreateView(APIView):
 
@@ -426,12 +435,8 @@ class ShotgunCreateView(APIView):
             starting_date=request.data.get("starting_date", timezone.now()),
             ending_date=request.data["ending_date"],
             requires_motivation=request.data["requires_motivation"],
-            success_message=split_then_markdownify(
-                request.data["success_message"]
-            ),
-            failure_message=split_then_markdownify(
-                request.data["failure_message"]
-            ),
+            success_message=split_then_markdownify(request.data["success_message"]),
+            failure_message=split_then_markdownify(request.data["failure_message"]),
         )
         shotgun.save()
 
@@ -442,7 +447,7 @@ class ShotgunCreateView(APIView):
                 "message": "shotgun_created",
             }
         )
-    
+
 
 class PostEditView(APIView):
     """
@@ -891,6 +896,7 @@ def post_create(request, event_id=None, course_id=None):
     context["Edit"] = False
     context["course_id"] = course_id
     return render(request, "news/post_edit.html", context)
+
 
 """ @login_required
 def sondage_create(request):

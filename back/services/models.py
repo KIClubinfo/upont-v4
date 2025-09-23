@@ -229,7 +229,7 @@ class Vrac(models.Model):
             self.stock_available[idx] += quantity
 
         self.save()
-    
+
     def update_quantity(self, quantity):
         """
         Met à jour la quantité disponible pour un prix donné
@@ -240,13 +240,15 @@ class Vrac(models.Model):
             ValidationError: si le prix n'est pas trouvé ou si la quantité est invalide
         """
         if quantity < self.get_total_stock() - self.get_total_stock_available():
-            raise ValidationError("Problème de stock, pas assez de stock disponible pour gérer les commandes")
+            raise ValidationError(
+                "Problème de stock, pas assez de stock disponible pour gérer les commandes"
+            )
         else:
             quantity -= self.get_total_stock()
-            if quantity < 0: #Perte de stock
+            if quantity < 0:  # Perte de stock
                 for i in range(len(self.stock)):
                     if self.stock_available[i] > 0:
-                        reduce = min(self.stock_available[i], -1*quantity)
+                        reduce = min(self.stock_available[i], -1 * quantity)
                         self.reduce_stock_available([self.price[i]], [reduce])
                         self.reduce_stock([self.price[i]], [reduce])
                         quantity += reduce
@@ -255,7 +257,6 @@ class Vrac(models.Model):
             if quantity > 0:
                 self.add_stock([self.price[0]], [quantity])
                 self.add_stock_available([self.price[0]], [quantity])
-        
 
         self.save()
 
@@ -338,7 +339,6 @@ class Bike(models.Model):
         return self.name.__str__()
 
 
-
 class RequestForm(models.Model):
     SERVICE_CHOICES = [
         ("velos", "Vélos"),
@@ -379,32 +379,36 @@ class RequestForm(models.Model):
             self.save()
 
 
-
 class ReservationBike(models.Model):
     """
     Logs of bike reservations
     """
+
     bike = models.ForeignKey(Bike, on_delete=models.CASCADE)
     borrower_id = models.IntegerField(default=-1)
     name = models.CharField(max_length=100)
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True, blank=True) # Null if ongoing
+    end_date = models.DateTimeField(null=True, blank=True)  # Null if ongoing
+
     def __str__(self):
-        end_date_str = self.end_date.strftime("%Y-%m-%d %H:%M:%S") if self.end_date else "Ongoing"
+        end_date_str = (
+            self.end_date.strftime("%Y-%m-%d %H:%M:%S") if self.end_date else "Ongoing"
+        )
         return f"Réservation de {self.bike.name} par {self.name} - Start: {self.start_date.strftime('%Y-%m-%d %H:%M:%S')}, End: {end_date_str}"
-    
+
 
 class ReservationMusicRoom(models.Model):
     """
     Logs of music room reservations
     """
+
     borrower_id = models.IntegerField(default=-1)
     name = models.CharField(max_length=100)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+
     def __str__(self):
         return f"Réservation de salle de musique par {self.borrower_id} - Start: {self.start_date.strftime('%Y-%m-%d %H:%M:%S')}, End: {self.end_date.strftime('%Y-%m-%d %H:%M:%S')}"
-    
 
 
 class Mediatek(models.Model):
@@ -417,7 +421,7 @@ class Mediatek(models.Model):
 
     def __str__(self):
         return "Med ouverte" if self.is_open else "Med fermée"
-    
+
     def open(self):
         self.is_open = True
         self.save()
@@ -425,14 +429,14 @@ class Mediatek(models.Model):
     def close(self):
         self.is_open = False
         self.save()
-    
+
 
 class MedItem(models.Model):
     TYPE_CHOICES = [
         ("roman", "Roman"),
         ("manga", "Manga"),
         ("bd", "Bande dessinée"),
-        ("jeu", "Jeu")
+        ("jeu", "Jeu"),
     ]
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     title = models.CharField(max_length=100)
@@ -443,9 +447,10 @@ class MedItem(models.Model):
     image = models.ImageField(upload_to="media", blank=True)
     borrowed_by = models.IntegerField(default=-1)
     borrowed_date = models.DateTimeField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.title} ({self.type}) - {self.author} - {self.year}"
-    
+
     def borrow(self, borrower_id):
         if not self.is_available:
             raise ValidationError("Item not available")
@@ -476,7 +481,7 @@ class Local(models.Model):
         ("trium", "Trium"),
         ("bitum", "Bitum"),
     ]
-    
+
     name = models.CharField(max_length=50, choices=TYPE_CHOICES, unique=True)
     is_open = models.BooleanField(default=False)
     description = models.TextField(blank=True)
@@ -484,12 +489,14 @@ class Local(models.Model):
     def save(self, *args, **kwargs):
         # Ensure only one instance per local type
         if Local.objects.filter(name=self.name).exists() and not self.pk:
-            raise ImproperlyConfigured(f"Only one {self.get_name_display()} instance allowed")
+            raise ImproperlyConfigured(
+                f"Only one {self.get_name_display()} instance allowed"
+            )
         super(Local, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.get_name_display()} - {'ouvert' if self.is_open else 'fermé'}"
-    
+
     def open(self):
         self.is_open = True
         self.save()

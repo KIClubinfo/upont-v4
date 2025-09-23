@@ -226,6 +226,7 @@ def compress_image(image, quality, name):
     new_image = File(im_io, name=name + "_" + uuid4().hex + ".jpg")
     return new_image
 
+
 class Message(models.Model):
     channel = models.ForeignKey("Channel", on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField()
@@ -240,7 +241,8 @@ class Message(models.Model):
     def __str__(self):
         author = [self.author, self.club][bool(self.club)]
         return f"Message from {author}: '{self.content}'"
-    
+
+
 class Channel(models.Model):
     name = models.CharField(max_length=50)
     date = models.DateTimeField()
@@ -254,6 +256,12 @@ class Channel(models.Model):
     admins = models.ManyToManyField("social.Student", related_name="channels_admin")
     encrypted_keys = models.ManyToManyField("social.ChannelEncryptedKey")
 
+
 class ChannelEncryptedKey(models.Model):
     key = models.TextField(max_length=100, null=True)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="encrypted_channel_keys", null=True)
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="encrypted_channel_keys",
+        null=True,
+    )

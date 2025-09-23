@@ -1,7 +1,18 @@
 from rest_framework import serializers
 from datetime import timedelta
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, MedItem, Local
+from .models import (
+    Bike,
+    Order,
+    OrderItem,
+    Vrac,
+    RequestForm,
+    ReservationBike,
+    ReservationMusicRoom,
+    MedItem,
+    Local,
+)
 from django.utils.timezone import make_aware
+
 
 class BikeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,6 +24,7 @@ class VracSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vrac
         fields = ["id", "name", "type", "price", "stock", "stock_available"]
+
 
 class VracUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
@@ -29,7 +41,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class CreateOrderSerializer(serializers.Serializer):
     products = serializers.ListField(child=serializers.CharField(max_length=100))
-    total_quantities = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    total_quantities = serializers.ListField(
+        child=serializers.IntegerField(min_value=0)
+    )
 
     def validate(self, data):
         if len(data["products"]) != len(data["total_quantities"]):
@@ -71,10 +85,12 @@ class RequestFormCreateSerializer(serializers.ModelSerializer):
         model = RequestForm
         fields = ["message", "service"]
 
+
 class RequestFormListSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestForm
         fields = ["id", "name", "message", "service", "status"]
+
 
 class ReservationBikeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -87,6 +103,7 @@ class ReservationMusicRoomSerializer(serializers.ModelSerializer):
         model = ReservationMusicRoom
         fields = ["id", "borrower_id", "name", "start_date", "end_date"]
 
+
 class CreateMusicRoomReservationSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
     start_date = serializers.DateTimeField()
@@ -96,12 +113,13 @@ class CreateMusicRoomReservationSerializer(serializers.Serializer):
         start_date = data["start_date"]
         end_date = data["end_date"]
 
-
         # Check for conflicts
         if ReservationMusicRoom.objects.filter(
             start_date__lt=end_date, end_date__gt=start_date
         ).exists():
-            raise serializers.ValidationError("There is a conflict with an existing reservation.")
+            raise serializers.ValidationError(
+                "There is a conflict with an existing reservation."
+            )
 
         return data
 
@@ -111,10 +129,23 @@ class LocalSerializer(serializers.ModelSerializer):
         model = Local
         fields = ["name", "is_open", "description"]
 
+
 class MedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedItem
-        fields = ["id", "type", "title", "author", "year", "is_available", "description", "image", "borrowed_by", "borrowed_date"]
+        fields = [
+            "id",
+            "type",
+            "title",
+            "author",
+            "year",
+            "is_available",
+            "description",
+            "image",
+            "borrowed_by",
+            "borrowed_date",
+        ]
+
 
 class MedItemSummarySerializer(serializers.ModelSerializer):
     class Meta:

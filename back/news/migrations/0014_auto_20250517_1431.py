@@ -7,19 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('social', '0016_alter_club_nickname'),
-        ('news', '0013_auto_20250517_1418'),
+        ("social", "0016_alter_club_nickname"),
+        ("news", "0013_auto_20250517_1418"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sondage',
-            name='author',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='social.student', verbose_name='author'),
+            model_name="sondage",
+            name="author",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="social.student",
+                verbose_name="author",
+            ),
         ),
         migrations.AddField(
-            model_name='sondage',
-            name='date',
+            model_name="sondage",
+            name="date",
             field=models.DateTimeField(null=True),
         ),
     ]

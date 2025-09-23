@@ -8,44 +8,98 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("social", "0018_message"),
-        ('social', '0016_alter_club_nickname'),
-        ('news', '0012_partnership'),
+        ("social", "0016_alter_club_nickname"),
+        ("news", "0012_partnership"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OptionSondage',
+            name="OptionSondage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('number', models.IntegerField()),
-                ('text', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("number", models.IntegerField()),
+                ("text", models.TextField()),
             ],
         ),
         migrations.CreateModel(
-            name='Sondage',
+            name="Sondage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
-                ('content', models.TextField()),
-                ('number_of_options', models.IntegerField(default=0)),
-                ('size', models.IntegerField(default=0)),
-                ('club', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='social.club', verbose_name='organizing club')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                ("content", models.TextField()),
+                ("number_of_options", models.IntegerField(default=0)),
+                ("size", models.IntegerField(default=0)),
+                (
+                    "club",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="social.club",
+                        verbose_name="organizing club",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='VoteSondage',
+            name="VoteSondage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sondage_date', models.DateTimeField()),
-                ('sondage', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='news.sondage')),
-                ('vote', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='news.optionsondage')),
-                ('voter', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='social.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("sondage_date", models.DateTimeField()),
+                (
+                    "sondage",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="news.sondage",
+                    ),
+                ),
+                (
+                    "vote",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="news.optionsondage",
+                    ),
+                ),
+                (
+                    "voter",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="social.student"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='optionsondage',
-            name='sondage',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='news.sondage'),
+            model_name="optionsondage",
+            name="sondage",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="news.sondage",
+            ),
         ),
         migrations.AlterUniqueTogether(
             name="participation",

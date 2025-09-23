@@ -7,19 +7,32 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('services', '0008_requestform'),
+        ("services", "0008_requestform"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ReservationBike',
+            name="ReservationBike",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('borrower_id', models.IntegerField(default=-1)),
-                ('name', models.CharField(max_length=100)),
-                ('start_date', models.DateTimeField()),
-                ('end_date', models.DateTimeField(blank=True, null=True)),
-                ('bike', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='services.bike')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("borrower_id", models.IntegerField(default=-1)),
+                ("name", models.CharField(max_length=100)),
+                ("start_date", models.DateTimeField()),
+                ("end_date", models.DateTimeField(blank=True, null=True)),
+                (
+                    "bike",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="services.bike"
+                    ),
+                ),
             ],
         ),
     ]

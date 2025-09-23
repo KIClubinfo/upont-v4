@@ -116,6 +116,7 @@ class ClubRequestForm(forms.ModelForm):
             "content": forms.Textarea(attrs={"class": "text-input"}),
         }
 
+
 class EditMessage(forms.ModelForm):
     class Meta:
         model = Message
@@ -128,9 +129,7 @@ class EditMessage(forms.ModelForm):
         )
         widgets = {
             "content": forms.TextInput(attrs={"class": "profil-input"}),
-            "date": forms.DateInput(
-                format="%d/%m/%Y", attrs={"class": "profil-input"}
-            ),
+            "date": forms.DateInput(format="%d/%m/%Y", attrs={"class": "profil-input"}),
         }
 
     def __init__(self, *args, **kwargs):

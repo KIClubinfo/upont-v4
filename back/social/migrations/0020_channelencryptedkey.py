@@ -7,16 +7,31 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('social', '0019_auto_20250530_1800'),
+        ("social", "0019_auto_20250530_1800"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ChannelEncryptedKey',
+            name="ChannelEncryptedKey",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('key', models.TextField(max_length=100, null=True)),
-                ('channel', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='social.channel')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("key", models.TextField(max_length=100, null=True)),
+                (
+                    "channel",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="social.channel",
+                    ),
+                ),
             ],
         ),
     ]

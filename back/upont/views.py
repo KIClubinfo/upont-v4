@@ -238,7 +238,6 @@ def get_sso_token(request):
     if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
-
     def capitalize_name_parts(name_str):
         if not name_str:
             return ""
@@ -280,8 +279,7 @@ def get_sso_token(request):
             email=f"{base_username}@eleves.enpc.fr",
             first_name=first_name,
             last_name=last_name,
-            
-    )
+        )
     student, created2 = Student.objects.get_or_create(
         user=user_check,
     )
@@ -292,13 +290,6 @@ def get_sso_token(request):
 
     if created_flag["value"]:
 
-
-
-            
-
-            
-
-        
         if created2:
             student.is_validated = False
             student.save()

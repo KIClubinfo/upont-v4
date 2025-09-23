@@ -202,6 +202,7 @@ class Partnership(models.Model):
     def __str__(self):
         return self.partner
 
+
 """ class VoteSondage(models.Model):
     voter = models.ForeignKey("social.Student", on_delete=models.CASCADE)
     sondage = models.ForeignKey("Sondage", on_delete=models.CASCADE, null=True)

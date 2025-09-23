@@ -2,8 +2,7 @@ from django import forms
 from django.shortcuts import get_object_or_404
 from social.models import Membership, Student
 
-from .models import Comment, Event, Post, Shotgun#, Sondage
-
+from .models import Comment, Event, Post, Shotgun  # , Sondage
 
 
 class EditEvent(forms.ModelForm):
@@ -110,6 +109,7 @@ class EditPost(forms.ModelForm):
             widget=forms.TextInput(attrs={"class": "profil-input"}), required=False
         )
 
+
 """ class EditSondage(forms.ModelForm):
     class Meta:
         model = Sondage
@@ -132,6 +132,8 @@ class EditPost(forms.ModelForm):
         ]
 
  """
+
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

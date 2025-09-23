@@ -6,37 +6,37 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('news', '0014_auto_20250517_1431'),
+        ("news", "0014_auto_20250517_1431"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='sondage',
-            name='author',
+            model_name="sondage",
+            name="author",
         ),
         migrations.RemoveField(
-            model_name='sondage',
-            name='club',
+            model_name="sondage",
+            name="club",
         ),
         migrations.RemoveField(
-            model_name='votesondage',
-            name='sondage',
+            model_name="votesondage",
+            name="sondage",
         ),
         migrations.RemoveField(
-            model_name='votesondage',
-            name='vote',
+            model_name="votesondage",
+            name="vote",
         ),
         migrations.RemoveField(
-            model_name='votesondage',
-            name='voter',
+            model_name="votesondage",
+            name="voter",
         ),
         migrations.DeleteModel(
-            name='OptionSondage',
+            name="OptionSondage",
         ),
         migrations.DeleteModel(
-            name='Sondage',
+            name="Sondage",
         ),
         migrations.DeleteModel(
-            name='VoteSondage',
+            name="VoteSondage",
         ),
     ]
