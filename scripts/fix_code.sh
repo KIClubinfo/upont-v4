@@ -8,3 +8,5 @@ poetry run autopep8 --in-place --aggressive --aggressive $(find $BACK_DIR -name 
 
 # Trie et nettoie les imports avec isort
 poetry run isort $(find $BACK_DIR -name "*.py")
+
+black
