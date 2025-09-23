@@ -10,11 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build containers
-        run: docker-compose build
+        run: docker compose build
       - name: Start containers
-        run: docker-compose up -d
+        run: docker compose up -d
       - name: Run tests
-        run: docker-compose exec -T back python manage.py test
+        run: docker compose exec -T back python manage.py test
   test-prod:
     runs-on: ubuntu-latest
     steps:
@@ -24,7 +24,7 @@ jobs:
       - name: Start containers
         run: bash scripts/start.sh
       - name: Run tests
-        run: docker-compose exec -T back python manage.py test
+        run: docker compose exec -T back python manage.py test
   lint:
     runs-on: ubuntu-latest
     steps:
