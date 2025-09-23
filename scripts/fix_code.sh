@@ -1,21 +1,32 @@
 #!/bin/bash
 set -e
 
-# Chemin vers le projet
-PROJECT_DIR="$(dirname "$(realpath "$0")")/../back"
+# Dossier du projet backend
+BACK_DIR="../back"
 
-echo "==> Vérification et correction automatique du code Python dans $PROJECT_DIR"
+echo "==> Vérification et correction automatique du code Python dans $BACK_DIR"
 
-# 1️⃣ Corriger le formatage avec autopep8
+# Aller dans le dossier back pour que toutes les commandes s'exécutent correctement
+cd "$BACK_DIR"
+
+# 1. Formatage autopep8
 echo "-> Formatage autopep8..."
-poetry run autopep8 --in-place --aggressive --aggressive $(find "$PROJECT_DIR" -name "*.py")
+poetry run autopep8 --in-place --aggressive --aggressive $(find . -name "*.py")
 
-# 2️⃣ Trier et organiser les imports avec isort
+# 2. Organisation des imports avec isort
 echo "-> Organisation des imports avec isort..."
-poetry run isort $(find "$PROJECT_DIR" -name "*.py")
+poetry run isort .
 
-# 3️⃣ Vérifier avec flake8 pour voir les imports/variables inutilisés
+# 3. Formatage complet avec black
+echo "-> Formatage avec black..."
+poetry run black .
+
+# 4. Supprimer imports et variables inutilisées
+echo "-> Suppression des imports et variables inutilisées..."
+poetry run autoflake --in-place --remove-unused-variables --remove-all-unused-imports -r .
+
+# 5. Vérification des imports et variables inutilisées avec flake8
 echo "-> Vérification des imports et variables inutilisées (F401/F841)..."
-poetry run flake8 "$PROJECT_DIR" --select=F
-black
-echo "==> Terminé. Les erreurs F401/F841 doivent être corrigées manuellement."
+poetry run flake8 . --select=F401,F841
+
+echo "==> Correction terminée !"

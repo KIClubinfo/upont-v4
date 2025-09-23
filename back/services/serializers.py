@@ -1,6 +1,3 @@
-from datetime import timedelta
-
-from django.utils.timezone import make_aware
 from rest_framework import serializers
 
 from .models import (
@@ -8,7 +5,6 @@ from .models import (
     Local,
     MedItem,
     Order,
-    OrderItem,
     RequestForm,
     ReservationBike,
     ReservationMusicRoom,

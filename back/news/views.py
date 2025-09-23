@@ -23,15 +23,8 @@ from social.models import Club, Membership, Promotion, Student
 from upont.regex import split_then_markdownify
 
 from .forms import AddShotgun, CommentForm, EditEvent, EditPost  # , EditSondage
-from .models import (
-    Comment,
-    Event,
-    Participation,  # , Sondage, OptionSondage
-    Partnership,
-    Post,
-    Ressource,
-    Shotgun,
-)
+from .models import Participation  # , Sondage, OptionSondage
+from .models import Comment, Event, Partnership, Post, Ressource, Shotgun
 from .serializers import (
     EventSerializer,
     PartnershipSerializer,

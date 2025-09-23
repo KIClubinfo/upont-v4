@@ -52,10 +52,11 @@ from pochtron.views import (
     PochtronTransactions,
     SearchAlcohol,
 )
-from services.views import LocalViewSet  # Replace MediatekViewSet with LocalViewSet
+
+# Replace MediatekViewSet with LocalViewSet
 from services.views import (
     BikesViewSet,
-    MedItemViewSet,
+    LocalViewSet,
     OrderViewSet,
     RequestFormViewSet,
     ReservationBikeViewSet,

@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
@@ -15,7 +13,6 @@ from social.models import Membership
 from .models import (
     Bike,
     Local,
-    Mediatek,
     MedItem,
     Order,
     OrderItem,
@@ -500,9 +497,6 @@ class ReservationBikeViewSet(ModelViewSet):
 
             # 3. Select the N-th item (using 0-based index n-1)
             # This directly fetches only the required object from the database
-            nth_last_reservation = reservations_qs[
-                min(n - 1, reservations_qs.count() - 1)
-            ]
 
             # --- End Query Logic ---
             data = {}
