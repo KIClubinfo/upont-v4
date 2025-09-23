@@ -7,8 +7,9 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
-from trade.models import Transaction
 from unidecode import unidecode
+
+from trade.models import Transaction
 
 
 class Promotion(models.Model):
@@ -80,6 +81,7 @@ class Student(models.Model):
     )  # validators should be a list
     birthdate = models.DateField(max_length=12, null=True, blank=True)
     biography = models.TextField(max_length=300, null=True, blank=True)
+    public_key = models.TextField(max_length=100, null=True)
     picture = models.ImageField(upload_to="pictures/", null=True, blank=True)
     nationality = models.ForeignKey(
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
@@ -87,6 +89,7 @@ class Student(models.Model):
     first_connection = models.BooleanField(default=True)
     is_validated = models.BooleanField(default=True)
     is_moderator = models.BooleanField(default=False)
+    is_validated = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if self.picture:
@@ -223,3 +226,43 @@ def compress_image(image, quality, name):
     im.save(im_io, "JPEG", quality=quality, optimize=True)
     new_image = File(im_io, name=name + "_" + uuid4().hex + ".jpg")
     return new_image
+
+
+class Message(models.Model):
+    channel = models.ForeignKey("Channel", on_delete=models.SET_NULL, null=True)
+    date = models.DateTimeField()
+    author = models.ForeignKey(
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
+    )
+    club = models.ForeignKey(
+        "social.Club", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    content = models.TextField()
+
+    def __str__(self):
+        author = [self.author, self.club][bool(self.club)]
+        return f"Message from {author}: '{self.content}'"
+
+
+class Channel(models.Model):
+    name = models.CharField(max_length=50)
+    date = models.DateTimeField()
+    creator = models.ForeignKey(
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
+    )
+    club = models.ForeignKey(
+        "social.Club", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    members = models.ManyToManyField("social.Student", related_name="channels")
+    admins = models.ManyToManyField("social.Student", related_name="channels_admin")
+    encrypted_keys = models.ManyToManyField("social.ChannelEncryptedKey")
+
+
+class ChannelEncryptedKey(models.Model):
+    key = models.TextField(max_length=100, null=True)
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="encrypted_channel_keys",
+        null=True,
+    )

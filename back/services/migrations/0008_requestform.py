@@ -6,18 +6,43 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('services', '0007_order_id_user'),
+        ("services", "0007_order_id_user"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='RequestForm',
+            name="RequestForm",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('message', models.TextField()),
-                ('service', models.CharField(choices=[('velos', 'Vélos'), ('vracs', 'Vracs'), ('musique', 'Musique')], max_length=100)),
-                ('status', models.CharField(choices=[('pending', 'En attente'), ('done', 'Lue')], default='pending', max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("message", models.TextField()),
+                (
+                    "service",
+                    models.CharField(
+                        choices=[
+                            ("velos", "Vélos"),
+                            ("vracs", "Vracs"),
+                            ("musique", "Musique"),
+                        ],
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("pending", "En attente"), ("done", "Lue")],
+                        default="pending",
+                        max_length=100,
+                    ),
+                ),
             ],
         ),
     ]

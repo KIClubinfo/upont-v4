@@ -1,16 +1,17 @@
 import csv
 import io
 
-from courses.models import Timeslot
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
-from news.models import Event
 from rest_framework import views
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+
+from courses.models import Timeslot
+from news.models import Event
 from social.models import Student
 
 

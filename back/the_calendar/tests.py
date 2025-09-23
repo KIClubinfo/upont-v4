@@ -1,11 +1,12 @@
 import datetime
 
-from courses.models import Course, Enrolment, Group, Teacher, Timeslot
 from django.contrib.auth import models
 from django.urls import reverse_lazy
 from django.utils import timezone
-from news.models import Event
 from rest_framework.test import APITestCase
+
+from courses.models import Course, Enrolment, Group, Teacher, Timeslot
+from news.models import Event
 from social.models import Student
 
 

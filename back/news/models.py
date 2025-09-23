@@ -3,6 +3,7 @@ from django.db.models import F
 from django.db.models.expressions import Window
 from django.db.models.functions import Rank
 from django.utils import timezone
+
 from social.models import Student
 
 
@@ -201,3 +202,54 @@ class Partnership(models.Model):
 
     def __str__(self):
         return self.partner
+
+
+""" class VoteSondage(models.Model):
+    voter = models.ForeignKey("social.Student", on_delete=models.CASCADE)
+    sondage = models.ForeignKey("Sondage", on_delete=models.CASCADE, null=True)
+    sondage_date = models.DateTimeField()
+    vote = models.ForeignKey("OptionSondage", on_delete=models.CASCADE)
+    def __str__(self):
+        return f"Vote from {self.student}: '{self.vote}'"
+
+class OptionSondage(models.Model):
+    sondage = models.ForeignKey("Sondage", on_delete=models.CASCADE, null=True)
+    number = models.IntegerField()
+    text = models.TextField()
+    def __str__(self):
+        return f"Option from {self.sondage}: '{self.text}'"
+
+class Sondage(models.Model):
+    title = models.CharField(max_length=50)
+    club = models.ForeignKey(
+        "social.Club",
+        verbose_name="organizing club",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    author = models.ForeignKey(
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
+    )
+    date = models.DateTimeField(null=True)
+    content = models.TextField()
+    number_of_options = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+    def student_vote(self, student: Student):
+        return VoteSondage.objects.filter(sondage=self, voter=student)
+
+    def count_votes(self):
+        options = OptionSondage.objects.filter(sondage=self).order_by("number")
+        return [
+            option.annotate(number_of_votes = VoteSondage.objects.filter(vote=option, sondage=self).count())
+            for option in options
+        ]
+
+    def total_votes(self):
+        options = OptionSondage.objects.filter(sondage=self).order_by("number")
+        return sum(VoteSondage.objects.filter(vote=option, sondage=self).count() for option in options)
+
+
+ """

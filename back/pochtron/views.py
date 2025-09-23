@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from social.models import Club, Student
 from trade.forms import EditPrice, EditTradeAdmin
 from trade.models import TradeAdmin, Transaction
@@ -283,7 +284,8 @@ def admin_create(request):
         if "Valider" in request.POST:
             POST = request.POST.copy()
             POST["club"] = club
-            # admin_student = None if the pair (student, club) is not yet related to a TradeAdmin object
+            # admin_student = None if the pair (student, club) is not yet
+            # related to a TradeAdmin object
             admin_student = TradeAdmin.objects.filter(
                 club=club, student=POST["student"]
             ).first()

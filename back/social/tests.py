@@ -2,6 +2,7 @@ from django.contrib.auth import models
 from django.core.validators import ValidationError
 from django.test import TestCase
 from django.utils import timezone
+
 from trade.models import Good, Price, Transaction
 
 from .models import Category, Club, Membership, Nationality, Promotion, Role, Student

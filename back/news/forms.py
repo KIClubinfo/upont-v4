@@ -1,8 +1,9 @@
 from django import forms
 from django.shortcuts import get_object_or_404
+
 from social.models import Membership, Student
 
-from .models import Comment, Event, Post, Shotgun
+from .models import Comment, Event, Post, Shotgun  # , Sondage
 
 
 class EditEvent(forms.ModelForm):
@@ -108,6 +109,30 @@ class EditPost(forms.ModelForm):
         self.fields["video"] = forms.URLField(
             widget=forms.TextInput(attrs={"class": "profil-input"}), required=False
         )
+
+
+""" class EditSondage(forms.ModelForm):
+    class Meta:
+        model = Sondage
+        fields = (
+            "title",
+            "content",
+            "club",
+        )
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "profil-input"}),
+            "content": forms.Textarea(attrs={"class": "text-input mt-2"}),
+            "club": forms.Select(attrs={"class": "profil-select"}),
+        }
+
+    def __init__(self, user_id, *args, **kwargs):
+        super(EditSondage, self).__init__(*args, **kwargs)
+        self.fields["club"].choices = [("", "Élève")] + [
+            (membership.club.id, membership.club)
+            for membership in Membership.objects.filter(student__user__pk=user_id)
+        ]
+
+ """
 
 
 class CommentForm(forms.ModelForm):

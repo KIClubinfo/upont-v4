@@ -7,6 +7,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APITestCase
+
 from social.models import Club, Membership, Student
 
 from .models import Comment, Event, Participation, Post, Shotgun
@@ -177,7 +178,8 @@ class ShotgunModelTest(TestCase):
             participation1,
             participation2,
         ) = self.shotgun_with_two_participants_with_motivation()
-        # works the same as without motivation if all motivations are accepted :
+        # works the same as without motivation if all motivations are accepted
+        # :
         self.assertTrue(shotgun.accepted_participations()[0] == participation1)
         self.assertTrue(len(shotgun.accepted_participations()) == 1)
         shotgun.size = 2
@@ -389,7 +391,8 @@ class CommentViewsTest(TestCase):
         self.assertEqual(retrieved_comment.content, "Some test comment from a student")
 
     def test_deleting_my_own_comment_on_post_works(self):
-        # Create several comments to check whether the view actually deletes only one comment
+        # Create several comments to check whether the view actually deletes
+        # only one comment
         self.create_comment_from_student()
         comment = self.create_comment_from_student()
         client = Client()

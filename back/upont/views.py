@@ -1,5 +1,6 @@
 import csv
 import io
+import logging
 import mimetypes
 import os
 from urllib.parse import unquote
@@ -29,10 +30,14 @@ from rest_framework.decorators import (
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+
 from social.models import Promotion, Student
 from upont.auth import EmailBackend
 
 from .settings import LOGIN_REDIRECT_URL, LOGIN_URL
+
+logger = logging.getLogger(__name__)
+
 
 User = get_user_model()
 
@@ -146,14 +151,10 @@ def add(request):
     students_not_added = []
     for column in csv.reader(io_string, delimiter=";", quotechar="|"):
         password = models.User.objects.make_random_password()  # à envoyer par mail
-        debut = column[3].split("@")[0]
-        if len(debut.split(".")[1].split("-")) > 1:
-            username = debut.split(".")[0][0] + "." + debut.split(".")[1]
-        else:
-            username = debut
+        username = column[2].lower() + "." + column[1].lower()
         user, created = models.User.objects.get_or_create(
-            last_name=column[1],
-            first_name=column[2],
+            last_name=column[1].capitalize(),
+            first_name=column[2].capitalize(),
             username=username,
             email=column[3],
         )
@@ -220,30 +221,80 @@ def get_sso_token(request):
     cas_user_authenticated.connect(user_authenticated_handler, weak=False)
     user = CASBackend().authenticate(request, ticket=ticket, service=service)
     cas_user_authenticated.disconnect(user_authenticated_handler)
+    logger.info("=== DEBUG USER ===")
+    logger.info(f"Username: {user.username}")
+    logger.info(f"First name: {user.first_name}")
+    logger.info(f"Last name: {user.last_name}")
+    logger.info(f"Email: {user.email}")
+    logger.info(f"ID: {user.id}")
+    logger.info(f"Is active: {user.is_active}")
+    logger.info(f"Is staff: {user.is_staff}")
+    logger.info(f"Is superuser: {user.is_superuser}")
+    logger.info(f"Date joined: {user.date_joined}")
+    logger.info(f"Last login: {user.last_login}")
+    # Pour voir tous les champs du mod  le, utile pour debug
+    logger.info(f"All fields: {user.__dict__}")
 
     if not user:
         return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
+    def capitalize_name_parts(name_str):
+        if not name_str:
+            return ""
+        parts = name_str.split("-")
+        capitalized_parts = [part.capitalize() for part in parts if part]
+        return "-".join(capitalized_parts)
+
+    User = get_user_model()
+
+    first_name, last_name = (
+        user.username.split(".", 1) if "." in user.username else (user.username, "")
+    )
+    first_name = capitalize_name_parts(first_name)
+    last_name = capitalize_name_parts(last_name)
+
+    # 1️⃣ Vérifier si le username CAS existe
+    try:
+        user_check = User.objects.get(username=user.username)
+    except User.DoesNotExist:
+        user_check = None
+
+    # 2️⃣ Sinon, chercher un user avec même prénom et nom
+    if not user_check:
+        try:
+            user_check = User.objects.get(first_name=first_name, last_name=last_name)
+        except User.DoesNotExist:
+            user_check = None
+
+    # 3️⃣ Si aucun user trouvé, créer un nouvel utilisateur
+    if not user_check:
+        base_username = user.username
+        counter = 1
+        while User.objects.filter(username=base_username).exists():
+            base_username = f"{user.username}{counter}"
+            counter += 1
+
+        user_check = User.objects.create_user(
+            username=base_username,
+            email=f"{base_username}@eleves.enpc.fr",
+            first_name=first_name,
+            last_name=last_name,
+        )
+    student, created2 = Student.objects.get_or_create(
+        user=user_check,
+    )
+    if created2:
+        student.promo = Promotion.objects.order_by("-nickname").first()
+        student.is_validated = False
+        student.save()
+
     if created_flag["value"]:
 
-        def capitalize_name_parts(name_str):
-            if not name_str:
-                return ""
-            parts = name_str.split("-")
-            capitalized_parts = [part.capitalize() for part in parts if part]
-            return "-".join(capitalized_parts)
+        if created2:
+            student.is_validated = False
+            student.save()
 
-        first_name, last_name = (
-            user.username.split(".", 1) if "." in user.username else (user.username, "")
-        )
-        latest_promotion = Promotion.objects.order_by("-nickname").first()
-        user.first_name = capitalize_name_parts(first_name)
-        user.last_name = capitalize_name_parts(last_name)
-        user.email = f"{user.username}@enpc.fr"
-        user.save()
-        Student.objects.create(user=user, promo=latest_promotion, is_validated=False)
-
-    token, _ = Token.objects.get_or_create(user=user)
+    token, _ = Token.objects.get_or_create(user=user_check)
 
     redirect_url = f"upont://login?token={token.key}"
 

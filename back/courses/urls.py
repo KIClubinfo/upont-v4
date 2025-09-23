@@ -1,4 +1,5 @@
 from django.urls import path
+
 from news.views import post_create, post_edit
 
 from . import views

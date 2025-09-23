@@ -6,8 +6,9 @@ from django.core.files import File
 from django.test import TestCase
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from news.models import Post
 from rest_framework.test import APITestCase
+
+from news.models import Post
 from social.models import Student
 
 from .models import (

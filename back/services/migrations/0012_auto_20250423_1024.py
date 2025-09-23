@@ -6,32 +6,78 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('services', '0011_auto_20250313_1446'),
+        ("services", "0011_auto_20250313_1446"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Local',
+            name="Local",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(choices=[('med', 'Médiathèque'), ('ki', 'KI'), ('musique', 'Salle de musique'), ('bde', 'BDE'), ('bds', 'BDS'), ('bda', 'BDA'), ('foyer', 'Foyer'), ('pep', 'PEP'), ('jardin', 'Jardin'), ('dvp', 'DVP'), ('trium', 'Trium'), ('bitum', 'Bitum')], max_length=50, unique=True)),
-                ('is_open', models.BooleanField(default=False)),
-                ('description', models.TextField(blank=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        choices=[
+                            ("med", "Médiathèque"),
+                            ("ki", "KI"),
+                            ("musique", "Salle de musique"),
+                            ("bde", "BDE"),
+                            ("bds", "BDS"),
+                            ("bda", "BDA"),
+                            ("foyer", "Foyer"),
+                            ("pep", "PEP"),
+                            ("jardin", "Jardin"),
+                            ("dvp", "DVP"),
+                            ("trium", "Trium"),
+                            ("bitum", "Bitum"),
+                        ],
+                        max_length=50,
+                        unique=True,
+                    ),
+                ),
+                ("is_open", models.BooleanField(default=False)),
+                ("description", models.TextField(blank=True)),
             ],
         ),
         migrations.AlterField(
-            model_name='meditem',
-            name='description',
+            model_name="meditem",
+            name="description",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='meditem',
-            name='year',
+            model_name="meditem",
+            name="year",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='requestform',
-            name='service',
-            field=models.CharField(choices=[('velos', 'Vélos'), ('vracs', 'Vracs'), ('musique', 'Musique'), ('ki', 'KI'), ('med', 'Med'), ('bde', 'BDE'), ('bds', 'BDS'), ('bda', 'BDA'), ('foyer', 'Foyer'), ('pep', 'PEP'), ('jardin', 'Jardin'), ('dvp', 'DVP'), ('trium', 'Trium'), ('bitum', 'Bitum')], max_length=10),
+            model_name="requestform",
+            name="service",
+            field=models.CharField(
+                choices=[
+                    ("velos", "Vélos"),
+                    ("vracs", "Vracs"),
+                    ("musique", "Musique"),
+                    ("ki", "KI"),
+                    ("med", "Med"),
+                    ("bde", "BDE"),
+                    ("bds", "BDS"),
+                    ("bda", "BDA"),
+                    ("foyer", "Foyer"),
+                    ("pep", "PEP"),
+                    ("jardin", "Jardin"),
+                    ("dvp", "DVP"),
+                    ("trium", "Trium"),
+                    ("bitum", "Bitum"),
+                ],
+                max_length=10,
+            ),
         ),
     ]

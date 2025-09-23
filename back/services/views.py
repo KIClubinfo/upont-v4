@@ -1,32 +1,40 @@
-from django.db import transaction
-from django.utils import timezone
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
 from django.core.exceptions import ValidationError
-from datetime import timedelta
+from django.db import transaction
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-
-from .models import Bike, Order, OrderItem, Vrac, RequestForm, ReservationBike, ReservationMusicRoom, Mediatek, MedItem, Local
 from social.models import Membership
 
+from .models import (
+    Bike,
+    Local,
+    MedItem,
+    Order,
+    OrderItem,
+    RequestForm,
+    ReservationBike,
+    ReservationMusicRoom,
+    Vrac,
+)
 from .serializers import (
     BikeSerializer,
-    CreateOrderSerializer,
-    OrderSummarySerializer,
-    VracSerializer,
-    VracUpdateSerializer,
-    ReservationBikeSerializer,
-    ReservationMusicRoomSerializer,
     CreateMusicRoomReservationSerializer,
+    CreateOrderSerializer,
+    LocalSerializer,
     MedItemSerializer,
     MedItemSummarySerializer,
+    OrderSummarySerializer,
     RequestFormCreateSerializer,
     RequestFormListSerializer,
-    LocalSerializer
+    ReservationBikeSerializer,
+    ReservationMusicRoomSerializer,
+    VracSerializer,
+    VracUpdateSerializer,
 )
 
 
@@ -50,7 +58,9 @@ class VracViewSet(ModelViewSet):
         user = request.user
 
         # Vérifier si l'utilisateur est membre d'Ecoponts
-        if not Membership.objects.filter(student__user=user, club__name="Ecoponts").exists():
+        if not Membership.objects.filter(
+            student__user=user, club__name="Ecoponts"
+        ).exists():
             return Response(
                 {"error": "Vous n'êtes pas autorisé à effectuer cette opération"},
                 status=status.HTTP_403_FORBIDDEN,
@@ -84,7 +94,7 @@ class VracViewSet(ModelViewSet):
             message = f"Le produit {name} a été créé avec succès"
 
         return Response({"message": message}, status=status.HTTP_200_OK)
-    
+
     @action(detail=False, methods=["post"])
     @transaction.atomic
     def regularize_stock(self, request):
@@ -94,7 +104,9 @@ class VracViewSet(ModelViewSet):
         user = request.user
 
         # Vérifier si l'utilisateur est membre d'Ecoponts
-        if not Membership.objects.filter(student__user=user, club__name="Ecoponts").exists():
+        if not Membership.objects.filter(
+            student__user=user, club__name="Ecoponts"
+        ).exists():
             return Response(
                 {"error": "Vous n'êtes pas autorisé à effectuer cette opération"},
                 status=status.HTTP_403_FORBIDDEN,
@@ -116,7 +128,9 @@ class VracViewSet(ModelViewSet):
             message = f"Le stock de {name} a été mis à jour avec succès"
         except Vrac.DoesNotExist:
             # Créer un nouveau produit
-            return Response({"error": "Le produit n'existe pas"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Le produit n'existe pas"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         return Response({"message": message}, status=status.HTTP_200_OK)
 
@@ -124,8 +138,10 @@ class VracViewSet(ModelViewSet):
         """
         Disable the default create method
         """
-        return Response({"error": "Method Not Allowed, Post data on /update_data"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
+        return Response(
+            {"error": "Method Not Allowed, Post data on /update_data"},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
 
 class OrderViewSet(ModelViewSet):
@@ -169,7 +185,7 @@ class OrderViewSet(ModelViewSet):
                     prices.append(price)
                     quantities.append(quantity_from_this_batch)
                     remaining_quantity -= quantity_from_this_batch
-                
+
                 if remaining_quantity > 0:
                     raise ValueError
 
@@ -191,7 +207,8 @@ class OrderViewSet(ModelViewSet):
             )
 
         except Exception as e:
-            # En cas d'erreur, le @transaction.atomic annulera toutes les modifications
+            # En cas d'erreur, le @transaction.atomic annulera toutes les
+            # modifications
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["get"])
@@ -200,11 +217,13 @@ class OrderViewSet(ModelViewSet):
         Returns a list of all orders with their summaries
         """
         user = request.user
-        if Membership.objects.filter(student__user=user, club__name="Ecoponts").exists():
+        if Membership.objects.filter(
+            student__user=user, club__name="Ecoponts"
+        ).exists():
             orders = Order.objects.all()
         else:
             orders = Order.objects.filter(id_user=user.id)
-        
+
         serializer = OrderSummarySerializer(orders, many=True)
         return Response(serializer.data)
 
@@ -213,7 +232,9 @@ class OrderViewSet(ModelViewSet):
         if order.id_user == user.id:
             return True
         # Check if the user has a membership in the club "Ecoponts"
-        return Membership.objects.filter(student__user=user, club__name="Ecoponts").exists()
+        return Membership.objects.filter(
+            student__user=user, club__name="Ecoponts"
+        ).exists()
 
     @action(detail=True, methods=["post"])
     @transaction.atomic
@@ -224,7 +245,7 @@ class OrderViewSet(ModelViewSet):
         try:
             # Récupérer la commande
             order = self.get_object()
-            
+
             if not self.has_permission(request.user, order):
                 return Response(
                     {"error": "Vous n'êtes pas autorisé à confirmer cette commande"},
@@ -302,18 +323,21 @@ class OrderViewSet(ModelViewSet):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
     def create(self, request, *args, **kwargs):
         """
         Disable the default create method
         """
-        return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    
+        return Response(
+            {"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
 
 class RequestFormViewSet(ModelViewSet):
     queryset = RequestForm.objects.all()
 
     def get_serializer_class(self):
-        if self.action == 'create_request':
+        if self.action == "create_request":
             return RequestFormCreateSerializer
         return RequestFormListSerializer
 
@@ -343,17 +367,22 @@ class RequestFormViewSet(ModelViewSet):
         }
 
         club_name = club_service_map.get(service)
-        if club_name and Membership.objects.filter(student__user=user, club__name=club_name).exists():
+        if (
+            club_name
+            and Membership.objects.filter(
+                student__user=user, club__name=club_name
+            ).exists()
+        ):
             requests = RequestForm.objects.filter(service=service, status="pending")
         else:
             return Response(
-            {"error": "Vous n'êtes pas autorisé à accéder à ces demandes"},
-            status=status.HTTP_403_FORBIDDEN,
+                {"error": "Vous n'êtes pas autorisé à accéder à ces demandes"},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         serializer = RequestFormListSerializer(requests, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=["post"])
     def create_request(self, request):
         """
@@ -364,7 +393,7 @@ class RequestFormViewSet(ModelViewSet):
             RequestForm.objects.create(
                 name=request.user.username,  # Assuming the user is authenticated
                 status="pending",
-                **serializer.validated_data
+                **serializer.validated_data,
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -379,17 +408,29 @@ class RequestFormViewSet(ModelViewSet):
             if request_form.status == "pending":
                 request_form.status = "done"
                 request_form.save()
-                return Response({"message": "Request marked as done"}, status=status.HTTP_200_OK)
+                return Response(
+                    {"message": "Request marked as done"}, status=status.HTTP_200_OK
+                )
             else:
-                return Response({"error": "Request is not in 'pending' status"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Request is not in 'pending' status"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         except RequestForm.DoesNotExist:
-            return Response({"error": "RequestForm not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "RequestForm not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
     def create(self, request, *args, **kwargs):
         """
         Disable the default create method
         """
-        return Response({"error": "Method Not Allowed, Post data on /update_data"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        
+        return Response(
+            {"error": "Method Not Allowed, Post data on /update_data"},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+
+
 class ReservationBikeViewSet(ModelViewSet):
     serializer_class = ReservationBikeSerializer
     queryset = ReservationBike.objects.all()
@@ -406,65 +447,92 @@ class ReservationBikeViewSet(ModelViewSet):
 
         # --- Input Validation ---
         if bike_id is None:
-             return Response({"error": "Missing 'bike_id' in request body"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Missing 'bike_id' in request body"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        # Attempt to convert bike_id to integer if needed, depending on your Bike model's PK type
+        # Attempt to convert bike_id to integer if needed, depending on your
+        # Bike model's PK type
         try:
             bike_id_int = int(bike_id)
         except (ValueError, TypeError):
-             return Response({"error": "'bike_id' must be a valid integer."}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response(
+                {"error": "'bike_id' must be a valid integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if n_str is None:
-            return Response({"error": "Missing 'n' in request body"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Missing 'n' in request body"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
-            n = int(n_str) # Convert n to integer
+            n = int(n_str)  # Convert n to integer
             if n <= 0:
-                 # N must be 1 or greater (1st last, 2nd last, etc.)
-                 raise ValueError("'n' must be a positive integer (1 or greater).")
+                # N must be 1 or greater (1st last, 2nd last, etc.)
+                raise ValueError("'n' must be a positive integer (1 or greater).")
         except (ValueError, TypeError):
-            return Response({"error": "'n' must be a positive integer (1 or greater)."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "'n' must be a positive integer (1 or greater)."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         # --- End Input Validation ---
 
         try:
             # --- Query Logic ---
             # 1. Filter by bike_id
             # 2. Order by start_date descending (most recent first)
-            reservations_qs = ReservationBike.objects.filter(bike_id=bike_id_int).order_by('-start_date')
+            reservations_qs = ReservationBike.objects.filter(
+                bike_id=bike_id_int
+            ).order_by("-start_date")
 
             # Check if any reservations exist for this bike
             if not reservations_qs.exists():
-                 return Response({"error": f"No reservations found for bike_id {bike_id_int}"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"error": f"No reservations found for bike_id {bike_id_int}"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
             # 3. Select the N-th item (using 0-based index n-1)
             # This directly fetches only the required object from the database
-            nth_last_reservation = reservations_qs[min(n-1, reservations_qs.count()-1)] 
 
             # --- End Query Logic ---
             data = {}
             # 4. Get the string representation
             for i in range(min(n, reservations_qs.count())):
                 reserv = reservations_qs[i]
-                data[f"reservation_{i+1}"] = str(reserv)
+                data[f"reservation_{i + 1}"] = str(reserv)
 
-
-
-            # Use the key 'nth_last_log' as before, although the value is now the reservation string
+            # Use the key 'nth_last_log' as before, although the value is now
+            # the reservation string
             return Response(data, status=status.HTTP_200_OK)
 
         except IndexError:
             # This occurs if n is greater than the total number of reservations found
             # E.g., asking for the 10th last when only 5 exist.
-            count = reservations_qs.count() # Get the count (efficient if already evaluated or needed here)
-            return Response({"error": f"Cannot retrieve the {n}-th last reservation: Only {count} reservation(s) found for bike_id {bike_id_int}."}, status=status.HTTP_404_NOT_FOUND)
+            count = (
+                reservations_qs.count()
+            )  # Get the count (efficient if already evaluated or needed here)
+            return Response(
+                {
+                    "error": f"Cannot retrieve the {n}-th last reservation: Only {count} reservation(s) found for bike_id {bike_id_int}."
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         except Exception as e:
             # Log the actual error for debugging on the server
-            print(f"Unexpected error in get_nth_last_log (str mode) for bike_id {bike_id_int}: {e}")
+            print(
+                f"Unexpected error in get_nth_last_log (str mode) for bike_id {bike_id_int}: {e}"
+            )
             # Return a generic server error for the client
-            return Response({"error": "An unexpected server error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            return Response(
+                {"error": "An unexpected server error occurred."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
     @action(detail=False, methods=["post"])
     def log_reservation(self, request):
         """
@@ -475,7 +543,11 @@ class ReservationBikeViewSet(ModelViewSet):
 
         try:
             bike = Bike.objects.get(pk=bike_id)
-            last_log = ReservationBike.objects.filter(bike=bike).order_by('-start_date').first()
+            last_log = (
+                ReservationBike.objects.filter(bike=bike)
+                .order_by("-start_date")
+                .first()
+            )
 
             if last_log and last_log.end_date is None:
                 # Update the existing log entry
@@ -490,20 +562,25 @@ class ReservationBikeViewSet(ModelViewSet):
                     borrower_id=user.id,
                     name=user.username,
                     start_date=timezone.now(),
-                    end_date=None
+                    end_date=None,
                 )
                 serializer = ReservationBikeSerializer(log)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         except Bike.DoesNotExist:
-            return Response({"error": "Bike not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Bike not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
     def create(self, request, *args, **kwargs):
         """
         Disable the default create method
         """
-        return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        
+        return Response(
+            {"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
+
 class ReservationMusicRoomViewSet(ModelViewSet):
     serializer_class = ReservationMusicRoomSerializer
     queryset = ReservationMusicRoom.objects.all()
@@ -514,7 +591,9 @@ class ReservationMusicRoomViewSet(ModelViewSet):
         Returns a list of all upcoming reservations
         """
         now = timezone.now()
-        upcoming_reservations = ReservationMusicRoom.objects.filter(start_date__gt=now).order_by('start_date')
+        upcoming_reservations = ReservationMusicRoom.objects.filter(
+            start_date__gt=now
+        ).order_by("start_date")
         serializer = ReservationMusicRoomSerializer(upcoming_reservations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -531,10 +610,7 @@ class ReservationMusicRoomViewSet(ModelViewSet):
             end_date = serializer.validated_data["end_date"]
 
             reservation = ReservationMusicRoom.objects.create(
-                borrower_id=user.id,
-                name=name,
-                start_date=start_date,
-                end_date=end_date
+                borrower_id=user.id, name=name, start_date=start_date, end_date=end_date
             )
             reservation_serializer = ReservationMusicRoomSerializer(reservation)
             return Response(reservation_serializer.data, status=status.HTTP_201_CREATED)
@@ -547,18 +623,33 @@ class ReservationMusicRoomViewSet(ModelViewSet):
         """
         try:
             reservation = self.get_object()
-            if reservation.borrower_id != request.user.id or Membership.objects.filter(student__user=request.user, club__name="Décibel").exists():
-                return Response({"error": "You are not authorized to cancel this reservation"}, status=status.HTTP_403_FORBIDDEN)
+            if (
+                reservation.borrower_id != request.user.id
+                or Membership.objects.filter(
+                    student__user=request.user, club__name="Décibel"
+                ).exists()
+            ):
+                return Response(
+                    {"error": "You are not authorized to cancel this reservation"},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
             reservation.delete()
-            return Response({"message": "Reservation cancelled successfully"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Reservation cancelled successfully"},
+                status=status.HTTP_200_OK,
+            )
         except ReservationMusicRoom.DoesNotExist:
-            return Response({"error": "Reservation not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Reservation not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
     def create(self, request, *args, **kwargs):
         """
         Disable the default create method
         """
-        return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        
+        return Response(
+            {"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
 
 class MedItemViewSet(ModelViewSet):
@@ -575,7 +666,9 @@ class MedItemViewSet(ModelViewSet):
 
         try:
             item.borrow(user.id)
-            return Response({"message": "Item borrowed successfully"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Item borrowed successfully"}, status=status.HTTP_200_OK
+            )
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -587,12 +680,22 @@ class MedItemViewSet(ModelViewSet):
         item = get_object_or_404(MedItem, pk=pk)
         user = request.user
 
-        if item.borrowed_by != user.id and not Membership.objects.filter(student__user=user, club__name="La Mediatek et Du Ponts et Des Jeux").exists():
-            return Response({"error": "You are not authorized to return this item"}, status=status.HTTP_403_FORBIDDEN)
+        if (
+            item.borrowed_by != user.id
+            and not Membership.objects.filter(
+                student__user=user, club__name="La Mediatek et Du Ponts et Des Jeux"
+            ).exists()
+        ):
+            return Response(
+                {"error": "You are not authorized to return this item"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         item.return_item()
-        return Response({"message": "Item returned successfully"}, status=status.HTTP_200_OK)
-    
+        return Response(
+            {"message": "Item returned successfully"}, status=status.HTTP_200_OK
+        )
+
     @action(detail=True, methods=["get"])
     def detail(self, request, pk=None):
         """
@@ -601,7 +704,7 @@ class MedItemViewSet(ModelViewSet):
         item = get_object_or_404(MedItem, pk=pk)
         serializer = MedItemSerializer(item)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(detail=False, methods=["get"])
     def filter(self, request):
         """
@@ -649,27 +752,28 @@ class LocalViewSet(ModelViewSet):
         Changes the status (open/close) of a local if the user has the right permissions
         """
         user = request.user
-        local_name = request.query_params.get('local')
+        local_name = request.query_params.get("local")
 
         if not local_name:
             return Response(
-                {"error": "Local name is required in query parameters"}, 
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Local name is required in query parameters"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
 
         # Check if the local exists and the user has permission
         try:
             local = get_object_or_404(Local, name=local_name)
             required_club = self.LOCAL_CLUB_MAP.get(local_name)
-            
-            if not required_club or not Membership.objects.filter(
-                student__user=user, 
-                club__name=required_club
-            ).exists():
+
+            if (
+                not required_club
+                or not Membership.objects.filter(
+                    student__user=user, club__name=required_club
+                ).exists()
+            ):
                 return Response(
-                    {"error": "You are not authorized to change this local's status"}, 
-                    status=status.HTTP_403_FORBIDDEN
+                    {"error": "You are not authorized to change this local's status"},
+                    status=status.HTTP_403_FORBIDDEN,
                 )
 
             # Toggle the status
@@ -684,29 +788,24 @@ class LocalViewSet(ModelViewSet):
 
         except Local.DoesNotExist:
             return Response(
-                {"error": f"Local '{local_name}' not found"}, 
-                status=status.HTTP_404_NOT_FOUND
+                {"error": f"Local '{local_name}' not found"},
+                status=status.HTTP_404_NOT_FOUND,
             )
-    
+
     @action(detail=False, methods=["get"])
     def status(self, request):
         """
         Returns the status of all locals or a specific local if specified in query params
         """
-        local_name = request.query_params.get('local')
-        
+        local_name = request.query_params.get("local")
+
         if local_name:
             local = get_object_or_404(Local, name=local_name)
-            return Response(
-                {"status": str(local)}, 
-                status=status.HTTP_200_OK
-            )
-        
+            return Response({"status": str(local)}, status=status.HTTP_200_OK)
+
         # If no specific local requested, return all locals' status
         locals = Local.objects.all()
-        status_dict = {
-            local.name: str(local) for local in locals
-        }
+        status_dict = {local.name: str(local) for local in locals}
         return Response(status_dict, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"])
@@ -724,19 +823,20 @@ class LocalViewSet(ModelViewSet):
         Returns a list of closed locals that the user has permission to open
         """
         user = request.user
-        
+
         # Get user's club memberships
         user_clubs = set(
-            membership.club.name 
+            membership.club.name
             for membership in Membership.objects.filter(student__user=user)
         )
 
         # Get closed locals
         closed_locals = Local.objects.filter(is_open=False)
-        
+
         # Filter locals based on user's permissions
         available_locals = [
-            local for local in closed_locals
+            local
+            for local in closed_locals
             if self.LOCAL_CLUB_MAP.get(local.name) in user_clubs
         ]
 
@@ -748,6 +848,5 @@ class LocalViewSet(ModelViewSet):
         Disable the default create method
         """
         return Response(
-            {"error": "Method Not Allowed"}, 
-            status=status.HTTP_405_METHOD_NOT_ALLOWED
+            {"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
         )

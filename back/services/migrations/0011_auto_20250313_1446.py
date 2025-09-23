@@ -6,40 +6,78 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('services', '0010_reservationmusicroom'),
+        ("services", "0010_reservationmusicroom"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Mediatek',
+            name="Mediatek",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_open', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_open", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='MedItem',
+            name="MedItem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(choices=[('roman', 'Roman'), ('manga', 'Manga'), ('bd', 'Bande dessinée'), ('jeu', 'Jeu')], max_length=10)),
-                ('title', models.CharField(max_length=100)),
-                ('author', models.CharField(max_length=100)),
-                ('year', models.IntegerField()),
-                ('is_available', models.BooleanField(default=True)),
-                ('description', models.TextField()),
-                ('image', models.ImageField(blank=True, upload_to='media')),
-                ('borrowed_by', models.IntegerField(default=-1)),
-                ('borrowed_date', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("roman", "Roman"),
+                            ("manga", "Manga"),
+                            ("bd", "Bande dessinée"),
+                            ("jeu", "Jeu"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                ("title", models.CharField(max_length=100)),
+                ("author", models.CharField(max_length=100)),
+                ("year", models.IntegerField()),
+                ("is_available", models.BooleanField(default=True)),
+                ("description", models.TextField()),
+                ("image", models.ImageField(blank=True, upload_to="media")),
+                ("borrowed_by", models.IntegerField(default=-1)),
+                ("borrowed_date", models.DateTimeField(blank=True, null=True)),
             ],
         ),
         migrations.AlterField(
-            model_name='requestform',
-            name='service',
-            field=models.CharField(choices=[('velos', 'Vélos'), ('vracs', 'Vracs'), ('musique', 'Musique')], max_length=10),
+            model_name="requestform",
+            name="service",
+            field=models.CharField(
+                choices=[
+                    ("velos", "Vélos"),
+                    ("vracs", "Vracs"),
+                    ("musique", "Musique"),
+                ],
+                max_length=10,
+            ),
         ),
         migrations.AlterField(
-            model_name='requestform',
-            name='status',
-            field=models.CharField(choices=[('pending', 'En attente'), ('done', 'Lue')], default='pending', max_length=10),
+            model_name="requestform",
+            name="status",
+            field=models.CharField(
+                choices=[("pending", "En attente"), ("done", "Lue")],
+                default="pending",
+                max_length=10,
+            ),
         ),
     ]

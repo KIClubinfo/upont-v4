@@ -13,7 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 import django_cas_ng.views
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.contrib.auth import views as auth_views
+from django.urls import include, path
+from django_reverse_js.views import urls_js
+from rest_framework import routers
+
 from courses.views import (
     CourseViewSet,
     GroupViewSet,
@@ -21,12 +30,6 @@ from courses.views import (
     ResourceViewSet,
     TimeslotViewSet,
 )
-from django.conf import settings
-from django.conf.urls.static import static
-from django.contrib import admin
-from django.contrib.auth import views as auth_views
-from django.urls import include, path
-from django_reverse_js.views import urls_js
 from news.views import (
     DeleteCommentView,
     EventViewSet,
@@ -49,16 +52,16 @@ from pochtron.views import (
     PochtronTransactions,
     SearchAlcohol,
 )
-from rest_framework import routers
+
+# Replace MediatekViewSet with LocalViewSet
 from services.views import (
-    BikesViewSet, 
+    BikesViewSet,
+    LocalViewSet,
     OrderViewSet,
-    VracViewSet,
     RequestFormViewSet,
     ReservationBikeViewSet,
     ReservationMusicRoomViewSet,
-    LocalViewSet,  # Replace MediatekViewSet with LocalViewSet
-    MedItemViewSet,
+    VracViewSet,
 )
 from social.views import (
     ClubsViewSet,
@@ -115,7 +118,9 @@ else:
 # ---- API URLS ----#
 
 router = routers.DefaultRouter()
-router.register(r"admin-status", views.AdminStatusViewSet, basename="check-admin-status")
+router.register(
+    r"admin-status", views.AdminStatusViewSet, basename="check-admin-status"
+)
 router.register(r"students", StudentViewSet)
 router.register(r"posts", PostViewSet, basename="post")
 router.register(r"events", EventViewSet, basename="event")
@@ -128,8 +133,12 @@ router.register(r"services/bikes", BikesViewSet, basename="bikes")
 router.register(r"services/orders", OrderViewSet, basename="order")
 router.register(r"services/vrac", VracViewSet, basename="vrac")
 router.register(r"services/requests", RequestFormViewSet, basename="requests")
-router.register(r"services/reservations", ReservationBikeViewSet, basename="reservations")
-router.register(r"services/musicroom", ReservationMusicRoomViewSet, basename="musicroom")
+router.register(
+    r"services/reservations", ReservationBikeViewSet, basename="reservations"
+)
+router.register(
+    r"services/musicroom", ReservationMusicRoomViewSet, basename="musicroom"
+)
 router.register(r"services/locals", LocalViewSet, basename="local")
 
 router.register(r"partnerships", PartnershipViewSet, basename="partnership")

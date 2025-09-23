@@ -1,7 +1,8 @@
-from courses.serializers import ResourceSerializer
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework import serializers
+
+from courses.serializers import ResourceSerializer
 from social.models import Student
 from social.serializers import ClubSerializerLite, StudentSerializer
 

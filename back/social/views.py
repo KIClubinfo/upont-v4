@@ -1,3 +1,9 @@
+import base64
+import os
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import PermissionDenied
@@ -5,6 +11,7 @@ from django.db.models import Q
 from django.db.models.functions import Greatest
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -15,8 +22,11 @@ from rest_framework.views import APIView
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
 from .models import (
     Category,
+    Channel,
+    ChannelEncryptedKey,
     Club,
     Membership,
+    Message,
     NotificationToken,
     Promotion,
     Role,
@@ -84,32 +94,31 @@ class StudentViewSet(viewsets.ModelViewSet):
             print(form.errors)
             return Response({"status": "error", "errors": form.errors})
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def unvalidated(self, request):
         """Returns list of unvalidated students"""
         if not (request.user.is_superuser or request.user.is_staff):
             return Response({"error": "Permission denied"}, status=403)
-            
+
         unvalidated = Student.objects.filter(is_validated=False).order_by(
             "-promo__year", "user__first_name", "user__last_name"
         )
         serializer = StudentSerializer(unvalidated, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def birthdays_today(self, request):
         """Returns list of students whose birthday is today"""
         from datetime import datetime
-        
+
         # Extract month and day from today's date
         today = datetime.now()
-        
+
         # Filter students whose birthday matches today's month and day
         birthday_students = Student.objects.filter(
-            birthdate__month=today.month,
-            birthdate__day=today.day
-        ).order_by('-promo__year', 'user__first_name', 'user__last_name')
-        
+            birthdate__month=today.month, birthdate__day=today.day
+        ).order_by("-promo__year", "user__first_name", "user__last_name")
+
         serializer = StudentSerializer(birthday_students, many=True)
         return Response(serializer.data)
 
@@ -296,6 +305,95 @@ class ProfilePicUpdate(APIView):
         student.picture = image
         student.save()
         return Response({"status": "ok"})
+
+
+class CreateChannel(APIView):
+    """
+    API endpoint that allows a student to create a channel
+    """
+
+    def post(self, request):
+        members = [
+            get_object_or_404(Student, user__id=user_id)
+            for user_id in request.data["members"]
+        ]
+        admins = [
+            get_object_or_404(Student, user__id=user_id)
+            for user_id in request.data["admins"]
+        ]
+        # Symmetric key to encrypt message in the channel
+        key = os.urandom(32)
+        key_base64 = base64.b64encode(key).decode("utf-8")
+        encrypted_keys = []
+        for user_id in request.data["members"]:
+            student = get_object_or_404(Student, user__id=user_id)
+            public_key_pem = student.public_key.encode("utf-8")
+            public_key = serialization.load_pem_public_key(
+                public_key_pem, backend=default_backend()
+            )
+            encrypted_key = public_key.encrypt(
+                key_base64,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None,
+                ),
+            )
+            encrypted_key_save = ChannelEncryptedKey(
+                key=base64.b64encode(encrypted_key).decode("utf-8"),
+                student=student,
+            )
+            encrypted_key_save.save()
+            encrypted_keys.append(encrypted_key_save)
+
+        if request.data["channel_of"] == "-1":
+            club = club = get_object_or_404(Club, id=request.data["channel_of"])
+            channel = Channel(
+                name=request.data["name"],
+                date=timezone.now(),
+                creator=get_object_or_404(Student, user__id=request.user.id),
+                members=members,
+                admins=admins,
+                encrypted_keys=encrypted_keys,
+            )
+        else:
+            channel = Channel(
+                name=request.data["name"],
+                date=timezone.now(),
+                creator=get_object_or_404(Student, user__id=request.user.id),
+                club=club,
+                members=members,
+                admins=admins,
+                encrypted_keys=encrypted_keys,
+            )
+        channel.save()
+        return Response({"status": "ok"})
+
+
+class CreateMessage(APIView):
+    def post(self, request):
+        if request.data["by_club"] == "-1":
+            message = Message(
+                channel=get_object_or_404(Channel, id=request.data["channel"]),
+                date=timezone.now(),
+                author=get_object_or_404(Student, user__id=request.user.id),
+                content=request.data["content"],
+            )
+        else:
+            club = club = get_object_or_404(Club, id=request.data["channel_of"])
+            message = Message(
+                channel=get_object_or_404(Channel, id=request.data["channel"]),
+                date=timezone.now(),
+                author=get_object_or_404(Student, user__id=request.user.id),
+                club=club,
+                content=request.data["content"],
+            )
+        message.save()
+
+
+""" class ViewMessage(APIView):
+
+ """
 
 
 @login_required
@@ -536,7 +634,8 @@ def view_club(request, club_id):
     )
     if not membership_club_list:  # If no match is found
         is_admin = False
-    elif not membership_club_list[0].is_admin:  # If the user does not have the rights
+    # If the user does not have the rights
+    elif not membership_club_list[0].is_admin:
         is_admin = False
     else:
         is_admin = True
@@ -564,7 +663,8 @@ def club_edit(request, club_id):
     form_role = AddRole()
     if not student_membership_club:  # If no match is found
         raise PermissionDenied
-    if not student_membership_club[0].is_admin:  # If the user does not have the rights
+    # If the user does not have the rights
+    if not student_membership_club[0].is_admin:
         raise PermissionDenied
 
     context = {
@@ -597,9 +697,9 @@ def club_edit(request, club_id):
                 not request.POST["student"].isdigit()
                 or not request.POST["role"].isdigit()
             ):
-                context[
-                    "error"
-                ] = "Fais bien attention à sélectionner l'élève ET le rôle"
+                context["error"] = (
+                    "Fais bien attention à sélectionner l'élève ET le rôle"
+                )
                 context["AddMember"] = AddMember()
                 return render(request, "social/club_edit.html", context)
 
@@ -714,7 +814,7 @@ def club_request(request):
     return render(request, "social/club_request.html", context)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def validate_student(request):
     """
@@ -724,20 +824,22 @@ def validate_student(request):
     # Check if user has permission
     if not (request.user.is_superuser or request.user.is_staff):
         return Response({"error": "Permission denied"}, status=403)
-    
+
     # Get student_id from request data
-    student_id = request.data.get('student_id')
+    student_id = request.data.get("student_id")
     if not student_id:
         return Response({"error": "student_id is required"}, status=400)
-    
+
     # Get and update student
     try:
         student = get_object_or_404(Student, id=student_id)
         student.is_validated = True
         student.save()
-        return Response({
-            "success": True,
-            "message": f"Student {student.user.first_name} {student.user.last_name} has been validated"
-        })
+        return Response(
+            {
+                "success": True,
+                "message": f"Student {student.user.first_name} {student.user.last_name} has been validated",
+            }
+        )
     except Exception as e:
         return Response({"error": str(e)}, status=400)

@@ -4,7 +4,6 @@ import re
 from datetime import datetime
 from functools import reduce
 
-from courses.models import Course, Resource
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -18,11 +17,14 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from courses.models import Course, Resource
 from social.models import Club, Membership, Promotion, Student
 from upont.regex import split_then_markdownify
 
-from .forms import AddShotgun, CommentForm, EditEvent, EditPost
-from .models import Comment, Event, Participation, Partnership, Post, Ressource, Shotgun
+from .forms import AddShotgun, CommentForm, EditEvent, EditPost  # , EditSondage
+from .models import Participation  # , Sondage, OptionSondage
+from .models import Comment, Event, Partnership, Post, Ressource, Shotgun
 from .serializers import (
     EventSerializer,
     PartnershipSerializer,
@@ -259,6 +261,57 @@ class PostCreateView(APIView):
         return Response({"status": "ok"})
 
 
+"""
+class SondageCreateView(APIView):
+
+    def post(self, request):
+        if request.data["title"] == "":
+            return Response({"status": "error", "message": "empty_title"})
+        elif request.data["content"] == "":
+            return Response({"status": "error", "message": "empty_content"})
+        student = get_object_or_404(Student, user__id=request.user.id)
+
+        if request.data["publish_as"] == "-1":
+            sondage = Sondage(
+                title=request.data["title"],
+                author=student,
+                date=timezone.now(),
+                content=split_then_markdownify(request.data["content"]),
+            )
+        else:
+            club = get_object_or_404(Club, id=request.data["publish_as"])
+            if club.is_member(student.id):
+                sondage = Sondage(
+                    title=request.data["title"],
+                    author=student,
+                    club=club,
+                    date=timezone.now(),
+                    content=split_then_markdownify(request.data["content"]),
+                )
+            else:
+                return Response({"status": "error", "message": "forbidden"})
+            if request.data["options"] == []:
+                return Response({"status": "error", "message": "empty_options"})
+            else:
+                i = 0
+                for option in request.data["options"]:
+
+                    if(option["text"] == ""):
+                        return Response({"status": "error", "message": "empty_option_text"})
+                    else:
+                        option_sondage = OptionSondage(
+                            sondage = sondage,
+                            number = i,
+                            text = option["text"],
+                            )
+                    option_sondage.save()
+                    i+=1
+        sondage.number_of_options = i
+        sondage.save()
+        return Response({"status": "ok"})
+ """
+
+
 class PostCreateViewV2(APIView):
     """
     API endpoint that allows students to create posts
@@ -331,9 +384,68 @@ class PostCreateViewV2(APIView):
         return Response({"status": "ok"})
 
 
+class ShotgunCreateView(APIView):
+    """
+    API endpoint to create a shotgun (only for club admins).
+    """
+
+    def post(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+
+        # Vérifier les clubs où l'étudiant est admin
+        admin_clubs_memberships = Membership.objects.filter(
+            student__pk=student.id, is_admin=True
+        )
+        admin_clubs = []
+        for membership in admin_clubs_memberships:
+            admin_clubs.append(membership.club)
+
+        if not admin_clubs:
+            return Response({"status": "error", "message": "not_admin"})
+
+        # Champs obligatoires
+        title = request.data["title"]
+        content = request.data["content"]
+        club_id = request.data["club"]
+
+        if not title:
+            return Response({"status": "error", "message": "empty_title"})
+        if not content:
+            return Response({"status": "error", "message": "empty_content"})
+        if not club_id:
+            return Response({"status": "error", "message": "no_club"})
+
+        club = get_object_or_404(Club, id=club_id)
+
+        # Vérifier que l’étudiant est admin du club choisi
+        if club not in admin_clubs:
+            return Response({"status": "error", "message": "forbidden"})
+
+        # Création du shotgun
+        shotgun = Shotgun(
+            club=club,
+            title=title,
+            content=split_then_markdownify(content),
+            starting_date=request.data.get("starting_date", timezone.now()),
+            ending_date=request.data["ending_date"],
+            requires_motivation=request.data["requires_motivation"],
+            success_message=split_then_markdownify(request.data["success_message"]),
+            failure_message=split_then_markdownify(request.data["failure_message"]),
+        )
+        shotgun.save()
+
+        return Response(
+            {
+                "status": "ok",
+                "shotgun_id": shotgun.id,
+                "message": "shotgun_created",
+            }
+        )
+
+
 class PostEditView(APIView):
     """
-    API endpoint that allows students to create posts
+    API endpoint that allows students to edit posts
     """
 
     def post(self, request):
@@ -778,6 +890,32 @@ def post_create(request, event_id=None, course_id=None):
     context["Edit"] = False
     context["course_id"] = course_id
     return render(request, "news/post_edit.html", context)
+
+
+""" @login_required
+def sondage_create(request):
+    context = {}
+    if request.method == "POST":
+        if "Valider" in request.POST:
+            form = EditSondage(
+                request.user.id,
+                request.POST,
+                request.FILES,
+            )
+            if form.is_valid():
+                post = form.save(commit=False)
+                student = Student.objects.get(user__id=request.user.id)
+                post.author = student
+                post.date = timezone.now()
+                post.content = split_then_markdownify(post.content)
+                post.save()
+                return HttpResponseRedirect(request.session["origin"])
+    else:
+        form = EditSondage(request.user.id)
+    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:sondages"))
+    context["EditSondage"] = form
+    context["Edit"] = False
+    return render(request, "news/sondage_edit.html", context) """
 
 
 @login_required

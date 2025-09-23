@@ -3,9 +3,11 @@ import time
 import requests
 from celery import shared_task
 from exponent_server_sdk import DeviceNotRegisteredError, PushClient, PushMessage
+
 from social.models import NotificationToken, Student
 
-# Optionally providing an access token within a session if you have enabled push security
+# Optionally providing an access token within a session if you have
+# enabled push security
 session = requests.Session()
 session.headers.update(
     {
