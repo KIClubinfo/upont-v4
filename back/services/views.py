@@ -503,7 +503,7 @@ class ReservationBikeViewSet(ModelViewSet):
             # 4. Get the string representation
             for i in range(min(n, reservations_qs.count())):
                 reserv = reservations_qs[i]
-                data[f"reservation_{i+1}"] = str(reserv)
+                data[f"reservation_{i + 1}"] = str(reserv)
 
             # Use the key 'nth_last_log' as before, although the value is now
             # the reservation string
