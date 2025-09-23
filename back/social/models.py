@@ -38,10 +38,7 @@ class Role(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(models2.User(), on_delete=models.PROTECT)
-    promo = models.ForeignKey(
-        "Promotion",
-        on_delete=models.SET_NULL,
-        null=True)
+    promo = models.ForeignKey("Promotion", on_delete=models.SET_NULL, null=True)
 
     class Department(models.TextChoices):
         IMI = "IMI", _("Ingénierie mathématique et informatique")
@@ -61,10 +58,7 @@ class Student(models.Model):
         H = "Homme"
         A = "Autre"
 
-    gender = models.CharField(
-        max_length=5,
-        choices=Gender.choices,
-        default=Gender.A)
+    gender = models.CharField(max_length=5, choices=Gender.choices, default=Gender.A)
 
     class Origin(models.TextChoices):
         CC = "Concours Commun"
@@ -73,16 +67,14 @@ class Student(models.Model):
         DD = "Double Diplôme"
         ETR = "Université étrangère"
 
-    origin = models.CharField(
-        max_length=20,
-        choices=Origin.choices,
-        default=Origin.CC)
+    origin = models.CharField(max_length=20, choices=Origin.choices, default=Origin.CC)
 
     phone_regex = RegexValidator(
         regex=r"^\+?\d{9,16}$",
         message=(
             "Le numéro doit être entré au format: '+999999999'. Jusqu'à 16 chiffres"
-            " sont autorisés."),
+            " sont autorisés."
+        ),
     )
     phone_number = models.CharField(
         validators=[phone_regex], max_length=17, null=True, blank=True
@@ -133,11 +125,7 @@ class Category(models.Model):
 
 class Club(models.Model):
     name = models.CharField(max_length=50, default="Club")
-    nickname = models.CharField(
-        max_length=50,
-        default="",
-        null=True,
-        blank=True)
+    nickname = models.CharField(max_length=50, default="", null=True, blank=True)
     logo = models.ImageField(upload_to="logos/", null=True, blank=True)
     background_picture = models.ImageField(
         upload_to="background_pictures/", null=True, blank=True
@@ -163,10 +151,7 @@ class Club(models.Model):
         LISTE = "Liste"
         POLE = "Pôle"
 
-    label = models.CharField(
-        max_length=20,
-        choices=Label.choices,
-        default=Label.CLUB)
+    label = models.CharField(max_length=20, choices=Label.choices, default=Label.CLUB)
 
     def save(self, *args, **kwargs):
         if self.logo:
@@ -187,8 +172,7 @@ class Club(models.Model):
         return False
 
     def is_admin(self, student_id):
-        membership = Membership.objects.filter(
-            student__id=student_id, club=self)
+        membership = Membership.objects.filter(student__id=student_id, club=self)
         if len(membership) > 0 and membership[0].is_admin:
             return True
         return False
@@ -245,16 +229,11 @@ def compress_image(image, quality, name):
 
 
 class Message(models.Model):
-    channel = models.ForeignKey(
-        "Channel",
-        on_delete=models.SET_NULL,
-        null=True)
+    channel = models.ForeignKey("Channel", on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField()
     author = models.ForeignKey(
-        "social.Student",
-        verbose_name="author",
-        on_delete=models.SET_NULL,
-        null=True)
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
+    )
     club = models.ForeignKey(
         "social.Club", on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -269,17 +248,13 @@ class Channel(models.Model):
     name = models.CharField(max_length=50)
     date = models.DateTimeField()
     creator = models.ForeignKey(
-        "social.Student",
-        verbose_name="author",
-        on_delete=models.SET_NULL,
-        null=True)
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
+    )
     club = models.ForeignKey(
         "social.Club", on_delete=models.SET_NULL, null=True, blank=True
     )
     members = models.ManyToManyField("social.Student", related_name="channels")
-    admins = models.ManyToManyField(
-        "social.Student",
-        related_name="channels_admin")
+    admins = models.ManyToManyField("social.Student", related_name="channels_admin")
     encrypted_keys = models.ManyToManyField("social.ChannelEncryptedKey")
 
 

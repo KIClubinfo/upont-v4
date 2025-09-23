@@ -26,8 +26,9 @@ class SearchAlcohol(APIView):
     def get(self, request):
         if "alcohol" in request.GET and request.GET["alcohol"].strip():
             query = request.GET.get("alcohol", None)
-            alcohols = Alcohol.objects.filter(
-                name__icontains=query).order_by("-name")[:5]
+            alcohols = Alcohol.objects.filter(name__icontains=query).order_by("-name")[
+                :5
+            ]
         else:
             alcohols = Alcohol.objects.all().order_by("-name")[:5]
         serializer = AlcoholSerializer(alcohols, many=True)
@@ -48,8 +49,7 @@ def home(request):
         admin = TradeAdmin(student=student, club=club)
         admin.save()
 
-    context["admin"] = TradeAdmin.objects.filter(
-        student=student, club=club).exists()
+    context["admin"] = TradeAdmin.objects.filter(student=student, club=club).exists()
     context["user_balance"] = student.balance_in_euros(club)
 
     context["transactions"] = [
@@ -105,10 +105,7 @@ def shop(request):
     student = get_object_or_404(Student, user__pk=request.user.id)
 
     try:
-        TradeAdmin.objects.get(
-            student=student,
-            club=club,
-            manage_transactions=True)
+        TradeAdmin.objects.get(student=student, club=club, manage_transactions=True)
     except TradeAdmin.DoesNotExist:
         raise PermissionDenied
 

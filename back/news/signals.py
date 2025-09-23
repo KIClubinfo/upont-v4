@@ -15,8 +15,6 @@ def on_post_create(sender, instance, created, **kwargs):
             )
         else:
             notifications.send_push_message_to_all_students(
-                instance.author.user.first_name +
-                " " +
-                instance.author.user.last_name,
+                instance.author.user.first_name + " " + instance.author.user.last_name,
                 instance.title,
             )

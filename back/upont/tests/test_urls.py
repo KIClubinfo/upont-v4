@@ -1,10 +1,13 @@
-from django.contrib.auth.views import (LoginView, LogoutView,
-                                       PasswordChangeDoneView,
-                                       PasswordChangeView,
-                                       PasswordResetCompleteView,
-                                       PasswordResetConfirmView,
-                                       PasswordResetDoneView,
-                                       PasswordResetView)
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordChangeDoneView,
+    PasswordChangeView,
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
 from django.test import SimpleTestCase
 from django.urls import resolve, reverse
 
@@ -37,16 +40,10 @@ class TestUrls(SimpleTestCase):
     def test_password_reset_confirm_url_resolves(self):
         url = reverse(
             "password_reset_confirm",
-            kwargs={
-                "uidb64": "Mg",
-                "token": "ayd1gp-435793523dbd8f1e69f37053c440"},
+            kwargs={"uidb64": "Mg", "token": "ayd1gp-435793523dbd8f1e69f37053c440"},
         )
-        self.assertEquals(
-            resolve(url).func.view_class,
-            PasswordResetConfirmView)
+        self.assertEquals(resolve(url).func.view_class, PasswordResetConfirmView)
 
     def test_password_reset_complete_url_resolves(self):
         url = reverse("password_reset_complete")
-        self.assertEquals(
-            resolve(url).func.view_class,
-            PasswordResetCompleteView)
+        self.assertEquals(resolve(url).func.view_class, PasswordResetCompleteView)

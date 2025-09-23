@@ -11,8 +11,16 @@ from rest_framework.test import APITestCase
 from news.models import Post
 from social.models import Student
 
-from .models import (Course, CourseDepartment, CourseUpdate, Enrolment, Group,
-                     Resource, Teacher, Timeslot)
+from .models import (
+    Course,
+    CourseDepartment,
+    CourseUpdate,
+    Enrolment,
+    Group,
+    Resource,
+    Teacher,
+    Timeslot,
+)
 
 
 class TeacherModelTest(TestCase):
@@ -283,15 +291,9 @@ class CourseViewsetTest(APITestCase):
         self.assertEqual(response_course1["id"], self.course1.pk)
         self.assertEqual(response_course1["name"], self.course1.name)
         self.assertEqual(response_course1["acronym"], self.course1.acronym)
-        self.assertEqual(
-            response_course1["department"],
-            self.course1.department)
-        self.assertEqual(
-            response_course1["teacher"]["id"],
-            self.course1.teacher.pk)
-        self.assertEqual(
-            response_course1["description"],
-            self.course1.description)
+        self.assertEqual(response_course1["department"], self.course1.department)
+        self.assertEqual(response_course1["teacher"]["id"], self.course1.teacher.pk)
+        self.assertEqual(response_course1["description"], self.course1.description)
 
     def test_is_enrolled_filter(self):
         # Enroll the user in Course1
@@ -468,11 +470,11 @@ class TimeslotViewSetTest(APITestCase):
         response_timeslot1 = response.data.get("results")[0]
         self.assertEqual(response_timeslot1["id"], self.timeslot1.pk)
         self.assertEqual(
-            response_timeslot1["start"],
-            self.timeslot1.start.astimezone().isoformat())
+            response_timeslot1["start"], self.timeslot1.start.astimezone().isoformat()
+        )
         self.assertEqual(
-            response_timeslot1["end"],
-            self.timeslot1.end.astimezone().isoformat())
+            response_timeslot1["end"], self.timeslot1.end.astimezone().isoformat()
+        )
         group_id = int(response_timeslot1["course_groups"][0].split("/")[-2])
         self.assertEqual(group_id, self.group1.pk)
         self.assertEqual(response_timeslot1["course_name"], self.course1.name)

@@ -5,8 +5,7 @@ from django.utils import timezone
 
 from trade.models import Good, Price, Transaction
 
-from .models import (Category, Club, Membership, Nationality, Promotion, Role,
-                     Student)
+from .models import Category, Club, Membership, Nationality, Promotion, Role, Student
 
 
 class PromotionModelTest(TestCase):
@@ -19,9 +18,7 @@ class PromotionModelTest(TestCase):
 
 class NationalityModelTest(TestCase):
     def test_nationality_saves_in_database(self):
-        nationality = Nationality(
-            nationality="Française",
-            short_nationality="FR")
+        nationality = Nationality(nationality="Française", short_nationality="FR")
         nationality.save()
         retrieved_nationality = Nationality.objects.get(pk=nationality.pk)
         self.assertEqual(retrieved_nationality.pk, nationality.pk)
@@ -158,10 +155,7 @@ class ClubModelTest(TestCase):
         test_club = Club(description="Un Club", active=True, has_fee=True)
         test_club.save()
         self.assertFalse(test_club.is_member(test_student.id))
-        membership = Membership(
-            is_admin=False,
-            club=test_club,
-            student=test_student)
+        membership = Membership(is_admin=False, club=test_club, student=test_student)
         membership.save()
         self.assertTrue(test_club.is_member(test_student.id))
 
@@ -179,10 +173,7 @@ class ClubModelTest(TestCase):
         test_club = Club(description="Un Club", active=True, has_fee=True)
         test_club.save()
         self.assertFalse(test_club.is_admin(test_student.id))
-        membership = Membership(
-            is_admin=False,
-            club=test_club,
-            student=test_student)
+        membership = Membership(is_admin=False, club=test_club, student=test_student)
         membership.save()
         self.assertFalse(test_club.is_admin(test_student.id))
         membership.is_admin = True
@@ -234,10 +225,7 @@ class MembershipModelTest(TestCase):
         test_student.save()
         test_club = Club(description="Un Club", active=True, has_fee=True)
         test_club.save()
-        membership = Membership(
-            is_admin=False,
-            club=test_club,
-            student=test_student)
+        membership = Membership(is_admin=False, club=test_club, student=test_student)
         membership.save()
         retrieved_membership = Membership.objects.get(pk=membership.pk)
         self.assertEqual(retrieved_membership.pk, membership.pk)

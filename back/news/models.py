@@ -10,10 +10,7 @@ from social.models import Student
 class Event(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
-    club = models.ForeignKey(
-        "social.Club",
-        on_delete=models.SET_NULL,
-        null=True)
+    club = models.ForeignKey("social.Club", on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField()
     end = models.DateTimeField()
     location = models.CharField(max_length=50)
@@ -44,10 +41,8 @@ class Event(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=50)
     author = models.ForeignKey(
-        "social.Student",
-        verbose_name="author",
-        on_delete=models.SET_NULL,
-        null=True)
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
+    )
     club = models.ForeignKey(
         "social.Club", on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -56,11 +51,7 @@ class Post(models.Model):
         upload_to="post_illustrations", null=True, blank=True
     )
     content = models.TextField()
-    event = models.ForeignKey(
-        "Event",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True)
+    event = models.ForeignKey("Event", on_delete=models.SET_NULL, null=True, blank=True)
     likes = models.ManyToManyField(
         Student,
         related_name="posts",
@@ -95,15 +86,10 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(
-        "Post",
-        on_delete=models.CASCADE,
-        related_name="comments")
+    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(
-        "social.Student",
-        verbose_name="author",
-        on_delete=models.SET_NULL,
-        null=True)
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
+    )
     club = models.ForeignKey(
         "social.Club", on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -168,8 +154,7 @@ class Shotgun(models.Model):
         return timezone.now() > self.ending_date
 
     def participated(self, student: Student):
-        participation = Participation.objects.filter(
-            shotgun=self, participant=student)
+        participation = Participation.objects.filter(shotgun=self, participant=student)
         if participation.exists():
             return True
         return False
@@ -190,19 +175,11 @@ class Shotgun(models.Model):
 
 class Ressource(models.Model):
     title = models.CharField(max_length=50)
-    post = models.ForeignKey(
-        "Post",
-        on_delete=models.CASCADE,
-        related_name="resources")
+    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="resources")
     author = models.ForeignKey(
-        "social.Student",
-        verbose_name="author",
-        on_delete=models.SET_NULL,
-        null=True)
-    image = models.ImageField(
-        upload_to="news/ressources",
-        null=True,
-        blank=True)
+        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
+    )
+    image = models.ImageField(upload_to="news/ressources", null=True, blank=True)
     video_url = models.URLField(null=True, blank=True)
 
     def is_video(self):

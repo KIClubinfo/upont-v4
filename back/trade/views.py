@@ -18,8 +18,7 @@ from .models import Good, TradeAdmin, Transaction
 @login_required
 def student_transactions(request):
     student = get_object_or_404(Student, user__id=request.user.id)
-    transactions = Transaction.objects.filter(
-        student=student).order_by("-date")
+    transactions = Transaction.objects.filter(student=student).order_by("-date")
     context = {
         "transactions": transactions,
         "student": student,
@@ -36,8 +35,7 @@ def club_transactions(request, club_id):
         and not TradeAdmin.objects.filter(student=student, club=club).exists()
     ):
         raise PermissionDenied
-    transactions = Transaction.objects.filter(
-        good__club=club).order_by("-date")
+    transactions = Transaction.objects.filter(good__club=club).order_by("-date")
     context = {
         "transactions": transactions,
         "club": club,
@@ -72,20 +70,24 @@ def add_transaction(request):
             )
             balance = 0
             for transaction in all_transactions_with_this_club:
-                balance += (transaction.quantity *
-                            transaction.balance_change_for_student())
+                balance += (
+                    transaction.quantity * transaction.balance_change_for_student()
+                )
             balance -= good.price()
             if balance >= 0:
                 filled_form.save()
-                return JsonResponse(
-                    {"error": "", "new_balance": balance}, status=201)
+                return JsonResponse({"error": "", "new_balance": balance}, status=201)
             else:
                 return JsonResponse(
                     {
                         "error": (
                             "Pas assez d'argent sur ce compte.                    "
                             " Solde actuel : {} €".format(
-                                (balance + good.price()) / 100))})
+                                (balance + good.price()) / 100
+                            )
+                        )
+                    }
+                )
         return JsonResponse(
             {"error": "Merci de remplir le formulaire correctement."}, status=500
         )
@@ -101,8 +103,10 @@ class LastTransactions(APIView):
             club_id = request.GET.get("club", None)
             club = Club.objects.get(pk=club_id)
             student = get_object_or_404(Student, user__pk=request.user.id)
-            if (not club.is_member(student.id) and not TradeAdmin.objects.filter(
-                    student=student, club=club).exists()):
+            if (
+                not club.is_member(student.id)
+                and not TradeAdmin.objects.filter(student=student, club=club).exists()
+            ):
                 raise PermissionDenied
             if "end" in request.GET and request.GET["end"].strip():
                 end = int(request.GET.get("end", 20))
@@ -112,13 +116,10 @@ class LastTransactions(APIView):
                 start = int(request.GET.get("start", 0))
             else:
                 start = 0
-            transactions = Transaction.objects.filter(
-                good__club=club).order_by("-date")
-            serializer = TransactionSerializer(
-                transactions[start:end], many=True)
+            transactions = Transaction.objects.filter(good__club=club).order_by("-date")
+            serializer = TransactionSerializer(transactions[start:end], many=True)
             has_more = end < len(transactions)
-            return Response(
-                {"transactions": serializer.data, "has_more": has_more})
+            return Response({"transactions": serializer.data, "has_more": has_more})
         else:
             return HttpResponse(status=500)
 
@@ -130,8 +131,7 @@ def credit_account(request):
         data = json.loads(request.body.decode("utf-8"))
         club = get_object_or_404(Club, pk=data["club"])
         try:
-            TradeAdmin.objects.get(
-                student=student, club=club, manage_credits=True)
+            TradeAdmin.objects.get(student=student, club=club, manage_credits=True)
         except TradeAdmin.DoesNotExist:
             raise PermissionDenied
 

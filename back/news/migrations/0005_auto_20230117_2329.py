@@ -24,9 +24,7 @@ class Migration(migrations.Migration):
             model_name="post",
             name="likes",
             field=models.ManyToManyField(
-                blank=True,
-                editable=False,
-                related_name="posts",
-                to="social.Student"),
+                blank=True, editable=False, related_name="posts", to="social.Student"
+            ),
         ),
     ]

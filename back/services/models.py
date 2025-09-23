@@ -27,18 +27,12 @@ class Vrac(models.Model):
     )
 
     stock = ArrayField(
-        models.IntegerField(
-            validators=[
-                MinValueValidator(0)]),
-        blank=True,
-        default=list)
+        models.IntegerField(validators=[MinValueValidator(0)]), blank=True, default=list
+    )
 
     stock_available = ArrayField(
-        models.IntegerField(
-            validators=[
-                MinValueValidator(0)]),
-        blank=True,
-        default=list)
+        models.IntegerField(validators=[MinValueValidator(0)]), blank=True, default=list
+    )
 
     def __str__(self):
         return self.name
@@ -85,8 +79,7 @@ class Vrac(models.Model):
             quantity_from_this_batch = min(available, remaining)
 
             if self.type == "vrac":
-                total_price += (price / quantity_factor) * \
-                    quantity_from_this_batch
+                total_price += (price / quantity_factor) * quantity_from_this_batch
             else:
                 total_price += price * quantity_from_this_batch
 
@@ -113,8 +106,7 @@ class Vrac(models.Model):
             try:
                 idx = self.price.index(price)
                 if self.stock[idx] < quantity:
-                    raise ValidationError(
-                        f"Stock insuffisant pour le prix {price}")
+                    raise ValidationError(f"Stock insuffisant pour le prix {price}")
             except ValueError:
                 raise ValidationError(f"Prix {price} non trouvé dans le stock")
 
@@ -156,8 +148,7 @@ class Vrac(models.Model):
             if price <= 0:
                 raise ValidationError(f"Le prix {price} doit être positif")
             if quantity <= 0:
-                raise ValidationError(
-                    f"La quantité {quantity} doit être positive")
+                raise ValidationError(f"La quantité {quantity} doit être positive")
 
         # Ajout des nouveaux stocks
         for price, quantity in zip(prices, quantities):
@@ -223,8 +214,7 @@ class Vrac(models.Model):
         # Vérification des valeurs et existence des prix
         for price, quantity in zip(prices, quantities):
             if quantity <= 0:
-                raise ValidationError(
-                    f"La quantité {quantity} doit être positive")
+                raise ValidationError(f"La quantité {quantity} doit être positive")
             try:
                 idx = self.price.index(price)
                 if self.stock_available[idx] + quantity > self.stock[idx]:
@@ -287,11 +277,8 @@ class OrderItem(models.Model):
         default=list,
     )
     quantities = ArrayField(
-        models.IntegerField(
-            validators=[
-                MinValueValidator(0)]),
-        blank=True,
-        default=list)
+        models.IntegerField(validators=[MinValueValidator(0)]), blank=True, default=list
+    )
 
     def __str__(self):
         return f"Commande de {self.order.name} / {self.vrac.name}"
@@ -312,8 +299,7 @@ class OrderItem(models.Model):
 class Order(models.Model):
     name = models.CharField(max_length=100)
     id_user = models.IntegerField(default=-1)
-    products = models.ManyToManyField(
-        Vrac, through="OrderItem", related_name="orders")
+    products = models.ManyToManyField(Vrac, through="OrderItem", related_name="orders")
 
     def __str__(self):
         return f"Commande de {self.name}"
@@ -381,10 +367,7 @@ class RequestForm(models.Model):
     name = models.CharField(max_length=100)
     message = models.TextField()
     service = models.CharField(max_length=10, choices=SERVICE_CHOICES)
-    status = models.CharField(
-        max_length=10,
-        default="pending",
-        choices=STATUS_CHOICES)
+    status = models.CharField(max_length=10, default="pending", choices=STATUS_CHOICES)
 
     def __str__(self):
         return self.name
@@ -410,8 +393,9 @@ class ReservationBike(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)  # Null if ongoing
 
     def __str__(self):
-        end_date_str = (self.end_date.strftime(
-            "%Y-%m-%d %H:%M:%S") if self.end_date else "Ongoing")
+        end_date_str = (
+            self.end_date.strftime("%Y-%m-%d %H:%M:%S") if self.end_date else "Ongoing"
+        )
         return f"Réservation de {self.bike.name} par {self.name} - Start: {self.start_date.strftime('%Y-%m-%d %H:%M:%S')}, End: {end_date_str}"
 
 

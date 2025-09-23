@@ -104,15 +104,11 @@ class EditPost(forms.ModelForm):
             for membership in Membership.objects.filter(student__user__pk=user_id)
         ]
         self.fields["resource_file"] = forms.FileField(
-            widget=forms.FileInput(
-                attrs={
-                    "class": "profil-input"}),
-            required=False)
+            widget=forms.FileInput(attrs={"class": "profil-input"}), required=False
+        )
         self.fields["video"] = forms.URLField(
-            widget=forms.TextInput(
-                attrs={
-                    "class": "profil-input"}),
-            required=False)
+            widget=forms.TextInput(attrs={"class": "profil-input"}), required=False
+        )
 
 
 """ class EditSondage(forms.ModelForm):

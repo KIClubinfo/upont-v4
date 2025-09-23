@@ -10,8 +10,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import models as models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import (FileResponse, HttpResponse, HttpResponseForbidden,
-                         HttpResponseRedirect)
+from django.http import (
+    FileResponse,
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+)
 from django.shortcuts import render
 from django.urls import reverse
 from django_cas_ng.backends import CASBackend
@@ -19,8 +23,11 @@ from django_cas_ng.signals import cas_user_authenticated
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import (api_view, authentication_classes,
-                                       permission_classes)
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
@@ -78,10 +85,7 @@ def get_media_path(request, path):
         # By default, percent-encoded sequences are decoded with UTF-8, and invalid
         # sequences are replaced by a placeholder character.
         # Example: unquote('abc%20def') -> 'abc def'.
-        file_path = unquote(
-            os.path.join(
-                settings.MEDIA_ROOT,
-                path)).encode("utf-8")
+        file_path = unquote(os.path.join(settings.MEDIA_ROOT, path)).encode("utf-8")
         # FileResponse - A streaming HTTP response class optimized for files.
         return FileResponse(open(file_path, "rb"), content_type=mimetype)
     return Response("Access to this file is permitted.", status=404)
@@ -185,9 +189,8 @@ def get_token(request):
     if "email" not in request.data or "password" not in request.data:
         return Response({"error": "Please provide both email and password"})
     user = EmailBackend().authenticate(
-        request,
-        username=request.data["email"],
-        password=request.data["password"])
+        request, username=request.data["email"], password=request.data["password"]
+    )
     if user is None:
         return Response({"error": "Invalid credentials"})
     token, created = Token.objects.get_or_create(user=user)
@@ -233,8 +236,7 @@ def get_sso_token(request):
     logger.info(f"All fields: {user.__dict__}")
 
     if not user:
-        return Response(
-            {"error": "Échec de l'authentification CAS"}, status=403)
+        return Response({"error": "Échec de l'authentification CAS"}, status=403)
 
     def capitalize_name_parts(name_str):
         if not name_str:
@@ -246,9 +248,8 @@ def get_sso_token(request):
     User = get_user_model()
 
     first_name, last_name = (
-        user.username.split(
-            ".", 1) if "." in user.username else (
-            user.username, ""))
+        user.username.split(".", 1) if "." in user.username else (user.username, "")
+    )
     first_name = capitalize_name_parts(first_name)
     last_name = capitalize_name_parts(last_name)
 
@@ -261,8 +262,7 @@ def get_sso_token(request):
     # 2️⃣ Sinon, chercher un user avec même prénom et nom
     if not user_check:
         try:
-            user_check = User.objects.get(
-                first_name=first_name, last_name=last_name)
+            user_check = User.objects.get(first_name=first_name, last_name=last_name)
         except User.DoesNotExist:
             user_check = None
 

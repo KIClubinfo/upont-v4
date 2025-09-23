@@ -32,8 +32,7 @@ class TestAuthenticate(TestCase):
             last_name="Doe",
         )
 
-    def test_login_with_correct_username_and_password_authenticates_and_redirects(
-            self):
+    def test_login_with_correct_username_and_password_authenticates_and_redirects(self):
         response = self.client.post(
             reverse("login"),
             {"username": self.user.username, "password": self.password},
@@ -42,11 +41,10 @@ class TestAuthenticate(TestCase):
         self.assertEquals(response.url, reverse(LOGIN_REDIRECT_URL))
         self.assertTrue(response.wsgi_request.user.is_authenticated)
 
-    def test_login_with_correct_email_and_password_authenticates_and_redirects(
-            self):
+    def test_login_with_correct_email_and_password_authenticates_and_redirects(self):
         response = self.client.post(
-            reverse("login"), {
-                "username": self.user.email, "password": self.password})
+            reverse("login"), {"username": self.user.email, "password": self.password}
+        )
         self.assertEquals(response.status_code, 302)
         self.assertEquals(response.url, reverse(LOGIN_REDIRECT_URL))
         self.assertTrue(response.wsgi_request.user.is_authenticated)
@@ -68,10 +66,8 @@ class TestAuthenticate(TestCase):
         response = self.client.get(requested_url)
         self.assertEquals(response.status_code, 302)
         self.assertEquals(
-            response.url,
-            reverse("login") +
-            "?next=" +
-            reverse("social:index_users"))
+            response.url, reverse("login") + "?next=" + reverse("social:index_users")
+        )
 
     def test_getting_logout_page_logs_out(self):
         self.client.login(username=self.user.username, password=self.password)
@@ -108,26 +104,17 @@ class TestAuthenticate(TestCase):
         token = response.context[0]["token"]
         self.assertIn(token, sent_mail.body)
 
-    def test_getting_password_reset_confirm_with_wrong_token_prints_message(
-            self):
+    def test_getting_password_reset_confirm_with_wrong_token_prints_message(self):
         response = self.client.get(
-            reverse(
-                "password_reset_confirm",
-                kwargs={
-                    "uidb64": "foo",
-                    "token": "bar"}))
+            reverse("password_reset_confirm", kwargs={"uidb64": "foo", "token": "bar"})
+        )
         self.assertEquals(response.status_code, 200)
         self.assertIn(b"plus valide", response.content)
 
-    def test_getting_password_reset_confirm_with_wrong_token_displays_form(
-            self):
+    def test_getting_password_reset_confirm_with_wrong_token_displays_form(self):
         uid, token = self.generate_token()
         response = self.client.get(
-            reverse(
-                "password_reset_confirm",
-                kwargs={
-                    "uidb64": uid,
-                    "token": token}),
+            reverse("password_reset_confirm", kwargs={"uidb64": uid, "token": token}),
             follow=True,
         )
         self.assertEquals(response.status_code, 200)
@@ -136,11 +123,8 @@ class TestAuthenticate(TestCase):
     def test_password_reset_resets_password_and_redirects(self):
         uid, token = self.generate_token()
         response = self.client.get(
-            reverse(
-                "password_reset_confirm",
-                kwargs={
-                    "uidb64": uid,
-                    "token": token}))
+            reverse("password_reset_confirm", kwargs={"uidb64": uid, "token": token})
+        )
         response = self.client.post(
             response.url,
             {"new_password1": "new_password", "new_password2": "new_password"},

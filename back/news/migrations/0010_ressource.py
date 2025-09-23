@@ -14,42 +14,38 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Ressource",
             fields=[
-                ("id",
-                 models.BigAutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name="ID",
-                 ),
-                 ),
-                ("title",
-                 models.CharField(
-                     max_length=50)),
-                ("image",
-                 models.ImageField(
-                     blank=True,
-                     null=True,
-                     upload_to="ressources"),
-                 ),
-                ("video_url",
-                 models.URLField(
-                     blank=True,
-                     null=True)),
-                ("author",
-                 models.ForeignKey(
-                     null=True,
-                     on_delete=django.db.models.deletion.SET_NULL,
-                     to="social.student",
-                     verbose_name="author",
-                 ),
-                 ),
-                ("post",
-                 models.ForeignKey(
-                     on_delete=django.db.models.deletion.CASCADE,
-                     related_name="ressources",
-                     to="news.post",
-                 ),
-                 ),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                (
+                    "image",
+                    models.ImageField(blank=True, null=True, upload_to="ressources"),
+                ),
+                ("video_url", models.URLField(blank=True, null=True)),
+                (
+                    "author",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="social.student",
+                        verbose_name="author",
+                    ),
+                ),
+                (
+                    "post",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="ressources",
+                        to="news.post",
+                    ),
+                ),
             ],
         ),
     ]

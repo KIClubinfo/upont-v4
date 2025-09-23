@@ -39,7 +39,8 @@ class CalendarData(views.APIView):
                 course_timeslots_queryset = Timeslot.objects.none()
             else:
                 raise ValidationError(
-                    detail="Error in parsing courses parameter: must be either 'true' or 'false'")
+                    detail="Error in parsing courses parameter: must be either 'true' or 'false'"
+                )
         else:
             course_timeslots_queryset = Timeslot.objects.all()
 
@@ -51,7 +52,8 @@ class CalendarData(views.APIView):
                 events_queryset = Event.objects.none()
             else:
                 raise ValidationError(
-                    detail="Error in parsing events paramter: must be either 'true' or 'false'")
+                    detail="Error in parsing events paramter: must be either 'true' or 'false'"
+                )
         else:
             events_queryset = Event.objects.all()
 
@@ -67,7 +69,8 @@ class CalendarData(views.APIView):
                 )
             else:
                 raise ValidationError(
-                    detail="Error in parsing start parameter, the date must be in ISO format")
+                    detail="Error in parsing start parameter, the date must be in ISO format"
+                )
 
         end = self.request.GET.get("end")
         if end is not None:
@@ -81,7 +84,8 @@ class CalendarData(views.APIView):
                 )
             else:
                 raise ValidationError(
-                    detail="Error in parsing end parameter, the date must be in ISO format")
+                    detail="Error in parsing end parameter, the date must be in ISO format"
+                )
 
         # Must be the last filter applied because no filter is allowed after queryset
         # union of difference
@@ -89,14 +93,12 @@ class CalendarData(views.APIView):
         if is_enrolled is not None:
             student = get_object_or_404(Student, user__id=self.request.user.id)
             if is_enrolled == "true":
-                events_queryset = events_queryset.intersection(
-                    student.events.all())
+                events_queryset = events_queryset.intersection(student.events.all())
                 course_timeslots_queryset = course_timeslots_queryset.filter(
                     course_groups__enrolment__student=student
                 ).distinct()
             elif is_enrolled == "false":
-                events_queryset = events_queryset.difference(
-                    student.events.all())
+                events_queryset = events_queryset.difference(student.events.all())
                 course_timeslots_queryset = course_timeslots_queryset.exclude(
                     course_groups__enrolment__student=student
                 )
@@ -109,8 +111,7 @@ class CalendarData(views.APIView):
         #    Formatting
         # --------------------------------------------------
         scheduled = []
-        for course_timeslot in course_timeslots_queryset.order_by(
-                "start", "pk"):
+        for course_timeslot in course_timeslots_queryset.order_by("start", "pk"):
             if course_timeslot.course_groups.exists():
                 course_name = course_timeslot.course_groups.first().course.name
                 course_id = course_timeslot.course_groups.first().course.pk
@@ -251,8 +252,7 @@ def export_schedule(request):
 
     fileformat = request.GET.get("fileformat")
     if fileformat is None:
-        return HttpResponseBadRequest(
-            "A fileformat (csv or ics) must be specify")
+        return HttpResponseBadRequest("A fileformat (csv or ics) must be specify")
 
     if fileformat == "csv":
         exported_data = export_csv(events, courses)
@@ -265,6 +265,5 @@ def export_schedule(request):
 
     filename = "emploidutemps_upont.{}".format(fileformat)
     response = HttpResponse(exported_data, content_type="text/plain")
-    response["Content-Disposition"] = 'attachment; filename={}"'.format(
-        filename)
+    response["Content-Disposition"] = 'attachment; filename={}"'.format(filename)
     return response

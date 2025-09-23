@@ -18,8 +18,8 @@ def split_then_markdownify(text):
         i, k = test_for_markdown_link(text)
         return (
             split_then_markdownify(text[:i])
-            + text[i: k + 1]
-            + split_then_markdownify(text[k + 1:])
+            + text[i : k + 1]
+            + split_then_markdownify(text[k + 1 :])
         )
     else:
         return convert_to_markdown(text)

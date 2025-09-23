@@ -139,9 +139,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             return reverse("news:post_edit", args=(obj.pk,))
         else:
             course_id = obj.course.all()[0].id
-            return reverse(
-                "courses:course_post_edit", args=(
-                    course_id, obj.pk))
+            return reverse("courses:course_post_edit", args=(course_id, obj.pk))
 
     author_url = serializers.SerializerMethodField()
 

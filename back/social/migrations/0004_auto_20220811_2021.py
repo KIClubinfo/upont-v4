@@ -13,24 +13,17 @@ class Migration(migrations.Migration):
             model_name="club",
             name="background_picture",
             field=models.ImageField(
-                blank=True,
-                null=True,
-                upload_to="background_pictures/"),
+                blank=True, null=True, upload_to="background_pictures/"
+            ),
         ),
         migrations.AlterField(
             model_name="club",
             name="logo",
-            field=models.ImageField(
-                blank=True,
-                null=True,
-                upload_to="logos/"),
+            field=models.ImageField(blank=True, null=True, upload_to="logos/"),
         ),
         migrations.AlterField(
             model_name="student",
             name="picture",
-            field=models.ImageField(
-                blank=True,
-                null=True,
-                upload_to="pictures/"),
+            field=models.ImageField(blank=True, null=True, upload_to="pictures/"),
         ),
     ]

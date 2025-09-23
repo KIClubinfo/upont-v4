@@ -128,13 +128,8 @@ class EditMessage(forms.ModelForm):
             "content",
         )
         widgets = {
-            "content": forms.TextInput(
-                attrs={
-                    "class": "profil-input"}),
-            "date": forms.DateInput(
-                format="%d/%m/%Y",
-                attrs={
-                    "class": "profil-input"}),
+            "content": forms.TextInput(attrs={"class": "profil-input"}),
+            "date": forms.DateInput(format="%d/%m/%Y", attrs={"class": "profil-input"}),
         }
 
     def __init__(self, *args, **kwargs):

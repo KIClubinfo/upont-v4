@@ -12,11 +12,22 @@ from rest_framework.response import Response
 
 from social.models import Student
 
-from .models import (Course, CourseDepartment, Enrolment, Group, Resource,
-                     Teacher, Timeslot)
+from .models import (
+    Course,
+    CourseDepartment,
+    Enrolment,
+    Group,
+    Resource,
+    Teacher,
+    Timeslot,
+)
 from .scrapper import get_schedule
-from .serializers import (CourseSerializer, GroupSerializer,
-                          ResourceSerializer, TimeslotSerializer)
+from .serializers import (
+    CourseSerializer,
+    GroupSerializer,
+    ResourceSerializer,
+    TimeslotSerializer,
+)
 
 
 @login_required
@@ -54,12 +65,10 @@ def add(request):
     list_courses = []
     for column in csv.reader(io_string, delimiter="\t", quotechar="|"):
         name = column[0]
-        teachers = list(
-            map(lambda teacher: teacher.strip(), column[1].split(",")))
+        teachers = list(map(lambda teacher: teacher.strip(), column[1].split(",")))
         department = column[2]
         acronym = column[3]
-        if (name == "") or (teachers == "") or (
-                department == "") or (acronym == ""):
+        if (name == "") or (teachers == "") or (department == "") or (acronym == ""):
             courses_not_added.append(column),
         if department not in CourseDepartment.values:
             department == "AHE"
@@ -78,8 +87,7 @@ def add(request):
                 #     if created2:
                 #         teacher.save()
                 #     course.teacher.add(teacher)
-                teacher, created2 = Teacher.objects.get_or_create(
-                    name=teachers[0])
+                teacher, created2 = Teacher.objects.get_or_create(name=teachers[0])
                 if created2:
                     teacher.save()
                 course.teacher = teacher
@@ -168,11 +176,9 @@ class TimeslotViewSet(viewsets.ModelViewSet):
         if is_enrolled is not None:
             student = get_object_or_404(Student, user__id=self.request.user.id)
             if is_enrolled == "true":
-                queryset = queryset.filter(
-                    course_groups__enrolment__student=student)
+                queryset = queryset.filter(course_groups__enrolment__student=student)
             elif is_enrolled == "false":
-                queryset = queryset.exclude(
-                    course_groups__enrolment__student=student)
+                queryset = queryset.exclude(course_groups__enrolment__student=student)
             else:
                 raise ValidationError(
                     detail="is_enrolled must be either 'true' or 'false'"
@@ -246,8 +252,7 @@ def join_group(request, group_id, action):
         enrolment.save()
         if action == "Join_group":
             # select the null group if he exists
-            null_group = group.course.groups.all().filter(
-                number__isnull=True)[:1].get()
+            null_group = group.course.groups.all().filter(number__isnull=True)[:1].get()
             if null_group is not None:
                 enrolment = Enrolment(
                     group=null_group,

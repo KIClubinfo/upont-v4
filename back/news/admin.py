@@ -1,7 +1,14 @@
 from django.contrib import admin
 
-from .models import (Comment, Event,  # , Sondage, OptionSondage, VoteSondage
-                     Participation, Partnership, Post, Ressource, Shotgun)
+from .models import (
+    Comment,
+    Event,  # , Sondage, OptionSondage, VoteSondage
+    Participation,
+    Partnership,
+    Post,
+    Ressource,
+    Shotgun,
+)
 
 admin.site.register(Partnership)
 

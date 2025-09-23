@@ -116,11 +116,11 @@ class CalendarDataTest(APITestCase):
         self.assertEqual(response_course1["type"], "course")
         self.assertEqual(response_course1["title"], self.course1.name)
         self.assertEqual(
-            response_course1["start"],
-            self.timeslot1.start.astimezone().isoformat())
+            response_course1["start"], self.timeslot1.start.astimezone().isoformat()
+        )
         self.assertEqual(
-            response_course1["end"],
-            self.timeslot1.end.astimezone().isoformat())
+            response_course1["end"], self.timeslot1.end.astimezone().isoformat()
+        )
         # Check event1 data
         response_event1 = response.data[2]
         self.assertEqual(response_event1["id"], self.event1.pk)

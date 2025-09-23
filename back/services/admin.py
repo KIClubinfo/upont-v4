@@ -3,8 +3,17 @@ from decimal import Decimal
 from django import forms
 from django.contrib import admin
 
-from .models import (Bike, Local, Mediatek, MedItem, Order, OrderItem,
-                     RequestForm, ReservationMusicRoom, Vrac)
+from .models import (
+    Bike,
+    Local,
+    Mediatek,
+    MedItem,
+    Order,
+    OrderItem,
+    RequestForm,
+    ReservationMusicRoom,
+    Vrac,
+)
 
 
 class VracAdminForm(forms.ModelForm):
@@ -24,12 +33,7 @@ class VracAdminForm(forms.ModelForm):
 
     class Meta:
         model = Vrac
-        fields = [
-            "name",
-            "type",
-            "price_list",
-            "stock_list",
-            "stock_available_list"]
+        fields = ["name", "type", "price_list", "stock_list", "stock_available_list"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -50,8 +54,8 @@ class VracAdminForm(forms.ModelForm):
             # Convert comma-separated strings to lists
             if cleaned_data.get("price_list"):
                 cleaned_data["price"] = [
-                    Decimal(
-                        x.strip()) for x in cleaned_data["price_list"].split(",")]
+                    Decimal(x.strip()) for x in cleaned_data["price_list"].split(",")
+                ]
             if cleaned_data.get("stock_list"):
                 cleaned_data["stock"] = [
                     int(x.strip()) for x in cleaned_data["stock_list"].split(",")
@@ -68,8 +72,7 @@ class VracAdminForm(forms.ModelForm):
             ) or len(cleaned_data.get("stock", [])) != len(
                 cleaned_data.get("stock_available", [])
             ):
-                raise forms.ValidationError(
-                    "All lists must have the same length")
+                raise forms.ValidationError("All lists must have the same length")
 
         except ValueError:
             raise forms.ValidationError(
