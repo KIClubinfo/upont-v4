@@ -15,68 +15,34 @@ Including another URLconf
 """
 
 import django_cas_ng.views
-from courses.views import (
-    CourseViewSet,
-    GroupViewSet,
-    ListCourseDepartments,
-    ResourceViewSet,
-    TimeslotViewSet,
-)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django_reverse_js.views import urls_js
-from news.views import (
-    DeleteCommentView,
-    EventViewSet,
-    PartnershipViewSet,
-    PostCommentView,
-    PostCreateView,
-    PostCreateViewV2,
-    PostDeleteView,
-    PostEditView,
-    PostReactionView,
-    PostViewSet,
-    SearchPost,
-    ShotgunParticipateView,
-    ShotgunView,
-)
-from pochtron.views import (
-    CagnotteURL,
-    PochtronBalance,
-    PochtronId,
-    PochtronTransactions,
-    SearchAlcohol,
-)
 from rest_framework import routers
-from services.views import (
-    BikesViewSet,
-    OrderViewSet,
-    VracViewSet,
-    RequestFormViewSet,
-    ReservationBikeViewSet,
-    ReservationMusicRoomViewSet,
-    LocalViewSet,  # Replace MediatekViewSet with LocalViewSet
-    MedItemViewSet,
-)
-from social.views import (
-    ClubsViewSet,
-    CurrentStudentView,
-    NotificationTokenView,
-    OneClubView,
-    OneStudentView,
-    ProfilePicUpdate,
-    SearchClub,
-    SearchRole,
-    SearchStudent,
-    StudentCanPublishAs,
-    StudentMembershipView,
-    StudentProfileEdit,
-    StudentViewSet,
-    validate_student,
-)
+
+from courses.views import (CourseViewSet, GroupViewSet, ListCourseDepartments,
+                           ResourceViewSet, TimeslotViewSet)
+from news.views import (DeleteCommentView, EventViewSet, PartnershipViewSet,
+                        PostCommentView, PostCreateView, PostCreateViewV2,
+                        PostDeleteView, PostEditView, PostReactionView,
+                        PostViewSet, SearchPost, ShotgunParticipateView,
+                        ShotgunView)
+from pochtron.views import (CagnotteURL, PochtronBalance, PochtronId,
+                            PochtronTransactions, SearchAlcohol)
+from services.views import \
+    LocalViewSet  # Replace MediatekViewSet with LocalViewSet
+from services.views import (BikesViewSet, MedItemViewSet, OrderViewSet,
+                            RequestFormViewSet, ReservationBikeViewSet,
+                            ReservationMusicRoomViewSet, VracViewSet)
+from social.views import (ClubsViewSet, CurrentStudentView,
+                          NotificationTokenView, OneClubView, OneStudentView,
+                          ProfilePicUpdate, SearchClub, SearchRole,
+                          SearchStudent, StudentCanPublishAs,
+                          StudentMembershipView, StudentProfileEdit,
+                          StudentViewSet, validate_student)
 from the_calendar.views import CalendarData
 from trade.views import LastTransactions, add_transaction, credit_account
 
@@ -101,15 +67,22 @@ urlpatterns = [
     path("", include("django.contrib.auth.urls")),
     path("", views.root_redirect),
     path("internal/auth-check/", views.auth_check, name="internal_auth_check"),
-    path("cas/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
-    path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
+    path(
+        "cas/login",
+        django_cas_ng.views.LoginView.as_view(),
+        name="cas_ng_login"),
+    path(
+        "cas/logout",
+        django_cas_ng.views.LogoutView.as_view(),
+        name="cas_ng_logout"),
     path("page_not_created/", views.page_not_created, name="page_not_created"),
     path("privacy", views.privacy, name="privacy"),
     path("contact", views.contact, name="contact"),
 ]
 
 if settings.DEBUG:  # in debug anyone can access any image
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
 else:
     urlpatterns.append(path("media/<path:path>", views.media))
 
@@ -150,13 +123,28 @@ urlpatterns += [
     path(
         "api/transactions/last/", LastTransactions.as_view(), name="last_transactions"
     ),
-    path("api/forms/publish/", StudentCanPublishAs.as_view(), name="publish_comment"),
-    path("api/forms/transactions/add/", add_transaction, name="add_transaction"),
-    path("api/forms/transactions/credit/", credit_account, name="credit_account"),
+    path(
+        "api/forms/publish/",
+        StudentCanPublishAs.as_view(),
+        name="publish_comment"),
+    path(
+        "api/forms/transactions/add/",
+        add_transaction,
+        name="add_transaction"),
+    path(
+        "api/forms/transactions/credit/",
+        credit_account,
+        name="credit_account"),
     path("api/search/roles/", SearchRole.as_view(), name="search_roles"),
-    path("api/search/students/", SearchStudent.as_view(), name="search_students"),
+    path(
+        "api/search/students/",
+        SearchStudent.as_view(),
+        name="search_students"),
     path("api/search/clubs/", SearchClub.as_view(), name="search_clubs"),
-    path("api/search/alcohols/", SearchAlcohol.as_view(), name="search_alcohols"),
+    path(
+        "api/search/alcohols/",
+        SearchAlcohol.as_view(),
+        name="search_alcohols"),
     path("api/search/posts/", SearchPost.as_view(), name="search_posts"),
     path("api/id/pochtron/", PochtronId.as_view(), name="pochtron_id"),
     path(
@@ -176,7 +164,10 @@ urlpatterns += [
     path(
         "api/notification_token/", NotificationTokenView.as_view(), name="student_token"
     ),
-    path("api/post_reaction/", PostReactionView.as_view(), name="post_reaction"),
+    path(
+        "api/post_reaction/",
+        PostReactionView.as_view(),
+        name="post_reaction"),
     path(
         "api/news/post/delete/", PostDeleteView.as_view(), name="api_news_post_delete"
     ),
@@ -187,20 +178,35 @@ urlpatterns += [
     ),
     path("api/comment_post/", PostCommentView.as_view(), name="post_comment"),
     path("api/create_post/", PostCreateView.as_view(), name="post_creation"),
-    path("api/create_post/v2/", PostCreateViewV2.as_view(), name="post_creation_v2"),
+    path(
+        "api/create_post/v2/",
+        PostCreateViewV2.as_view(),
+        name="post_creation_v2"),
     path("api/edit_post/", PostEditView.as_view(), name="post_edit"),
     path("api/student/", OneStudentView.as_view(), name="student"),
-    path("api/membership/", StudentMembershipView.as_view(), name="membership"),
+    path(
+        "api/membership/",
+        StudentMembershipView.as_view(),
+        name="membership"),
     path("api/club/", OneClubView.as_view(), name="club"),
     path("api/media/<path:path>", views.get_media_path, name="get_media_path"),
-    path("api/pochtron/balance/", PochtronBalance.as_view(), name="pochtron_balance"),
+    path(
+        "api/pochtron/balance/",
+        PochtronBalance.as_view(),
+        name="pochtron_balance"),
     path(
         "api/pochtron/transactions/",
         PochtronTransactions.as_view(),
         name="pochtron_transactions",
     ),
-    path("api/pochtron/cagnotte_url/", CagnotteURL.as_view(), name="cagnotte_url"),
+    path(
+        "api/pochtron/cagnotte_url/",
+        CagnotteURL.as_view(),
+        name="cagnotte_url"),
     path("api/test/", ProfilePicUpdate.as_view(), name="test"),
-    path("api/edit_profile/", StudentProfileEdit.as_view(), name="edit_profile"),
+    path(
+        "api/edit_profile/",
+        StudentProfileEdit.as_view(),
+        name="edit_profile"),
     path("api/validate-student/", validate_student, name="validate_student"),
 ]

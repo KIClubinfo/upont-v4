@@ -34,4 +34,5 @@ cryptography = "^46.0.1"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "^2.3.2"
+isort = "^6.0.1"
 

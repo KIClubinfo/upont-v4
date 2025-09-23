@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Course, CourseUpdate, Enrolment, Group, Resource, Teacher, Timeslot
+from .models import (Course, CourseUpdate, Enrolment, Group, Resource, Teacher,
+                     Timeslot)
 
 
 class CourseAdmin(admin.ModelAdmin):

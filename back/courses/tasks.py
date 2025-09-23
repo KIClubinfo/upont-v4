@@ -2,6 +2,7 @@ import datetime
 
 from celery.schedules import crontab
 from django.utils import timezone
+
 from upont.celery import app
 
 from .models import Timeslot

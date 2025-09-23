@@ -6,8 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("courses", "0008_merge_0003_auto_20230212_2026_0007_auto_20230117_2329"),
-    ]
+        ("courses", "0008_merge_0003_auto_20230212_2026_0007_auto_20230117_2329"), ]
 
     operations = [
         migrations.RemoveField(

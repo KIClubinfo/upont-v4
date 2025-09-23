@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Club, ClubRequest, Membership, Role, Student, Message
+from .models import Club, ClubRequest, Membership, Message, Role, Student
 
 # from django.forms import extras
 
@@ -128,8 +128,13 @@ class EditMessage(forms.ModelForm):
             "content",
         )
         widgets = {
-            "content": forms.TextInput(attrs={"class": "profil-input"}),
-            "date": forms.DateInput(format="%d/%m/%Y", attrs={"class": "profil-input"}),
+            "content": forms.TextInput(
+                attrs={
+                    "class": "profil-input"}),
+            "date": forms.DateInput(
+                format="%d/%m/%Y",
+                attrs={
+                    "class": "profil-input"}),
         }
 
     def __init__(self, *args, **kwargs):

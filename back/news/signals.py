@@ -1,6 +1,7 @@
-import upont.notifications as notifications
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+import upont.notifications as notifications
 
 from .models import Post
 
@@ -14,6 +15,8 @@ def on_post_create(sender, instance, created, **kwargs):
             )
         else:
             notifications.send_push_message_to_all_students(
-                instance.author.user.first_name + " " + instance.author.user.last_name,
+                instance.author.user.first_name +
+                " " +
+                instance.author.user.last_name,
                 instance.title,
             )

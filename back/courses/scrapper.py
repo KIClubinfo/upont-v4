@@ -22,8 +22,7 @@ def get_schedule(date):
     according to emploidutemps.enpc.org
     """
     url = "https://emploidutemps.enpc.fr/?code_departement=&mydate={day:02d}%2F{month:02d}%2F{year}".format(
-        day=date.day, month=date.month, year=date.year
-    )
+        day=date.day, month=date.month, year=date.year)
     page = requests.get(url)
     page.encoding = "utf-8"
 
@@ -32,8 +31,20 @@ def get_schedule(date):
     entry = soup.find_all("tr", attrs={"height": "30"})
 
     today_range = [
-        timezone.make_aware(datetime.datetime(date.year, date.month, date.day, 0, 0)),
-        timezone.make_aware(datetime.datetime(date.year, date.month, date.day, 23, 59)),
+        timezone.make_aware(
+            datetime.datetime(
+                date.year,
+                date.month,
+                date.day,
+                0,
+                0)),
+        timezone.make_aware(
+            datetime.datetime(
+                date.year,
+                date.month,
+                date.day,
+                23,
+                59)),
     ]
 
     Timeslot.objects.filter(start__range=today_range).delete()
@@ -54,7 +65,9 @@ def get_schedule(date):
             acronym = ""
             # name = infos[4].text.strip()
         else:
-            acronym, _ = map(lambda s: s.strip(), infos[4].text.split("-", maxsplit=1))
+            acronym, _ = map(
+                lambda s: s.strip(), infos[4].text.split(
+                    "-", maxsplit=1))
 
         # --------------------------------------------------
         # Inserting the data in the database
@@ -109,6 +122,7 @@ def get_schedule(date):
                         if group_query.exists():
                             timeslot.course_groups.add(*group_query)
                         else:
-                            group = Group(course=course, teacher=course.teacher)
+                            group = Group(
+                                course=course, teacher=course.teacher)
                             group.save()
                             timeslot.course_groups.add(group)

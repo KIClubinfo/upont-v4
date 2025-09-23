@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 from news.models import Post
 from social.models import Student
 
@@ -22,7 +23,8 @@ class CourseDepartment(models.TextChoices):
     DE = "DE", _("Direction de l'enseignement")
     DLC = "DLC", _("Département langues et culture")
     SHS = "SHS", _("Sciences humaines et sociales")
-    PAPDD = "PAPDD", _("Politique et action publique pour le développement durable")
+    PAPDD = "PAPDD", _(
+        "Politique et action publique pour le développement durable")
     DS = "D.SCHOOL", _("d.school")
     AHE = "AHE", _("Autres hors école")
 
@@ -31,8 +33,9 @@ class Course(models.Model):
     name = models.CharField(max_length=100, default="Cours sans nom")
     acronym = models.CharField(max_length=100, default="ABC")
     department = models.CharField(
-        max_length=8, choices=CourseDepartment.choices, default=CourseDepartment.AHE
-    )
+        max_length=8,
+        choices=CourseDepartment.choices,
+        default=CourseDepartment.AHE)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
 
     description = models.TextField()
@@ -55,15 +58,24 @@ class Course(models.Model):
 
 class CourseUpdate(models.Model):
     date = models.DateTimeField()
-    old_course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="old")
-    new_course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="new")
+    old_course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="old")
+    new_course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="new")
 
     def __str__(self):
         return self.old_course.name + " : " + self.new_course.name
 
 
 class Group(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="groups")
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="groups")
     teacher = models.ForeignKey(
         Teacher, on_delete=models.CASCADE, related_name="groups"
     )
@@ -96,7 +108,8 @@ class Enrolment(models.Model):
 class Timeslot(models.Model):
     start = models.DateTimeField()
     end = models.DateTimeField()
-    course_groups = models.ManyToManyField(Group, related_name="timeslot", blank=True)
+    course_groups = models.ManyToManyField(
+        Group, related_name="timeslot", blank=True)
     place = models.CharField(max_length=50, blank=True)
 
     def get_course_name(self):
@@ -115,10 +128,16 @@ class Timeslot(models.Model):
 class Resource(models.Model):
     name = models.CharField(max_length=50, default="Ressource")
     author = models.ForeignKey(
-        "social.Student", verbose_name="author", on_delete=models.SET_NULL, null=True
-    )
+        "social.Student",
+        verbose_name="author",
+        on_delete=models.SET_NULL,
+        null=True)
     date = models.DateTimeField()
-    file = models.FileField("Fichier", upload_to="ressources", null=True, blank=True)
+    file = models.FileField(
+        "Fichier",
+        upload_to="ressources",
+        null=True,
+        blank=True)
     post = models.ForeignKey(
         "news.Post",
         verbose_name="post",

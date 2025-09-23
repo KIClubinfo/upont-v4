@@ -14,6 +14,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="event",
             name="duration",
-            field=models.DurationField(default=datetime.timedelta(seconds=3600)),
+            field=models.DurationField(
+                default=datetime.timedelta(
+                    seconds=3600)),
         ),
     ]

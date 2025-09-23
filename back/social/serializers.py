@@ -55,7 +55,8 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "is_moderator",
         ]
 
-    birthdate = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    birthdate = serializers.DateField(
+        format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
 
 
 class RoleSerializer(serializers.HyperlinkedModelSerializer):

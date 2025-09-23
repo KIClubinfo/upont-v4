@@ -12,23 +12,31 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="membership",
             name="is_old",
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(
+                default=False),
         ),
         migrations.AlterField(
             model_name="club",
             name="background_picture",
             field=models.ImageField(
-                blank=True, null=True, upload_to="background_pictures/"
-            ),
+                blank=True,
+                null=True,
+                upload_to="background_pictures/"),
         ),
         migrations.AlterField(
             model_name="club",
             name="logo",
-            field=models.ImageField(blank=True, null=True, upload_to="logos/"),
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to="logos/"),
         ),
         migrations.AlterField(
             model_name="student",
             name="picture",
-            field=models.ImageField(blank=True, null=True, upload_to="pictures/"),
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to="pictures/"),
         ),
     ]

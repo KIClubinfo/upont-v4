@@ -13,23 +13,24 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ClubRequest",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=30)),
-                ("content", models.TextField()),
-                (
-                    "student",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="social.student"
-                    ),
-                ),
+                ("id",
+                 models.BigAutoField(
+                     auto_created=True,
+                     primary_key=True,
+                     serialize=False,
+                     verbose_name="ID",
+                 ),
+                 ),
+                ("name",
+                 models.CharField(
+                     max_length=30)),
+                ("content",
+                 models.TextField()),
+                ("student",
+                 models.ForeignKey(
+                     on_delete=django.db.models.deletion.CASCADE,
+                     to="social.student"),
+                 ),
             ],
         ),
     ]

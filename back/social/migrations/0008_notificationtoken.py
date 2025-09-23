@@ -13,22 +13,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="NotificationToken",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("token", models.CharField(max_length=200)),
-                (
-                    "student",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="social.student"
-                    ),
-                ),
+                ("id",
+                 models.BigAutoField(
+                     auto_created=True,
+                     primary_key=True,
+                     serialize=False,
+                     verbose_name="ID",
+                 ),
+                 ),
+                ("token",
+                 models.CharField(
+                     max_length=200)),
+                ("student",
+                 models.ForeignKey(
+                     on_delete=django.db.models.deletion.CASCADE,
+                     to="social.student"),
+                 ),
             ],
         ),
     ]

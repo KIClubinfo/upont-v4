@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             model_name="pochtronadmin",
             name="student",
             field=models.OneToOneField(
-                on_delete=django.db.models.deletion.CASCADE, to="social.student"
-            ),
+                on_delete=django.db.models.deletion.CASCADE,
+                to="social.student"),
         ),
     ]

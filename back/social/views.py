@@ -1,3 +1,9 @@
+import base64
+import os
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import PermissionDenied
@@ -12,33 +18,12 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.backends import default_backend
-
-import os
-import base64
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
-from .models import (
-    Category,
-    Club,
-    Membership,
-    NotificationToken,
-    Promotion,
-    Role,
-    Student,
-    Channel,
-    Message,
-    ChannelEncryptedKey,
-)
-from .serializers import (
-    ClubSerializer,
-    ClubSerializerLite,
-    RoleSerializer,
-    StudentSerializer,
-)
+from .models import (Category, Channel, ChannelEncryptedKey, Club, Membership,
+                     Message, NotificationToken, Promotion, Role, Student)
+from .serializers import (ClubSerializer, ClubSerializerLite, RoleSerializer,
+                          StudentSerializer)
 
 
 @login_required
@@ -72,7 +57,8 @@ class StudentViewSet(viewsets.ModelViewSet):
         if form.is_valid():
             if "promo" in request.data:
                 try:
-                    promotion = Promotion.objects.get(nickname=request.data["promo"])
+                    promotion = Promotion.objects.get(
+                        nickname=request.data["promo"])
                     student.promo = promotion
                     student.save()
                 except Promotion.DoesNotExist:
@@ -161,7 +147,8 @@ class StudentCanPublishAs(APIView):
 
     def get(self, request):
         data = {"-1": "Élève"}
-        for membership in Membership.objects.filter(student__user__id=request.user.id):
+        for membership in Membership.objects.filter(
+                student__user__id=request.user.id):
             data[membership.club.id] = membership.club.name
         return Response({"can_publish_as": data})
 
@@ -178,7 +165,8 @@ class StudentMembershipView(APIView):
     def get(self, request):
         student = get_object_or_404(Student, user__pk=request.GET["id"])
         data = []
-        for membership in Membership.objects.filter(student__user__id=student.user.id):
+        for membership in Membership.objects.filter(
+                student__user__id=student.user.id):
             club = Club.objects.get(id=membership.club.id)
             serializer = ClubSerializerLite(club)
             club_data = serializer.data
@@ -201,7 +189,8 @@ class SearchRole(APIView):
     def get(self, request):
         if "role" in request.GET and request.GET["role"].strip():
             query = request.GET.get("role", None)
-            roles = Role.objects.filter(name__icontains=query).order_by("-name")
+            roles = Role.objects.filter(
+                name__icontains=query).order_by("-name")
         else:
             roles = Role.objects.all().order_by("-name")
         serializer = RoleSerializer(roles, many=True)
@@ -234,8 +223,8 @@ class NotificationTokenView(APIView):
         token = request.data["token"]
         if not NotificationToken.objects.filter(token=token).exists():
             NotificationToken.objects.create(
-                student=Student.objects.get(user__id=request.user.id), token=token
-            )
+                student=Student.objects.get(
+                    user__id=request.user.id), token=token)
             return Response({"status": "created"})
         return Response({"status": "exists"})
 
@@ -275,7 +264,8 @@ class SearchClub(APIView):
             clubs, searched_expression = search_club(request)
             clubs = clubs[:25]
         else:
-            clubs = Club.objects.all().order_by("label", "name", "nickname")[:25]
+            clubs = Club.objects.all().order_by(
+                "label", "name", "nickname")[:25]
         serializer = ClubSerializer(clubs, many=True)
         return Response({"clubs": serializer.data})
 
@@ -348,7 +338,8 @@ class CreateChannel(APIView):
             encrypted_keys.append(encrypted_key_save)
 
         if request.data["channel_of"] == "-1":
-            club = club = get_object_or_404(Club, id=request.data["channel_of"])
+            club = club = get_object_or_404(
+                Club, id=request.data["channel_of"])
             channel = Channel(
                 name=request.data["name"],
                 date=timezone.now(),
@@ -381,7 +372,8 @@ class CreateMessage(APIView):
                 content=request.data["content"],
             )
         else:
-            club = club = get_object_or_404(Club, id=request.data["channel_of"])
+            club = club = get_object_or_404(
+                Club, id=request.data["channel_of"])
             message = Message(
                 channel=get_object_or_404(Channel, id=request.data["channel"]),
                 date=timezone.now(),
@@ -408,7 +400,9 @@ def profile(request, user_id=None):
         "all_student_list": all_student_list,
         "student": student,
         "membership_club_list": membership_club_list,
-        "complete_name": student.user.first_name + " " + student.user.last_name,
+        "complete_name": student.user.first_name +
+        " " +
+        student.user.last_name,
     }
     if user_id == request.user.id:
         return render(request, "social/profile.html", context)
@@ -421,7 +415,8 @@ def search(request):
     searched_expression = "Si trouver quelque chose tu veux, le chercher il te faut."
 
     if "user" in request.GET:
-        all_student_list = Student.objects.order_by("-promo__year", "user__first_name")
+        all_student_list = Student.objects.order_by(
+            "-promo__year", "user__first_name")
         context = {"all_student_list": all_student_list}
         if request.GET["user"].strip():
             found_students, searched_expression = search_user(request)
@@ -445,9 +440,12 @@ def search(request):
         if request.GET["club"].strip():
             found_clubs, searched_expression = search_club(request)
             context["club_displayed_list"] = found_clubs
-            context["asso_club_list"] = found_clubs.filter(label=Club.Label.ASSO)
-            context["club_club_list"] = found_clubs.filter(label=Club.Label.CLUB)
-            context["liste_club_list"] = found_clubs.filter(label=Club.Label.LISTE)
+            context["asso_club_list"] = found_clubs.filter(
+                label=Club.Label.ASSO)
+            context["club_club_list"] = found_clubs.filter(
+                label=Club.Label.CLUB)
+            context["liste_club_list"] = found_clubs.filter(
+                label=Club.Label.LISTE)
         context["searched_expression"] = searched_expression
         return render(request, "social/index_clubs.html", context)
 
@@ -579,18 +577,18 @@ def index_clubs(request):
     all_clubs_list = Club.objects.order_by("name")
     active_clubs_list = Club.objects.filter(active=True).order_by("name")
     inactive_clubs_list = Club.objects.filter(active=False).order_by("name")
-    ASSO_club_list = Club.objects.filter(label=Club.Label.ASSO, active=True).order_by(
-        "name"
-    )
-    CLUB_club_list = Club.objects.filter(label=Club.Label.CLUB, active=True).order_by(
-        "name"
-    )
-    LISTE_club_list = Club.objects.filter(label=Club.Label.LISTE, active=True).order_by(
-        "name"
-    )
-    POLE_club_list = Club.objects.filter(label=Club.Label.POLE, active=True).order_by(
-        "name"
-    )
+    ASSO_club_list = Club.objects.filter(
+        label=Club.Label.ASSO,
+        active=True).order_by("name")
+    CLUB_club_list = Club.objects.filter(
+        label=Club.Label.CLUB,
+        active=True).order_by("name")
+    LISTE_club_list = Club.objects.filter(
+        label=Club.Label.LISTE,
+        active=True).order_by("name")
+    POLE_club_list = Club.objects.filter(
+        label=Club.Label.POLE,
+        active=True).order_by("name")
     context = {
         "all_clubs_list": all_clubs_list,
         "club_displayed_list": active_clubs_list,
@@ -603,7 +601,8 @@ def index_clubs(request):
     all_categories_list = Category.objects.order_by("name")
     context["all_categories_list"] = all_categories_list
 
-    my_memberships_list = Membership.objects.filter(student__user__id=request.user.id)
+    my_memberships_list = Membership.objects.filter(
+        student__user__id=request.user.id)
     context["my_memberships_list"] = my_memberships_list
     return render(request, "social/index_clubs.html", context)
 
@@ -619,8 +618,7 @@ def get_old_members(club_id):  # Grouping old members of club_id by promos in a 
     for promo in promos:
         promo_nickname = promo["student__promo__nickname"]
         promo_members = Membership.objects.filter(
-            club__id=club_id, is_old=True, student__promo__nickname=promo_nickname
-        )
+            club__id=club_id, is_old=True, student__promo__nickname=promo_nickname)
         old_members[promo_nickname] = promo_members
     return old_members
 
@@ -635,7 +633,8 @@ def view_club(request, club_id):
     )
     if not membership_club_list:  # If no match is found
         is_admin = False
-    elif not membership_club_list[0].is_admin:  # If the user does not have the rights
+    # If the user does not have the rights
+    elif not membership_club_list[0].is_admin:
         is_admin = False
     else:
         is_admin = True
@@ -663,7 +662,8 @@ def club_edit(request, club_id):
     form_role = AddRole()
     if not student_membership_club:  # If no match is found
         raise PermissionDenied
-    if not student_membership_club[0].is_admin:  # If the user does not have the rights
+    # If the user does not have the rights
+    if not student_membership_club[0].is_admin:
         raise PermissionDenied
 
     context = {
@@ -718,7 +718,8 @@ def club_edit(request, club_id):
                             role=None,
                             is_admin=False,
                         )
-                    form_membership = AddMember(request.POST, instance=membership_added)
+                    form_membership = AddMember(
+                        request.POST, instance=membership_added)
                     if form_membership.is_valid():
                         form_membership.save()
                     return redirect("social:club_edit", club_id=club.id)
@@ -803,7 +804,8 @@ def club_request(request):
             )
             if form.is_valid():
                 new_request = form.save(commit=False)
-                new_request.student = Student.objects.get(user__id=request.user.id)
+                new_request.student = Student.objects.get(
+                    user__id=request.user.id)
                 new_request.save()
                 return redirect("social:club_index")
 
@@ -838,7 +840,6 @@ def validate_student(request):
             {
                 "success": True,
                 "message": f"Student {student.user.first_name} {student.user.last_name} has been validated",
-            }
-        )
+            })
     except Exception as e:
         return Response({"error": str(e)}, status=400)

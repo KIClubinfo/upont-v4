@@ -23,8 +23,8 @@ class Migration(migrations.Migration):
                         decimal_places=2,
                         max_digits=10,
                         validators=[
-                            django.core.validators.MinValueValidator(Decimal("0.00"))
-                        ],
+                            django.core.validators.MinValueValidator(
+                                Decimal("0.00"))],
                     ),
                     blank=True,
                     default=list,
@@ -43,8 +43,8 @@ class Migration(migrations.Migration):
                     decimal_places=2,
                     max_digits=10,
                     validators=[
-                        django.core.validators.MinValueValidator(Decimal("0.00"))
-                    ],
+                        django.core.validators.MinValueValidator(
+                            Decimal("0.00"))],
                 ),
                 blank=True,
                 default=list,

@@ -1,11 +1,12 @@
 import datetime
 
-from courses.models import Course, Enrolment, Group, Teacher, Timeslot
 from django.contrib.auth import models
 from django.urls import reverse_lazy
 from django.utils import timezone
-from news.models import Event
 from rest_framework.test import APITestCase
+
+from courses.models import Course, Enrolment, Group, Teacher, Timeslot
+from news.models import Event
 from social.models import Student
 
 
@@ -115,11 +116,11 @@ class CalendarDataTest(APITestCase):
         self.assertEqual(response_course1["type"], "course")
         self.assertEqual(response_course1["title"], self.course1.name)
         self.assertEqual(
-            response_course1["start"], self.timeslot1.start.astimezone().isoformat()
-        )
+            response_course1["start"],
+            self.timeslot1.start.astimezone().isoformat())
         self.assertEqual(
-            response_course1["end"], self.timeslot1.end.astimezone().isoformat()
-        )
+            response_course1["end"],
+            self.timeslot1.end.astimezone().isoformat())
         # Check event1 data
         response_event1 = response.data[2]
         self.assertEqual(response_event1["id"], self.event1.pk)

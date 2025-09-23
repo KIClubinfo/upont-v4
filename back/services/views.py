@@ -1,44 +1,26 @@
-from django.db import transaction
-from django.utils import timezone
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from django.core.exceptions import ValidationError
 from datetime import timedelta
+
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-
-from .models import (
-    Bike,
-    Order,
-    OrderItem,
-    Vrac,
-    RequestForm,
-    ReservationBike,
-    ReservationMusicRoom,
-    Mediatek,
-    MedItem,
-    Local,
-)
 from social.models import Membership
 
-from .serializers import (
-    BikeSerializer,
-    CreateOrderSerializer,
-    OrderSummarySerializer,
-    VracSerializer,
-    VracUpdateSerializer,
-    ReservationBikeSerializer,
-    ReservationMusicRoomSerializer,
-    CreateMusicRoomReservationSerializer,
-    MedItemSerializer,
-    MedItemSummarySerializer,
-    RequestFormCreateSerializer,
-    RequestFormListSerializer,
-    LocalSerializer,
-)
+from .models import (Bike, Local, Mediatek, MedItem, Order, OrderItem,
+                     RequestForm, ReservationBike, ReservationMusicRoom, Vrac)
+from .serializers import (BikeSerializer, CreateMusicRoomReservationSerializer,
+                          CreateOrderSerializer, LocalSerializer,
+                          MedItemSerializer, MedItemSummarySerializer,
+                          OrderSummarySerializer, RequestFormCreateSerializer,
+                          RequestFormListSerializer, ReservationBikeSerializer,
+                          ReservationMusicRoomSerializer, VracSerializer,
+                          VracUpdateSerializer)
 
 
 class BikesViewSet(ModelViewSet):
@@ -72,7 +54,9 @@ class VracViewSet(ModelViewSet):
         # Valider les données d'entrée
         serializer = VracUpdateSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST)
 
         name = serializer.validated_data["name"]
         type = serializer.validated_data["type"]
@@ -118,7 +102,9 @@ class VracViewSet(ModelViewSet):
         # Valider les données d'entrée
         serializer = VracUpdateSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST)
 
         name = serializer.validated_data["name"]
         quantity = serializer.validated_data["quantity"]
@@ -131,9 +117,8 @@ class VracViewSet(ModelViewSet):
             message = f"Le stock de {name} a été mis à jour avec succès"
         except Vrac.DoesNotExist:
             # Créer un nouveau produit
-            return Response(
-                {"error": "Le produit n'existe pas"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Le produit n'existe pas"},
+                            status=status.HTTP_404_NOT_FOUND)
 
         return Response({"message": message}, status=status.HTTP_200_OK)
 
@@ -160,7 +145,9 @@ class OrderViewSet(ModelViewSet):
         serializer = CreateOrderSerializer(data=request.data)
 
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = request.user
@@ -184,7 +171,8 @@ class OrderViewSet(ModelViewSet):
                     if remaining_quantity <= 0:
                         break
 
-                    quantity_from_this_batch = min(available, remaining_quantity)
+                    quantity_from_this_batch = min(
+                        available, remaining_quantity)
                     prices.append(price)
                     quantities.append(quantity_from_this_batch)
                     remaining_quantity -= quantity_from_this_batch
@@ -197,8 +185,10 @@ class OrderViewSet(ModelViewSet):
 
                 # Créer l'OrderItem
                 OrderItem.objects.create(
-                    order=order, vrac=vrac, prices=prices, quantities=quantities
-                )
+                    order=order,
+                    vrac=vrac,
+                    prices=prices,
+                    quantities=quantities)
 
             return Response(
                 {
@@ -210,8 +200,10 @@ class OrderViewSet(ModelViewSet):
             )
 
         except Exception as e:
-            # En cas d'erreur, le @transaction.atomic annulera toutes les modifications
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            # En cas d'erreur, le @transaction.atomic annulera toutes les
+            # modifications
+            return Response({"error": str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["get"])
     def list_orders(self, request):
@@ -257,7 +249,8 @@ class OrderViewSet(ModelViewSet):
             # Pour chaque item de la commande
             for order_item in order.orderitem_set.all():
                 # Réduire le stock du produit
-                order_item.vrac.reduce_stock(order_item.prices, order_item.quantities)
+                order_item.vrac.reduce_stock(
+                    order_item.prices, order_item.quantities)
 
             # Sauvegarder le nom pour le message de retour
             order_name = order.name
@@ -271,11 +264,11 @@ class OrderViewSet(ModelViewSet):
             )
 
         except Order.DoesNotExist:
-            return Response(
-                {"error": "Commande non trouvée"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Commande non trouvée"},
+                            status=status.HTTP_404_NOT_FOUND)
         except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -316,11 +309,11 @@ class OrderViewSet(ModelViewSet):
             )
 
         except Order.DoesNotExist:
-            return Response(
-                {"error": "Commande non trouvée"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Commande non trouvée"},
+                            status=status.HTTP_404_NOT_FOUND)
         except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -330,9 +323,8 @@ class OrderViewSet(ModelViewSet):
         """
         Disable the default create method
         """
-        return Response(
-            {"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
-        )
+        return Response({"error": "Method Not Allowed"},
+                        status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class RequestFormViewSet(ModelViewSet):
@@ -375,7 +367,8 @@ class RequestFormViewSet(ModelViewSet):
                 student__user=user, club__name=club_name
             ).exists()
         ):
-            requests = RequestForm.objects.filter(service=service, status="pending")
+            requests = RequestForm.objects.filter(
+                service=service, status="pending")
         else:
             return Response(
                 {"error": "Vous n'êtes pas autorisé à accéder à ces demandes"},
@@ -419,9 +412,8 @@ class RequestFormViewSet(ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except RequestForm.DoesNotExist:
-            return Response(
-                {"error": "RequestForm not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "RequestForm not found"},
+                            status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request, *args, **kwargs):
         """
@@ -454,7 +446,8 @@ class ReservationBikeViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Attempt to convert bike_id to integer if needed, depending on your Bike model's PK type
+        # Attempt to convert bike_id to integer if needed, depending on your
+        # Bike model's PK type
         try:
             bike_id_int = int(bike_id)
         except (ValueError, TypeError):
@@ -473,7 +466,8 @@ class ReservationBikeViewSet(ModelViewSet):
             n = int(n_str)  # Convert n to integer
             if n <= 0:
                 # N must be 1 or greater (1st last, 2nd last, etc.)
-                raise ValueError("'n' must be a positive integer (1 or greater).")
+                raise ValueError(
+                    "'n' must be a positive integer (1 or greater).")
         except (ValueError, TypeError):
             return Response(
                 {"error": "'n' must be a positive integer (1 or greater)."},
@@ -509,7 +503,8 @@ class ReservationBikeViewSet(ModelViewSet):
                 reserv = reservations_qs[i]
                 data[f"reservation_{i+1}"] = str(reserv)
 
-            # Use the key 'nth_last_log' as before, although the value is now the reservation string
+            # Use the key 'nth_last_log' as before, although the value is now
+            # the reservation string
             return Response(data, status=status.HTTP_200_OK)
 
         except IndexError:
@@ -568,7 +563,9 @@ class ReservationBikeViewSet(ModelViewSet):
                     end_date=None,
                 )
                 serializer = ReservationBikeSerializer(log)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED)
 
         except Bike.DoesNotExist:
             return Response(
@@ -579,9 +576,8 @@ class ReservationBikeViewSet(ModelViewSet):
         """
         Disable the default create method
         """
-        return Response(
-            {"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
-        )
+        return Response({"error": "Method Not Allowed"},
+                        status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReservationMusicRoomViewSet(ModelViewSet):
@@ -597,7 +593,8 @@ class ReservationMusicRoomViewSet(ModelViewSet):
         upcoming_reservations = ReservationMusicRoom.objects.filter(
             start_date__gt=now
         ).order_by("start_date")
-        serializer = ReservationMusicRoomSerializer(upcoming_reservations, many=True)
+        serializer = ReservationMusicRoomSerializer(
+            upcoming_reservations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["post"])
@@ -613,10 +610,12 @@ class ReservationMusicRoomViewSet(ModelViewSet):
             end_date = serializer.validated_data["end_date"]
 
             reservation = ReservationMusicRoom.objects.create(
-                borrower_id=user.id, name=name, start_date=start_date, end_date=end_date
-            )
-            reservation_serializer = ReservationMusicRoomSerializer(reservation)
-            return Response(reservation_serializer.data, status=status.HTTP_201_CREATED)
+                borrower_id=user.id, name=name, start_date=start_date, end_date=end_date)
+            reservation_serializer = ReservationMusicRoomSerializer(
+                reservation)
+            return Response(
+                reservation_serializer.data,
+                status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=["post"])
@@ -642,17 +641,15 @@ class ReservationMusicRoomViewSet(ModelViewSet):
                 status=status.HTTP_200_OK,
             )
         except ReservationMusicRoom.DoesNotExist:
-            return Response(
-                {"error": "Reservation not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Reservation not found"},
+                            status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request, *args, **kwargs):
         """
         Disable the default create method
         """
-        return Response(
-            {"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
-        )
+        return Response({"error": "Method Not Allowed"},
+                        status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class MedItemViewSet(ModelViewSet):
@@ -673,7 +670,8 @@ class MedItemViewSet(ModelViewSet):
                 {"message": "Item borrowed successfully"}, status=status.HTTP_200_OK
             )
         except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=["post"])
     def return_item(self, request, pk=None):
@@ -850,6 +848,5 @@ class LocalViewSet(ModelViewSet):
         """
         Disable the default create method
         """
-        return Response(
-            {"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
-        )
+        return Response({"error": "Method Not Allowed"},
+                        status=status.HTTP_405_METHOD_NOT_ALLOWED)

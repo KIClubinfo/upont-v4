@@ -4,7 +4,6 @@ import re
 from datetime import datetime
 from functools import reduce
 
-from courses.models import Course, Resource
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -18,25 +17,17 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from courses.models import Course, Resource
 from social.models import Club, Membership, Promotion, Student
 from upont.regex import split_then_markdownify
 
-from .forms import AddShotgun, CommentForm, EditEvent, EditPost  # , EditSondage
-from .models import (
-    Comment,
-    Event,
-    Participation,
-    Partnership,
-    Post,
-    Ressource,
-    Shotgun,
-)  # , Sondage, OptionSondage
-from .serializers import (
-    EventSerializer,
-    PartnershipSerializer,
-    PostSerializer,
-    ShotgunSerializer,
-)
+from .forms import (AddShotgun, CommentForm, EditEvent,  # , EditSondage
+                    EditPost)
+from .models import (Comment, Event, Participation,  # , Sondage, OptionSondage
+                     Partnership, Post, Ressource, Shotgun)
+from .serializers import (EventSerializer, PartnershipSerializer,
+                          PostSerializer, ShotgunSerializer)
 
 pattern = re.compile(
     r"^(http(s)?:\/\/)?((w){3}.)?youtu(be\.com\/watch\?v=|\.be\/)([A-Za-z0-9_\-]{11})$"
@@ -60,7 +51,9 @@ def posts(request):
         user_to_delete = request.user
         user_to_delete.delete()
         logout(request)
-        messages.warning(request, "Vous n'êtes pas autorisé à accéder à ce site.")
+        messages.warning(
+            request,
+            "Vous n'êtes pas autorisé à accéder à ce site.")
         return redirect(reverse_lazy("login"))
     if request.method == "GET":
         return render(request, "news/posts.html")
@@ -97,7 +90,8 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         student = get_object_or_404(Student, user__id=self.request.user.id)
         promo = get_object_or_404(Promotion, pk=student.promo.pk)
-        filter_date = datetime(promo.year + 2000 - 3, 8, 20, tzinfo=timezone.utc)
+        filter_date = datetime(promo.year + 2000 - 3, 8,
+                               20, tzinfo=timezone.utc)
         queryset = Post.objects.filter(date__gt=filter_date)
         mode = self.request.GET.get("mode")
         bookmark = self.request.GET.get("bookmark")
@@ -108,7 +102,9 @@ class PostViewSet(viewsets.ModelViewSet):
         if mode is None:
             queryset = queryset.order_by("-date", "title")
         elif mode == "social":
-            queryset = queryset.filter(course__isnull=True).order_by("-date", "title")
+            queryset = queryset.filter(
+                course__isnull=True).order_by(
+                "-date", "title")
             if bookmark:
                 queryset = queryset.filter(bookmark=student)
         elif mode == "course":
@@ -152,9 +148,8 @@ class ShotgunView(APIView):
     def get(self, request):
         # shotguns to which the user participated :
         student = get_object_or_404(Student, user__id=request.user.id)
-        shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by(
-            "starting_date"
-        )
+        shotguns = Shotgun.objects.filter(
+            ending_date__gte=timezone.now()).order_by("starting_date")
         serializer = ShotgunSerializer(
             shotguns, many=True, context={"student": student}
         )
@@ -267,7 +262,7 @@ class PostCreateView(APIView):
         return Response({"status": "ok"})
 
 
-""" 
+"""
 class SondageCreateView(APIView):
 
     def post(self, request):
@@ -276,7 +271,7 @@ class SondageCreateView(APIView):
         elif request.data["content"] == "":
             return Response({"status": "error", "message": "empty_content"})
         student = get_object_or_404(Student, user__id=request.user.id)
-        
+
         if request.data["publish_as"] == "-1":
             sondage = Sondage(
                 title=request.data["title"],
@@ -301,7 +296,7 @@ class SondageCreateView(APIView):
             else:
                 i = 0
                 for option in request.data["options"]:
-                    
+
                     if(option["text"] == ""):
                         return Response({"status": "error", "message": "empty_option_text"})
                     else:
@@ -432,11 +427,15 @@ class ShotgunCreateView(APIView):
             club=club,
             title=title,
             content=split_then_markdownify(content),
-            starting_date=request.data.get("starting_date", timezone.now()),
+            starting_date=request.data.get(
+                "starting_date",
+                timezone.now()),
             ending_date=request.data["ending_date"],
             requires_motivation=request.data["requires_motivation"],
-            success_message=split_then_markdownify(request.data["success_message"]),
-            failure_message=split_then_markdownify(request.data["failure_message"]),
+            success_message=split_then_markdownify(
+                request.data["success_message"]),
+            failure_message=split_then_markdownify(
+                request.data["failure_message"]),
         )
         shotgun.save()
 
@@ -616,7 +615,9 @@ class EventViewSet(viewsets.ModelViewSet):
                     detail="is_enrolled must be either 'true' or 'false'"
                 )
 
-        return queryset.order_by("date", "name").filter(end__gte=timezone.now())
+        return queryset.order_by(
+            "date", "name").filter(
+            end__gte=timezone.now())
 
 
 class SearchPost(APIView):
@@ -627,13 +628,18 @@ class SearchPost(APIView):
     def get(self, request):
         student = get_object_or_404(Student, user__id=request.user.id)
         promo = get_object_or_404(Promotion, pk=student.promo.pk)
-        filter_date = datetime(promo.year + 2000 - 3, 8, 20, tzinfo=timezone.utc)
+        filter_date = datetime(promo.year + 2000 - 3, 8,
+                               20, tzinfo=timezone.utc)
         if "post" in request.GET and request.GET["post"].strip():
             found_posts, searched_expression = search_post(request)
-            result = [post for post in found_posts if post.date > filter_date][:15]
+            result = [post for post in found_posts if post.date >
+                      filter_date][:15]
         else:
-            result = Post.objects.filter(date__gt=filter_date).order_by("-date")[:15]
-        serializer = PostSerializer(result, many=True, context={"request": request})
+            result = Post.objects.filter(
+                date__gt=filter_date).order_by("-date")[:15]
+        serializer = PostSerializer(
+            result, many=True, context={
+                "request": request})
         return Response({"posts": serializer.data})
 
 
@@ -645,7 +651,8 @@ def search_post(request):
         return Post.objects.none(), searched_expression
 
     # Créer des conditions pour chaque mot-clé
-    content_conditions = [Q(content__icontains=word) for word in key_words_list]
+    content_conditions = [Q(content__icontains=word)
+                          for word in key_words_list]
     title_conditions = [Q(title__icontains=word) for word in key_words_list]
 
     # Combiner les conditions avec OR pour chaque champ
@@ -665,7 +672,8 @@ def search_post(request):
 @login_required
 def events(request):
     student = get_object_or_404(Student, user__id=request.user.id)
-    all_events_list = Event.objects.filter(end__gte=timezone.now()).order_by("date")
+    all_events_list = Event.objects.filter(
+        end__gte=timezone.now()).order_by("date")
     is_member = Membership.objects.filter(student=student).exists()
     context = {"all_events_list": all_events_list, "is_member": is_member}
     return render(request, "news/events.html", context)
@@ -778,14 +786,16 @@ def post_edit(request, post_id, course_id=None):
                 instance=Post.objects.get(id=post_id),
             )
             if form.is_valid():
-                videos = Ressource.objects.filter(post=post, video_url__isnull=False)
+                videos = Ressource.objects.filter(
+                    post=post, video_url__isnull=False)
                 if request.POST["video"] == "" and len(videos) >= 1:
                     videos.first().delete()
                 elif request.POST["video"] != "":
                     resources = Ressource.objects.filter(
                         post=post, video_url__isnull=False
                     )
-                    if len(resources) >= 1 and pattern.match(request.POST["video"]):
+                    if len(resources) >= 1 and pattern.match(
+                            request.POST["video"]):
                         resource = resources.first()
                         resource.video_url = request.POST["video"]
                         resource.save()
@@ -800,7 +810,8 @@ def post_edit(request, post_id, course_id=None):
                             resource.save()
                 resources = Ressource.objects.filter(post=post)
                 if "illustration" in request.FILES:
-                    images = Ressource.objects.filter(post=post, image__isnull=False)
+                    images = Ressource.objects.filter(
+                        post=post, image__isnull=False)
                     if len(images) >= 1:
                         image = images.first()
                         image.image = request.FILES["illustration"]
@@ -835,7 +846,8 @@ def post_edit(request, post_id, course_id=None):
     context["post"] = post
     context["Edit"] = True
     context["course_id"] = course_id
-    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:posts"))
+    request.session["origin"] = request.META.get(
+        "HTTP_REFERER", reverse("news:posts"))
     return render(request, "news/post_edit.html", context)
 
 
@@ -890,8 +902,10 @@ def post_create(request, event_id=None, course_id=None):
     else:
         form = EditPost(request.user.id)
         if event_id is not None:
-            form.fields["event"].initial = get_object_or_404(Event, id=event_id)
-    request.session["origin"] = request.META.get("HTTP_REFERER", reverse("news:posts"))
+            form.fields["event"].initial = get_object_or_404(
+                Event, id=event_id)
+    request.session["origin"] = request.META.get(
+        "HTTP_REFERER", reverse("news:posts"))
     context["EditPost"] = form
     context["Edit"] = False
     context["course_id"] = course_id
@@ -968,22 +982,19 @@ def shotguns(request):
     for participation in user_participations:
         user_shotguns.append(participation.shotgun)
     # shotguns that are not ended and to which the user did not participate :
-    next_shotguns = Shotgun.objects.filter(ending_date__gte=timezone.now()).order_by(
-        "starting_date"
-    )
+    next_shotguns = Shotgun.objects.filter(
+        ending_date__gte=timezone.now()).order_by("starting_date")
     for user_shotgun in user_shotguns:
         next_shotguns = next_shotguns.exclude(id=user_shotgun.pk)
     # shotguns that are ended and to which the user did not participate :
-    old_shotguns = Shotgun.objects.filter(ending_date__lte=timezone.now()).order_by(
-        "ending_date"
-    )
+    old_shotguns = Shotgun.objects.filter(
+        ending_date__lte=timezone.now()).order_by("ending_date")
     for user_shotgun in user_shotguns:
         old_shotguns = old_shotguns.exclude(id=user_shotgun.pk)
 
     # check is user is admin of at least one club :
-    display_admin_button = (
-        len(Membership.objects.filter(student__pk=student.id, is_admin=True)) > 0
-    )
+    display_admin_button = (len(Membership.objects.filter(
+        student__pk=student.id, is_admin=True)) > 0)
 
     context = {
         "next_shotguns": next_shotguns,
@@ -1000,7 +1011,8 @@ def shotgun_detail(request, shotgun_id):
     student = get_object_or_404(Student, user__id=request.user.id)
     already_participated = shotgun.participated(student)
     got_accepted = shotgun.got_accepted(student)
-    participation = Participation.objects.filter(participant=student, shotgun=shotgun)
+    participation = Participation.objects.filter(
+        participant=student, shotgun=shotgun)
     if len(participation) > 0:
         motivation = participation[0].motivation
     else:
@@ -1020,7 +1032,12 @@ def shotgun_participate(request, shotgun_id):
     shotgun = get_object_or_404(Shotgun, pk=shotgun_id)
     student = get_object_or_404(Student, user__id=request.user.id)
     if shotgun.participated(student):
-        return HttpResponseRedirect(reverse("news:shotgun_detail", args=(shotgun_id,)))
+        return HttpResponseRedirect(
+            reverse(
+                "news:shotgun_detail",
+                args=(
+                    shotgun_id,
+                )))
     if shotgun.requires_motivation:
         try:
             motivation = request.POST["motivation"]
@@ -1049,7 +1066,12 @@ def shotgun_participate(request, shotgun_id):
             participant=student,
         )
         participation.save()
-    return HttpResponseRedirect(reverse("news:shotgun_detail", args=(shotgun_id,)))
+    return HttpResponseRedirect(
+        reverse(
+            "news:shotgun_detail",
+            args=(
+                shotgun_id,
+            )))
 
 
 @login_required
@@ -1136,8 +1158,10 @@ def new_shotgun(request):
         if form.is_valid():
             shotgun = form.save()
             shotgun.content = split_then_markdownify(shotgun.content)
-            shotgun.success_message = split_then_markdownify(shotgun.success_message)
-            shotgun.failure_message = split_then_markdownify(shotgun.failure_message)
+            shotgun.success_message = split_then_markdownify(
+                shotgun.success_message)
+            shotgun.failure_message = split_then_markdownify(
+                shotgun.failure_message)
             shotgun.save()
             return HttpResponseRedirect(reverse("news:shotguns"))
 

@@ -14,7 +14,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="ressource",
             name="image",
-            field=models.ImageField(blank=True, null=True, upload_to="news/ressources"),
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to="news/ressources"),
         ),
         migrations.AlterField(
             model_name="ressource",

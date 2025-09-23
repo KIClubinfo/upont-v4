@@ -7,6 +7,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APITestCase
+
 from social.models import Club, Membership, Student
 
 from .models import Comment, Event, Participation, Post, Shotgun
@@ -177,7 +178,8 @@ class ShotgunModelTest(TestCase):
             participation1,
             participation2,
         ) = self.shotgun_with_two_participants_with_motivation()
-        # works the same as without motivation if all motivations are accepted :
+        # works the same as without motivation if all motivations are accepted
+        # :
         self.assertTrue(shotgun.accepted_participations()[0] == participation1)
         self.assertTrue(len(shotgun.accepted_participations()) == 1)
         shotgun.size = 2
@@ -386,15 +388,23 @@ class CommentViewsTest(TestCase):
         response = comment_post(comment_request, self.post.pk)
         self.assertEqual(response.status_code, 201)
         retrieved_comment = Comment.objects.get(post=self.post)
-        self.assertEqual(retrieved_comment.content, "Some test comment from a student")
+        self.assertEqual(
+            retrieved_comment.content,
+            "Some test comment from a student")
 
     def test_deleting_my_own_comment_on_post_works(self):
-        # Create several comments to check whether the view actually deletes only one comment
+        # Create several comments to check whether the view actually deletes
+        # only one comment
         self.create_comment_from_student()
         comment = self.create_comment_from_student()
         client = Client()
         client.force_login(self.comment_user)
-        response = client.get(reverse("news:comment_delete", args=(comment.id,)))
+        response = client.get(
+            reverse(
+                "news:comment_delete",
+                args=(
+                    comment.id,
+                )))
         self.assertEqual(response.status_code, 200)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 1)
@@ -414,7 +424,12 @@ class CommentViewsTest(TestCase):
         deleter_student.save()
         client = Client()
         client.force_login(deleter_user)
-        response = client.get(reverse("news:comment_delete", args=(comment.id,)))
+        response = client.get(
+            reverse(
+                "news:comment_delete",
+                args=(
+                    comment.id,
+                )))
         self.assertEqual(response.status_code, 403)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 2)
@@ -434,7 +449,9 @@ class CommentViewsTest(TestCase):
         response = comment_post(comment_request, self.post.pk)
         self.assertEqual(response.status_code, 201)
         retrieved_comment = Comment.objects.get(post=self.post)
-        self.assertEqual(retrieved_comment.content, "Some test comment from a club")
+        self.assertEqual(
+            retrieved_comment.content,
+            "Some test comment from a club")
 
     def test_deleting_comment_from_another_club_fails(self):
         comment = self.create_comment_from_club()
@@ -463,7 +480,12 @@ class CommentViewsTest(TestCase):
         deleter_club_membership.save()
         client = Client()
         client.force_login(deleter_user)
-        response = client.get(reverse("news:comment_delete", args=(comment.id,)))
+        response = client.get(
+            reverse(
+                "news:comment_delete",
+                args=(
+                    comment.id,
+                )))
         self.assertEqual(response.status_code, 403)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 1)
@@ -495,7 +517,12 @@ class CommentViewsTest(TestCase):
         deleter_club_membership.save()
         client = Client()
         client.force_login(deleter_user)
-        response = client.get(reverse("news:comment_delete", args=(comment.id,)))
+        response = client.get(
+            reverse(
+                "news:comment_delete",
+                args=(
+                    comment.id,
+                )))
         self.assertEqual(response.status_code, 200)
         retrieved_comments = Comment.objects.filter(post=self.post)
         self.assertEqual(len(retrieved_comments), 0)
@@ -553,7 +580,9 @@ class EventAPITest(APITestCase):
         self.assertEqual(response_event1["id"], event2.pk)
         self.assertEqual(response_event1["name"], event2.name)
         self.assertEqual(response_event1["description"], event2.description)
-        self.assertEqual(response_event1["date"], event2.date.astimezone().isoformat())
+        self.assertEqual(
+            response_event1["date"],
+            event2.date.astimezone().isoformat())
         self.assertEqual(response_event1["location"], event2.location)
         self.assertEqual(len(response_event1["participants"]), 1)
         participant_id = int(response_event1["participants"][0].split("/")[-2])
@@ -563,6 +592,8 @@ class EventAPITest(APITestCase):
         self.assertEqual(response_event2["id"], event1.pk)
         self.assertEqual(response_event2["name"], event1.name)
         self.assertEqual(response_event2["description"], event1.description)
-        self.assertEqual(response_event2["date"], event1.date.astimezone().isoformat())
+        self.assertEqual(
+            response_event2["date"],
+            event1.date.astimezone().isoformat())
         self.assertEqual(response_event2["location"], event1.location)
         self.assertEqual(response_event2["participants"], [])

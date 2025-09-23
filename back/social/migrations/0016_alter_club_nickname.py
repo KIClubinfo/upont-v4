@@ -12,6 +12,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="club",
             name="nickname",
-            field=models.CharField(blank=True, default="", max_length=50, null=True),
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=50,
+                null=True),
         ),
     ]
