@@ -13,6 +13,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -396,41 +398,73 @@ class ShotgunCreateView(APIView):
         admin_clubs_memberships = Membership.objects.filter(
             student__pk=student.id, is_admin=True
         )
-        admin_clubs = []
-        for membership in admin_clubs_memberships:
-            admin_clubs.append(membership.club)
+        admin_clubs = [m.club for m in admin_clubs_memberships]
 
         if not admin_clubs:
-            return Response({"status": "error", "message": "not_admin"})
+            return Response(
+                {"status": "error", "message": "not_admin"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
-        # Champs obligatoires
-        title = request.data["title"]
-        content = request.data["content"]
-        club_id = request.data["club"]
+        # Champs obligatoires (sécurisés)
+        title = request.data.get("title", "").strip()
+        content = request.data.get("content", "").strip()
+        club_id = request.data.get("club")
 
         if not title:
-            return Response({"status": "error", "message": "empty_title"})
+            return Response({"status": "error", "message": "empty_title"}, status=400)
         if not content:
-            return Response({"status": "error", "message": "empty_content"})
+            return Response({"status": "error", "message": "empty_content"}, status=400)
         if not club_id:
-            return Response({"status": "error", "message": "no_club"})
+            return Response({"status": "error", "message": "no_club"}, status=400)
 
         club = get_object_or_404(Club, id=club_id)
 
         # Vérifier que l’étudiant est admin du club choisi
         if club not in admin_clubs:
-            return Response({"status": "error", "message": "forbidden"})
+            return Response(
+                {"status": "error", "message": "forbidden"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Dates
+        starting_date = parse_datetime(request.data.get("starting_date")) or timezone.now()
+        ending_date = parse_datetime(request.data.get("ending_date"))
+
+        if not ending_date:
+            return Response(
+                {"status": "error", "message": "no_ending_date"},
+                status=400,
+            )
+
+        # Bool (React Native -> string)
+        requires_motivation = request.data.get("requires_motivation") in [
+            True, "true", "True", "1", 1
+        ]
+
+        # Messages optionnels
+        success_message = split_then_markdownify(
+            request.data.get("success_message", "")
+        )
+        failure_message = split_then_markdownify(
+            request.data.get("failure_message", "")
+        )
+
+        # Taille (si existante)
+        size = request.data.get("size")
+        size = int(size) if size else None
 
         # Création du shotgun
         shotgun = Shotgun(
             club=club,
             title=title,
             content=split_then_markdownify(content),
-            starting_date=request.data.get("starting_date", timezone.now()),
-            ending_date=request.data["ending_date"],
-            requires_motivation=request.data["requires_motivation"],
-            success_message=split_then_markdownify(request.data["success_message"]),
-            failure_message=split_then_markdownify(request.data["failure_message"]),
+            starting_date=starting_date,
+            ending_date=ending_date,
+            requires_motivation=requires_motivation,
+            success_message=success_message,
+            failure_message=failure_message,
+            size=size,
         )
         shotgun.save()
 
@@ -439,7 +473,8 @@ class ShotgunCreateView(APIView):
                 "status": "ok",
                 "shotgun_id": shotgun.id,
                 "message": "shotgun_created",
-            }
+            },
+            status=status.HTTP_201_CREATED,
         )
 
 
