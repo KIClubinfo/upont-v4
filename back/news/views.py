@@ -428,7 +428,9 @@ class ShotgunCreateView(APIView):
             )
 
         # Dates
-        starting_date = parse_datetime(request.data.get("starting_date")) or timezone.now()
+        starting_date = (
+            parse_datetime(request.data.get("starting_date")) or timezone.now()
+        )
         ending_date = parse_datetime(request.data.get("ending_date"))
 
         if not ending_date:
@@ -439,7 +441,11 @@ class ShotgunCreateView(APIView):
 
         # Bool (React Native -> string)
         requires_motivation = request.data.get("requires_motivation") in [
-            True, "true", "True", "1", 1
+            True,
+            "true",
+            "True",
+            "1",
+            1,
         ]
 
         # Messages optionnels
