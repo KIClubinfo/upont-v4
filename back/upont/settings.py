@@ -188,7 +188,7 @@ REMOTE_STATIC_STORAGE = env("REMOTE_STATIC_STORAGE", default=False)
 
 if REMOTE_STATIC_STORAGE:
     REMOTE_STATIC_URL = env("REMOTE_STATIC_URL", default="/static")
-    FTP_STORAGE_LOCATION = "ftp://enpc-upontcdn:ziBwEfQL3KmZLMKB9Pacdx@ftp.cluster007.hosting.ovh.net:21"
+    FTP_STORAGE_LOCATION = env("FTP_STORAGE_LOCATION")
     ENCODING = "utf-8"
     STATICFILES_STORAGE = "upont.storage.StaticStorage"
     STATIC_URL = REMOTE_STATIC_URL + "/"
