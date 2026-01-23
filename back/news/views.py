@@ -13,6 +13,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.db import transaction
 from django.utils.dateparse import parse_datetime
 from rest_framework import status
 from rest_framework import viewsets
@@ -320,71 +321,75 @@ class PostCreateViewV2(APIView):
     """
 
     def post(self, request):
-        process_img = True
-        if request.data["title"] == "":
-            return Response({"status": "error", "message": "empty_title"})
-        elif request.data["content"] == "":
-            return Response({"status": "error", "message": "empty_content"})
-        student = get_object_or_404(Student, user__id=request.user.id)
-        if request.data["publish_as"] == "-1":
-            post = Post(
-                title=request.data["title"],
-                author=student,
-                date=timezone.now(),
-                content=split_then_markdownify(request.data["content"]),
-            )
-            if "illustration" in request.data:
-                post.illustration = request.data["illustration"]
-            post.save()
-        else:
-            club = get_object_or_404(Club, id=request.data["publish_as"])
-            if club.is_member(student.id):
-                post = Post(
-                    title=request.data["title"],
-                    author=student,
-                    club=club,
-                    date=timezone.now(),
-                    content=split_then_markdownify(request.data["content"]),
-                )
-                if "illustration" in request.data:
-                    post.illustration = request.data["illustration"]
-                post.save()
-            else:
-                process_img = False
-                return Response({"status": "error", "message": "forbidden"})
+        # --- Vérifications de base ---
+        title = request.data.get("title", "").strip()
+        content = request.data.get("content", "").strip()
+        publish_as = request.data.get("publish_as")
 
-        if (
-            "resources_count" in request.data
-            and int(request.data["resources_count"]) > 0
-            and process_img
-        ):
-            resources = []
-            for i in range(0, int(request.data["resources_count"])):
-                resources.append(
-                    {
-                        "type": request.data["resources-" + str(i) + "-type"],
-                        "data": request.data["resources-" + str(i) + "-data"],
-                    }
-                )
-            for resource in resources:
-                if resource["type"] == "video":
-                    resource = Ressource(
-                        title=request.data["title"],
-                        post=post,
+        if not title:
+            return Response({"status": "error", "message": "empty_title"})
+
+        if not content:
+            return Response({"status": "error", "message": "empty_content"})
+
+        student = get_object_or_404(Student, user__id=request.user.id)
+
+        try:
+            with transaction.atomic():
+                # --- Création du post ---
+                if publish_as == "-1":
+                    post = Post.objects.create(
+                        title=title,
                         author=student,
-                        video_url=resource["data"],
+                        date=timezone.now(),
+                        content=split_then_markdownify(content),
                     )
-                elif resource["type"] == "image":
-                    resource = Ressource(
-                        title=request.data["title"],
-                        post=post,
+                else:
+                    club = get_object_or_404(Club, id=publish_as)
+                    if not club.is_member(student.id):
+                        return Response({"status": "error", "message": "forbidden"})
+
+                    post = Post.objects.create(
+                        title=title,
                         author=student,
-                        image=resource["data"],
+                        club=club,
+                        date=timezone.now(),
+                        content=split_then_markdownify(content),
                     )
-                resource.save()
+
+                # --- Gestion des ressources (image / vidéo) ---
+                resources_count = int(request.data.get("resources_count", 0))
+
+                for i in range(resources_count):
+                    res_type = request.data.get(f"resources-{i}-type")
+
+                    if res_type == "video":
+                        video_url = request.data.get(f"resources-{i}-data")
+                        if video_url:
+                            Ressource.objects.create(
+                                title=title,
+                                post=post,
+                                author=student,
+                                video_url=video_url,
+                            )
+
+                    elif res_type == "image":
+                        image_file = request.FILES.get(f"resources-{i}-data")
+                        if image_file:
+                            Ressource.objects.create(
+                                title=title,
+                                post=post,
+                                author=student,
+                                image=image_file,
+                            )
+
+        except Exception as e:
+            return Response(
+                {"status": "error", "message": "server_error", "detail": str(e)},
+                status=500,
+            )
 
         return Response({"status": "ok"})
-
 
 class ShotgunCreateView(APIView):
     """
