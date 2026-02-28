@@ -70,6 +70,7 @@ from social.views import (
     ChannelJoinRequestCreateView,
     ChannelJoinRequestListView,
     ChannelJoinRequestAcceptView,
+    ChannelAddMemberView,
     ChannelMessagesView,
     ClubsViewSet,
     CreateChannel,
@@ -85,6 +86,7 @@ from social.views import (
     StudentCanPublishAs,
     StudentMembershipView,
     StudentPublicKeyView,
+    StudentPublicKeyByUserView,
     StudentProfileEdit,
     StudentViewSet,
     validate_student,
@@ -199,6 +201,16 @@ urlpatterns += [
     ),
     path("api/messages/create/", CreateMessage.as_view(), name="create_message"),
     path("api/public-key/", StudentPublicKeyView.as_view(), name="student_public_key"),
+    path(
+        "api/public-key/<int:user_id>/",
+        StudentPublicKeyByUserView.as_view(),
+        name="student_public_key_by_user",
+    ),
+    path(
+        "api/channels/<int:channel_id>/members/add/",
+        ChannelAddMemberView.as_view(),
+        name="channel_add_member",
+    ),
     path("api/id/pochtron/", PochtronId.as_view(), name="pochtron_id"),
     path(
         "api/course_departments/",
