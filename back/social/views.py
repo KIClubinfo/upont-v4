@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.db.models import Q
 from django.db.models.functions import Greatest
 from django.http import Http404
@@ -18,6 +19,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 
 from .forms import AddMember, AddRole, ClubRequestForm, EditClub, EditProfile
 from .models import (
@@ -307,88 +309,331 @@ class ProfilePicUpdate(APIView):
         return Response({"status": "ok"})
 
 
+class StudentPublicKeyView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = get_object_or_404(Student, user__id=request.user.id)
+        return Response({"public_key": student.public_key})
+
+    def post(self, request):
+        public_key_pem = request.data.get("public_key", "")
+        if not isinstance(public_key_pem, str) or not public_key_pem.strip():
+            return Response(
+                {"status": "error", "error": "La clé publique est requise."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            serialization.load_pem_public_key(
+                public_key_pem.encode("utf-8"),
+                backend=default_backend(),
+            )
+        except ValueError:
+            return Response(
+                {"status": "error", "error": "Format de clé publique invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        student = get_object_or_404(Student, user__id=request.user.id)
+        student.public_key = public_key_pem
+        student.save(update_fields=["public_key"])
+        return Response({"status": "ok"})
+
+
+class ChannelListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channels = (
+            Channel.objects.filter(members=current_student)
+            .select_related("creator__user", "club")
+            .prefetch_related("members__user", "admins__user")
+            .order_by("-date")
+        )
+
+        payload = []
+        for channel in channels:
+            payload.append(
+                {
+                    "id": channel.id,
+                    "name": channel.name,
+                    "date": channel.date,
+                    "creator_id": channel.creator.user.id if channel.creator else None,
+                    "creator_username": (
+                        channel.creator.user.username if channel.creator else None
+                    ),
+                    "club_id": channel.club.id if channel.club else None,
+                    "club_name": channel.club.name if channel.club else None,
+                    "members": [
+                        {
+                            "id": member.user.id,
+                            "username": member.user.username,
+                        }
+                        for member in channel.members.all()
+                    ],
+                    "admins": [
+                        {
+                            "id": admin.user.id,
+                            "username": admin.user.username,
+                        }
+                        for admin in channel.admins.all()
+                    ],
+                    "has_encrypted_key": channel.encrypted_keys.filter(
+                        student=current_student
+                    ).exists(),
+                }
+            )
+
+        return Response({"channels": payload})
+
+
 class CreateChannel(APIView):
     """
     API endpoint that allows a student to create a channel
     """
 
-    def post(self, request):
-        members = [
-            get_object_or_404(Student, user__id=user_id)
-            for user_id in request.data["members"]
-        ]
-        admins = [
-            get_object_or_404(Student, user__id=user_id)
-            for user_id in request.data["admins"]
-        ]
-        # Symmetric key to encrypt message in the channel
-        key = os.urandom(32)
-        key_base64 = base64.b64encode(key).decode("utf-8")
-        encrypted_keys = []
-        for user_id in request.data["members"]:
-            student = get_object_or_404(Student, user__id=user_id)
-            public_key_pem = student.public_key.encode("utf-8")
-            public_key = serialization.load_pem_public_key(
-                public_key_pem, backend=default_backend()
-            )
-            encrypted_key = public_key.encrypt(
-                key_base64,
-                padding.OAEP(
-                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                    algorithm=hashes.SHA256(),
-                    label=None,
-                ),
-            )
-            encrypted_key_save = ChannelEncryptedKey(
-                key=base64.b64encode(encrypted_key).decode("utf-8"),
-                student=student,
-            )
-            encrypted_key_save.save()
-            encrypted_keys.append(encrypted_key_save)
+    permission_classes = [IsAuthenticated]
 
-        if request.data["channel_of"] == "-1":
-            club = club = get_object_or_404(Club, id=request.data["channel_of"])
-            channel = Channel(
-                name=request.data["name"],
-                date=timezone.now(),
-                creator=get_object_or_404(Student, user__id=request.user.id),
-                members=members,
-                admins=admins,
-                encrypted_keys=encrypted_keys,
+    def post(self, request):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        member_ids = request.data.get("members", [])
+        admin_ids = request.data.get("admins", [])
+        channel_name = request.data.get("name", "").strip()
+
+        if not channel_name:
+            return Response(
+                {"status": "error", "error": "Le nom du channel est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        else:
-            channel = Channel(
-                name=request.data["name"],
+
+        if not isinstance(member_ids, list) or not member_ids:
+            return Response(
+                {"status": "error", "error": "La liste des membres est invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not isinstance(admin_ids, list):
+            return Response(
+                {"status": "error", "error": "La liste des admins est invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if request.user.id not in member_ids:
+            member_ids.append(request.user.id)
+        if request.user.id not in admin_ids:
+            admin_ids.append(request.user.id)
+
+        members = list(Student.objects.filter(user__id__in=member_ids))
+        if len(members) != len(set(member_ids)):
+            return Response(
+                {"status": "error", "error": "Certains membres sont introuvables."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        admins = list(Student.objects.filter(user__id__in=admin_ids))
+        if len(admins) != len(set(admin_ids)):
+            return Response(
+                {"status": "error", "error": "Certains admins sont introuvables."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        member_student_ids = {student.id for student in members}
+        if any(admin.id not in member_student_ids for admin in admins):
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Tous les admins doivent faire partie des membres.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        channel_of = str(request.data.get("channel_of", "-1"))
+        club = None
+        if channel_of != "-1":
+            club = get_object_or_404(Club, id=channel_of)
+
+        # Validate and parse every member key before persisting anything.
+        public_keys_by_student = {}
+        for student in members:
+            if not student.public_key:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": (
+                            "Tous les membres doivent avoir une clé publique "
+                            f"(manquante pour {student.user.username})."
+                        ),
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                public_keys_by_student[student.id] = serialization.load_pem_public_key(
+                    student.public_key.encode("utf-8"),
+                    backend=default_backend(),
+                )
+            except ValueError:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": (
+                            "La clé publique d'un membre est invalide "
+                            f"({student.user.username})."
+                        ),
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        with transaction.atomic():
+            # Symmetric key to encrypt messages in the channel.
+            key = os.urandom(32)
+            encrypted_keys = []
+            for student in members:
+                encrypted_key = public_keys_by_student[student.id].encrypt(
+                    key,
+                    padding.OAEP(
+                        mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                        algorithm=hashes.SHA256(),
+                        label=None,
+                    ),
+                )
+                encrypted_key_save = ChannelEncryptedKey.objects.create(
+                    key=base64.b64encode(encrypted_key).decode("utf-8"),
+                    student=student,
+                )
+                encrypted_keys.append(encrypted_key_save)
+
+            channel = Channel.objects.create(
+                name=channel_name,
                 date=timezone.now(),
-                creator=get_object_or_404(Student, user__id=request.user.id),
+                creator=current_student,
                 club=club,
-                members=members,
-                admins=admins,
-                encrypted_keys=encrypted_keys,
             )
-        channel.save()
-        return Response({"status": "ok"})
+            channel.members.set(members)
+            channel.admins.set(admins)
+            channel.encrypted_keys.set(encrypted_keys)
+
+        return Response(
+            {"status": "ok", "channel_id": channel.id},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class CreateMessage(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        if request.data["by_club"] == "-1":
-            message = Message(
-                channel=get_object_or_404(Channel, id=request.data["channel"]),
-                date=timezone.now(),
-                author=get_object_or_404(Student, user__id=request.user.id),
-                content=request.data["content"],
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=request.data.get("channel"))
+
+        if not channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Vous n'êtes pas membre de ce channel."},
+                status=status.HTTP_403_FORBIDDEN,
             )
-        else:
-            club = club = get_object_or_404(Club, id=request.data["channel_of"])
-            message = Message(
-                channel=get_object_or_404(Channel, id=request.data["channel"]),
-                date=timezone.now(),
-                author=get_object_or_404(Student, user__id=request.user.id),
-                club=club,
-                content=request.data["content"],
+
+        content = request.data.get("content", "")
+        if not content:
+            return Response(
+                {"status": "error", "error": "Le contenu du message est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        message.save()
+
+        club = None
+        if str(request.data.get("by_club", "-1")) != "-1":
+            club = get_object_or_404(Club, id=request.data.get("channel_of"))
+            if not Membership.objects.filter(
+                student=current_student, club=club, is_old=False
+            ).exists():
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Vous ne pouvez pas publier au nom de ce club.",
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+        message = Message.objects.create(
+            channel=channel,
+            date=timezone.now(),
+            author=current_student,
+            club=club,
+            content=content,
+        )
+        return Response(
+            {"status": "ok", "message_id": message.id},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class ChannelMessagesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Accès interdit à ce channel."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        messages = (
+            Message.objects.filter(channel=channel)
+            .select_related("author__user", "club")
+            .order_by("date")
+        )
+
+        serialized_messages = []
+        for message in messages:
+            author_id = None
+            author_username = None
+            if message.author:
+                author_id = message.author.user.id
+                author_username = message.author.user.username
+            serialized_messages.append(
+                {
+                    "id": message.id,
+                    "channel": channel.id,
+                    "date": message.date,
+                    "author_id": author_id,
+                    "author_username": author_username,
+                    "club_id": message.club.id if message.club else None,
+                    "club_name": message.club.name if message.club else None,
+                    "content": message.content,
+                }
+            )
+
+        return Response({"messages": serialized_messages})
+
+
+class ChannelEncryptedKeyView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Accès interdit à ce channel."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        encrypted_key = channel.encrypted_keys.filter(student=current_student).first()
+        if encrypted_key is None:
+            return Response(
+                {"status": "error", "error": "Aucune clé chiffrée pour cet utilisateur."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return Response(
+            {
+                "channel_id": channel.id,
+                "student_id": current_student.id,
+                "encrypted_key": encrypted_key.key,
+            }
+        )
 
 
 """ class ViewMessage(APIView):

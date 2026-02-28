@@ -48,6 +48,8 @@ class Student(models.Model):
         VET = "VET", _("Ville, environnement, transport")
         GI = "GI", _("Génie industriel")
         A1 = "1A", _("Première année")
+        DOCT = "Doct", _("Doctorant")
+        MAST = "Mast", _("Master")
 
     department = models.CharField(
         max_length=4, choices=Department.choices, default=Department.A1
@@ -81,7 +83,7 @@ class Student(models.Model):
     )  # validators should be a list
     birthdate = models.DateField(max_length=12, null=True, blank=True)
     biography = models.TextField(max_length=300, null=True, blank=True)
-    public_key = models.TextField(max_length=100, null=True)
+    public_key = models.TextField(null=True, blank=True)
     picture = models.ImageField(upload_to="pictures/", null=True, blank=True)
     nationality = models.ForeignKey(
         "Nationality", on_delete=models.SET_NULL, null=True, blank=True
@@ -259,7 +261,7 @@ class Channel(models.Model):
 
 
 class ChannelEncryptedKey(models.Model):
-    key = models.TextField(max_length=100, null=True)
+    key = models.TextField(null=True)
     student = models.ForeignKey(
         Student,
         on_delete=models.CASCADE,
