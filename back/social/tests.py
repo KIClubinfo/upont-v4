@@ -1,11 +1,25 @@
 from django.contrib.auth import models
 from django.core.validators import ValidationError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
+from rest_framework.test import APITestCase
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 from trade.models import Good, Price, Transaction
 
-from .models import Category, Club, Membership, Nationality, Promotion, Role, Student
+from .models import (
+    Category,
+    Channel,
+    Club,
+    Membership,
+    Message,
+    Nationality,
+    Promotion,
+    Role,
+    Student,
+)
 
 
 class PromotionModelTest(TestCase):
@@ -229,3 +243,145 @@ class MembershipModelTest(TestCase):
         membership.save()
         retrieved_membership = Membership.objects.get(pk=membership.pk)
         self.assertEqual(retrieved_membership.pk, membership.pk)
+
+
+def _generate_public_key():
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    return private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode("utf-8")
+
+
+class ChannelMessagingApiTest(APITestCase):
+    def setUp(self):
+        self.user_1 = models.User.objects.create_user(username="user1", password="pw")
+        self.user_2 = models.User.objects.create_user(username="user2", password="pw")
+        self.user_3 = models.User.objects.create_user(username="user3", password="pw")
+
+        self.student_1 = Student.objects.create(
+            user=self.user_1,
+            public_key=_generate_public_key(),
+        )
+        self.student_2 = Student.objects.create(
+            user=self.user_2,
+            public_key=_generate_public_key(),
+        )
+        self.student_3 = Student.objects.create(
+            user=self.user_3,
+            public_key=_generate_public_key(),
+        )
+
+    def test_create_channel_stores_member_encrypted_keys(self):
+        self.client.force_authenticate(user=self.user_1)
+        response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "crypto-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        channel = Channel.objects.get(pk=response.data["channel_id"])
+        self.assertEqual(channel.members.count(), 2)
+        self.assertEqual(channel.admins.count(), 1)
+        self.assertEqual(channel.encrypted_keys.count(), 2)
+        self.assertEqual(
+            channel.encrypted_keys.filter(student=self.student_1).count(),
+            1,
+        )
+        self.assertEqual(
+            channel.encrypted_keys.filter(student=self.student_2).count(),
+            1,
+        )
+
+    def test_channel_key_endpoint_requires_membership(self):
+        channel = Channel.objects.create(
+            name="restricted-room",
+            date=timezone.now(),
+            creator=self.student_1,
+        )
+        channel.members.set([self.student_1, self.student_2])
+
+        self.client.force_authenticate(user=self.user_3)
+        response = self.client.get(
+            reverse("channel_encrypted_key", kwargs={"channel_id": channel.id})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_member_can_create_and_read_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "msg-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "ciphertext-placeholder",
+            },
+            format="json",
+        )
+        self.assertEqual(create_message_response.status_code, 201)
+        self.assertEqual(
+            Message.objects.filter(channel_id=channel_id).count(),
+            1,
+        )
+
+        get_messages_response = self.client.get(
+            reverse("channel_messages", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(get_messages_response.status_code, 200)
+        self.assertEqual(len(get_messages_response.data["messages"]), 1)
+        self.assertEqual(
+            get_messages_response.data["messages"][0]["content"],
+            "ciphertext-placeholder",
+        )
+
+    def test_set_and_get_public_key(self):
+        self.client.force_authenticate(user=self.user_1)
+        new_public_key = _generate_public_key()
+        set_response = self.client.post(
+            reverse("student_public_key"),
+            {"public_key": new_public_key},
+            format="json",
+        )
+        self.assertEqual(set_response.status_code, 200)
+
+        get_response = self.client.get(reverse("student_public_key"))
+        self.assertEqual(get_response.status_code, 200)
+        self.assertEqual(get_response.data["public_key"], new_public_key)
+
+    def test_channels_list_contains_member_channel(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "list-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        self.assertEqual(create_channel_response.status_code, 201)
+
+        list_response = self.client.get(reverse("channels_list"))
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(len(list_response.data["channels"]), 1)
+        self.assertEqual(list_response.data["channels"][0]["name"], "list-room")
+        self.assertTrue(list_response.data["channels"][0]["has_encrypted_key"])

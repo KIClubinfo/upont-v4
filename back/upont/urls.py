@@ -65,7 +65,12 @@ from services.views import (
     VracViewSet,
 )
 from social.views import (
+    ChannelListView,
+    ChannelEncryptedKeyView,
+    ChannelMessagesView,
     ClubsViewSet,
+    CreateChannel,
+    CreateMessage,
     CurrentStudentView,
     NotificationTokenView,
     OneClubView,
@@ -76,6 +81,7 @@ from social.views import (
     SearchStudent,
     StudentCanPublishAs,
     StudentMembershipView,
+    StudentPublicKeyView,
     StudentProfileEdit,
     StudentViewSet,
     validate_student,
@@ -161,6 +167,20 @@ urlpatterns += [
     path("api/search/clubs/", SearchClub.as_view(), name="search_clubs"),
     path("api/search/alcohols/", SearchAlcohol.as_view(), name="search_alcohols"),
     path("api/search/posts/", SearchPost.as_view(), name="search_posts"),
+    path("api/channels/", ChannelListView.as_view(), name="channels_list"),
+    path("api/channels/create/", CreateChannel.as_view(), name="create_channel"),
+    path(
+        "api/channels/<int:channel_id>/messages/",
+        ChannelMessagesView.as_view(),
+        name="channel_messages",
+    ),
+    path(
+        "api/channels/<int:channel_id>/key/",
+        ChannelEncryptedKeyView.as_view(),
+        name="channel_encrypted_key",
+    ),
+    path("api/messages/create/", CreateMessage.as_view(), name="create_message"),
+    path("api/public-key/", StudentPublicKeyView.as_view(), name="student_public_key"),
     path("api/id/pochtron/", PochtronId.as_view(), name="pochtron_id"),
     path(
         "api/course_departments/",
