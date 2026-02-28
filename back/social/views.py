@@ -588,6 +588,91 @@ class ChannelJoinRequestCreateView(APIView):
         return Response({"status": "created"}, status=status.HTTP_201_CREATED)
 
 
+class ChannelJoinRequestListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.admins.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Seuls les admins du channel y ont accès."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        pending_requests = (
+            ChannelJoinRequest.objects.filter(
+                channel=channel,
+                status=ChannelJoinRequest.Status.PENDING,
+            )
+            .select_related("student__user")
+            .order_by("date")
+        )
+
+        return Response(
+            {
+                "requests": [
+                    {
+                        "id": join_request.id,
+                        "channel_id": channel.id,
+                        "student_id": join_request.student.user.id,
+                        "student_username": join_request.student.user.username,
+                        "student_first_name": join_request.student.user.first_name,
+                        "student_last_name": join_request.student.user.last_name,
+                        "student_full_name": (
+                            f"{(join_request.student.user.first_name or '').strip()} "
+                            f"{(join_request.student.user.last_name or '').strip()}"
+                        ).strip()
+                        or join_request.student.user.username,
+                        "date": join_request.date,
+                        "status": join_request.status,
+                    }
+                    for join_request in pending_requests
+                ]
+            }
+        )
+
+
+class ChannelJoinRequestAcceptView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, channel_id, join_request_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.admins.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Seuls les admins du channel y ont accès."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        join_request = get_object_or_404(
+            ChannelJoinRequest,
+            id=join_request_id,
+            channel=channel,
+        )
+        if join_request.status != ChannelJoinRequest.Status.PENDING:
+            return Response(
+                {"status": "error", "error": "Cette demande n'est plus en attente."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            join_request.status = ChannelJoinRequest.Status.ACCEPTED
+            join_request.save(update_fields=["status"])
+            channel.members.add(join_request.student)
+
+        return Response(
+            {
+                "status": "accepted",
+                "channel_id": channel.id,
+                "join_request_id": join_request.id,
+                "student_id": join_request.student.user.id,
+            }
+        )
+
+
 class CreateMessage(APIView):
     permission_classes = [IsAuthenticated]
 

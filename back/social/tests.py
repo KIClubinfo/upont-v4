@@ -598,3 +598,116 @@ class ChannelMessagingApiTest(APITestCase):
                 status=ChannelJoinRequest.Status.PENDING,
             ).exists()
         )
+
+    def test_channel_admin_can_list_pending_join_requests(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "pending-room",
+                "members": [self.user_1.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        self.client.post(
+            reverse("channel_join_request_create", kwargs={"channel_id": channel_id}),
+            {},
+            format="json",
+        )
+
+        self.client.force_authenticate(user=self.user_1)
+        list_response = self.client.get(
+            reverse("channel_join_requests_list", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(len(list_response.data["requests"]), 1)
+        self.assertEqual(
+            list_response.data["requests"][0]["student_id"],
+            self.user_2.id,
+        )
+
+    def test_non_admin_cannot_list_or_accept_join_requests(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "private-room",
+                "members": [self.user_1.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        self.client.post(
+            reverse("channel_join_request_create", kwargs={"channel_id": channel_id}),
+            {},
+            format="json",
+        )
+        join_request = ChannelJoinRequest.objects.get(
+            channel_id=channel_id,
+            student=self.student_2,
+        )
+
+        self.client.force_authenticate(user=self.user_3)
+        list_response = self.client.get(
+            reverse("channel_join_requests_list", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(list_response.status_code, 403)
+
+        accept_response = self.client.post(
+            reverse(
+                "channel_join_request_accept",
+                kwargs={"channel_id": channel_id, "join_request_id": join_request.id},
+            ),
+            {},
+            format="json",
+        )
+        self.assertEqual(accept_response.status_code, 403)
+
+    def test_channel_admin_can_accept_join_request(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "approval-room",
+                "members": [self.user_1.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        self.client.post(
+            reverse("channel_join_request_create", kwargs={"channel_id": channel_id}),
+            {},
+            format="json",
+        )
+        join_request = ChannelJoinRequest.objects.get(
+            channel_id=channel_id,
+            student=self.student_2,
+        )
+
+        self.client.force_authenticate(user=self.user_1)
+        accept_response = self.client.post(
+            reverse(
+                "channel_join_request_accept",
+                kwargs={"channel_id": channel_id, "join_request_id": join_request.id},
+            ),
+            {},
+            format="json",
+        )
+        self.assertEqual(accept_response.status_code, 200)
+        join_request.refresh_from_db()
+        self.assertEqual(join_request.status, ChannelJoinRequest.Status.ACCEPTED)
+        channel = Channel.objects.get(pk=channel_id)
+        self.assertTrue(channel.members.filter(pk=self.student_2.pk).exists())
