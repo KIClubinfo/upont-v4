@@ -608,16 +608,34 @@ class CreateMessage(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        by_club_value = str(request.data.get("by_club", "-1")).strip().lower()
+        send_as_club = by_club_value in {"1", "true", "yes", "on"} or (
+            by_club_value not in {"-1", "0", "false", "no", "off", ""}
+        )
+
         club = None
-        if str(request.data.get("by_club", "-1")) != "-1":
-            club = get_object_or_404(Club, id=request.data.get("channel_of"))
-            if not Membership.objects.filter(
-                student=current_student, club=club, is_old=False
-            ).exists():
+        if send_as_club:
+            if channel.club is None:
                 return Response(
                     {
                         "status": "error",
-                        "error": "Vous ne pouvez pas publier au nom de ce club.",
+                        "error": "Ce channel n'est pas un channel de club.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            club = channel.club
+            can_publish_as_club = Membership.objects.filter(
+                student=current_student,
+                club=club,
+                is_admin=True,
+                is_old=False,
+            ).exists()
+            if not can_publish_as_club:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Seuls les admins du club peuvent publier au nom du club.",
                     },
                     status=status.HTTP_403_FORBIDDEN,
                 )
@@ -658,9 +676,14 @@ class ChannelMessagesView(APIView):
         for message in messages:
             author_id = None
             author_username = None
+            author_name = None
             if message.author:
                 author_id = message.author.user.id
                 author_username = message.author.user.username
+                first_name = (message.author.user.first_name or "").strip()
+                last_name = (message.author.user.last_name or "").strip()
+                full_name = f"{first_name} {last_name}".strip()
+                author_name = full_name or author_username
             serialized_messages.append(
                 {
                     "id": message.id,
@@ -668,6 +691,7 @@ class ChannelMessagesView(APIView):
                     "date": message.date,
                     "author_id": author_id,
                     "author_username": author_username,
+                    "author_name": author_name,
                     "club_id": message.club.id if message.club else None,
                     "club_name": message.club.name if message.club else None,
                     "content": message.content,

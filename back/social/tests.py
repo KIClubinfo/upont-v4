@@ -256,7 +256,12 @@ def _generate_public_key():
 
 class ChannelMessagingApiTest(APITestCase):
     def setUp(self):
-        self.user_1 = models.User.objects.create_user(username="user1", password="pw")
+        self.user_1 = models.User.objects.create_user(
+            username="user1",
+            password="pw",
+            first_name="Alice",
+            last_name="Martin",
+        )
         self.user_2 = models.User.objects.create_user(username="user2", password="pw")
         self.user_3 = models.User.objects.create_user(username="user3", password="pw")
 
@@ -352,6 +357,107 @@ class ChannelMessagingApiTest(APITestCase):
             get_messages_response.data["messages"][0]["content"],
             "ciphertext-placeholder",
         )
+        self.assertEqual(
+            get_messages_response.data["messages"][0]["author_name"],
+            "Alice Martin",
+        )
+
+    def test_club_admin_can_send_message_as_club(self):
+        club = Club.objects.create(
+            name="Club Test",
+            description="Club test",
+            active=True,
+            has_fee=False,
+        )
+        Membership.objects.create(
+            student=self.student_1,
+            club=club,
+            role=None,
+            is_admin=True,
+            is_old=False,
+        )
+        Membership.objects.create(
+            student=self.student_2,
+            club=club,
+            role=None,
+            is_admin=False,
+            is_old=False,
+        )
+
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "club-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": str(club.id),
+            },
+            format="json",
+        )
+        self.assertEqual(create_channel_response.status_code, 201)
+        channel_id = create_channel_response.data["channel_id"]
+
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": True,
+                "content": "club-signed-message",
+            },
+            format="json",
+        )
+        self.assertEqual(create_message_response.status_code, 201)
+        message = Message.objects.get(pk=create_message_response.data["message_id"])
+        self.assertEqual(message.club_id, club.id)
+
+    def test_non_club_admin_cannot_send_message_as_club(self):
+        club = Club.objects.create(
+            name="Club Test",
+            description="Club test",
+            active=True,
+            has_fee=False,
+        )
+        Membership.objects.create(
+            student=self.student_1,
+            club=club,
+            role=None,
+            is_admin=True,
+            is_old=False,
+        )
+        Membership.objects.create(
+            student=self.student_2,
+            club=club,
+            role=None,
+            is_admin=False,
+            is_old=False,
+        )
+
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "club-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": str(club.id),
+            },
+            format="json",
+        )
+        self.assertEqual(create_channel_response.status_code, 201)
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": True,
+                "content": "unauthorized-club-message",
+            },
+            format="json",
+        )
+        self.assertEqual(create_message_response.status_code, 403)
 
     def test_set_and_get_public_key(self):
         self.client.force_authenticate(user=self.user_1)
