@@ -268,3 +268,28 @@ class ChannelEncryptedKey(models.Model):
         related_name="encrypted_channel_keys",
         null=True,
     )
+
+
+class ChannelJoinRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", _("En attente")
+        ACCEPTED = "accepted", _("Acceptee")
+        REJECTED = "rejected", _("Refusee")
+
+    channel = models.ForeignKey(
+        "social.Channel", on_delete=models.CASCADE, related_name="join_requests"
+    )
+    student = models.ForeignKey(
+        "social.Student", on_delete=models.CASCADE, related_name="channel_join_requests"
+    )
+    status = models.CharField(
+        max_length=10, choices=Status.choices, default=Status.PENDING
+    )
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["channel", "student"], name="unique_channel_join_request"
+            )
+        ]

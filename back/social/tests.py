@@ -12,6 +12,7 @@ from trade.models import Good, Price, Transaction
 from .models import (
     Category,
     Channel,
+    ChannelJoinRequest,
     Club,
     Membership,
     Message,
@@ -385,3 +386,109 @@ class ChannelMessagingApiTest(APITestCase):
         self.assertEqual(len(list_response.data["channels"]), 1)
         self.assertEqual(list_response.data["channels"][0]["name"], "list-room")
         self.assertTrue(list_response.data["channels"][0]["has_encrypted_key"])
+
+    def test_club_channel_requires_club_admin_and_is_unique(self):
+        club = Club.objects.create(
+            name="Club Test",
+            description="Club test",
+            active=True,
+            has_fee=False,
+        )
+        Membership.objects.create(
+            student=self.student_1,
+            club=club,
+            role=None,
+            is_admin=True,
+            is_old=False,
+        )
+
+        self.client.force_authenticate(user=self.user_1)
+        first_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "club-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": str(club.id),
+            },
+            format="json",
+        )
+        self.assertEqual(first_response.status_code, 201)
+
+        second_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "club-room-2",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": str(club.id),
+            },
+            format="json",
+        )
+        self.assertEqual(second_response.status_code, 400)
+        self.assertEqual(
+            second_response.data["error"], "Un channel existe deja pour ce club."
+        )
+
+    def test_non_admin_cannot_create_club_channel(self):
+        club = Club.objects.create(
+            name="Club Test",
+            description="Club test",
+            active=True,
+            has_fee=False,
+        )
+        Membership.objects.create(
+            student=self.student_2,
+            club=club,
+            role=None,
+            is_admin=False,
+            is_old=False,
+        )
+
+        self.client.force_authenticate(user=self.user_2)
+        response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "club-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_2.id],
+                "channel_of": str(club.id),
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_can_list_all_channels_and_request_join(self):
+        self.client.force_authenticate(user=self.user_1)
+        response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "public-room",
+                "members": [self.user_1.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        list_response = self.client.get(reverse("channels_list"), {"scope": "all"})
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(len(list_response.data["channels"]), 1)
+        self.assertFalse(list_response.data["channels"][0]["is_member"])
+        self.assertTrue(list_response.data["channels"][0]["can_request_join"])
+
+        join_response = self.client.post(
+            reverse("channel_join_request_create", kwargs={"channel_id": channel_id}),
+            {},
+            format="json",
+        )
+        self.assertEqual(join_response.status_code, 201)
+        self.assertTrue(
+            ChannelJoinRequest.objects.filter(
+                channel_id=channel_id,
+                student=self.student_2,
+                status=ChannelJoinRequest.Status.PENDING,
+            ).exists()
+        )

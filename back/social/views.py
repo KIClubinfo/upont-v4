@@ -26,6 +26,7 @@ from .models import (
     Category,
     Channel,
     ChannelEncryptedKey,
+    ChannelJoinRequest,
     Club,
     Membership,
     Message,
@@ -346,15 +347,31 @@ class ChannelListView(APIView):
 
     def get(self, request):
         current_student = get_object_or_404(Student, user__id=request.user.id)
-        channels = (
-            Channel.objects.filter(members=current_student)
-            .select_related("creator__user", "club")
-            .prefetch_related("members__user", "admins__user")
-            .order_by("-date")
-        )
+        scope = request.GET.get("scope", "mine")
+        if scope == "all":
+            channels = (
+                Channel.objects.all()
+                .select_related("creator__user", "club")
+                .prefetch_related("members__user", "admins__user")
+                .order_by("-date")
+            )
+        else:
+            channels = (
+                Channel.objects.filter(members=current_student)
+                .select_related("creator__user", "club")
+                .prefetch_related("members__user", "admins__user")
+                .order_by("-date")
+            )
+
+        my_requests = {
+            request.channel_id: request.status
+            for request in ChannelJoinRequest.objects.filter(student=current_student)
+        }
 
         payload = []
         for channel in channels:
+            is_member = channel.members.filter(id=current_student.id).exists()
+            is_admin = channel.admins.filter(id=current_student.id).exists()
             payload.append(
                 {
                     "id": channel.id,
@@ -380,6 +397,10 @@ class ChannelListView(APIView):
                         }
                         for admin in channel.admins.all()
                     ],
+                    "is_member": is_member,
+                    "is_admin": is_admin,
+                    "can_request_join": not is_member,
+                    "join_request_status": my_requests.get(channel.id),
                     "has_encrypted_key": channel.encrypted_keys.filter(
                         student=current_student
                     ).exists(),
@@ -451,6 +472,28 @@ class CreateChannel(APIView):
         club = None
         if channel_of != "-1":
             club = get_object_or_404(Club, id=channel_of)
+            is_admin_of_club = Membership.objects.filter(
+                student=current_student,
+                club=club,
+                is_admin=True,
+                is_old=False,
+            ).exists()
+            if not is_admin_of_club:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Seuls les admins du club peuvent creer un channel de club.",
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            if Channel.objects.filter(club=club).exists():
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Un channel existe deja pour ce club.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         # Validate and parse every member key before persisting anything.
         public_keys_by_student = {}
@@ -516,6 +559,33 @@ class CreateChannel(APIView):
             {"status": "ok", "channel_id": channel.id},
             status=status.HTTP_201_CREATED,
         )
+
+
+class ChannelJoinRequestCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Vous etes deja membre de ce channel."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        join_request, created = ChannelJoinRequest.objects.get_or_create(
+            channel=channel,
+            student=current_student,
+            defaults={"status": ChannelJoinRequest.Status.PENDING},
+        )
+        if not created and join_request.status == ChannelJoinRequest.Status.PENDING:
+            return Response({"status": "exists"})
+        if not created:
+            join_request.status = ChannelJoinRequest.Status.PENDING
+            join_request.save(update_fields=["status"])
+
+        return Response({"status": "created"}, status=status.HTTP_201_CREATED)
 
 
 class CreateMessage(APIView):

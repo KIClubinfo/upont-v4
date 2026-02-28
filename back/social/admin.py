@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import (
     Category,
     Channel,
+    ChannelJoinRequest,
     Club,
     ClubRequest,
     Membership,
@@ -48,8 +49,15 @@ class ChannelAdmin(admin.ModelAdmin):
     ordering = ("name",)
 
 
+class ChannelJoinRequestAdmin(admin.ModelAdmin):
+    list_display = ("channel", "student", "status", "date")
+    list_filter = ("status", "channel")
+    ordering = ("-date",)
+
+
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Channel, ChannelAdmin)
+admin.site.register(ChannelJoinRequest, ChannelJoinRequestAdmin)
 admin.site.register(Promotion)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Nationality)
