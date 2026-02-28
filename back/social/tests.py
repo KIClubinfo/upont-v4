@@ -6,6 +6,10 @@ from django.utils import timezone
 from rest_framework.test import APITestCase
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
+import os
+import base64
 
 from trade.models import Good, Price, Transaction
 
@@ -711,3 +715,74 @@ class ChannelMessagingApiTest(APITestCase):
         self.assertEqual(join_request.status, ChannelJoinRequest.Status.ACCEPTED)
         channel = Channel.objects.get(pk=channel_id)
         self.assertTrue(channel.members.filter(pk=self.student_2.pk).exists())
+
+    def test_channel_admin_can_add_member_without_join_request(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "direct-add-room",
+                "members": [self.user_1.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        public_key_response = self.client.get(
+            reverse("student_public_key_by_user", kwargs={"user_id": self.user_2.id})
+        )
+        self.assertEqual(public_key_response.status_code, 200)
+        public_key = serialization.load_pem_public_key(
+            public_key_response.data["public_key"].encode("utf-8")
+        )
+        encrypted_key = public_key.encrypt(
+            os.urandom(32),
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
+        encrypted_key_b64 = base64.b64encode(encrypted_key).decode("utf-8")
+
+        add_member_response = self.client.post(
+            reverse("channel_add_member", kwargs={"channel_id": channel_id}),
+            {
+                "student_user_id": self.user_2.id,
+                "encrypted_key": encrypted_key_b64,
+            },
+            format="json",
+        )
+        self.assertEqual(add_member_response.status_code, 200)
+        channel = Channel.objects.get(pk=channel_id)
+        self.assertTrue(channel.members.filter(pk=self.student_2.pk).exists())
+        self.assertTrue(
+            channel.encrypted_keys.filter(student=self.student_2).exists()
+        )
+
+    def test_non_admin_cannot_add_member_without_join_request(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "forbidden-add-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        add_member_response = self.client.post(
+            reverse("channel_add_member", kwargs={"channel_id": channel_id}),
+            {
+                "student_user_id": self.user_3.id,
+                "encrypted_key": "ZmFrZS1rZXk=",
+            },
+            format="json",
+        )
+        self.assertEqual(add_member_response.status_code, 403)

@@ -673,6 +673,85 @@ class ChannelJoinRequestAcceptView(APIView):
         )
 
 
+class StudentPublicKeyByUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        student = get_object_or_404(Student, user__id=user_id)
+        if not student.public_key:
+            return Response(
+                {"status": "error", "error": "Cet utilisateur n'a pas de clé publique."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        return Response({"user_id": user_id, "public_key": student.public_key})
+
+
+class ChannelAddMemberView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.admins.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Seuls les admins du channel y ont accès."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        student_user_id = request.data.get("student_user_id")
+        encrypted_key = request.data.get("encrypted_key")
+        if student_user_id is None:
+            return Response(
+                {"status": "error", "error": "student_user_id est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not isinstance(encrypted_key, str) or not encrypted_key.strip():
+            return Response(
+                {"status": "error", "error": "encrypted_key est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            base64.b64decode(encrypted_key, validate=True)
+        except (ValueError, TypeError):
+            return Response(
+                {
+                    "status": "error",
+                    "error": "encrypted_key doit être une chaîne base64 valide.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        student_to_add = get_object_or_404(Student, user__id=student_user_id)
+        if channel.members.filter(id=student_to_add.id).exists():
+            return Response(
+                {"status": "error", "error": "Cet utilisateur est déjà membre du channel."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            encrypted_key_obj = ChannelEncryptedKey.objects.create(
+                key=encrypted_key,
+                student=student_to_add,
+            )
+            channel.encrypted_keys.add(encrypted_key_obj)
+            channel.members.add(student_to_add)
+            ChannelJoinRequest.objects.filter(
+                channel=channel,
+                student=student_to_add,
+                status=ChannelJoinRequest.Status.PENDING,
+            ).update(status=ChannelJoinRequest.Status.ACCEPTED)
+
+        return Response(
+            {
+                "status": "added",
+                "channel_id": channel.id,
+                "student_id": student_to_add.user.id,
+            }
+        )
+
+
 class CreateMessage(APIView):
     permission_classes = [IsAuthenticated]
 
