@@ -68,6 +68,8 @@ from social.views import (
     ChannelListView,
     ChannelEncryptedKeyView,
     ChannelJoinRequestCreateView,
+    ChannelJoinRequestListView,
+    ChannelJoinRequestAcceptView,
     ChannelMessagesView,
     ClubsViewSet,
     CreateChannel,
@@ -174,6 +176,16 @@ urlpatterns += [
         "api/channels/<int:channel_id>/join-request/",
         ChannelJoinRequestCreateView.as_view(),
         name="channel_join_request_create",
+    ),
+    path(
+        "api/channels/<int:channel_id>/join-requests/",
+        ChannelJoinRequestListView.as_view(),
+        name="channel_join_requests_list",
+    ),
+    path(
+        "api/channels/<int:channel_id>/join-requests/<int:join_request_id>/accept/",
+        ChannelJoinRequestAcceptView.as_view(),
+        name="channel_join_request_accept",
     ),
     path(
         "api/channels/<int:channel_id>/messages/",
