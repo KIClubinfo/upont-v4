@@ -658,9 +658,32 @@ class ChannelJoinRequestAcceptView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        encrypted_key = request.data.get("encrypted_key")
+        if not isinstance(encrypted_key, str) or not encrypted_key.strip():
+            return Response(
+                {"status": "error", "error": "encrypted_key est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        encrypted_key = encrypted_key.strip()
+        try:
+            base64.b64decode(encrypted_key, validate=True)
+        except Exception:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "encrypted_key doit être une chaîne base64 valide.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         with transaction.atomic():
             join_request.status = ChannelJoinRequest.Status.ACCEPTED
             join_request.save(update_fields=["status"])
+            encrypted_key_obj = ChannelEncryptedKey.objects.create(
+                key=encrypted_key,
+                student=join_request.student,
+            )
+            channel.encrypted_keys.add(encrypted_key_obj)
             channel.members.add(join_request.student)
 
         return Response(

@@ -701,13 +701,26 @@ class ChannelMessagingApiTest(APITestCase):
             student=self.student_2,
         )
 
+        public_key = serialization.load_pem_public_key(
+            self.student_2.public_key.encode("utf-8")
+        )
+        encrypted_key = public_key.encrypt(
+            os.urandom(32),
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
+        encrypted_key_b64 = base64.b64encode(encrypted_key).decode("utf-8")
+
         self.client.force_authenticate(user=self.user_1)
         accept_response = self.client.post(
             reverse(
                 "channel_join_request_accept",
                 kwargs={"channel_id": channel_id, "join_request_id": join_request.id},
             ),
-            {},
+            {"encrypted_key": encrypted_key_b64},
             format="json",
         )
         self.assertEqual(accept_response.status_code, 200)
@@ -715,6 +728,7 @@ class ChannelMessagingApiTest(APITestCase):
         self.assertEqual(join_request.status, ChannelJoinRequest.Status.ACCEPTED)
         channel = Channel.objects.get(pk=channel_id)
         self.assertTrue(channel.members.filter(pk=self.student_2.pk).exists())
+        self.assertTrue(channel.encrypted_keys.filter(student=self.student_2).exists())
 
     def test_channel_admin_can_add_member_without_join_request(self):
         self.client.force_authenticate(user=self.user_1)
