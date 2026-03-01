@@ -68,6 +68,7 @@ from social.views import (
     DeleteAllChannelMessagesView,
     DeleteChannelMessageView,
     DeleteChannelView,
+    RenameChannelView,
     ChannelListView,
     ChannelEncryptedKeyView,
     ChannelJoinRequestCreateView,
@@ -220,6 +221,11 @@ urlpatterns += [
         "api/channels/<int:channel_id>/messages/delete-all/",
         DeleteAllChannelMessagesView.as_view(),
         name="delete_all_channel_messages",
+    ),
+    path(
+        "api/channels/<int:channel_id>/rename/",
+        RenameChannelView.as_view(),
+        name="rename_channel",
     ),
     path("api/public-key/", StudentPublicKeyView.as_view(), name="student_public_key"),
     path(
