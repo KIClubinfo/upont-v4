@@ -419,6 +419,20 @@ class CreateChannel(APIView):
 
     def post(self, request):
         current_student = get_object_or_404(Student, user__id=request.user.id)
+        is_upont_admin = (
+            request.user.is_superuser
+            or request.user.is_staff
+            or current_student.is_moderator
+        )
+        if not is_upont_admin:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les admins uPont peuvent créer un channel.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         member_ids = request.data.get("members", [])
         admin_ids = request.data.get("admins", [])
         channel_name = request.data.get("name", "").strip()

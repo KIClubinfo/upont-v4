@@ -271,6 +271,7 @@ class ChannelMessagingApiTest(APITestCase):
 
         self.student_1 = Student.objects.create(
             user=self.user_1,
+            is_moderator=True,
             public_key=_generate_public_key(),
         )
         self.student_2 = Student.objects.create(
@@ -563,6 +564,20 @@ class ChannelMessagingApiTest(APITestCase):
                 "members": [self.user_1.id, self.user_2.id],
                 "admins": [self.user_2.id],
                 "channel_of": str(club.id),
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_non_upont_admin_cannot_create_channel(self):
+        self.client.force_authenticate(user=self.user_2)
+        response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "forbidden-room",
+                "members": [self.user_2.id],
+                "admins": [self.user_2.id],
+                "channel_of": "-1",
             },
             format="json",
         )
