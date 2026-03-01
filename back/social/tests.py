@@ -786,3 +786,349 @@ class ChannelMessagingApiTest(APITestCase):
             format="json",
         )
         self.assertEqual(add_member_response.status_code, 403)
+
+    def test_author_can_delete_own_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "delete-own-message-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "message-to-delete",
+            },
+            format="json",
+        )
+        message_id = create_message_response.data["message_id"]
+
+        delete_response = self.client.delete(
+            reverse("delete_channel_message", kwargs={"message_id": message_id})
+        )
+        self.assertEqual(delete_response.status_code, 200)
+        self.assertFalse(Message.objects.filter(pk=message_id).exists())
+
+    def test_channel_admin_can_delete_other_member_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "delete-admin-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "member-message",
+            },
+            format="json",
+        )
+        message_id = create_message_response.data["message_id"]
+
+        self.client.force_authenticate(user=self.user_1)
+        delete_response = self.client.delete(
+            reverse("delete_channel_message", kwargs={"message_id": message_id})
+        )
+        self.assertEqual(delete_response.status_code, 200)
+        self.assertFalse(Message.objects.filter(pk=message_id).exists())
+
+    def test_non_author_non_admin_cannot_delete_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "delete-forbidden-room",
+                "members": [self.user_1.id, self.user_2.id, self.user_3.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "protected-message",
+            },
+            format="json",
+        )
+        message_id = create_message_response.data["message_id"]
+
+        self.client.force_authenticate(user=self.user_3)
+        delete_response = self.client.delete(
+            reverse("delete_channel_message", kwargs={"message_id": message_id})
+        )
+        self.assertEqual(delete_response.status_code, 403)
+        self.assertTrue(Message.objects.filter(pk=message_id).exists())
+
+    def test_channel_admin_can_delete_all_messages(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "purge-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_1)
+        self.client.post(
+            reverse("create_message"),
+            {"channel": channel_id, "by_club": "-1", "content": "admin-message"},
+            format="json",
+        )
+        self.client.force_authenticate(user=self.user_2)
+        self.client.post(
+            reverse("create_message"),
+            {"channel": channel_id, "by_club": "-1", "content": "member-message"},
+            format="json",
+        )
+
+        self.client.force_authenticate(user=self.user_1)
+        purge_response = self.client.delete(
+            reverse("delete_all_channel_messages", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(purge_response.status_code, 200)
+        self.assertEqual(Message.objects.filter(channel_id=channel_id).count(), 0)
+
+    def test_channel_admin_can_delete_channel(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "delete-channel-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.post(
+            reverse("create_message"),
+            {"channel": channel_id, "by_club": "-1", "content": "to-be-deleted"},
+            format="json",
+        )
+
+        delete_channel_response = self.client.delete(
+            reverse("delete_channel", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(delete_channel_response.status_code, 200)
+        self.assertFalse(Channel.objects.filter(pk=channel_id).exists())
+        self.assertEqual(Message.objects.filter(channel_id=channel_id).count(), 0)
+
+    def test_non_admin_cannot_delete_all_messages(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "purge-forbidden-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        purge_response = self.client.delete(
+            reverse("delete_all_channel_messages", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(purge_response.status_code, 403)
+
+    def test_non_admin_cannot_delete_channel(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "delete-channel-forbidden-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        delete_channel_response = self.client.delete(
+            reverse("delete_channel", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(delete_channel_response.status_code, 403)
+        self.assertTrue(Channel.objects.filter(pk=channel_id).exists())
+
+    def test_channel_admin_can_list_members(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "members-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        list_response = self.client.get(
+            reverse("channel_members_list", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(len(list_response.data["members"]), 2)
+        self.assertTrue(
+            any(member["user_id"] == self.user_1.id for member in list_response.data["members"])
+        )
+        self.assertTrue(
+            any(member["user_id"] == self.user_2.id for member in list_response.data["members"])
+        )
+
+    def test_non_admin_cannot_list_members(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "members-forbidden-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        list_response = self.client.get(
+            reverse("channel_members_list", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(list_response.status_code, 403)
+
+    def test_channel_admin_can_remove_member(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "remove-member-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        remove_response = self.client.delete(
+            reverse(
+                "channel_remove_member",
+                kwargs={"channel_id": channel_id, "user_id": self.user_2.id},
+            )
+        )
+        self.assertEqual(remove_response.status_code, 200)
+        channel = Channel.objects.get(pk=channel_id)
+        self.assertFalse(channel.members.filter(pk=self.student_2.pk).exists())
+        self.assertFalse(channel.admins.filter(pk=self.student_2.pk).exists())
+        self.assertFalse(channel.encrypted_keys.filter(student=self.student_2).exists())
+
+    def test_non_admin_cannot_remove_member(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "remove-member-forbidden-room",
+                "members": [self.user_1.id, self.user_2.id, self.user_3.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        remove_response = self.client.delete(
+            reverse(
+                "channel_remove_member",
+                kwargs={"channel_id": channel_id, "user_id": self.user_3.id},
+            )
+        )
+        self.assertEqual(remove_response.status_code, 403)
+        channel = Channel.objects.get(pk=channel_id)
+        self.assertTrue(channel.members.filter(pk=self.student_3.pk).exists())
+
+    def test_member_can_leave_channel(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "leave-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id, self.user_2.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        leave_response = self.client.post(
+            reverse("channel_leave", kwargs={"channel_id": channel_id}),
+            {},
+            format="json",
+        )
+        self.assertEqual(leave_response.status_code, 200)
+
+        channel = Channel.objects.get(pk=channel_id)
+        self.assertFalse(channel.members.filter(pk=self.student_2.pk).exists())
+        self.assertFalse(channel.admins.filter(pk=self.student_2.pk).exists())
+        self.assertFalse(channel.encrypted_keys.filter(student=self.student_2).exists())
+
+    def test_non_member_cannot_leave_channel(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "leave-forbidden-room",
+                "members": [self.user_1.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        leave_response = self.client.post(
+            reverse("channel_leave", kwargs={"channel_id": channel_id}),
+            {},
+            format="json",
+        )
+        self.assertEqual(leave_response.status_code, 400)

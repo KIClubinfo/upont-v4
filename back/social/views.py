@@ -752,6 +752,116 @@ class ChannelAddMemberView(APIView):
         )
 
 
+class ChannelMembersView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.admins.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Seuls les admins du channel y ont accès."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        members = channel.members.select_related("user").all().order_by(
+            "user__first_name", "user__last_name", "user__username"
+        )
+        admin_ids = set(channel.admins.values_list("id", flat=True))
+        members_payload = []
+        for member in members:
+            first_name = (member.user.first_name or "").strip()
+            last_name = (member.user.last_name or "").strip()
+            full_name = f"{first_name} {last_name}".strip()
+            members_payload.append(
+                {
+                    "student_id": member.id,
+                    "user_id": member.user.id,
+                    "username": member.user.username,
+                    "full_name": full_name or member.user.username,
+                    "is_admin": member.id in admin_ids,
+                }
+            )
+
+        return Response({"channel_id": channel.id, "members": members_payload})
+
+
+class ChannelRemoveMemberView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, channel_id, user_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.admins.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Seuls les admins du channel y ont accès."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        student_to_remove = get_object_or_404(Student, user__id=user_id)
+        if not channel.members.filter(id=student_to_remove.id).exists():
+            return Response(
+                {"status": "error", "error": "Cet utilisateur n'est pas membre du channel."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        encrypted_keys_to_remove = list(
+            channel.encrypted_keys.filter(student=student_to_remove)
+        )
+        with transaction.atomic():
+            channel.members.remove(student_to_remove)
+            channel.admins.remove(student_to_remove)
+            if encrypted_keys_to_remove:
+                channel.encrypted_keys.remove(*encrypted_keys_to_remove)
+                ChannelEncryptedKey.objects.filter(
+                    id__in=[key.id for key in encrypted_keys_to_remove]
+                ).delete()
+
+        return Response(
+            {
+                "status": "removed",
+                "channel_id": channel.id,
+                "student_id": student_to_remove.user.id,
+            }
+        )
+
+
+class ChannelLeaveView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Vous n'êtes pas membre de ce channel."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        encrypted_keys_to_remove = list(
+            channel.encrypted_keys.filter(student=current_student)
+        )
+        with transaction.atomic():
+            channel.members.remove(current_student)
+            channel.admins.remove(current_student)
+            if encrypted_keys_to_remove:
+                channel.encrypted_keys.remove(*encrypted_keys_to_remove)
+                ChannelEncryptedKey.objects.filter(
+                    id__in=[key.id for key in encrypted_keys_to_remove]
+                ).delete()
+
+        return Response(
+            {
+                "status": "left",
+                "channel_id": channel.id,
+                "student_id": current_student.user.id,
+            }
+        )
+
+
 class CreateMessage(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -890,6 +1000,81 @@ class ChannelEncryptedKeyView(APIView):
                 "channel_id": channel.id,
                 "student_id": current_student.id,
                 "encrypted_key": encrypted_key.key,
+            }
+        )
+
+
+class DeleteChannelView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.admins.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Seuls les admins du channel peuvent le supprimer."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        encrypted_key_ids = list(channel.encrypted_keys.values_list("id", flat=True))
+        with transaction.atomic():
+            Message.objects.filter(channel=channel).delete()
+            channel.encrypted_keys.clear()
+            if encrypted_key_ids:
+                ChannelEncryptedKey.objects.filter(id__in=encrypted_key_ids).delete()
+            channel.delete()
+
+        return Response({"status": "deleted", "channel_id": channel_id})
+
+
+class DeleteChannelMessageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, message_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        message = get_object_or_404(Message.objects.select_related("channel", "author"), id=message_id)
+
+        is_author = message.author_id == current_student.id
+        is_channel_admin = bool(
+            message.channel and message.channel.admins.filter(id=current_student.id).exists()
+        )
+        if not (is_author or is_channel_admin):
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seul l'auteur du message ou un admin du channel peut le supprimer.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        deleted_message_id = message.id
+        message.delete()
+        return Response({"status": "deleted", "message_id": deleted_message_id})
+
+
+class DeleteAllChannelMessagesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.admins.filter(id=current_student.id).exists():
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les admins du channel peuvent supprimer tous les messages.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        deleted_count, _ = Message.objects.filter(channel=channel).delete()
+        return Response(
+            {
+                "status": "deleted",
+                "channel_id": channel.id,
+                "deleted_messages_count": deleted_count,
             }
         )
 
