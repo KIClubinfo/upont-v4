@@ -42,6 +42,13 @@ from .serializers import (
     StudentSerializer,
 )
 
+def _is_upont_admin(user, student=None):
+    if user.is_superuser or user.is_staff:
+        return True
+    if student is not None:
+        return bool(student.is_moderator)
+    return Student.objects.filter(user__id=user.id, is_moderator=True).exists()
+
 
 @login_required
 def index_users(request):
@@ -419,11 +426,7 @@ class CreateChannel(APIView):
 
     def post(self, request):
         current_student = get_object_or_404(Student, user__id=request.user.id)
-        is_upont_admin = (
-            request.user.is_superuser
-            or request.user.is_staff
-            or current_student.is_moderator
-        )
+        is_upont_admin = _is_upont_admin(request.user, current_student)
         if not is_upont_admin:
             return Response(
                 {
@@ -1012,6 +1015,34 @@ class ChannelMessagesView(APIView):
         return Response({"messages": serialized_messages})
 
 
+class RenameChannelView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, channel_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        can_manage = channel.admins.filter(id=current_student.id).exists() or _is_upont_admin(
+            request.user, current_student
+        )
+        if not can_manage:
+            return Response(
+                {"status": "error", "error": "Seuls les admins peuvent renommer ce channel."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        new_name = str(request.data.get("name", "")).strip()
+        if not new_name:
+            return Response(
+                {"status": "error", "error": "Le nom du channel est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        channel.name = new_name
+        channel.save(update_fields=["name"])
+        return Response({"status": "renamed", "channel_id": channel.id, "name": channel.name})
+
+
 class ChannelEncryptedKeyView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1048,9 +1079,15 @@ class DeleteChannelView(APIView):
         current_student = get_object_or_404(Student, user__id=request.user.id)
         channel = get_object_or_404(Channel, id=channel_id)
 
-        if not channel.admins.filter(id=current_student.id).exists():
+        can_manage = channel.admins.filter(id=current_student.id).exists() or _is_upont_admin(
+            request.user, current_student
+        )
+        if not can_manage:
             return Response(
-                {"status": "error", "error": "Seuls les admins du channel peuvent le supprimer."},
+                {
+                    "status": "error",
+                    "error": "Seuls les admins du channel ou admins uPont peuvent le supprimer.",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -1097,11 +1134,14 @@ class DeleteAllChannelMessagesView(APIView):
         current_student = get_object_or_404(Student, user__id=request.user.id)
         channel = get_object_or_404(Channel, id=channel_id)
 
-        if not channel.admins.filter(id=current_student.id).exists():
+        can_manage = channel.admins.filter(id=current_student.id).exists() or _is_upont_admin(
+            request.user, current_student
+        )
+        if not can_manage:
             return Response(
                 {
                     "status": "error",
-                    "error": "Seuls les admins du channel peuvent supprimer tous les messages.",
+                    "error": "Seuls les admins du channel ou admins uPont peuvent supprimer tous les messages.",
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )

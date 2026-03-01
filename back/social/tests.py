@@ -975,6 +975,51 @@ class ChannelMessagingApiTest(APITestCase):
         self.assertFalse(Channel.objects.filter(pk=channel_id).exists())
         self.assertEqual(Message.objects.filter(channel_id=channel_id).count(), 0)
 
+    def test_channel_admin_can_rename_channel(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "rename-me",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        rename_response = self.client.post(
+            reverse("rename_channel", kwargs={"channel_id": channel_id}),
+            {"name": "renamed-channel"},
+            format="json",
+        )
+        self.assertEqual(rename_response.status_code, 200)
+        channel = Channel.objects.get(pk=channel_id)
+        self.assertEqual(channel.name, "renamed-channel")
+
+    def test_non_admin_cannot_rename_channel(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "rename-forbidden",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        rename_response = self.client.post(
+            reverse("rename_channel", kwargs={"channel_id": channel_id}),
+            {"name": "should-fail"},
+            format="json",
+        )
+        self.assertEqual(rename_response.status_code, 403)
+
     def test_non_admin_cannot_delete_all_messages(self):
         self.client.force_authenticate(user=self.user_1)
         create_channel_response = self.client.post(
@@ -1015,6 +1060,52 @@ class ChannelMessagingApiTest(APITestCase):
         )
         self.assertEqual(delete_channel_response.status_code, 403)
         self.assertTrue(Channel.objects.filter(pk=channel_id).exists())
+
+    def test_upont_admin_can_rename_delete_and_purge_without_membership(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "upont-admin-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+        self.client.post(
+            reverse("create_message"),
+            {"channel": channel_id, "by_club": "-1", "content": "m1"},
+            format="json",
+        )
+
+        self.student_3.is_moderator = True
+        self.student_3.save(update_fields=["is_moderator"])
+        self.client.force_authenticate(user=self.user_3)
+
+        rename_response = self.client.post(
+            reverse("rename_channel", kwargs={"channel_id": channel_id}),
+            {"name": "upont-admin-renamed"},
+            format="json",
+        )
+        self.assertEqual(rename_response.status_code, 200)
+        self.assertEqual(
+            Channel.objects.get(pk=channel_id).name,
+            "upont-admin-renamed",
+        )
+
+        purge_response = self.client.delete(
+            reverse("delete_all_channel_messages", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(purge_response.status_code, 200)
+        self.assertEqual(Message.objects.filter(channel_id=channel_id).count(), 0)
+
+        delete_channel_response = self.client.delete(
+            reverse("delete_channel", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(delete_channel_response.status_code, 200)
+        self.assertFalse(Channel.objects.filter(pk=channel_id).exists())
 
     def test_channel_admin_can_list_members(self):
         self.client.force_authenticate(user=self.user_1)
