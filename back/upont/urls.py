@@ -65,12 +65,18 @@ from services.views import (
     VracViewSet,
 )
 from social.views import (
+    DeleteAllChannelMessagesView,
+    DeleteChannelMessageView,
+    DeleteChannelView,
     ChannelListView,
     ChannelEncryptedKeyView,
     ChannelJoinRequestCreateView,
     ChannelJoinRequestListView,
     ChannelJoinRequestAcceptView,
+    ChannelLeaveView,
+    ChannelMembersView,
     ChannelAddMemberView,
+    ChannelRemoveMemberView,
     ChannelMessagesView,
     ClubsViewSet,
     CreateChannel,
@@ -200,6 +206,21 @@ urlpatterns += [
         name="channel_encrypted_key",
     ),
     path("api/messages/create/", CreateMessage.as_view(), name="create_message"),
+    path(
+        "api/channels/<int:channel_id>/delete/",
+        DeleteChannelView.as_view(),
+        name="delete_channel",
+    ),
+    path(
+        "api/messages/<int:message_id>/delete/",
+        DeleteChannelMessageView.as_view(),
+        name="delete_channel_message",
+    ),
+    path(
+        "api/channels/<int:channel_id>/messages/delete-all/",
+        DeleteAllChannelMessagesView.as_view(),
+        name="delete_all_channel_messages",
+    ),
     path("api/public-key/", StudentPublicKeyView.as_view(), name="student_public_key"),
     path(
         "api/public-key/<int:user_id>/",
@@ -210,6 +231,21 @@ urlpatterns += [
         "api/channels/<int:channel_id>/members/add/",
         ChannelAddMemberView.as_view(),
         name="channel_add_member",
+    ),
+    path(
+        "api/channels/<int:channel_id>/members/",
+        ChannelMembersView.as_view(),
+        name="channel_members_list",
+    ),
+    path(
+        "api/channels/<int:channel_id>/members/<int:user_id>/remove/",
+        ChannelRemoveMemberView.as_view(),
+        name="channel_remove_member",
+    ),
+    path(
+        "api/channels/<int:channel_id>/leave/",
+        ChannelLeaveView.as_view(),
+        name="channel_leave",
     ),
     path("api/id/pochtron/", PochtronId.as_view(), name="pochtron_id"),
     path(
