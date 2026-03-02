@@ -30,6 +30,7 @@ from .models import (
     Club,
     Membership,
     Message,
+    MessageReaction,
     NotificationToken,
     Promotion,
     Role,
@@ -922,6 +923,26 @@ class CreateMessage(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        reply_to_message = None
+        reply_to_id = request.data.get("reply_to")
+        if reply_to_id not in (None, "", "-1"):
+            try:
+                reply_to_id = int(reply_to_id)
+            except (TypeError, ValueError):
+                return Response(
+                    {"status": "error", "error": "reply_to doit être un identifiant valide."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            reply_to_message = get_object_or_404(Message, id=reply_to_id)
+            if reply_to_message.channel_id != channel.id:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Le message auquel vous répondez n'appartient pas à ce channel.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         by_club_value = str(request.data.get("by_club", "-1")).strip().lower()
         send_as_club = by_club_value in {"1", "true", "yes", "on"} or (
             by_club_value not in {"-1", "0", "false", "no", "off", ""}
@@ -959,6 +980,7 @@ class CreateMessage(APIView):
             date=timezone.now(),
             author=current_student,
             club=club,
+            reply_to=reply_to_message,
             content=content,
         )
         return Response(
@@ -982,7 +1004,8 @@ class ChannelMessagesView(APIView):
 
         messages = (
             Message.objects.filter(channel=channel)
-            .select_related("author__user", "club")
+            .select_related("author__user", "club", "reply_to__author__user", "reply_to__club")
+            .prefetch_related("reactions__student__user")
             .order_by("date")
         )
 
@@ -1008,11 +1031,103 @@ class ChannelMessagesView(APIView):
                     "author_name": author_name,
                     "club_id": message.club.id if message.club else None,
                     "club_name": message.club.name if message.club else None,
+                    "reply_to_id": message.reply_to.id if message.reply_to else None,
+                    "reply_to_content": message.reply_to.content if message.reply_to else None,
+                    "reply_to_author_name": (
+                        (
+                            f"{(message.reply_to.author.user.first_name or '').strip()} "
+                            f"{(message.reply_to.author.user.last_name or '').strip()}"
+                        ).strip()
+                        or message.reply_to.author.user.username
+                    )
+                    if message.reply_to and message.reply_to.author
+                    else (message.reply_to.club.name if message.reply_to and message.reply_to.club else None),
+                    "reactions": [
+                        {
+                            "id": reaction.id,
+                            "emoji": reaction.emoji,
+                            "student_id": reaction.student.user.id,
+                            "student_username": reaction.student.user.username,
+                            "student_name": (
+                                f"{(reaction.student.user.first_name or '').strip()} "
+                                f"{(reaction.student.user.last_name or '').strip()}"
+                            ).strip()
+                            or reaction.student.user.username,
+                        }
+                        for reaction in message.reactions.all().order_by("date", "id")
+                    ],
                     "content": message.content,
                 }
             )
 
         return Response({"messages": serialized_messages})
+
+
+class MessageReactionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, message_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        message = get_object_or_404(Message.objects.select_related("channel"), id=message_id)
+
+        if not message.channel or not message.channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Accès interdit à ce message."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        emoji = str(request.data.get("emoji", "")).strip()
+        if not emoji:
+            return Response(
+                {"status": "error", "error": "emoji est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        reaction = MessageReaction.objects.filter(
+            message=message,
+            student=current_student,
+        ).first()
+
+        if reaction and reaction.emoji == emoji:
+            reaction.delete()
+            action = "removed"
+        elif reaction:
+            reaction.emoji = emoji
+            reaction.save(update_fields=["emoji"])
+            action = "updated"
+        else:
+            MessageReaction.objects.create(
+                message=message,
+                student=current_student,
+                emoji=emoji,
+            )
+            action = "created"
+
+        reactions = (
+            MessageReaction.objects.filter(message=message)
+            .select_related("student__user")
+            .order_by("date", "id")
+        )
+        return Response(
+            {
+                "status": action,
+                "message_id": message.id,
+                "reactions": [
+                    {
+                        "id": item.id,
+                        "emoji": item.emoji,
+                        "student_id": item.student.user.id,
+                        "student_username": item.student.user.username,
+                        "student_name": (
+                            f"{(item.student.user.first_name or '').strip()} "
+                            f"{(item.student.user.last_name or '').strip()}"
+                        ).strip()
+                        or item.student.user.username,
+                    }
+                    for item in reactions
+                ],
+            }
+        )
 
 
 class RenameChannelView(APIView):

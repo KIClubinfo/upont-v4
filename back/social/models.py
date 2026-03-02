@@ -239,11 +239,36 @@ class Message(models.Model):
     club = models.ForeignKey(
         "social.Club", on_delete=models.SET_NULL, null=True, blank=True
     )
+    reply_to = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="replies",
+    )
     content = models.TextField()
 
     def __str__(self):
         author = [self.author, self.club][bool(self.club)]
         return f"Message from {author}: '{self.content}'"
+
+
+class MessageReaction(models.Model):
+    message = models.ForeignKey(
+        "social.Message", on_delete=models.CASCADE, related_name="reactions"
+    )
+    student = models.ForeignKey(
+        "social.Student", on_delete=models.CASCADE, related_name="message_reactions"
+    )
+    emoji = models.CharField(max_length=32)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["message", "student"], name="unique_message_reaction"
+            )
+        ]
 
 
 class Channel(models.Model):
