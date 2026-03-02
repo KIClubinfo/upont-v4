@@ -20,6 +20,7 @@ from .models import (
     Club,
     Membership,
     Message,
+    MessageReaction,
     Nationality,
     Promotion,
     Role,
@@ -365,6 +366,114 @@ class ChannelMessagingApiTest(APITestCase):
         self.assertEqual(
             get_messages_response.data["messages"][0]["author_name"],
             "Alice Martin",
+        )
+
+    def test_member_can_reply_to_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "reply-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        first_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "first-message",
+            },
+            format="json",
+        )
+        first_message_id = first_message_response.data["message_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        reply_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "reply-message",
+                "reply_to": first_message_id,
+            },
+            format="json",
+        )
+        self.assertEqual(reply_message_response.status_code, 201)
+
+        get_messages_response = self.client.get(
+            reverse("channel_messages", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(get_messages_response.status_code, 200)
+        self.assertEqual(len(get_messages_response.data["messages"]), 2)
+        reply_payload = get_messages_response.data["messages"][1]
+        self.assertEqual(reply_payload["reply_to_id"], first_message_id)
+        self.assertEqual(reply_payload["reply_to_content"], "first-message")
+
+    def test_member_can_toggle_message_reaction(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "reaction-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "message-to-react",
+            },
+            format="json",
+        )
+        message_id = create_message_response.data["message_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        first_reaction_response = self.client.post(
+            reverse("message_reaction", kwargs={"message_id": message_id}),
+            {"emoji": "👍"},
+            format="json",
+        )
+        self.assertEqual(first_reaction_response.status_code, 200)
+        self.assertEqual(first_reaction_response.data["status"], "created")
+        self.assertEqual(
+            MessageReaction.objects.filter(message_id=message_id, student=self.student_2).count(),
+            1,
+        )
+
+        update_reaction_response = self.client.post(
+            reverse("message_reaction", kwargs={"message_id": message_id}),
+            {"emoji": "🔥"},
+            format="json",
+        )
+        self.assertEqual(update_reaction_response.status_code, 200)
+        self.assertEqual(update_reaction_response.data["status"], "updated")
+        self.assertEqual(
+            MessageReaction.objects.get(message_id=message_id, student=self.student_2).emoji,
+            "🔥",
+        )
+
+        remove_reaction_response = self.client.post(
+            reverse("message_reaction", kwargs={"message_id": message_id}),
+            {"emoji": "🔥"},
+            format="json",
+        )
+        self.assertEqual(remove_reaction_response.status_code, 200)
+        self.assertEqual(remove_reaction_response.data["status"], "removed")
+        self.assertFalse(
+            MessageReaction.objects.filter(message_id=message_id, student=self.student_2).exists()
         )
 
     def test_club_admin_can_send_message_as_club(self):

@@ -68,6 +68,7 @@ from social.views import (
     DeleteAllChannelMessagesView,
     DeleteChannelMessageView,
     DeleteChannelView,
+    MessageReactionView,
     RenameChannelView,
     ChannelListView,
     ChannelEncryptedKeyView,
@@ -216,6 +217,11 @@ urlpatterns += [
         "api/messages/<int:message_id>/delete/",
         DeleteChannelMessageView.as_view(),
         name="delete_channel_message",
+    ),
+    path(
+        "api/messages/<int:message_id>/reaction/",
+        MessageReactionView.as_view(),
+        name="message_reaction",
     ),
     path(
         "api/channels/<int:channel_id>/messages/delete-all/",
