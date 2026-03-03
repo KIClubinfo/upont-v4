@@ -306,7 +306,10 @@ class MessagePollVote(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["poll", "student"], name="unique_poll_vote")
+            models.UniqueConstraint(
+                fields=["poll", "option", "student"],
+                name="unique_poll_option_vote",
+            )
         ]
 
 
