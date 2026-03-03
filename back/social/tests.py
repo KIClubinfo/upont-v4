@@ -476,6 +476,76 @@ class ChannelMessagingApiTest(APITestCase):
             MessageReaction.objects.filter(message_id=message_id, student=self.student_2).exists()
         )
 
+    def test_poll_message_creation_and_vote_visibility(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "poll-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        create_poll_response = self.client.post(
+            reverse("create_poll_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "Quel dessert ?",
+                "options": ["Tiramisu", "Mousse au chocolat"],
+            },
+            format="json",
+        )
+        self.assertEqual(create_poll_response.status_code, 201)
+        message = Message.objects.get(pk=create_poll_response.data["message_id"])
+        self.assertTrue(hasattr(message, "poll"))
+        self.assertEqual(message.poll.options.count(), 2)
+
+        messages_response = self.client.get(
+            reverse("channel_messages", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(messages_response.status_code, 200)
+        poll_payload = messages_response.data["messages"][0]["poll"]
+        self.assertIsNotNone(poll_payload)
+        self.assertEqual(len(poll_payload["options"]), 2)
+        self.assertEqual(poll_payload["total_votes"], 0)
+
+        self.client.force_authenticate(user=self.user_2)
+        option_id = poll_payload["options"][0]["id"]
+        vote_response = self.client.post(
+            reverse("message_poll_vote", kwargs={"message_id": message.id}),
+            {"option_id": option_id},
+            format="json",
+        )
+        self.assertEqual(vote_response.status_code, 200)
+        self.assertEqual(vote_response.data["status"], "created")
+
+        non_creator_messages_response = self.client.get(
+            reverse("channel_messages", kwargs={"channel_id": channel_id})
+        )
+        poll_for_non_creator = non_creator_messages_response.data["messages"][0]["poll"]
+        non_creator_option_payload = next(
+            item for item in poll_for_non_creator["options"] if item["id"] == option_id
+        )
+        self.assertEqual(non_creator_option_payload["votes_count"], 1)
+        self.assertEqual(non_creator_option_payload["voters"], [])
+
+        self.client.force_authenticate(user=self.user_1)
+        creator_messages_response = self.client.get(
+            reverse("channel_messages", kwargs={"channel_id": channel_id})
+        )
+        poll_for_creator = creator_messages_response.data["messages"][0]["poll"]
+        creator_option_payload = next(
+            item for item in poll_for_creator["options"] if item["id"] == option_id
+        )
+        self.assertEqual(creator_option_payload["votes_count"], 1)
+        self.assertEqual(len(creator_option_payload["voters"]), 1)
+        self.assertEqual(creator_option_payload["voters"][0]["user_id"], self.user_2.id)
+
     def test_club_admin_can_send_message_as_club(self):
         club = Club.objects.create(
             name="Club Test",
@@ -586,6 +656,52 @@ class ChannelMessagingApiTest(APITestCase):
         get_response = self.client.get(reverse("student_public_key"))
         self.assertEqual(get_response.status_code, 200)
         self.assertEqual(get_response.data["public_key"], new_public_key)
+
+    def test_reset_public_key_updates_encrypted_keys_in_all_member_channels(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "key-rotation-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        self.assertEqual(create_channel_response.status_code, 201)
+        channel = Channel.objects.get(pk=create_channel_response.data["channel_id"])
+
+        old_key_obj = channel.encrypted_keys.filter(student=self.student_2).first()
+        self.assertIsNotNone(old_key_obj)
+        old_key_id = old_key_obj.id
+
+        self.client.force_authenticate(user=self.user_2)
+        new_public_key = _generate_public_key()
+        new_encrypted_key = base64.b64encode(os.urandom(64)).decode("utf-8")
+        update_response = self.client.post(
+            reverse("student_public_key"),
+            {
+                "public_key": new_public_key,
+                "channel_keys": [
+                    {
+                        "channel_id": channel.id,
+                        "encrypted_key": new_encrypted_key,
+                    }
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(update_response.status_code, 200)
+        self.assertEqual(update_response.data["updated_channels"], 1)
+
+        channel.refresh_from_db()
+        self.student_2.refresh_from_db()
+        updated_keys = list(channel.encrypted_keys.filter(student=self.student_2))
+        self.assertEqual(len(updated_keys), 1)
+        self.assertEqual(updated_keys[0].key, new_encrypted_key)
+        self.assertNotEqual(updated_keys[0].id, old_key_id)
+        self.assertEqual(self.student_2.public_key, new_public_key)
 
     def test_channels_list_contains_member_channel(self):
         self.client.force_authenticate(user=self.user_1)

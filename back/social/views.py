@@ -30,6 +30,9 @@ from .models import (
     Club,
     Membership,
     Message,
+    MessagePoll,
+    MessagePollOption,
+    MessagePollVote,
     MessageReaction,
     NotificationToken,
     Promotion,
@@ -49,6 +52,58 @@ def _is_upont_admin(user, student=None):
     if student is not None:
         return bool(student.is_moderator)
     return Student.objects.filter(user__id=user.id, is_moderator=True).exists()
+
+
+def _serialize_poll_for_viewer(poll, viewer_student):
+    if poll is None:
+        return None
+
+    option_ids = [option.id for option in poll.options.all()]
+    votes = list(
+        MessagePollVote.objects.filter(poll=poll, option_id__in=option_ids)
+        .select_related("student__user")
+        .order_by("date", "id")
+    )
+    vote_counts = {}
+    for vote in votes:
+        vote_counts[vote.option_id] = vote_counts.get(vote.option_id, 0) + 1
+
+    my_vote = next((vote for vote in votes if vote.student_id == viewer_student.id), None)
+    can_view_vote_details = poll.created_by_id == viewer_student.id
+
+    return {
+        "id": poll.id,
+        "created_by_user_id": poll.created_by.user.id if poll.created_by else None,
+        "my_vote_option_id": my_vote.option_id if my_vote else None,
+        "total_votes": len(votes),
+        "options": [
+            {
+                "id": option.id,
+                "content": option.content,
+                "position": option.position,
+                "votes_count": vote_counts.get(option.id, 0),
+                "voters": (
+                    [
+                        {
+                            "student_id": vote.student.id,
+                            "user_id": vote.student.user.id,
+                            "username": vote.student.user.username,
+                            "name": (
+                                f"{(vote.student.user.first_name or '').strip()} "
+                                f"{(vote.student.user.last_name or '').strip()}"
+                            ).strip()
+                            or vote.student.user.username,
+                        }
+                        for vote in votes
+                        if vote.option_id == option.id
+                    ]
+                    if can_view_vote_details
+                    else []
+                ),
+            }
+            for option in poll.options.all()
+        ],
+    }
 
 
 @login_required
@@ -345,9 +400,143 @@ class StudentPublicKeyView(APIView):
             )
 
         student = get_object_or_404(Student, user__id=request.user.id)
-        student.public_key = public_key_pem
-        student.save(update_fields=["public_key"])
-        return Response({"status": "ok"})
+        channel_keys_payload = request.data.get("channel_keys", None)
+
+        parsed_channel_keys = {}
+        member_channels_by_id = {}
+        if channel_keys_payload is not None:
+            if not isinstance(channel_keys_payload, list):
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "channel_keys doit être une liste.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            member_channels = list(
+                Channel.objects.filter(members=student).only("id")
+            )
+            member_channels_by_id = {channel.id: channel for channel in member_channels}
+
+            for item in channel_keys_payload:
+                if not isinstance(item, dict):
+                    return Response(
+                        {
+                            "status": "error",
+                            "error": "Chaque entrée de channel_keys doit être un objet.",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                channel_id = item.get("channel_id")
+                encrypted_key = item.get("encrypted_key")
+                if channel_id is None or encrypted_key is None:
+                    return Response(
+                        {
+                            "status": "error",
+                            "error": (
+                                "Chaque entrée de channel_keys doit contenir "
+                                "channel_id et encrypted_key."
+                            ),
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                try:
+                    channel_id = int(channel_id)
+                except (TypeError, ValueError):
+                    return Response(
+                        {"status": "error", "error": "channel_id invalide."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                if channel_id not in member_channels_by_id:
+                    return Response(
+                        {
+                            "status": "error",
+                            "error": (
+                                "channel_keys contient un channel dont "
+                                "l'utilisateur n'est pas membre."
+                            ),
+                        },
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+
+                if channel_id in parsed_channel_keys:
+                    return Response(
+                        {
+                            "status": "error",
+                            "error": "channel_keys contient des channel_id en double.",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                if not isinstance(encrypted_key, str) or not encrypted_key.strip():
+                    return Response(
+                        {"status": "error", "error": "encrypted_key est requis."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                encrypted_key = encrypted_key.strip()
+                try:
+                    base64.b64decode(encrypted_key, validate=True)
+                except Exception:
+                    return Response(
+                        {
+                            "status": "error",
+                            "error": (
+                                "Chaque encrypted_key doit être une chaîne "
+                                "base64 valide."
+                            ),
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                parsed_channel_keys[channel_id] = encrypted_key
+
+            expected_channel_ids = set(member_channels_by_id.keys())
+            provided_channel_ids = set(parsed_channel_keys.keys())
+            if provided_channel_ids != expected_channel_ids:
+                missing_channel_ids = sorted(expected_channel_ids - provided_channel_ids)
+                extra_channel_ids = sorted(provided_channel_ids - expected_channel_ids)
+                return Response(
+                    {
+                        "status": "error",
+                        "error": (
+                            "channel_keys doit couvrir exactement tous les channels "
+                            "où l'utilisateur est membre."
+                        ),
+                        "missing_channel_ids": missing_channel_ids,
+                        "extra_channel_ids": extra_channel_ids,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        with transaction.atomic():
+            student.public_key = public_key_pem
+            student.save(update_fields=["public_key"])
+
+            if parsed_channel_keys:
+                for channel_id, encrypted_key in parsed_channel_keys.items():
+                    channel = member_channels_by_id[channel_id]
+                    old_keys = list(channel.encrypted_keys.filter(student=student))
+                    new_key = ChannelEncryptedKey.objects.create(
+                        key=encrypted_key,
+                        student=student,
+                    )
+                    channel.encrypted_keys.add(new_key)
+                    if old_keys:
+                        channel.encrypted_keys.remove(*old_keys)
+                        ChannelEncryptedKey.objects.filter(
+                            id__in=[item.id for item in old_keys]
+                        ).delete()
+
+        return Response(
+            {
+                "status": "ok",
+                "updated_channels": len(parsed_channel_keys),
+            }
+        )
 
 
 class ChannelListView(APIView):
@@ -989,6 +1178,111 @@ class CreateMessage(APIView):
         )
 
 
+class CreatePollMessageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=request.data.get("channel"))
+
+        if not channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Vous n'êtes pas membre de ce channel."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        content = str(request.data.get("content", "")).strip()
+        raw_options = request.data.get("options", [])
+        if not content:
+            return Response(
+                {"status": "error", "error": "Le contenu du message est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not isinstance(raw_options, list):
+            return Response(
+                {"status": "error", "error": "options doit être une liste."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        options = [str(option).strip() for option in raw_options if str(option).strip()]
+        # Keep poll readable and easy to answer.
+        if len(options) < 2:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Un sondage doit contenir au moins 2 options.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if len(options) > 12:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Un sondage ne peut pas dépasser 12 options.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        by_club_value = str(request.data.get("by_club", "-1")).strip().lower()
+        send_as_club = by_club_value in {"1", "true", "yes", "on"} or (
+            by_club_value not in {"-1", "0", "false", "no", "off", ""}
+        )
+
+        club = None
+        if send_as_club:
+            if channel.club is None:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Ce channel n'est pas un channel de club.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            club = channel.club
+            can_publish_as_club = Membership.objects.filter(
+                student=current_student,
+                club=club,
+                is_admin=True,
+                is_old=False,
+            ).exists()
+            if not can_publish_as_club:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Seuls les admins du club peuvent publier au nom du club.",
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+        with transaction.atomic():
+            message = Message.objects.create(
+                channel=channel,
+                date=timezone.now(),
+                author=current_student,
+                club=club,
+                content=content,
+            )
+            poll = MessagePoll.objects.create(
+                message=message,
+                created_by=current_student,
+            )
+            MessagePollOption.objects.bulk_create(
+                [
+                    MessagePollOption(
+                        poll=poll,
+                        content=option_content,
+                        position=index,
+                    )
+                    for index, option_content in enumerate(options)
+                ]
+            )
+
+        return Response(
+            {"status": "ok", "message_id": message.id, "poll_id": poll.id},
+            status=status.HTTP_201_CREATED,
+        )
+
+
 class ChannelMessagesView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1004,13 +1298,24 @@ class ChannelMessagesView(APIView):
 
         messages = (
             Message.objects.filter(channel=channel)
-            .select_related("author__user", "club", "reply_to__author__user", "reply_to__club")
+            .select_related(
+                "author__user",
+                "club",
+                "reply_to__author__user",
+                "reply_to__club",
+                "poll__created_by__user",
+            )
             .prefetch_related("reactions__student__user")
             .order_by("date")
         )
 
         serialized_messages = []
         for message in messages:
+            try:
+                message_poll = message.poll
+            except MessagePoll.DoesNotExist:
+                message_poll = None
+
             author_id = None
             author_username = None
             author_name = None
@@ -1056,6 +1361,7 @@ class ChannelMessagesView(APIView):
                         }
                         for reaction in message.reactions.all().order_by("date", "id")
                     ],
+                    "poll": _serialize_poll_for_viewer(message_poll, current_student),
                     "content": message.content,
                 }
             )
@@ -1126,6 +1432,81 @@ class MessageReactionView(APIView):
                     }
                     for item in reactions
                 ],
+            }
+        )
+
+
+class MessagePollVoteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, message_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        message = get_object_or_404(
+            Message.objects.select_related("channel", "poll__created_by__user"),
+            id=message_id,
+        )
+
+        if not message.channel or not message.channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Accès interdit à ce message."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        try:
+            poll = message.poll
+        except MessagePoll.DoesNotExist:
+            poll = None
+
+        if poll is None:
+            return Response(
+                {"status": "error", "error": "Ce message n'est pas un sondage."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        option_id = request.data.get("option_id")
+        try:
+            option_id = int(option_id)
+        except (TypeError, ValueError):
+            return Response(
+                {"status": "error", "error": "option_id invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        option = MessagePollOption.objects.filter(id=option_id, poll=poll).first()
+        if option is None:
+            return Response(
+                {"status": "error", "error": "Option du sondage introuvable."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        existing_vote = MessagePollVote.objects.filter(
+            poll=poll,
+            student=current_student,
+        ).first()
+        if existing_vote and existing_vote.option_id == option.id:
+            existing_vote.delete()
+            action = "removed"
+        elif existing_vote:
+            existing_vote.option = option
+            existing_vote.save(update_fields=["option"])
+            action = "updated"
+        else:
+            MessagePollVote.objects.create(
+                poll=poll,
+                option=option,
+                student=current_student,
+            )
+            action = "created"
+
+        poll = (
+            MessagePoll.objects.filter(id=poll.id)
+            .select_related("created_by__user")
+            .prefetch_related("options")
+            .first()
+        )
+        return Response(
+            {
+                "status": action,
+                "message_id": message.id,
+                "poll": _serialize_poll_for_viewer(poll, current_student),
             }
         )
 

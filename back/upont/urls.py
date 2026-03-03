@@ -69,6 +69,8 @@ from social.views import (
     DeleteChannelMessageView,
     DeleteChannelView,
     MessageReactionView,
+    MessagePollVoteView,
+    CreatePollMessageView,
     RenameChannelView,
     ChannelListView,
     ChannelEncryptedKeyView,
@@ -209,6 +211,11 @@ urlpatterns += [
     ),
     path("api/messages/create/", CreateMessage.as_view(), name="create_message"),
     path(
+        "api/messages/create-poll/",
+        CreatePollMessageView.as_view(),
+        name="create_poll_message",
+    ),
+    path(
         "api/channels/<int:channel_id>/delete/",
         DeleteChannelView.as_view(),
         name="delete_channel",
@@ -222,6 +229,11 @@ urlpatterns += [
         "api/messages/<int:message_id>/reaction/",
         MessageReactionView.as_view(),
         name="message_reaction",
+    ),
+    path(
+        "api/messages/<int:message_id>/poll-vote/",
+        MessagePollVoteView.as_view(),
+        name="message_poll_vote",
     ),
     path(
         "api/channels/<int:channel_id>/messages/delete-all/",
