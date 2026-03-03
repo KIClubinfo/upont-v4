@@ -68,13 +68,19 @@ def _serialize_poll_for_viewer(poll, viewer_student):
     for vote in votes:
         vote_counts[vote.option_id] = vote_counts.get(vote.option_id, 0) + 1
 
-    my_vote = next((vote for vote in votes if vote.student_id == viewer_student.id), None)
+    my_vote_option_ids = sorted(
+        {
+            vote.option_id
+            for vote in votes
+            if vote.student_id == viewer_student.id
+        }
+    )
     can_view_vote_details = poll.created_by_id == viewer_student.id
 
     return {
         "id": poll.id,
         "created_by_user_id": poll.created_by.user.id if poll.created_by else None,
-        "my_vote_option_id": my_vote.option_id if my_vote else None,
+        "my_vote_option_ids": my_vote_option_ids,
         "total_votes": len(votes),
         "options": [
             {
@@ -1479,15 +1485,13 @@ class MessagePollVoteView(APIView):
 
         existing_vote = MessagePollVote.objects.filter(
             poll=poll,
+            option=option,
             student=current_student,
         ).first()
-        if existing_vote and existing_vote.option_id == option.id:
+
+        if existing_vote:
             existing_vote.delete()
             action = "removed"
-        elif existing_vote:
-            existing_vote.option = option
-            existing_vote.save(update_fields=["option"])
-            action = "updated"
         else:
             MessagePollVote.objects.create(
                 poll=poll,

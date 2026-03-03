@@ -516,23 +516,40 @@ class ChannelMessagingApiTest(APITestCase):
 
         self.client.force_authenticate(user=self.user_2)
         option_id = poll_payload["options"][0]["id"]
-        vote_response = self.client.post(
+        second_option_id = poll_payload["options"][1]["id"]
+        first_vote_response = self.client.post(
             reverse("message_poll_vote", kwargs={"message_id": message.id}),
             {"option_id": option_id},
             format="json",
         )
-        self.assertEqual(vote_response.status_code, 200)
-        self.assertEqual(vote_response.data["status"], "created")
+        self.assertEqual(first_vote_response.status_code, 200)
+        self.assertEqual(first_vote_response.data["status"], "created")
+        second_vote_response = self.client.post(
+            reverse("message_poll_vote", kwargs={"message_id": message.id}),
+            {"option_id": second_option_id},
+            format="json",
+        )
+        self.assertEqual(second_vote_response.status_code, 200)
+        self.assertEqual(second_vote_response.data["status"], "created")
 
         non_creator_messages_response = self.client.get(
             reverse("channel_messages", kwargs={"channel_id": channel_id})
         )
         poll_for_non_creator = non_creator_messages_response.data["messages"][0]["poll"]
+        self.assertEqual(
+            sorted(poll_for_non_creator["my_vote_option_ids"]),
+            sorted([option_id, second_option_id]),
+        )
         non_creator_option_payload = next(
             item for item in poll_for_non_creator["options"] if item["id"] == option_id
         )
         self.assertEqual(non_creator_option_payload["votes_count"], 1)
         self.assertEqual(non_creator_option_payload["voters"], [])
+        non_creator_second_option_payload = next(
+            item for item in poll_for_non_creator["options"] if item["id"] == second_option_id
+        )
+        self.assertEqual(non_creator_second_option_payload["votes_count"], 1)
+        self.assertEqual(poll_for_non_creator["total_votes"], 2)
 
         self.client.force_authenticate(user=self.user_1)
         creator_messages_response = self.client.get(
