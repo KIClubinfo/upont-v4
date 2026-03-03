@@ -271,6 +271,45 @@ class MessageReaction(models.Model):
         ]
 
 
+class MessagePoll(models.Model):
+    message = models.OneToOneField(
+        "social.Message", on_delete=models.CASCADE, related_name="poll"
+    )
+    created_by = models.ForeignKey(
+        "social.Student", on_delete=models.CASCADE, related_name="created_polls"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class MessagePollOption(models.Model):
+    poll = models.ForeignKey(
+        "social.MessagePoll", on_delete=models.CASCADE, related_name="options"
+    )
+    content = models.TextField()
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["position", "id"]
+
+
+class MessagePollVote(models.Model):
+    poll = models.ForeignKey(
+        "social.MessagePoll", on_delete=models.CASCADE, related_name="votes"
+    )
+    option = models.ForeignKey(
+        "social.MessagePollOption", on_delete=models.CASCADE, related_name="votes"
+    )
+    student = models.ForeignKey(
+        "social.Student", on_delete=models.CASCADE, related_name="poll_votes"
+    )
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["poll", "student"], name="unique_poll_vote")
+        ]
+
+
 class Channel(models.Model):
     name = models.CharField(max_length=50)
     date = models.DateTimeField()
