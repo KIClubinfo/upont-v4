@@ -1090,6 +1090,76 @@ class ChannelMessagingApiTest(APITestCase):
         self.assertEqual(delete_response.status_code, 200)
         self.assertFalse(Message.objects.filter(pk=message_id).exists())
 
+    def test_author_can_edit_own_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "edit-own-message-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "original-message",
+            },
+            format="json",
+        )
+        message_id = create_message_response.data["message_id"]
+
+        edit_response = self.client.post(
+            reverse("edit_channel_message", kwargs={"message_id": message_id}),
+            {"content": "edited-message"},
+            format="json",
+        )
+        self.assertEqual(edit_response.status_code, 200)
+        self.assertEqual(edit_response.data["status"], "edited")
+        self.assertEqual(edit_response.data["content"], "edited-message")
+        self.assertEqual(Message.objects.get(pk=message_id).content, "edited-message")
+
+    def test_non_author_cannot_edit_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "edit-forbidden-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        self.client.force_authenticate(user=self.user_2)
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "message-to-protect",
+            },
+            format="json",
+        )
+        message_id = create_message_response.data["message_id"]
+
+        self.client.force_authenticate(user=self.user_1)
+        edit_response = self.client.post(
+            reverse("edit_channel_message", kwargs={"message_id": message_id}),
+            {"content": "forbidden-edit"},
+            format="json",
+        )
+        self.assertEqual(edit_response.status_code, 403)
+        self.assertEqual(Message.objects.get(pk=message_id).content, "message-to-protect")
+
     def test_channel_admin_can_delete_other_member_message(self):
         self.client.force_authenticate(user=self.user_1)
         create_channel_response = self.client.post(
