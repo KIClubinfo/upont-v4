@@ -1302,18 +1302,71 @@ class ChannelMessagesView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        messages = (
-            Message.objects.filter(channel=channel)
-            .select_related(
-                "author__user",
-                "club",
-                "reply_to__author__user",
-                "reply_to__club",
-                "poll__created_by__user",
+        try:
+            limit = int(request.query_params.get("limit")) if request.query_params.get("limit") else None
+        except (TypeError, ValueError):
+            return Response(
+                {"status": "error", "error": "Paramètre 'limit' invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-            .prefetch_related("reactions__student__user")
-            .order_by("date")
-        )
+        if limit is not None and (limit <= 0 or limit > 200):
+            return Response(
+                {"status": "error", "error": "Paramètre 'limit' invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            before_id = (
+                int(request.query_params.get("before_id"))
+                if request.query_params.get("before_id")
+                else None
+            )
+        except (TypeError, ValueError):
+            return Response(
+                {"status": "error", "error": "Paramètre 'before_id' invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            after_id = (
+                int(request.query_params.get("after_id"))
+                if request.query_params.get("after_id")
+                else None
+            )
+        except (TypeError, ValueError):
+            return Response(
+                {"status": "error", "error": "Paramètre 'after_id' invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        order = request.query_params.get("order", "asc").lower()
+        if order not in {"asc", "desc"}:
+            return Response(
+                {"status": "error", "error": "Paramètre 'order' invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        messages = Message.objects.filter(channel=channel)
+        if before_id is not None:
+            messages = messages.filter(id__lt=before_id)
+        if after_id is not None:
+            messages = messages.filter(id__gt=after_id)
+
+        messages = messages.select_related(
+            "author__user",
+            "club",
+            "reply_to__author__user",
+            "reply_to__club",
+            "poll__created_by__user",
+        ).prefetch_related("reactions__student__user")
+
+        if order == "desc":
+            messages = messages.order_by("-id")
+        else:
+            messages = messages.order_by("id")
+
+        if limit is not None:
+            messages = messages[:limit]
 
         serialized_messages = []
         for message in messages:
