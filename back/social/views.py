@@ -1680,6 +1680,49 @@ class DeleteChannelMessageView(APIView):
         return Response({"status": "deleted", "message_id": deleted_message_id})
 
 
+class EditChannelMessageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, message_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        message = get_object_or_404(
+            Message.objects.select_related("channel", "author"),
+            id=message_id,
+        )
+
+        if message.author_id != current_student.id:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seul l'auteur du message peut le modifier.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if not message.channel or not message.channel.members.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Accès interdit à ce message."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        content = request.data.get("content")
+        if not isinstance(content, str) or not content.strip():
+            return Response(
+                {"status": "error", "error": "Le contenu du message est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        message.content = content
+        message.save(update_fields=["content"])
+        return Response(
+            {
+                "status": "edited",
+                "message_id": message.id,
+                "content": message.content,
+            }
+        )
+
+
 class DeleteAllChannelMessagesView(APIView):
     permission_classes = [IsAuthenticated]
 
