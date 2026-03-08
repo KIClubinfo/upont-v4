@@ -1,4 +1,5 @@
 from django.contrib.auth import models
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -414,6 +415,85 @@ class ChannelMessagingApiTest(APITestCase):
         reply_payload = get_messages_response.data["messages"][1]
         self.assertEqual(reply_payload["reply_to_id"], first_message_id)
         self.assertEqual(reply_payload["reply_to_content"], "first-message")
+
+    def test_member_can_send_gif_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "media-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        gif_file = SimpleUploadedFile(
+            "animated.gif",
+            b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!"
+            b"\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00"
+            b"\x00\x02\x02L\x01\x00;",
+            content_type="image/gif",
+        )
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "",
+                "media": gif_file,
+            },
+            format="multipart",
+        )
+
+        self.assertEqual(create_message_response.status_code, 201)
+        message = Message.objects.get(pk=create_message_response.data["message_id"])
+        self.assertEqual(message.kind, Message.Kind.GIF)
+        self.assertTrue(bool(message.media_file))
+        self.assertEqual(message.media_mime_type, "image/gif")
+
+        get_messages_response = self.client.get(
+            reverse("channel_messages", kwargs={"channel_id": channel_id})
+        )
+        self.assertEqual(get_messages_response.status_code, 200)
+        payload = get_messages_response.data["messages"][0]
+        self.assertEqual(payload["media_type"], Message.Kind.GIF)
+        self.assertIsNotNone(payload["media_url"])
+        self.assertIsNotNone(payload["media_mime_type"])
+
+    def test_member_cannot_send_unsupported_media_message(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "media-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        unsupported_file = SimpleUploadedFile(
+            "document.pdf",
+            b"%PDF-1.4 fake",
+            content_type="application/pdf",
+        )
+        create_message_response = self.client.post(
+            reverse("create_message"),
+            {
+                "channel": channel_id,
+                "by_club": "-1",
+                "content": "message-with-invalid-file",
+                "media": unsupported_file,
+            },
+            format="multipart",
+        )
+        self.assertEqual(create_message_response.status_code, 400)
+        self.assertIn("non support", create_message_response.data["error"].lower())
 
     def test_member_can_toggle_message_reaction(self):
         self.client.force_authenticate(user=self.user_1)

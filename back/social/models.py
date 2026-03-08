@@ -1,3 +1,4 @@
+import os
 from io import BytesIO
 from uuid import uuid4
 
@@ -230,7 +231,20 @@ def compress_image(image, quality, name):
     return new_image
 
 
+def message_media_upload_to(instance, filename):
+    extension = os.path.splitext(filename or "")[1].lower()
+    if not extension:
+        extension = ".bin"
+    return f"channels/{instance.channel_id}/messages/{uuid4().hex}{extension}"
+
+
 class Message(models.Model):
+    class Kind(models.TextChoices):
+        TEXT = "text", _("Texte")
+        IMAGE = "image", _("Image")
+        GIF = "gif", _("GIF")
+        VIDEO = "video", _("Video")
+
     channel = models.ForeignKey("Channel", on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField()
     author = models.ForeignKey(
@@ -247,6 +261,15 @@ class Message(models.Model):
         related_name="replies",
     )
     content = models.TextField()
+    kind = models.CharField(max_length=16, choices=Kind.choices, default=Kind.TEXT)
+    media_file = models.FileField(
+        upload_to=message_media_upload_to,
+        null=True,
+        blank=True,
+    )
+    media_mime_type = models.CharField(max_length=128, blank=True, default="")
+    media_original_name = models.CharField(max_length=255, blank=True, default="")
+    media_size = models.PositiveBigIntegerField(null=True, blank=True)
 
     def __str__(self):
         author = [self.author, self.club][bool(self.club)]
