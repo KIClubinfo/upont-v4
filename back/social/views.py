@@ -1,4 +1,5 @@
 import base64
+import mimetypes
 import os
 
 from cryptography.hazmat.backends import default_backend
@@ -15,7 +16,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -109,6 +110,132 @@ def _serialize_poll_for_viewer(poll, viewer_student):
             }
             for option in poll.options.all()
         ],
+    }
+
+
+MESSAGE_MAX_MEDIA_BYTES = 50 * 1024 * 1024
+MESSAGE_MAX_IMAGE_BYTES = 15 * 1024 * 1024
+
+ALLOWED_MESSAGE_IMAGE_MIME_TYPES = {
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif",
+}
+ALLOWED_MESSAGE_GIF_MIME_TYPES = {"image/gif"}
+ALLOWED_MESSAGE_VIDEO_MIME_TYPES = {
+    "video/mp4",
+    "video/quicktime",
+    "video/webm",
+}
+
+ALLOWED_MESSAGE_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"}
+ALLOWED_MESSAGE_GIF_EXTENSIONS = {".gif"}
+ALLOWED_MESSAGE_VIDEO_EXTENSIONS = {".mp4", ".mov", ".webm"}
+
+
+def _validate_message_media(uploaded_file):
+    raw_name = str(getattr(uploaded_file, "name", "") or "")
+    extension = os.path.splitext(raw_name)[1].lower()
+    raw_mime_type = str(getattr(uploaded_file, "content_type", "") or "")
+    mime_type = raw_mime_type.split(";")[0].strip().lower()
+    guessed_mime_type, _ = mimetypes.guess_type(raw_name)
+    if not mime_type and guessed_mime_type:
+        mime_type = guessed_mime_type.strip().lower()
+
+    file_size = int(getattr(uploaded_file, "size", 0) or 0)
+    if file_size <= 0:
+        return {
+            "error": "Le fichier envoyé est vide.",
+            "status_code": status.HTTP_400_BAD_REQUEST,
+        }
+
+    if file_size > MESSAGE_MAX_MEDIA_BYTES:
+        return {
+            "error": "Le fichier dépasse la taille maximale autorisée (50 Mo).",
+            "status_code": status.HTTP_400_BAD_REQUEST,
+        }
+
+    is_gif = mime_type in ALLOWED_MESSAGE_GIF_MIME_TYPES or extension in ALLOWED_MESSAGE_GIF_EXTENSIONS
+    is_image = (
+        is_gif
+        or mime_type.startswith("image/")
+        or extension in ALLOWED_MESSAGE_IMAGE_EXTENSIONS
+    )
+    is_video = mime_type.startswith("video/") or extension in ALLOWED_MESSAGE_VIDEO_EXTENSIONS
+
+    if is_gif:
+        if mime_type and mime_type not in ALLOWED_MESSAGE_GIF_MIME_TYPES:
+            return {
+                "error": "Format GIF non supporté.",
+                "status_code": status.HTTP_400_BAD_REQUEST,
+            }
+        if extension and extension not in ALLOWED_MESSAGE_GIF_EXTENSIONS:
+            return {
+                "error": "Extension GIF non supportée.",
+                "status_code": status.HTTP_400_BAD_REQUEST,
+            }
+        if file_size > MESSAGE_MAX_IMAGE_BYTES:
+            return {
+                "error": "Le GIF dépasse la taille maximale autorisée (15 Mo).",
+                "status_code": status.HTTP_400_BAD_REQUEST,
+            }
+        resolved_mime = mime_type or "image/gif"
+        return {
+            "kind": Message.Kind.GIF,
+            "mime_type": resolved_mime,
+            "size": file_size,
+            "original_name": raw_name[:255],
+        }
+
+    if is_image and not is_video:
+        if mime_type and mime_type not in ALLOWED_MESSAGE_IMAGE_MIME_TYPES:
+            return {
+                "error": "Format image non supporté.",
+                "status_code": status.HTTP_400_BAD_REQUEST,
+            }
+        if extension and extension not in ALLOWED_MESSAGE_IMAGE_EXTENSIONS:
+            return {
+                "error": "Extension image non supportée.",
+                "status_code": status.HTTP_400_BAD_REQUEST,
+            }
+        if file_size > MESSAGE_MAX_IMAGE_BYTES:
+            return {
+                "error": "L'image dépasse la taille maximale autorisée (15 Mo).",
+                "status_code": status.HTTP_400_BAD_REQUEST,
+            }
+        resolved_mime = mime_type or guessed_mime_type or "image/jpeg"
+        return {
+            "kind": Message.Kind.IMAGE,
+            "mime_type": resolved_mime,
+            "size": file_size,
+            "original_name": raw_name[:255],
+        }
+
+    if is_video:
+        if mime_type and mime_type not in ALLOWED_MESSAGE_VIDEO_MIME_TYPES:
+            return {
+                "error": "Format vidéo non supporté.",
+                "status_code": status.HTTP_400_BAD_REQUEST,
+            }
+        if extension and extension not in ALLOWED_MESSAGE_VIDEO_EXTENSIONS:
+            return {
+                "error": "Extension vidéo non supportée.",
+                "status_code": status.HTTP_400_BAD_REQUEST,
+            }
+        resolved_mime = mime_type or guessed_mime_type or "video/mp4"
+        return {
+            "kind": Message.Kind.VIDEO,
+            "mime_type": resolved_mime,
+            "size": file_size,
+            "original_name": raw_name[:255],
+        }
+
+    return {
+        "error": "Format de fichier non supporté. Utilise une image, un GIF ou une vidéo.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
     }
 
 
@@ -1100,6 +1227,7 @@ class ChannelLeaveView(APIView):
 
 class CreateMessage(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def post(self, request):
         current_student = get_object_or_404(Student, user__id=request.user.id)
@@ -1112,9 +1240,26 @@ class CreateMessage(APIView):
             )
 
         content = request.data.get("content", "")
-        if not content:
+        if content is None:
+            content = ""
+        content = str(content)
+        media_file = request.FILES.get("media")
+        media_payload = None
+
+        if media_file is not None:
+            media_payload = _validate_message_media(media_file)
+            if media_payload.get("error"):
+                return Response(
+                    {"status": "error", "error": media_payload["error"]},
+                    status=media_payload["status_code"],
+                )
+
+        if not content and media_file is None:
             return Response(
-                {"status": "error", "error": "Le contenu du message est requis."},
+                {
+                    "status": "error",
+                    "error": "Le contenu du message ou un média est requis.",
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -1177,9 +1322,24 @@ class CreateMessage(APIView):
             club=club,
             reply_to=reply_to_message,
             content=content,
+            kind=media_payload["kind"] if media_payload else Message.Kind.TEXT,
+            media_file=media_file,
+            media_mime_type=media_payload["mime_type"] if media_payload else "",
+            media_original_name=media_payload["original_name"] if media_payload else "",
+            media_size=media_payload["size"] if media_payload else None,
         )
         return Response(
-            {"status": "ok", "message_id": message.id},
+            {
+                "status": "ok",
+                "message_id": message.id,
+                "media_type": (
+                    message.kind
+                    if message.kind in {Message.Kind.IMAGE, Message.Kind.GIF, Message.Kind.VIDEO}
+                    else None
+                ),
+                "media_url": message.media_file.url if message.media_file else None,
+                "media_mime_type": message.media_mime_type if message.media_file else None,
+            },
             status=status.HTTP_201_CREATED,
         )
 
@@ -1395,6 +1555,15 @@ class ChannelMessagesView(APIView):
                     "author_name": author_name,
                     "club_id": message.club.id if message.club else None,
                     "club_name": message.club.name if message.club else None,
+                    "media_type": (
+                        message.kind
+                        if message.kind in {Message.Kind.IMAGE, Message.Kind.GIF, Message.Kind.VIDEO}
+                        else None
+                    ),
+                    "media_url": message.media_file.url if message.media_file else None,
+                    "media_mime_type": message.media_mime_type or None,
+                    "media_original_name": message.media_original_name or None,
+                    "media_size": message.media_size,
                     "reply_to_id": message.reply_to.id if message.reply_to else None,
                     "reply_to_content": message.reply_to.content if message.reply_to else None,
                     "reply_to_author_name": (
