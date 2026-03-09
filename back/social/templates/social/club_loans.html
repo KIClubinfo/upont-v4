@@ -80,6 +80,11 @@
                                     <label><strong>Emprunteur</strong></label>
                                     <select class="form-control" name="borrower_user_id">
                                         <option value="">Disponible</option>
+                                        {% if item.borrower and item.borrower not in active_members %}
+                                            <option value="{{ item.borrower.user.id }}" selected>
+                                                {{ item.borrower.user.first_name }} {{ item.borrower.user.last_name }} (hors club)
+                                            </option>
+                                        {% endif %}
                                         {% for member in active_members %}
                                             <option value="{{ member.user.id }}"
                                                 {% if item.borrower and item.borrower.user.id == member.user.id %}selected{% endif %}>

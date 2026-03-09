@@ -79,6 +79,65 @@
                     <p class="text-thin text-justified mt-2" style="font-size: medium; ">
                         {{club.description|markdownify}}</p>
 
+                    <h5 class="section-title text-bold mt-4">Objets empruntables du club</h5>
+                    {% if loan_feedback %}
+                        <p class="text-thin" style="color:#dc3545;">{{ loan_feedback }}</p>
+                    {% endif %}
+
+                    {% if available_loan_items %}
+                        {% for item in available_loan_items %}
+                            <div class="user-card" style="margin-bottom:0.75rem;">
+                                <div class="user-information">
+                                    <span class="user-name">{{ item.name }}</span>
+                                    <span>
+                                        {% if item.due_on %}
+                                            Date de retour prévue : {{ item.due_on }}
+                                        {% else %}
+                                            Date de retour non fixée
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <form method="post" style="margin-left:auto;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="borrow">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit" class="button blue-button">Emprunter</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-thin text-center mt-2" style="font-size: medium;">
+                            Aucun objet disponible actuellement.
+                        </p>
+                    {% endif %}
+
+                    {% if my_borrowed_items %}
+                        <h5 class="section-title text-bold mt-4">Mes objets empruntés dans ce club</h5>
+                        {% for item in my_borrowed_items %}
+                            <div class="user-card" style="margin-bottom:0.75rem;">
+                                <div class="user-information">
+                                    <span class="user-name">{{ item.name }}</span>
+                                    <span>
+                                        {% if item.due_on %}
+                                            À rendre le {{ item.due_on }}
+                                            {% if item.due_on < today %}
+                                                <strong style="color:#dc3545;">(en retard)</strong>
+                                            {% endif %}
+                                        {% else %}
+                                            Date de rendu non renseignée
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <form method="post" style="margin-left:auto;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="return">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit" class="button green-button">Rendre</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
                     <h5 class="section-title text-bold mt-4">Membres du club :</h5>
 
                     {% if active_members %}
