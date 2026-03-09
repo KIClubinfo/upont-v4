@@ -406,11 +406,16 @@ class ClubLoansViewTest(TestCase):
         self.client.force_login(self.user_member)
         response = self.client.post(
             reverse("club_loan_assign", kwargs={"club_id": self.club.id, "item_id": loan_item.id}),
-            {"borrower_user_id": str(self.user_outsider.id), "due_on": "2026-03-29"},
+            {
+                "borrower_user_id": str(self.user_outsider.id),
+                "borrowed_on": "2026-03-22",
+                "due_on": "2026-03-29",
+            },
         )
         self.assertEqual(response.status_code, 200)
         loan_item.refresh_from_db()
         self.assertEqual(loan_item.borrower, self.student_outsider)
+        self.assertEqual(str(loan_item.borrowed_on), "2026-03-22")
         self.assertEqual(str(loan_item.due_on), "2026-03-29")
 
     def test_non_member_cannot_assign_item_via_api(self):

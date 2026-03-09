@@ -599,6 +599,20 @@ class ClubLoanAssignView(APIView):
             )
         borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
 
+        borrowed_on = date.today()
+        borrowed_on_raw = request.data.get("borrowed_on", None)
+        if borrowed_on_raw is not None and str(borrowed_on_raw).strip():
+            try:
+                borrowed_on = date.fromisoformat(str(borrowed_on_raw).strip())
+            except ValueError:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Format de date de prêt invalide. Utilise YYYY-MM-DD.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         due_on = None
         due_on_raw = request.data.get("due_on", None)
         if due_on_raw is not None and str(due_on_raw).strip():
@@ -613,7 +627,6 @@ class ClubLoanAssignView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        borrowed_on = date.today()
         if due_on and due_on < borrowed_on:
             return Response(
                 {
