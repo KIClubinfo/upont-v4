@@ -113,6 +113,11 @@
 
 
                     <div class="centered-div">
+                        {% if is_member %}
+                            <a href="{% url 'social:club_loans' club.id %}">
+                                <button class="button blue-button">Objets prêtés du club</button>
+                            </a>
+                        {% endif %}
                         {% if is_admin %}
                             <a href="{% url 'social:club_edit' club.id %}">
                                 <button class="button blue-button">Modifier les informations du club</button>

@@ -1,0 +1,140 @@
+{% load static %}
+{% include "header.html" with title="Objets prêtés" %}
+
+<body>
+    {% include "feedback.html" %}
+    {% include "sidenav.html" with active_link="clubs" %}
+
+    <div class="content">
+        <div class="content-header">
+            <div class="row justify-content-between w-100">
+                <div class="col">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Rechercher">
+                        <button class="button search-button"><i class="fas fa-search "></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-main">
+            <h3 class="page-title">Objets prêtés - {{ club.name }}</h3>
+
+            <div class="box p-3 mb-4">
+                <h5 class="section-title mb-3">Ajouter un objet prêtable</h5>
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add">
+
+                    <div class="row">
+                        <div class="col-lg-4 mb-2">
+                            <label for="name"><strong>Nom de l'objet</strong></label>
+                            <input id="name" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-lg-3 mb-2">
+                            <label for="borrower_user_id"><strong>Emprunteur</strong></label>
+                            <select id="borrower_user_id" class="form-control" name="borrower_user_id">
+                                <option value="">Disponible (non prêté)</option>
+                                {% for member in active_members %}
+                                    <option value="{{ member.user.id }}">
+                                        {{ member.user.first_name }} {{ member.user.last_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-lg-2 mb-2">
+                            <label for="borrowed_on"><strong>Emprunté le</strong></label>
+                            <input id="borrowed_on" class="form-control" type="date" name="borrowed_on">
+                        </div>
+                        <div class="col-lg-2 mb-2">
+                            <label for="due_on"><strong>À rendre le</strong></label>
+                            <input id="due_on" class="form-control" type="date" name="due_on">
+                        </div>
+                        <div class="col-lg-1 mb-2 d-flex align-items-end">
+                            <button class="button green-button w-100" type="submit">Ajouter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="box p-3">
+                <h5 class="section-title mb-3">Inventaire et prêts en cours</h5>
+                {% if loan_items %}
+                    {% for item in loan_items %}
+                        <form method="post" class="border rounded p-2 mb-3">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+
+                            <div class="row">
+                                <div class="col-lg-3 mb-2">
+                                    <label><strong>Objet</strong></label>
+                                    <input class="form-control" name="name" value="{{ item.name }}" required>
+                                </div>
+                                <div class="col-lg-3 mb-2">
+                                    <label><strong>Emprunteur</strong></label>
+                                    <select class="form-control" name="borrower_user_id">
+                                        <option value="">Disponible</option>
+                                        {% for member in active_members %}
+                                            <option value="{{ member.user.id }}"
+                                                {% if item.borrower and item.borrower.user.id == member.user.id %}selected{% endif %}>
+                                                {{ member.user.first_name }} {{ member.user.last_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 mb-2">
+                                    <label><strong>Emprunté le</strong></label>
+                                    <input class="form-control" type="date" name="borrowed_on" value="{% if item.borrowed_on %}{{ item.borrowed_on|date:'Y-m-d' }}{% endif %}">
+                                </div>
+                                <div class="col-lg-2 mb-2">
+                                    <label><strong>À rendre le</strong></label>
+                                    <input class="form-control" type="date" name="due_on" value="{% if item.due_on %}{{ item.due_on|date:'Y-m-d' }}{% endif %}">
+                                </div>
+                                <div class="col-lg-2 mb-2 d-flex align-items-end">
+                                    <button class="button blue-button w-100" type="submit">Enregistrer</button>
+                                </div>
+                            </div>
+
+                            <div class="row mt-1">
+                                <div class="col-lg-9">
+                                    {% if item.borrower %}
+                                        <span>
+                                            Emprunté par <strong>{{ item.borrower.user.first_name }} {{ item.borrower.user.last_name }}</strong>
+                                            {% if item.due_on and item.due_on < today %}
+                                                <span style="color:#dc3545;"><strong> - En retard</strong></span>
+                                            {% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span>Disponible</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-3 text-right">
+                                    {% if item.borrower %}
+                                        <button class="button green-button" type="submit" name="action" value="return">Marquer rendu</button>
+                                    {% endif %}
+                                    <button class="button red-button" type="submit" name="action" value="delete">Retirer</button>
+                                </div>
+                            </div>
+                        </form>
+                    {% endfor %}
+                {% else %}
+                    <p>Aucun objet enregistré pour le moment.</p>
+                {% endif %}
+            </div>
+
+            <div class="mt-3">
+                <a href="{% url 'social:club_detail' club.id %}">
+                    <button class="button green-button">Retour au club</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

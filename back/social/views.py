@@ -1,6 +1,7 @@
 import base64
 import mimetypes
 import os
+from datetime import date
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
@@ -28,6 +29,7 @@ from .models import (
     Channel,
     ChannelEncryptedKey,
     ChannelJoinRequest,
+    ClubLoanItem,
     Club,
     Membership,
     Message,
@@ -53,6 +55,14 @@ def _is_upont_admin(user, student=None):
     if student is not None:
         return bool(student.is_moderator)
     return Student.objects.filter(user__id=user.id, is_moderator=True).exists()
+
+
+def _active_membership_for_user(club, user):
+    return Membership.objects.filter(
+        club=club,
+        student__user__id=user.id,
+        is_old=False,
+    ).first()
 
 
 def _serialize_poll_for_viewer(poll, viewer_student):
@@ -1191,6 +1201,58 @@ class ChannelRemoveMemberView(APIView):
         )
 
 
+class ChannelSetMemberAdminView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, channel_id, user_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        if not channel.admins.filter(id=current_student.id).exists():
+            return Response(
+                {"status": "error", "error": "Seuls les admins du channel y ont accès."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        student_target = get_object_or_404(Student, user__id=user_id)
+        if not channel.members.filter(id=student_target.id).exists():
+            return Response(
+                {"status": "error", "error": "Cet utilisateur n'est pas membre du channel."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        is_admin = request.data.get("is_admin")
+        if not isinstance(is_admin, bool):
+            return Response(
+                {"status": "error", "error": "is_admin doit être un booléen."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        admin_ids = set(channel.admins.values_list("id", flat=True))
+        if not is_admin and student_target.id in admin_ids and len(admin_ids) <= 1:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Le channel doit conserver au moins un admin.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if is_admin:
+            channel.admins.add(student_target)
+        else:
+            channel.admins.remove(student_target)
+
+        return Response(
+            {
+                "status": "updated",
+                "channel_id": channel.id,
+                "user_id": student_target.user.id,
+                "is_admin": is_admin,
+            }
+        )
+
+
 class ChannelLeaveView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1938,6 +2000,10 @@ def profile(request, user_id=None):
         "student": student,
         "membership_club_list": membership_club_list,
         "complete_name": student.user.first_name + " " + student.user.last_name,
+        "borrowed_items": ClubLoanItem.objects.filter(borrower=student)
+        .select_related("club")
+        .order_by("due_on", "name", "id"),
+        "today": date.today(),
     }
     if user_id == request.user.id:
         return render(request, "social/profile.html", context)
@@ -2159,23 +2225,118 @@ def view_club(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     active_members = Membership.objects.filter(club__id=club_id, is_old=False)
     old_members = get_old_members(club_id)
-    membership_club_list = Membership.objects.filter(
-        student__user__id=request.user.id, club__pk=club_id
-    )
-    if not membership_club_list:  # If no match is found
-        is_admin = False
-    # If the user does not have the rights
-    elif not membership_club_list[0].is_admin:
-        is_admin = False
-    else:
-        is_admin = True
+    membership = _active_membership_for_user(club, request.user)
+    is_member = membership is not None
+    is_admin = bool(membership and membership.is_admin)
     context = {
         "club": club,
         "active_members": active_members,
         "old_members": old_members,
         "is_admin": is_admin,
+        "is_member": is_member,
     }
     return render(request, "social/view_club.html", context)
+
+
+@login_required
+def club_loans(request, club_id):
+    club = get_object_or_404(Club, pk=club_id)
+    membership = _active_membership_for_user(club, request.user)
+    if membership is None:
+        raise PermissionDenied
+
+    active_memberships = Membership.objects.filter(club=club, is_old=False).select_related(
+        "student__user"
+    )
+    active_members = [membership.student for membership in active_memberships]
+
+    error = None
+
+    def parse_optional_date(raw_value, field_label):
+        raw_value = str(raw_value or "").strip()
+        if not raw_value:
+            return None
+        try:
+            return date.fromisoformat(raw_value)
+        except ValueError:
+            raise ValueError(f"Le format de date est invalide pour {field_label}.")
+
+    if request.method == "POST":
+        action = (request.POST.get("action") or "").strip()
+        item_id = (request.POST.get("item_id") or "").strip()
+        borrower_user_id = (request.POST.get("borrower_user_id") or "").strip()
+
+        item_name = (request.POST.get("name") or "").strip()
+        borrowed_on_raw = request.POST.get("borrowed_on")
+        due_on_raw = request.POST.get("due_on")
+
+        target_item = None
+        if item_id:
+            target_item = get_object_or_404(ClubLoanItem, pk=item_id, club=club)
+
+        if action == "delete" and target_item:
+            target_item.delete()
+            return redirect("social:club_loans", club_id=club.id)
+
+        if action == "return" and target_item:
+            target_item.borrower = None
+            target_item.borrowed_on = None
+            target_item.due_on = None
+            target_item.save()
+            return redirect("social:club_loans", club_id=club.id)
+
+        if action in {"add", "update"}:
+            if action == "add" and not item_name:
+                error = "Le nom de l'objet est requis."
+            else:
+                try:
+                    borrowed_on = parse_optional_date(borrowed_on_raw, "la date d'emprunt")
+                    due_on = parse_optional_date(due_on_raw, "la date de rendu")
+                except ValueError as exc:
+                    error = str(exc)
+                    borrowed_on = None
+                    due_on = None
+
+            borrower = None
+            if not error and borrower_user_id:
+                if not borrower_user_id.isdigit():
+                    error = "Sélection de l'emprunteur invalide."
+                else:
+                    borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
+                    if not Membership.objects.filter(
+                        student=borrower, club=club, is_old=False
+                    ).exists():
+                        error = "L'emprunteur doit être membre actif du club."
+
+            if not error and borrower and due_on and borrowed_on and due_on < borrowed_on:
+                error = "La date de rendu ne peut pas être avant la date d'emprunt."
+
+            if not error:
+                if action == "add":
+                    ClubLoanItem.objects.create(
+                        club=club,
+                        name=item_name,
+                        borrower=borrower,
+                        borrowed_on=borrowed_on,
+                        due_on=due_on,
+                    )
+                elif target_item is not None:
+                    target_item.name = item_name or target_item.name
+                    target_item.borrower = borrower
+                    target_item.borrowed_on = borrowed_on
+                    target_item.due_on = due_on
+                    target_item.save()
+                return redirect("social:club_loans", club_id=club.id)
+
+    loan_items = ClubLoanItem.objects.filter(club=club).select_related("borrower__user")
+    context = {
+        "club": club,
+        "loan_items": loan_items,
+        "active_members": active_members,
+        "today": date.today(),
+        "error": error,
+    }
+    return render(request, "social/club_loans.html", context)
 
 
 @login_required
