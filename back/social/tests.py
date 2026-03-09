@@ -352,7 +352,7 @@ class ClubLoansViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Projecteur")
 
-    def test_non_member_can_borrow_item_from_club_detail(self):
+    def test_non_member_cannot_borrow_item_from_club_detail(self):
         loan_item = ClubLoanItem.objects.create(
             club=self.club,
             name="Micro HF",
@@ -362,12 +362,12 @@ class ClubLoansViewTest(TestCase):
             reverse("social:club_detail", kwargs={"club_id": self.club.id}),
             {"action": "borrow", "item_id": str(loan_item.id)},
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         loan_item.refresh_from_db()
-        self.assertEqual(loan_item.borrower, self.student_outsider)
-        self.assertEqual(loan_item.borrowed_on, timezone.localdate())
+        self.assertIsNone(loan_item.borrower)
+        self.assertIsNone(loan_item.borrowed_on)
 
-    def test_borrower_can_return_own_item_from_club_detail(self):
+    def test_borrower_cannot_return_own_item_from_club_detail(self):
         loan_item = ClubLoanItem.objects.create(
             club=self.club,
             name="Caméra",
@@ -380,13 +380,11 @@ class ClubLoansViewTest(TestCase):
             reverse("social:club_detail", kwargs={"club_id": self.club.id}),
             {"action": "return", "item_id": str(loan_item.id)},
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         loan_item.refresh_from_db()
-        self.assertIsNone(loan_item.borrower)
-        self.assertIsNone(loan_item.borrowed_on)
-        self.assertIsNone(loan_item.due_on)
+        self.assertEqual(loan_item.borrower, self.student_outsider)
 
-    def test_non_member_can_borrow_item_via_api(self):
+    def test_non_member_cannot_borrow_item_via_api(self):
         loan_item = ClubLoanItem.objects.create(
             club=self.club,
             name="Table de mixage",
@@ -396,9 +394,38 @@ class ClubLoansViewTest(TestCase):
             reverse("club_loan_borrow", kwargs={"club_id": self.club.id, "item_id": loan_item.id}),
             {},
         )
+        self.assertEqual(response.status_code, 403)
+        loan_item.refresh_from_db()
+        self.assertIsNone(loan_item.borrower)
+
+    def test_member_can_assign_item_via_api_to_non_member(self):
+        loan_item = ClubLoanItem.objects.create(
+            club=self.club,
+            name="Table de mixage",
+        )
+        self.client.force_login(self.user_member)
+        response = self.client.post(
+            reverse("club_loan_assign", kwargs={"club_id": self.club.id, "item_id": loan_item.id}),
+            {"borrower_user_id": str(self.user_outsider.id), "due_on": "2026-03-29"},
+        )
         self.assertEqual(response.status_code, 200)
         loan_item.refresh_from_db()
         self.assertEqual(loan_item.borrower, self.student_outsider)
+        self.assertEqual(str(loan_item.due_on), "2026-03-29")
+
+    def test_non_member_cannot_assign_item_via_api(self):
+        loan_item = ClubLoanItem.objects.create(
+            club=self.club,
+            name="Pied caméra",
+        )
+        self.client.force_login(self.user_outsider)
+        response = self.client.post(
+            reverse("club_loan_assign", kwargs={"club_id": self.club.id, "item_id": loan_item.id}),
+            {"borrower_user_id": str(self.user_other.id)},
+        )
+        self.assertEqual(response.status_code, 403)
+        loan_item.refresh_from_db()
+        self.assertIsNone(loan_item.borrower)
 
     def test_non_member_cannot_return_other_borrower_item_via_api(self):
         loan_item = ClubLoanItem.objects.create(
@@ -416,6 +443,23 @@ class ClubLoansViewTest(TestCase):
         self.assertEqual(response.status_code, 403)
         loan_item.refresh_from_db()
         self.assertEqual(loan_item.borrower, self.student_other)
+
+    def test_member_can_return_item_via_api(self):
+        loan_item = ClubLoanItem.objects.create(
+            club=self.club,
+            name="Pied caméra",
+            borrower=self.student_other,
+            borrowed_on="2026-03-04",
+            due_on="2026-03-12",
+        )
+        self.client.force_login(self.user_member)
+        response = self.client.post(
+            reverse("club_loan_return", kwargs={"club_id": self.club.id, "item_id": loan_item.id}),
+            {},
+        )
+        self.assertEqual(response.status_code, 200)
+        loan_item.refresh_from_db()
+        self.assertIsNone(loan_item.borrower)
 
     def test_my_loans_api_returns_current_student_items(self):
         ClubLoanItem.objects.create(

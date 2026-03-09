@@ -80,9 +80,9 @@
                         {{club.description|markdownify}}</p>
 
                     <h5 class="section-title text-bold mt-4">Objets empruntables du club</h5>
-                    {% if loan_feedback %}
-                        <p class="text-thin" style="color:#dc3545;">{{ loan_feedback }}</p>
-                    {% endif %}
+                    <p class="text-thin" style="font-size: medium;">
+                        Les prêts sont gérés par les membres actifs du club.
+                    </p>
 
                     {% if available_loan_items %}
                         {% for item in available_loan_items %}
@@ -97,12 +97,6 @@
                                         {% endif %}
                                     </span>
                                 </div>
-                                <form method="post" style="margin-left:auto;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="borrow">
-                                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                                    <button type="submit" class="button blue-button">Emprunter</button>
-                                </form>
                             </div>
                         {% endfor %}
                     {% else %}
@@ -128,12 +122,6 @@
                                         {% endif %}
                                     </span>
                                 </div>
-                                <form method="post" style="margin-left:auto;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="return">
-                                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                                    <button type="submit" class="button green-button">Rendre</button>
-                                </form>
                             </div>
                         {% endfor %}
                     {% endif %}

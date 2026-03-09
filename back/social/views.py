@@ -140,8 +140,8 @@ def _serialize_club_loan_item_for_api(item, current_student_id, is_member):
         "due_on": item.due_on.isoformat() if item.due_on else None,
         "is_borrowed_by_me": is_mine,
         "is_available": item.borrower_id is None,
-        "can_borrow": item.borrower_id is None,
-        "can_return": bool(is_mine or is_member),
+        "can_borrow": bool(is_member and item.borrower_id is None),
+        "can_return": bool(is_member and item.borrower_id is not None),
     }
 
 
@@ -536,7 +536,16 @@ class ClubLoanBorrowView(APIView):
 
     def post(self, request, club_id, item_id):
         current_student = get_object_or_404(Student, user__id=request.user.id)
-        get_object_or_404(Club, id=club_id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        if membership is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent gérer les prêts.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
         item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
 
         if item.borrower_id is not None:
@@ -555,6 +564,74 @@ class ClubLoanBorrowView(APIView):
             {
                 "status": "borrowed",
                 "item": _serialize_club_loan_item_for_api(item, current_student.id, False),
+            }
+        )
+
+
+class ClubLoanAssignView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, club_id, item_id):
+        get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        if membership is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent attribuer un prêt.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
+        if item.borrower_id is not None:
+            return Response(
+                {"status": "error", "error": "Cet objet est déjà emprunté."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        borrower_user_id = str(request.data.get("borrower_user_id", "") or "").strip()
+        if not borrower_user_id.isdigit():
+            return Response(
+                {"status": "error", "error": "Emprunteur invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
+
+        due_on = None
+        due_on_raw = request.data.get("due_on", None)
+        if due_on_raw is not None and str(due_on_raw).strip():
+            try:
+                due_on = date.fromisoformat(str(due_on_raw).strip())
+            except ValueError:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Format de date invalide. Utilise YYYY-MM-DD.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        borrowed_on = date.today()
+        if due_on and due_on < borrowed_on:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "La date de rendu ne peut pas être avant la date d'emprunt.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        item.borrower = borrower
+        item.borrowed_on = borrowed_on
+        item.due_on = due_on
+        item.save(update_fields=["borrower", "borrowed_on", "due_on"])
+
+        return Response(
+            {
+                "status": "assigned",
+                "item": _serialize_club_loan_item_for_api(item, borrower.id, True),
             }
         )
 
@@ -622,15 +699,16 @@ class ClubLoanReturnView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, club_id, item_id):
-        current_student = get_object_or_404(Student, user__id=request.user.id)
+        get_object_or_404(Student, user__id=request.user.id)
         club = get_object_or_404(Club, id=club_id)
         item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
         membership = _active_membership_for_user(club, request.user)
-        is_member = membership is not None
-
-        if item.borrower_id != current_student.id and not is_member:
+        if membership is None:
             return Response(
-                {"status": "error", "error": "Action non autorisée."},
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent gérer les retours.",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -2423,36 +2501,6 @@ def view_club(request, club_id):
     membership = _active_membership_for_user(club, request.user)
     is_member = membership is not None
     is_admin = bool(membership and membership.is_admin)
-    loan_feedback = None
-
-    if request.method == "POST":
-        action = (request.POST.get("action") or "").strip()
-        item_id = (request.POST.get("item_id") or "").strip()
-        target_item = None
-        if item_id:
-            target_item = get_object_or_404(ClubLoanItem, pk=item_id, club=club)
-
-        if action == "borrow" and target_item is not None:
-            if target_item.borrower_id is not None:
-                loan_feedback = "Cet objet n'est plus disponible."
-            else:
-                target_item.borrower = current_student
-                target_item.borrowed_on = date.today()
-                if target_item.due_on and target_item.due_on < target_item.borrowed_on:
-                    target_item.due_on = None
-                target_item.save()
-                return redirect("social:club_detail", club_id=club.id)
-        elif action == "return" and target_item is not None:
-            # L'emprunteur peut rendre son objet, ou un membre du club peut forcer le retour.
-            if target_item.borrower_id != current_student.id and not is_member:
-                raise PermissionDenied
-            target_item.borrower = None
-            target_item.borrowed_on = None
-            target_item.due_on = None
-            target_item.save()
-            return redirect("social:club_detail", club_id=club.id)
-        elif action:
-            loan_feedback = "Action de prêt invalide."
 
     loan_items = list(
         ClubLoanItem.objects.filter(club=club)
@@ -2471,7 +2519,6 @@ def view_club(request, club_id):
         "is_member": is_member,
         "available_loan_items": available_loan_items,
         "my_borrowed_items": my_borrowed_items,
-        "loan_feedback": loan_feedback,
         "today": date.today(),
     }
     return render(request, "social/view_club.html", context)
@@ -2542,10 +2589,6 @@ def club_loans(request, club_id):
                     error = "Sélection de l'emprunteur invalide."
                 else:
                     borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
-                    if not Membership.objects.filter(
-                        student=borrower, club=club, is_old=False
-                    ).exists():
-                        error = "L'emprunteur doit être membre actif du club."
 
             if not error and borrower and due_on and borrowed_on and due_on < borrowed_on:
                 error = "La date de rendu ne peut pas être avant la date d'emprunt."
