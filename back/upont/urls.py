@@ -66,6 +66,7 @@ from services.views import (
 )
 from social.views import (
     ClubLoanBorrowView,
+    ClubLoanCreateItemView,
     ClubLoanItemsView,
     ClubLoanReturnView,
     MyClubLoanItemsView,
@@ -331,6 +332,11 @@ urlpatterns += [
         "api/clubs/<int:club_id>/loans/<int:item_id>/borrow/",
         ClubLoanBorrowView.as_view(),
         name="club_loan_borrow",
+    ),
+    path(
+        "api/clubs/<int:club_id>/loans/create/",
+        ClubLoanCreateItemView.as_view(),
+        name="club_loan_create",
     ),
     path(
         "api/clubs/<int:club_id>/loans/<int:item_id>/return/",
