@@ -65,6 +65,10 @@ from services.views import (
     VracViewSet,
 )
 from social.views import (
+    ClubLoanBorrowView,
+    ClubLoanItemsView,
+    ClubLoanReturnView,
+    MyClubLoanItemsView,
     DeleteAllChannelMessagesView,
     DeleteChannelMessageView,
     EditChannelMessageView,
@@ -318,6 +322,26 @@ urlpatterns += [
     path("api/student/", OneStudentView.as_view(), name="student"),
     path("api/membership/", StudentMembershipView.as_view(), name="membership"),
     path("api/club/", OneClubView.as_view(), name="club"),
+    path(
+        "api/clubs/<int:club_id>/loans/",
+        ClubLoanItemsView.as_view(),
+        name="club_loan_items",
+    ),
+    path(
+        "api/clubs/<int:club_id>/loans/<int:item_id>/borrow/",
+        ClubLoanBorrowView.as_view(),
+        name="club_loan_borrow",
+    ),
+    path(
+        "api/clubs/<int:club_id>/loans/<int:item_id>/return/",
+        ClubLoanReturnView.as_view(),
+        name="club_loan_return",
+    ),
+    path(
+        "api/me/loans/",
+        MyClubLoanItemsView.as_view(),
+        name="my_club_loan_items",
+    ),
     path("api/media/<path:path>", views.get_media_path, name="get_media_path"),
     path("api/pochtron/balance/", PochtronBalance.as_view(), name="pochtron_balance"),
     path(

@@ -123,6 +123,28 @@ def _serialize_poll_for_viewer(poll, viewer_student):
     }
 
 
+def _serialize_club_loan_item_for_api(item, current_student_id, is_member):
+    borrower_name = None
+    if item.borrower_id:
+        first_name = (item.borrower.user.first_name or "").strip()
+        last_name = (item.borrower.user.last_name or "").strip()
+        borrower_name = f"{first_name} {last_name}".strip() or item.borrower.user.username
+
+    is_mine = item.borrower_id == current_student_id
+    return {
+        "id": item.id,
+        "name": item.name,
+        "borrower_user_id": item.borrower.user.id if item.borrower_id else None,
+        "borrower_name": borrower_name,
+        "borrowed_on": item.borrowed_on.isoformat() if item.borrowed_on else None,
+        "due_on": item.due_on.isoformat() if item.due_on else None,
+        "is_borrowed_by_me": is_mine,
+        "is_available": item.borrower_id is None,
+        "can_borrow": item.borrower_id is None,
+        "can_return": bool(is_mine or is_member),
+    }
+
+
 MESSAGE_MAX_MEDIA_BYTES = 50 * 1024 * 1024
 MESSAGE_MAX_IMAGE_BYTES = 15 * 1024 * 1024
 
@@ -471,6 +493,119 @@ class OneClubView(APIView):
     @classmethod
     def get_extra_actions(cls):
         return []
+
+
+class ClubLoanItemsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, club_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        is_member = membership is not None
+
+        items = list(
+            ClubLoanItem.objects.filter(club=club)
+            .select_related("borrower__user")
+            .order_by("due_on", "name", "id")
+        )
+        serialized_items = [
+            _serialize_club_loan_item_for_api(item, current_student.id, is_member)
+            for item in items
+        ]
+
+        return Response(
+            {
+                "club_id": club.id,
+                "is_member": is_member,
+                "is_admin": bool(membership and membership.is_admin),
+                "today": date.today().isoformat(),
+                "items": serialized_items,
+                "available_items": [
+                    item for item in serialized_items if item["is_available"]
+                ],
+                "my_borrowed_items": [
+                    item for item in serialized_items if item["is_borrowed_by_me"]
+                ],
+            }
+        )
+
+
+class ClubLoanBorrowView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, club_id, item_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        get_object_or_404(Club, id=club_id)
+        item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
+
+        if item.borrower_id is not None:
+            return Response(
+                {"status": "error", "error": "Cet objet n'est plus disponible."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        item.borrower = current_student
+        item.borrowed_on = date.today()
+        if item.due_on and item.due_on < item.borrowed_on:
+            item.due_on = None
+        item.save(update_fields=["borrower", "borrowed_on", "due_on"])
+
+        return Response(
+            {
+                "status": "borrowed",
+                "item": _serialize_club_loan_item_for_api(item, current_student.id, False),
+            }
+        )
+
+
+class ClubLoanReturnView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, club_id, item_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        is_member = membership is not None
+
+        if item.borrower_id != current_student.id and not is_member:
+            return Response(
+                {"status": "error", "error": "Action non autorisée."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        item.borrower = None
+        item.borrowed_on = None
+        item.due_on = None
+        item.save(update_fields=["borrower", "borrowed_on", "due_on"])
+
+        return Response({"status": "returned", "item_id": item.id})
+
+
+class MyClubLoanItemsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        today = date.today()
+        items = ClubLoanItem.objects.filter(borrower=current_student).select_related("club")
+
+        data = []
+        for item in items.order_by("due_on", "name", "id"):
+            club_data = ClubSerializerLite(item.club).data
+            data.append(
+                {
+                    "id": item.id,
+                    "name": item.name,
+                    "club": club_data,
+                    "borrowed_on": item.borrowed_on.isoformat() if item.borrowed_on else None,
+                    "due_on": item.due_on.isoformat() if item.due_on else None,
+                    "is_overdue": bool(item.due_on and item.due_on < today),
+                }
+            )
+
+        return Response({"items": data, "today": today.isoformat()})
 
 
 class SearchClub(APIView):
