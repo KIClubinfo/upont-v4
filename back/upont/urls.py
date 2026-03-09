@@ -65,6 +65,7 @@ from services.views import (
     VracViewSet,
 )
 from social.views import (
+    ClubLoanAssignView,
     ClubLoanBorrowView,
     ClubLoanCreateItemView,
     ClubLoanItemsView,
@@ -332,6 +333,11 @@ urlpatterns += [
         "api/clubs/<int:club_id>/loans/<int:item_id>/borrow/",
         ClubLoanBorrowView.as_view(),
         name="club_loan_borrow",
+    ),
+    path(
+        "api/clubs/<int:club_id>/loans/<int:item_id>/assign/",
+        ClubLoanAssignView.as_view(),
+        name="club_loan_assign",
     ),
     path(
         "api/clubs/<int:club_id>/loans/create/",
