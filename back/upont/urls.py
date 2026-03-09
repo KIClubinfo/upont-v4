@@ -82,6 +82,7 @@ from social.views import (
     ChannelMembersView,
     ChannelAddMemberView,
     ChannelRemoveMemberView,
+    ChannelSetMemberAdminView,
     ChannelMessagesView,
     ClubsViewSet,
     CreateChannel,
@@ -271,6 +272,11 @@ urlpatterns += [
         "api/channels/<int:channel_id>/members/<int:user_id>/remove/",
         ChannelRemoveMemberView.as_view(),
         name="channel_remove_member",
+    ),
+    path(
+        "api/channels/<int:channel_id>/members/<int:user_id>/admin/",
+        ChannelSetMemberAdminView.as_view(),
+        name="channel_set_member_admin",
     ),
     path(
         "api/channels/<int:channel_id>/leave/",
