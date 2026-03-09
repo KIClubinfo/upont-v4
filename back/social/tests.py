@@ -18,6 +18,7 @@ from .models import (
     Category,
     Channel,
     ChannelJoinRequest,
+    ClubLoanItem,
     Club,
     Membership,
     Message,
@@ -250,6 +251,106 @@ class MembershipModelTest(TestCase):
         membership.save()
         retrieved_membership = Membership.objects.get(pk=membership.pk)
         self.assertEqual(retrieved_membership.pk, membership.pk)
+
+
+class ClubLoansViewTest(TestCase):
+    def setUp(self):
+        self.user_member = models.User.objects.create_user(
+            username="loanmember", password="test-pass"
+        )
+        self.user_other = models.User.objects.create_user(
+            username="loanother", password="test-pass"
+        )
+        self.user_outsider = models.User.objects.create_user(
+            username="loanoutsider", password="test-pass"
+        )
+
+        self.student_member = Student.objects.create(user=self.user_member)
+        self.student_other = Student.objects.create(user=self.user_other)
+        self.student_outsider = Student.objects.create(user=self.user_outsider)
+
+        self.role = Role.objects.create(name="Membre")
+        self.club = Club.objects.create(
+            name="Club Pret",
+            description="Gestion des prets",
+            active=True,
+            has_fee=False,
+        )
+        Membership.objects.create(
+            club=self.club, student=self.student_member, role=self.role, is_admin=True
+        )
+        Membership.objects.create(
+            club=self.club, student=self.student_other, role=self.role, is_admin=False
+        )
+
+    def test_non_member_cannot_access_club_loans_page(self):
+        self.client.force_login(self.user_outsider)
+        response = self.client.get(reverse("social:club_loans", kwargs={"club_id": self.club.id}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_member_can_add_update_return_and_delete_item(self):
+        self.client.force_login(self.user_member)
+
+        add_response = self.client.post(
+            reverse("social:club_loans", kwargs={"club_id": self.club.id}),
+            {
+                "action": "add",
+                "name": "Sono portable",
+                "borrower_user_id": str(self.user_other.id),
+                "borrowed_on": "2026-03-01",
+                "due_on": "2026-03-10",
+            },
+        )
+        self.assertEqual(add_response.status_code, 302)
+
+        item = ClubLoanItem.objects.get(club=self.club, name="Sono portable")
+        self.assertEqual(item.borrower, self.student_other)
+
+        update_response = self.client.post(
+            reverse("social:club_loans", kwargs={"club_id": self.club.id}),
+            {
+                "action": "update",
+                "item_id": str(item.id),
+                "name": "Sono portable v2",
+                "borrower_user_id": str(self.user_member.id),
+                "borrowed_on": "2026-03-02",
+                "due_on": "2026-03-12",
+            },
+        )
+        self.assertEqual(update_response.status_code, 302)
+        item.refresh_from_db()
+        self.assertEqual(item.name, "Sono portable v2")
+        self.assertEqual(item.borrower, self.student_member)
+
+        return_response = self.client.post(
+            reverse("social:club_loans", kwargs={"club_id": self.club.id}),
+            {"action": "return", "item_id": str(item.id)},
+        )
+        self.assertEqual(return_response.status_code, 302)
+        item.refresh_from_db()
+        self.assertIsNone(item.borrower)
+        self.assertIsNone(item.borrowed_on)
+        self.assertIsNone(item.due_on)
+
+        delete_response = self.client.post(
+            reverse("social:club_loans", kwargs={"club_id": self.club.id}),
+            {"action": "delete", "item_id": str(item.id)},
+        )
+        self.assertEqual(delete_response.status_code, 302)
+        self.assertFalse(ClubLoanItem.objects.filter(id=item.id).exists())
+
+    def test_profile_displays_student_loans(self):
+        ClubLoanItem.objects.create(
+            club=self.club,
+            name="Projecteur",
+            borrower=self.student_member,
+            borrowed_on="2026-03-03",
+            due_on="2026-03-15",
+        )
+        self.client.force_login(self.user_member)
+        response = self.client.get(reverse("social:profile"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Projecteur")
 
 
 def _generate_public_key():
@@ -1595,6 +1696,73 @@ class ChannelMessagingApiTest(APITestCase):
         self.assertEqual(remove_response.status_code, 403)
         channel = Channel.objects.get(pk=channel_id)
         self.assertTrue(channel.members.filter(pk=self.student_3.pk).exists())
+
+    def test_channel_admin_can_promote_and_demote_member_admin(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "member-admin-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        promote_response = self.client.post(
+            reverse(
+                "channel_set_member_admin",
+                kwargs={"channel_id": channel_id, "user_id": self.user_2.id},
+            ),
+            {"is_admin": True},
+            format="json",
+        )
+        self.assertEqual(promote_response.status_code, 200)
+
+        channel = Channel.objects.get(pk=channel_id)
+        self.assertTrue(channel.admins.filter(pk=self.student_2.pk).exists())
+
+        demote_response = self.client.post(
+            reverse(
+                "channel_set_member_admin",
+                kwargs={"channel_id": channel_id, "user_id": self.user_2.id},
+            ),
+            {"is_admin": False},
+            format="json",
+        )
+        self.assertEqual(demote_response.status_code, 200)
+
+        channel.refresh_from_db()
+        self.assertFalse(channel.admins.filter(pk=self.student_2.pk).exists())
+
+    def test_channel_cannot_have_zero_admins(self):
+        self.client.force_authenticate(user=self.user_1)
+        create_channel_response = self.client.post(
+            reverse("create_channel"),
+            {
+                "name": "last-admin-room",
+                "members": [self.user_1.id, self.user_2.id],
+                "admins": [self.user_1.id],
+                "channel_of": "-1",
+            },
+            format="json",
+        )
+        channel_id = create_channel_response.data["channel_id"]
+
+        demote_last_admin_response = self.client.post(
+            reverse(
+                "channel_set_member_admin",
+                kwargs={"channel_id": channel_id, "user_id": self.user_1.id},
+            ),
+            {"is_admin": False},
+            format="json",
+        )
+        self.assertEqual(demote_last_admin_response.status_code, 400)
+
+        channel = Channel.objects.get(pk=channel_id)
+        self.assertTrue(channel.admins.filter(pk=self.student_1.pk).exists())
 
     def test_member_can_leave_channel(self):
         self.client.force_authenticate(user=self.user_1)

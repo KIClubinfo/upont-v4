@@ -4,6 +4,7 @@ from .models import (
     Category,
     Channel,
     ChannelJoinRequest,
+    ClubLoanItem,
     Club,
     ClubRequest,
     Membership,
@@ -55,9 +56,17 @@ class ChannelJoinRequestAdmin(admin.ModelAdmin):
     ordering = ("-date",)
 
 
+class ClubLoanItemAdmin(admin.ModelAdmin):
+    list_display = ("club", "name", "borrower", "borrowed_on", "due_on")
+    list_filter = ("club", "due_on")
+    search_fields = ("name", "borrower__user__first_name", "borrower__user__last_name")
+    ordering = ("due_on", "club", "name")
+
+
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Channel, ChannelAdmin)
 admin.site.register(ChannelJoinRequest, ChannelJoinRequestAdmin)
+admin.site.register(ClubLoanItem, ClubLoanItemAdmin)
 admin.site.register(Promotion)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Nationality)

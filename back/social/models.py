@@ -383,3 +383,29 @@ class ChannelJoinRequest(models.Model):
                 fields=["channel", "student"], name="unique_channel_join_request"
             )
         ]
+
+
+class ClubLoanItem(models.Model):
+    club = models.ForeignKey(
+        "social.Club",
+        on_delete=models.CASCADE,
+        related_name="loan_items",
+    )
+    name = models.CharField(max_length=120)
+    borrower = models.ForeignKey(
+        "social.Student",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="borrowed_club_items",
+    )
+    borrowed_on = models.DateField(null=True, blank=True)
+    due_on = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["due_on", "name", "id"]
+
+    def __str__(self):
+        borrower_label = self.borrower.user.username if self.borrower else "disponible"
+        return f"{self.club.name} - {self.name} ({borrower_label})"

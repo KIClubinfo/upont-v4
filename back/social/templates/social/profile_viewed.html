@@ -96,6 +96,29 @@
                         </div><!--End of Box-->
                     {% endif %}
 
+                    <h4 class="page-title mt-4">Objets empruntés</h4>
+                    {% if borrowed_items %}
+                        <div class="box small-box">
+                            {% for item in borrowed_items %}
+                                <div class="mb-2">
+                                    <strong>{{ item.name }}</strong> - {{ item.club.name }}<br>
+                                    {% if item.due_on %}
+                                        À rendre le {{ item.due_on }}
+                                        {% if item.due_on < today %}
+                                            <strong style="color:#dc3545;">(en retard)</strong>
+                                        {% endif %}
+                                    {% else %}
+                                        Date de rendu non renseignée
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="box small-box">
+                            <h5 class="section-title text-center mt-2">Aucun emprunt en cours</h5>
+                        </div>
+                    {% endif %}
+
 
                 </div><!--End of Column-->
 
