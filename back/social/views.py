@@ -2223,17 +2223,62 @@ def get_old_members(club_id):  # Grouping old members of club_id by promos in a 
 @login_required
 def view_club(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
+    current_student = get_object_or_404(Student, user__id=request.user.id)
     active_members = Membership.objects.filter(club__id=club_id, is_old=False)
     old_members = get_old_members(club_id)
     membership = _active_membership_for_user(club, request.user)
     is_member = membership is not None
     is_admin = bool(membership and membership.is_admin)
+    loan_feedback = None
+
+    if request.method == "POST":
+        action = (request.POST.get("action") or "").strip()
+        item_id = (request.POST.get("item_id") or "").strip()
+        target_item = None
+        if item_id:
+            target_item = get_object_or_404(ClubLoanItem, pk=item_id, club=club)
+
+        if action == "borrow" and target_item is not None:
+            if target_item.borrower_id is not None:
+                loan_feedback = "Cet objet n'est plus disponible."
+            else:
+                target_item.borrower = current_student
+                target_item.borrowed_on = date.today()
+                if target_item.due_on and target_item.due_on < target_item.borrowed_on:
+                    target_item.due_on = None
+                target_item.save()
+                return redirect("social:club_detail", club_id=club.id)
+        elif action == "return" and target_item is not None:
+            # L'emprunteur peut rendre son objet, ou un membre du club peut forcer le retour.
+            if target_item.borrower_id != current_student.id and not is_member:
+                raise PermissionDenied
+            target_item.borrower = None
+            target_item.borrowed_on = None
+            target_item.due_on = None
+            target_item.save()
+            return redirect("social:club_detail", club_id=club.id)
+        elif action:
+            loan_feedback = "Action de prêt invalide."
+
+    loan_items = list(
+        ClubLoanItem.objects.filter(club=club)
+        .select_related("borrower__user")
+        .order_by("due_on", "name", "id")
+    )
+    available_loan_items = [item for item in loan_items if item.borrower_id is None]
+    my_borrowed_items = [
+        item for item in loan_items if item.borrower_id == current_student.id
+    ]
     context = {
         "club": club,
         "active_members": active_members,
         "old_members": old_members,
         "is_admin": is_admin,
         "is_member": is_member,
+        "available_loan_items": available_loan_items,
+        "my_borrowed_items": my_borrowed_items,
+        "loan_feedback": loan_feedback,
+        "today": date.today(),
     }
     return render(request, "social/view_club.html", context)
 
