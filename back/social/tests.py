@@ -432,6 +432,25 @@ class ClubLoansViewTest(TestCase):
         self.assertEqual(len(payload["items"]), 1)
         self.assertEqual(payload["items"][0]["name"], "Micro de conférence")
 
+    def test_member_can_create_loan_item_via_api(self):
+        self.client.force_login(self.user_member)
+        response = self.client.post(
+            reverse("club_loan_create", kwargs={"club_id": self.club.id}),
+            {"name": "GoPro", "due_on": "2026-03-31"},
+        )
+        self.assertEqual(response.status_code, 201)
+        item = ClubLoanItem.objects.get(club=self.club, name="GoPro")
+        self.assertEqual(str(item.due_on), "2026-03-31")
+
+    def test_non_member_cannot_create_loan_item_via_api(self):
+        self.client.force_login(self.user_outsider)
+        response = self.client.post(
+            reverse("club_loan_create", kwargs={"club_id": self.club.id}),
+            {"name": "Drone"},
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(ClubLoanItem.objects.filter(club=self.club, name="Drone").exists())
+
 
 def _generate_public_key():
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)

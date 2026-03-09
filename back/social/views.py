@@ -559,6 +559,65 @@ class ClubLoanBorrowView(APIView):
         )
 
 
+class ClubLoanCreateItemView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, club_id):
+        get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        if membership is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent ajouter des objets.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        item_name = str(request.data.get("name", "") or "").strip()
+        if not item_name:
+            return Response(
+                {"status": "error", "error": "Le nom de l'objet est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if len(item_name) > 120:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Le nom de l'objet est trop long (120 caractères max).",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        due_on = None
+        due_on_raw = request.data.get("due_on", None)
+        if due_on_raw is not None and str(due_on_raw).strip():
+            try:
+                due_on = date.fromisoformat(str(due_on_raw).strip())
+            except ValueError:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Format de date invalide. Utilise YYYY-MM-DD.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        item = ClubLoanItem.objects.create(
+            club=club,
+            name=item_name,
+            due_on=due_on,
+        )
+        return Response(
+            {
+                "status": "created",
+                "item": _serialize_club_loan_item_for_api(item, -1, True),
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
 class ClubLoanReturnView(APIView):
     permission_classes = [IsAuthenticated]
 
