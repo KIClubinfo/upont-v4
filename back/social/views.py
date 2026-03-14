@@ -1,8 +1,9 @@
 import base64
 import json
+import logging
 import mimetypes
 import os
-from datetime import date
+from datetime import date, timedelta
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
@@ -51,6 +52,8 @@ from .serializers import (
     StudentSerializer,
 )
 from upont import notifications as upont_notifications
+
+logger = logging.getLogger(__name__)
 
 def _is_upont_admin(user, student=None):
     if user.is_superuser or user.is_staff:
@@ -337,6 +340,76 @@ def _build_message_push_body(message):
     return content
 
 
+def _find_recent_duplicate_message(
+    *,
+    channel,
+    author,
+    club,
+    reply_to_message,
+    content,
+    kind,
+    media_mime_type="",
+    media_original_name="",
+    media_size=None,
+    window_seconds=4,
+):
+    duplicate_from = timezone.now() - timedelta(seconds=window_seconds)
+    qs = Message.objects.filter(
+        channel=channel,
+        author=author,
+        club=club,
+        reply_to=reply_to_message,
+        content=content,
+        kind=kind,
+        date__gte=duplicate_from,
+    )
+
+    if kind in {Message.Kind.IMAGE, Message.Kind.GIF, Message.Kind.VIDEO}:
+        qs = qs.filter(
+            media_mime_type=media_mime_type or "",
+            media_original_name=media_original_name or "",
+            media_size=media_size,
+        )
+
+    return qs.order_by("-id").first()
+
+
+def _find_recent_duplicate_poll_message(
+    *,
+    channel,
+    author,
+    club,
+    content,
+    options,
+    window_seconds=4,
+):
+    duplicate_from = timezone.now() - timedelta(seconds=window_seconds)
+    candidate_messages = (
+        Message.objects.filter(
+            channel=channel,
+            author=author,
+            club=club,
+            content=content,
+            date__gte=duplicate_from,
+        )
+        .select_related("poll")
+        .order_by("-id")[:10]
+    )
+
+    expected_options = [str(option).strip() for option in options]
+    for message in candidate_messages:
+        try:
+            poll = message.poll
+        except MessagePoll.DoesNotExist:
+            continue
+        existing_options = list(
+            poll.options.order_by("position", "id").values_list("content", flat=True)
+        )
+        if existing_options == expected_options:
+            return message, poll
+    return None, None
+
+
 def _send_channel_message_push_notifications(message, sender_student):
     if not message.channel_id or not message.channel:
         return
@@ -352,6 +425,7 @@ def _send_channel_message_push_notifications(message, sender_student):
 
     extra = {
         "screen": "ChannelDetails",
+        "messageId": message.id,
         "channelId": channel.id,
         "channelName": channel.name or "Conversation",
         "channelClubId": channel.club_id if channel.club_id else None,
@@ -359,12 +433,19 @@ def _send_channel_message_push_notifications(message, sender_student):
     }
 
     # Direct dispatch to avoid depending on a running Celery worker.
-    upont_notifications.send_push_message_to_group(
-        recipient_usernames,
-        _build_message_push_title(message),
-        _build_message_push_body(message),
-        extra,
-    )
+    try:
+        upont_notifications.send_push_message_to_group(
+            recipient_usernames,
+            _build_message_push_title(message),
+            _build_message_push_body(message),
+            extra,
+        )
+    except Exception:
+        logger.exception(
+            "Failed to send push notification for message %s in channel %s",
+            message.id,
+            channel.id,
+        )
 
 
 @login_required
@@ -2022,6 +2103,44 @@ class CreateMessage(APIView):
                     status=status.HTTP_403_FORBIDDEN,
                 )
 
+        message_kind = media_payload["kind"] if media_payload else Message.Kind.TEXT
+        media_mime_type = media_payload["mime_type"] if media_payload else ""
+        media_original_name = media_payload["original_name"] if media_payload else ""
+        media_size = media_payload["size"] if media_payload else None
+
+        duplicate_message = _find_recent_duplicate_message(
+            channel=channel,
+            author=current_student,
+            club=club,
+            reply_to_message=reply_to_message,
+            content=content,
+            kind=message_kind,
+            media_mime_type=media_mime_type,
+            media_original_name=media_original_name,
+            media_size=media_size,
+        )
+        if duplicate_message:
+            return Response(
+                {
+                    "status": "ok",
+                    "message_id": duplicate_message.id,
+                    "duplicate": True,
+                    "media_type": (
+                        duplicate_message.kind
+                        if duplicate_message.kind
+                        in {Message.Kind.IMAGE, Message.Kind.GIF, Message.Kind.VIDEO}
+                        else None
+                    ),
+                    "media_url": duplicate_message.media_file.url
+                    if duplicate_message.media_file
+                    else None,
+                    "media_mime_type": duplicate_message.media_mime_type
+                    if duplicate_message.media_file
+                    else None,
+                },
+                status=status.HTTP_200_OK,
+            )
+
         message = Message.objects.create(
             channel=channel,
             date=timezone.now(),
@@ -2029,17 +2148,13 @@ class CreateMessage(APIView):
             club=club,
             reply_to=reply_to_message,
             content=content,
-            kind=media_payload["kind"] if media_payload else Message.Kind.TEXT,
+            kind=message_kind,
             media_file=media_file,
-            media_mime_type=media_payload["mime_type"] if media_payload else "",
-            media_original_name=media_payload["original_name"] if media_payload else "",
-            media_size=media_payload["size"] if media_payload else None,
+            media_mime_type=media_mime_type,
+            media_original_name=media_original_name,
+            media_size=media_size,
         )
-        try:
-            _send_channel_message_push_notifications(message, current_student)
-        except Exception:
-            # Push failures must never break message creation.
-            pass
+        _send_channel_message_push_notifications(message, current_student)
         return Response(
             {
                 "status": "ok",
@@ -2132,6 +2247,24 @@ class CreatePollMessageView(APIView):
                     status=status.HTTP_403_FORBIDDEN,
                 )
 
+        duplicate_message, duplicate_poll = _find_recent_duplicate_poll_message(
+            channel=channel,
+            author=current_student,
+            club=club,
+            content=content,
+            options=options,
+        )
+        if duplicate_message and duplicate_poll:
+            return Response(
+                {
+                    "status": "ok",
+                    "message_id": duplicate_message.id,
+                    "poll_id": duplicate_poll.id,
+                    "duplicate": True,
+                },
+                status=status.HTTP_200_OK,
+            )
+
         with transaction.atomic():
             message = Message.objects.create(
                 channel=channel,
@@ -2155,11 +2288,7 @@ class CreatePollMessageView(APIView):
                 ]
             )
 
-        try:
-            _send_channel_message_push_notifications(message, current_student)
-        except Exception:
-            # Push failures must never break message creation.
-            pass
+        _send_channel_message_push_notifications(message, current_student)
 
         return Response(
             {"status": "ok", "message_id": message.id, "poll_id": poll.id},
