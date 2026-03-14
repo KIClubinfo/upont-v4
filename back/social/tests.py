@@ -18,6 +18,7 @@ from .models import (
     Category,
     Channel,
     ChannelJoinRequest,
+    ClubLoanCategory,
     ClubLoanItem,
     Club,
     Membership,
@@ -499,6 +500,58 @@ class ClubLoansViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 403)
         self.assertFalse(ClubLoanItem.objects.filter(club=self.club, name="Drone").exists())
+
+    def test_member_can_create_update_delete_category_via_api(self):
+        self.client.force_login(self.user_member)
+
+        create_response = self.client.post(
+            reverse("club_loan_categories", kwargs={"club_id": self.club.id}),
+            {"name": "Multimédia"},
+        )
+        self.assertEqual(create_response.status_code, 201)
+        category_id = create_response.json()["category"]["id"]
+
+        update_response = self.client.post(
+            reverse(
+                "club_loan_category_update",
+                kwargs={"club_id": self.club.id, "category_id": category_id},
+            ),
+            {"name": "Audio/Video"},
+        )
+        self.assertEqual(update_response.status_code, 200)
+        category = ClubLoanCategory.objects.get(id=category_id)
+        self.assertEqual(category.name, "Audio/Video")
+
+        delete_response = self.client.post(
+            reverse(
+                "club_loan_category_delete",
+                kwargs={"club_id": self.club.id, "category_id": category_id},
+            ),
+            {},
+        )
+        self.assertEqual(delete_response.status_code, 200)
+        self.assertFalse(ClubLoanCategory.objects.filter(id=category_id).exists())
+
+    def test_member_can_update_and_delete_available_item_via_api(self):
+        category = ClubLoanCategory.objects.create(club=self.club, name="Jeux")
+        item = ClubLoanItem.objects.create(club=self.club, name="Switch")
+        self.client.force_login(self.user_member)
+
+        update_response = self.client.post(
+            reverse("club_loan_update", kwargs={"club_id": self.club.id, "item_id": item.id}),
+            {"name": "Nintendo Switch", "category_id": str(category.id)},
+        )
+        self.assertEqual(update_response.status_code, 200)
+        item.refresh_from_db()
+        self.assertEqual(item.name, "Nintendo Switch")
+        self.assertEqual(item.category_id, category.id)
+
+        delete_response = self.client.post(
+            reverse("club_loan_delete", kwargs={"club_id": self.club.id, "item_id": item.id}),
+            {},
+        )
+        self.assertEqual(delete_response.status_code, 200)
+        self.assertFalse(ClubLoanItem.objects.filter(id=item.id).exists())
 
 
 def _generate_public_key():

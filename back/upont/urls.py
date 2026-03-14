@@ -68,8 +68,13 @@ from social.views import (
     ClubLoanAssignView,
     ClubLoanBorrowView,
     ClubLoanCreateItemView,
+    ClubLoanDeleteItemView,
+    ClubLoanCategoriesView,
+    ClubLoanCategoryDeleteView,
+    ClubLoanCategoryUpdateView,
     ClubLoanItemsView,
     ClubLoanReturnView,
+    ClubLoanUpdateItemView,
     MyClubLoanItemsView,
     DeleteAllChannelMessagesView,
     DeleteChannelMessageView,
@@ -345,9 +350,34 @@ urlpatterns += [
         name="club_loan_create",
     ),
     path(
+        "api/clubs/<int:club_id>/loans/<int:item_id>/update/",
+        ClubLoanUpdateItemView.as_view(),
+        name="club_loan_update",
+    ),
+    path(
+        "api/clubs/<int:club_id>/loans/<int:item_id>/delete/",
+        ClubLoanDeleteItemView.as_view(),
+        name="club_loan_delete",
+    ),
+    path(
         "api/clubs/<int:club_id>/loans/<int:item_id>/return/",
         ClubLoanReturnView.as_view(),
         name="club_loan_return",
+    ),
+    path(
+        "api/clubs/<int:club_id>/loan-categories/",
+        ClubLoanCategoriesView.as_view(),
+        name="club_loan_categories",
+    ),
+    path(
+        "api/clubs/<int:club_id>/loan-categories/<int:category_id>/update/",
+        ClubLoanCategoryUpdateView.as_view(),
+        name="club_loan_category_update",
+    ),
+    path(
+        "api/clubs/<int:club_id>/loan-categories/<int:category_id>/delete/",
+        ClubLoanCategoryDeleteView.as_view(),
+        name="club_loan_category_delete",
     ),
     path(
         "api/me/loans/",
