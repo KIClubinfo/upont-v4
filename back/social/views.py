@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.db.models.functions import Greatest
 from django.http import Http404
@@ -29,6 +29,7 @@ from .models import (
     Channel,
     ChannelEncryptedKey,
     ChannelJoinRequest,
+    ClubLoanCategory,
     ClubLoanItem,
     Club,
     Membership,
@@ -134,6 +135,8 @@ def _serialize_club_loan_item_for_api(item, current_student_id, is_member):
     return {
         "id": item.id,
         "name": item.name,
+        "category_id": item.category_id,
+        "category_name": item.category.name if item.category_id else None,
         "borrower_user_id": item.borrower.user.id if item.borrower_id else None,
         "borrower_name": borrower_name,
         "borrowed_on": item.borrowed_on.isoformat() if item.borrowed_on else None,
@@ -142,6 +145,13 @@ def _serialize_club_loan_item_for_api(item, current_student_id, is_member):
         "is_available": item.borrower_id is None,
         "can_borrow": bool(is_member and item.borrower_id is None),
         "can_return": bool(is_member and item.borrower_id is not None),
+    }
+
+
+def _serialize_club_loan_category_for_api(category):
+    return {
+        "id": category.id,
+        "name": category.name,
     }
 
 
@@ -506,9 +516,10 @@ class ClubLoanItemsView(APIView):
 
         items = list(
             ClubLoanItem.objects.filter(club=club)
-            .select_related("borrower__user")
+            .select_related("borrower__user", "category")
             .order_by("due_on", "name", "id")
         )
+        categories = list(club.loan_categories.all().order_by("name", "id"))
         serialized_items = [
             _serialize_club_loan_item_for_api(item, current_student.id, is_member)
             for item in items
@@ -519,7 +530,12 @@ class ClubLoanItemsView(APIView):
                 "club_id": club.id,
                 "is_member": is_member,
                 "is_admin": bool(membership and membership.is_admin),
+                "can_manage": is_member,
                 "today": date.today().isoformat(),
+                "categories": [
+                    _serialize_club_loan_category_for_api(category)
+                    for category in categories
+                ],
                 "items": serialized_items,
                 "available_items": [
                     item for item in serialized_items if item["is_available"]
@@ -680,6 +696,22 @@ class ClubLoanCreateItemView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        category = None
+        category_id_raw = request.data.get("category_id", None)
+        if category_id_raw is not None and str(category_id_raw).strip() not in {"", "null"}:
+            category_id_str = str(category_id_raw).strip()
+            if not category_id_str.isdigit():
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Catégorie invalide.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            category = get_object_or_404(
+                ClubLoanCategory, id=int(category_id_str), club=club
+            )
+
         due_on = None
         due_on_raw = request.data.get("due_on", None)
         if due_on_raw is not None and str(due_on_raw).strip():
@@ -697,6 +729,7 @@ class ClubLoanCreateItemView(APIView):
         item = ClubLoanItem.objects.create(
             club=club,
             name=item_name,
+            category=category,
             due_on=due_on,
         )
         return Response(
@@ -706,6 +739,237 @@ class ClubLoanCreateItemView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+class ClubLoanUpdateItemView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, club_id, item_id):
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        if membership is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent modifier les objets.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
+
+        item_name = str(request.data.get("name", item.name) or "").strip()
+        if not item_name:
+            return Response(
+                {"status": "error", "error": "Le nom de l'objet est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if len(item_name) > 120:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Le nom de l'objet est trop long (120 caractères max).",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        category = item.category
+        category_id_raw = request.data.get("category_id", item.category_id)
+        if category_id_raw is not None:
+            category_id_str = str(category_id_raw).strip()
+            if category_id_str in {"", "null", "None"}:
+                category = None
+            elif category_id_str.isdigit():
+                category = get_object_or_404(
+                    ClubLoanCategory, id=int(category_id_str), club=club
+                )
+            else:
+                return Response(
+                    {"status": "error", "error": "Catégorie invalide."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        item.name = item_name
+        item.category = category
+        item.save(update_fields=["name", "category"])
+
+        return Response(
+            {
+                "status": "updated",
+                "item": _serialize_club_loan_item_for_api(
+                    item,
+                    current_student.id,
+                    True,
+                ),
+            }
+        )
+
+
+class ClubLoanDeleteItemView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, club_id, item_id):
+        get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        if membership is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent supprimer les objets.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
+        if item.borrower_id is not None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Impossible de supprimer un objet déjà prêté.",
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+        item.delete()
+        return Response({"status": "deleted", "item_id": item_id})
+
+
+class ClubLoanCategoriesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, club_id):
+        get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        categories = club.loan_categories.all().order_by("name", "id")
+        return Response(
+            {
+                "categories": [
+                    _serialize_club_loan_category_for_api(category)
+                    for category in categories
+                ]
+            }
+        )
+
+    def post(self, request, club_id):
+        get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        if membership is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent gérer les catégories.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        name = str(request.data.get("name", "") or "").strip()
+        if not name:
+            return Response(
+                {"status": "error", "error": "Le nom de la catégorie est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if len(name) > 80:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Le nom de la catégorie est trop long (80 caractères max).",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            category = ClubLoanCategory.objects.create(club=club, name=name)
+        except IntegrityError:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Une catégorie avec ce nom existe déjà.",
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(
+            {
+                "status": "created",
+                "category": _serialize_club_loan_category_for_api(category),
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class ClubLoanCategoryUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, club_id, category_id):
+        get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        if membership is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent gérer les catégories.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        category = get_object_or_404(ClubLoanCategory, id=category_id, club=club)
+        name = str(request.data.get("name", "") or "").strip()
+        if not name:
+            return Response(
+                {"status": "error", "error": "Le nom de la catégorie est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if len(name) > 80:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Le nom de la catégorie est trop long (80 caractères max).",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        category.name = name
+        try:
+            category.save(update_fields=["name"])
+        except IntegrityError:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Une catégorie avec ce nom existe déjà.",
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(
+            {
+                "status": "updated",
+                "category": _serialize_club_loan_category_for_api(category),
+            }
+        )
+
+
+class ClubLoanCategoryDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, club_id, category_id):
+        get_object_or_404(Student, user__id=request.user.id)
+        club = get_object_or_404(Club, id=club_id)
+        membership = _active_membership_for_user(club, request.user)
+        if membership is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Seuls les membres du club peuvent gérer les catégories.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        category = get_object_or_404(ClubLoanCategory, id=category_id, club=club)
+        category.delete()
+        return Response({"status": "deleted", "category_id": category_id})
 
 
 class ClubLoanReturnView(APIView):

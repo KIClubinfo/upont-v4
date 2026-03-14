@@ -392,6 +392,13 @@ class ClubLoanItem(models.Model):
         related_name="loan_items",
     )
     name = models.CharField(max_length=120)
+    category = models.ForeignKey(
+        "social.ClubLoanCategory",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="loan_items",
+    )
     borrower = models.ForeignKey(
         "social.Student",
         on_delete=models.SET_NULL,
@@ -409,3 +416,24 @@ class ClubLoanItem(models.Model):
     def __str__(self):
         borrower_label = self.borrower.user.username if self.borrower else "disponible"
         return f"{self.club.name} - {self.name} ({borrower_label})"
+
+
+class ClubLoanCategory(models.Model):
+    club = models.ForeignKey(
+        "social.Club",
+        on_delete=models.CASCADE,
+        related_name="loan_categories",
+    )
+    name = models.CharField(max_length=80)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["club", "name"], name="unique_club_loan_category_name"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.club.name} - {self.name}"
