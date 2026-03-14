@@ -1,4 +1,5 @@
 import base64
+import json
 import mimetypes
 import os
 from datetime import date
@@ -49,6 +50,7 @@ from .serializers import (
     RoleSerializer,
     StudentSerializer,
 )
+from upont import notifications as upont_notifications
 
 def _is_upont_admin(user, student=None):
     if user.is_superuser or user.is_staff:
@@ -281,6 +283,90 @@ def _validate_message_media(uploaded_file):
     }
 
 
+def _looks_like_encrypted_message_payload(raw_content):
+    if not isinstance(raw_content, str):
+        return False
+    trimmed = raw_content.strip()
+    if not trimmed.startswith("{") or not trimmed.endswith("}"):
+        return False
+
+    try:
+        payload = json.loads(trimmed)
+    except (TypeError, ValueError):
+        return False
+
+    return (
+        isinstance(payload, dict)
+        and payload.get("version") == 1
+        and isinstance(payload.get("algorithm"), str)
+        and isinstance(payload.get("iv"), str)
+        and isinstance(payload.get("ciphertext"), str)
+        and isinstance(payload.get("tag"), str)
+    )
+
+
+def _build_message_push_title(message):
+    if message.club_id and message.club:
+        return message.club.name
+    if message.author_id and message.author:
+        first_name = (message.author.user.first_name or "").strip()
+        last_name = (message.author.user.last_name or "").strip()
+        return f"{first_name} {last_name}".strip() or message.author.user.username
+    return "Nouveau message"
+
+
+def _build_message_push_body(message):
+    if message.kind == Message.Kind.IMAGE:
+        return "🖼️ Image"
+    if message.kind == Message.Kind.GIF:
+        return "🎞️ GIF"
+    if message.kind == Message.Kind.VIDEO:
+        return "🎬 Vidéo"
+
+    try:
+        if message.poll is not None:
+            return "📊 Nouveau sondage"
+    except MessagePoll.DoesNotExist:
+        pass
+
+    content = str(message.content or "").strip()
+    if not content or _looks_like_encrypted_message_payload(content):
+        return "Nouveau message"
+    if len(content) > 120:
+        return f"{content[:117]}..."
+    return content
+
+
+def _send_channel_message_push_notifications(message, sender_student):
+    if not message.channel_id or not message.channel:
+        return
+
+    channel = message.channel
+    recipient_usernames = list(
+        channel.members.exclude(id=sender_student.id)
+        .filter(is_validated=True)
+        .values_list("user__username", flat=True)
+    )
+    if not recipient_usernames:
+        return
+
+    extra = {
+        "screen": "ChannelDetails",
+        "channelId": channel.id,
+        "channelName": channel.name or "Conversation",
+        "channelClubId": channel.club_id if channel.club_id else None,
+        "channelClubName": channel.club.name if channel.club_id and channel.club else None,
+    }
+
+    # Direct dispatch to avoid depending on a running Celery worker.
+    upont_notifications.send_push_message_to_group(
+        recipient_usernames,
+        _build_message_push_title(message),
+        _build_message_push_body(message),
+        extra,
+    )
+
+
 @login_required
 def index_users(request):
     all_student_list = Student.objects.order_by(
@@ -471,13 +557,23 @@ class NotificationTokenView(APIView):
     """
 
     def post(self, request):
-        token = request.data["token"]
-        if not NotificationToken.objects.filter(token=token).exists():
-            NotificationToken.objects.create(
-                student=Student.objects.get(user__id=request.user.id), token=token
+        token = str(request.data.get("token", "")).strip()
+        if not token:
+            return Response(
+                {"status": "error", "error": "Token manquant."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-            return Response({"status": "created"})
-        return Response({"status": "exists"})
+
+        current_student = get_object_or_404(Student, user__id=request.user.id)
+        token_obj, created = NotificationToken.objects.get_or_create(
+            token=token,
+            defaults={"student": current_student},
+        )
+        if not created and token_obj.student_id != current_student.id:
+            token_obj.student = current_student
+            token_obj.save(update_fields=["student"])
+            return Response({"status": "updated"})
+        return Response({"status": "created" if created else "exists"})
 
 
 class ClubsViewSet(viewsets.ModelViewSet):
@@ -1939,6 +2035,11 @@ class CreateMessage(APIView):
             media_original_name=media_payload["original_name"] if media_payload else "",
             media_size=media_payload["size"] if media_payload else None,
         )
+        try:
+            _send_channel_message_push_notifications(message, current_student)
+        except Exception:
+            # Push failures must never break message creation.
+            pass
         return Response(
             {
                 "status": "ok",
@@ -2053,6 +2154,12 @@ class CreatePollMessageView(APIView):
                     for index, option_content in enumerate(options)
                 ]
             )
+
+        try:
+            _send_channel_message_push_notifications(message, current_student)
+        except Exception:
+            # Push failures must never break message creation.
+            pass
 
         return Response(
             {"status": "ok", "message_id": message.id, "poll_id": poll.id},
