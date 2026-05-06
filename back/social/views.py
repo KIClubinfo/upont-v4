@@ -130,18 +130,22 @@ def _serialize_poll_for_viewer(poll, viewer_student):
 
 
 def _serialize_club_loan_item_for_api(item, current_student_id, is_member):
+    external_name = (
+        f"{(item.borrower_external_first_name or '').strip()} "
+        f"{(item.borrower_external_last_name or '').strip()}"
+    ).strip() or (item.borrower_external_name or "").strip()
     borrower_name = None
     borrower_is_external = False
     if item.borrower_id:
         first_name = (item.borrower.user.first_name or "").strip()
         last_name = (item.borrower.user.last_name or "").strip()
         borrower_name = f"{first_name} {last_name}".strip() or item.borrower.user.username
-    elif item.borrower_external_name:
-        borrower_name = item.borrower_external_name
+    elif external_name:
+        borrower_name = external_name
         borrower_is_external = True
 
     is_mine = item.borrower_id == current_student_id
-    is_borrowed = bool(item.borrower_id or item.borrower_external_name)
+    is_borrowed = bool(item.borrower_id or external_name)
     return {
         "id": item.id,
         "name": item.name,
@@ -149,6 +153,9 @@ def _serialize_club_loan_item_for_api(item, current_student_id, is_member):
         "category_name": item.category.name if item.category_id else None,
         "borrower_user_id": item.borrower.user.id if item.borrower_id else None,
         "borrower_external_name": item.borrower_external_name or None,
+        "borrower_external_first_name": item.borrower_external_first_name or None,
+        "borrower_external_last_name": item.borrower_external_last_name or None,
+        "borrower_external_phone_number": item.borrower_external_phone_number or None,
         "borrower_is_external": borrower_is_external,
         "borrower_name": borrower_name,
         "borrowed_on": item.borrowed_on.isoformat() if item.borrowed_on else None,
@@ -168,7 +175,12 @@ def _serialize_club_loan_category_for_api(category):
 
 
 def _club_loan_item_is_borrowed(item):
-    return bool(item.borrower_id or (item.borrower_external_name or "").strip())
+    has_external_identity = bool(
+        (item.borrower_external_first_name or "").strip()
+        or (item.borrower_external_last_name or "").strip()
+        or (item.borrower_external_name or "").strip()
+    )
+    return bool(item.borrower_id or has_external_identity)
 
 
 MESSAGE_MAX_MEDIA_BYTES = 50 * 1024 * 1024
@@ -760,10 +772,23 @@ class ClubLoanBorrowView(APIView):
 
         item.borrower = current_student
         item.borrower_external_name = ""
+        item.borrower_external_first_name = ""
+        item.borrower_external_last_name = ""
+        item.borrower_external_phone_number = ""
         item.borrowed_on = date.today()
         if item.due_on and item.due_on < item.borrowed_on:
             item.due_on = None
-        item.save(update_fields=["borrower", "borrower_external_name", "borrowed_on", "due_on"])
+        item.save(
+            update_fields=[
+                "borrower",
+                "borrower_external_name",
+                "borrower_external_first_name",
+                "borrower_external_last_name",
+                "borrower_external_phone_number",
+                "borrowed_on",
+                "due_on",
+            ]
+        )
 
         return Response(
             {
@@ -797,12 +822,25 @@ class ClubLoanAssignView(APIView):
             )
 
         borrower_user_id = str(request.data.get("borrower_user_id", "") or "").strip()
-        borrower_external_name = str(
-            request.data.get("borrower_external_name", "") or ""
+        borrower_external_name = str(request.data.get("borrower_external_name", "") or "").strip()
+        borrower_external_first_name = str(
+            request.data.get("borrower_external_first_name", "") or ""
+        ).strip()
+        borrower_external_last_name = str(
+            request.data.get("borrower_external_last_name", "") or ""
+        ).strip()
+        borrower_external_phone_number = str(
+            request.data.get("borrower_external_phone_number", "") or ""
         ).strip()
         borrower = None
+        external_identity_provided = bool(
+            borrower_external_name
+            or borrower_external_first_name
+            or borrower_external_last_name
+            or borrower_external_phone_number
+        )
 
-        if borrower_user_id and borrower_external_name:
+        if borrower_user_id and external_identity_provided:
             return Response(
                 {
                     "status": "error",
@@ -817,12 +855,57 @@ class ClubLoanAssignView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
-        elif borrower_external_name:
-            if len(borrower_external_name) > 160:
+        elif external_identity_provided:
+            if borrower_external_name and (
+                borrower_external_first_name or borrower_external_last_name
+            ):
                 return Response(
                     {
                         "status": "error",
-                        "error": "Le nom de l'emprunteur externe est trop long (160 caractères max).",
+                        "error": "Utilise soit 'emprunteur externe' (ancien format), soit prénom/nom/téléphone.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if borrower_external_name:
+                if len(borrower_external_name) > 160:
+                    return Response(
+                        {
+                            "status": "error",
+                            "error": "Le nom de l'emprunteur externe est trop long (160 caractères max).",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                split_name = borrower_external_name.split()
+                borrower_external_first_name = split_name[0]
+                borrower_external_last_name = " ".join(split_name[1:]) if len(split_name) > 1 else ""
+            else:
+                if not (
+                    borrower_external_first_name
+                    and borrower_external_last_name
+                    and borrower_external_phone_number
+                ):
+                    return Response(
+                        {
+                            "status": "error",
+                            "error": "Pour un emprunteur hors uPont, renseigne prénom, nom et téléphone.",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            if len(borrower_external_first_name) > 80 or len(borrower_external_last_name) > 80:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Le prénom ou le nom est trop long (80 caractères max).",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if borrower_external_phone_number and not Student.phone_regex.regex.match(
+                borrower_external_phone_number
+            ):
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Le téléphone externe est invalide. Utilise le format '+33612345678'.",
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
@@ -873,11 +956,31 @@ class ClubLoanAssignView(APIView):
             )
 
         item.borrower = borrower
-        item.borrower_external_name = "" if borrower else borrower_external_name
+        if borrower:
+            item.borrower_external_name = ""
+            item.borrower_external_first_name = ""
+            item.borrower_external_last_name = ""
+            item.borrower_external_phone_number = ""
+        else:
+            external_full_name = (
+                f"{borrower_external_first_name} {borrower_external_last_name}"
+            ).strip() or borrower_external_name
+            item.borrower_external_name = external_full_name
+            item.borrower_external_first_name = borrower_external_first_name
+            item.borrower_external_last_name = borrower_external_last_name
+            item.borrower_external_phone_number = borrower_external_phone_number
         item.borrowed_on = borrowed_on
         item.due_on = due_on
         item.save(
-            update_fields=["borrower", "borrower_external_name", "borrowed_on", "due_on"]
+            update_fields=[
+                "borrower",
+                "borrower_external_name",
+                "borrower_external_first_name",
+                "borrower_external_last_name",
+                "borrower_external_phone_number",
+                "borrowed_on",
+                "due_on",
+            ]
         )
 
         return Response(
@@ -1214,9 +1317,22 @@ class ClubLoanReturnView(APIView):
 
         item.borrower = None
         item.borrower_external_name = ""
+        item.borrower_external_first_name = ""
+        item.borrower_external_last_name = ""
+        item.borrower_external_phone_number = ""
         item.borrowed_on = None
         item.due_on = None
-        item.save(update_fields=["borrower", "borrower_external_name", "borrowed_on", "due_on"])
+        item.save(
+            update_fields=[
+                "borrower",
+                "borrower_external_name",
+                "borrower_external_first_name",
+                "borrower_external_last_name",
+                "borrower_external_phone_number",
+                "borrowed_on",
+                "due_on",
+            ]
+        )
 
         return Response({"status": "returned", "item_id": item.id})
 
@@ -3114,6 +3230,21 @@ def club_loans(request, club_id):
         borrower_external_name = (
             str(request.POST.get("borrower_external_name") or "").strip()
         )
+        borrower_external_first_name = (
+            str(request.POST.get("borrower_external_first_name") or "").strip()
+        )
+        borrower_external_last_name = (
+            str(request.POST.get("borrower_external_last_name") or "").strip()
+        )
+        borrower_external_phone_number = (
+            str(request.POST.get("borrower_external_phone_number") or "").strip()
+        )
+        external_identity_provided = bool(
+            borrower_external_name
+            or borrower_external_first_name
+            or borrower_external_last_name
+            or borrower_external_phone_number
+        )
 
         item_name = (request.POST.get("name") or "").strip()
         borrowed_on_raw = request.POST.get("borrowed_on")
@@ -3130,6 +3261,9 @@ def club_loans(request, club_id):
         if action == "return" and target_item:
             target_item.borrower = None
             target_item.borrower_external_name = ""
+            target_item.borrower_external_first_name = ""
+            target_item.borrower_external_last_name = ""
+            target_item.borrower_external_phone_number = ""
             target_item.borrowed_on = None
             target_item.due_on = None
             target_item.save()
@@ -3148,35 +3282,89 @@ def club_loans(request, club_id):
                     due_on = None
 
             borrower = None
-            if not error and borrower_user_id and borrower_external_name:
+            if not error and borrower_user_id and external_identity_provided:
                 error = "Choisis soit un utilisateur uPont, soit un emprunteur externe."
             if not error and borrower_user_id:
                 if not borrower_user_id.isdigit():
                     error = "Sélection de l'emprunteur invalide."
                 else:
                     borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
-            if not error and borrower_external_name and len(borrower_external_name) > 160:
-                error = "Le nom de l'emprunteur externe est trop long (160 caractères max)."
+            if not error and borrower_external_name and (
+                borrower_external_first_name or borrower_external_last_name
+            ):
+                error = "Utilise soit le nom externe (ancien format), soit prénom/nom/téléphone."
+            if not error and borrower_external_name:
+                if len(borrower_external_name) > 160:
+                    error = "Le nom de l'emprunteur externe est trop long (160 caractères max)."
+                else:
+                    split_name = borrower_external_name.split()
+                    borrower_external_first_name = split_name[0]
+                    borrower_external_last_name = (
+                        " ".join(split_name[1:]) if len(split_name) > 1 else ""
+                    )
+            if not error and not borrower and not borrower_external_name and (
+                borrower_external_first_name
+                or borrower_external_last_name
+                or borrower_external_phone_number
+            ):
+                if not (
+                    borrower_external_first_name
+                    and borrower_external_last_name
+                    and borrower_external_phone_number
+                ):
+                    error = "Pour un emprunteur hors uPont, renseigne prénom, nom et téléphone."
+            if not error and len(borrower_external_first_name) > 80:
+                error = "Le prénom externe est trop long (80 caractères max)."
+            if not error and len(borrower_external_last_name) > 80:
+                error = "Le nom externe est trop long (80 caractères max)."
+            if (
+                not error
+                and borrower_external_phone_number
+                and not Student.phone_regex.regex.match(borrower_external_phone_number)
+            ):
+                error = "Le téléphone externe est invalide. Utilise le format '+33612345678'."
 
-            if not error and borrower and due_on and borrowed_on and due_on < borrowed_on:
+            if not error and due_on and borrowed_on and due_on < borrowed_on:
                 error = "La date de rendu ne peut pas être avant la date d'emprunt."
 
             if not error:
                 if action == "add":
+                    external_full_name = (
+                        f"{borrower_external_first_name} {borrower_external_last_name}"
+                    ).strip() or borrower_external_name
                     ClubLoanItem.objects.create(
                         club=club,
                         name=item_name,
                         borrower=borrower,
-                        borrower_external_name="" if borrower else borrower_external_name,
+                        borrower_external_name="" if borrower else external_full_name,
+                        borrower_external_first_name=(
+                            "" if borrower else borrower_external_first_name
+                        ),
+                        borrower_external_last_name=(
+                            "" if borrower else borrower_external_last_name
+                        ),
+                        borrower_external_phone_number=(
+                            "" if borrower else borrower_external_phone_number
+                        ),
                         borrowed_on=borrowed_on,
                         due_on=due_on,
                     )
                 elif target_item is not None:
                     target_item.name = item_name or target_item.name
                     target_item.borrower = borrower
-                    target_item.borrower_external_name = (
-                        "" if borrower else borrower_external_name
-                    )
+                    if borrower:
+                        target_item.borrower_external_name = ""
+                        target_item.borrower_external_first_name = ""
+                        target_item.borrower_external_last_name = ""
+                        target_item.borrower_external_phone_number = ""
+                    else:
+                        external_full_name = (
+                            f"{borrower_external_first_name} {borrower_external_last_name}"
+                        ).strip() or borrower_external_name
+                        target_item.borrower_external_name = external_full_name
+                        target_item.borrower_external_first_name = borrower_external_first_name
+                        target_item.borrower_external_last_name = borrower_external_last_name
+                        target_item.borrower_external_phone_number = borrower_external_phone_number
                     target_item.borrowed_on = borrowed_on
                     target_item.due_on = due_on
                     target_item.save()

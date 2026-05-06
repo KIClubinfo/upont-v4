@@ -407,6 +407,13 @@ class ClubLoanItem(models.Model):
         related_name="borrowed_club_items",
     )
     borrower_external_name = models.CharField(max_length=160, blank=True, default="")
+    borrower_external_first_name = models.CharField(
+        max_length=80, blank=True, default=""
+    )
+    borrower_external_last_name = models.CharField(max_length=80, blank=True, default="")
+    borrower_external_phone_number = models.CharField(
+        max_length=17, blank=True, default=""
+    )
     borrowed_on = models.DateField(null=True, blank=True)
     due_on = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -417,6 +424,10 @@ class ClubLoanItem(models.Model):
     def __str__(self):
         if self.borrower:
             borrower_label = self.borrower.user.username
+        elif self.borrower_external_first_name or self.borrower_external_last_name:
+            borrower_label = (
+                f"{self.borrower_external_first_name} {self.borrower_external_last_name}"
+            ).strip()
         elif self.borrower_external_name:
             borrower_label = self.borrower_external_name
         else:

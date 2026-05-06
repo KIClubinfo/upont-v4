@@ -64,6 +64,9 @@ class ClubLoanItemAdmin(admin.ModelAdmin):
         "category",
         "borrower",
         "borrower_external_name",
+        "borrower_external_first_name",
+        "borrower_external_last_name",
+        "borrower_external_phone_number",
         "borrowed_on",
         "due_on",
     )
@@ -73,6 +76,9 @@ class ClubLoanItemAdmin(admin.ModelAdmin):
         "borrower__user__first_name",
         "borrower__user__last_name",
         "borrower_external_name",
+        "borrower_external_first_name",
+        "borrower_external_last_name",
+        "borrower_external_phone_number",
     )
     ordering = ("due_on", "club", "name")
 
