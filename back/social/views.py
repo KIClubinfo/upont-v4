@@ -131,25 +131,32 @@ def _serialize_poll_for_viewer(poll, viewer_student):
 
 def _serialize_club_loan_item_for_api(item, current_student_id, is_member):
     borrower_name = None
+    borrower_is_external = False
     if item.borrower_id:
         first_name = (item.borrower.user.first_name or "").strip()
         last_name = (item.borrower.user.last_name or "").strip()
         borrower_name = f"{first_name} {last_name}".strip() or item.borrower.user.username
+    elif item.borrower_external_name:
+        borrower_name = item.borrower_external_name
+        borrower_is_external = True
 
     is_mine = item.borrower_id == current_student_id
+    is_borrowed = bool(item.borrower_id or item.borrower_external_name)
     return {
         "id": item.id,
         "name": item.name,
         "category_id": item.category_id,
         "category_name": item.category.name if item.category_id else None,
         "borrower_user_id": item.borrower.user.id if item.borrower_id else None,
+        "borrower_external_name": item.borrower_external_name or None,
+        "borrower_is_external": borrower_is_external,
         "borrower_name": borrower_name,
         "borrowed_on": item.borrowed_on.isoformat() if item.borrowed_on else None,
         "due_on": item.due_on.isoformat() if item.due_on else None,
         "is_borrowed_by_me": is_mine,
-        "is_available": item.borrower_id is None,
-        "can_borrow": bool(is_member and item.borrower_id is None),
-        "can_return": bool(is_member and item.borrower_id is not None),
+        "is_available": not is_borrowed,
+        "can_borrow": bool(is_member and not is_borrowed),
+        "can_return": bool(is_member and is_borrowed),
     }
 
 
@@ -158,6 +165,10 @@ def _serialize_club_loan_category_for_api(category):
         "id": category.id,
         "name": category.name,
     }
+
+
+def _club_loan_item_is_borrowed(item):
+    return bool(item.borrower_id or (item.borrower_external_name or "").strip())
 
 
 MESSAGE_MAX_MEDIA_BYTES = 50 * 1024 * 1024
@@ -741,17 +752,18 @@ class ClubLoanBorrowView(APIView):
             )
         item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
 
-        if item.borrower_id is not None:
+        if _club_loan_item_is_borrowed(item):
             return Response(
                 {"status": "error", "error": "Cet objet n'est plus disponible."},
                 status=status.HTTP_409_CONFLICT,
             )
 
         item.borrower = current_student
+        item.borrower_external_name = ""
         item.borrowed_on = date.today()
         if item.due_on and item.due_on < item.borrowed_on:
             item.due_on = None
-        item.save(update_fields=["borrower", "borrowed_on", "due_on"])
+        item.save(update_fields=["borrower", "borrower_external_name", "borrowed_on", "due_on"])
 
         return Response(
             {
@@ -765,7 +777,7 @@ class ClubLoanAssignView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, club_id, item_id):
-        get_object_or_404(Student, user__id=request.user.id)
+        current_student = get_object_or_404(Student, user__id=request.user.id)
         club = get_object_or_404(Club, id=club_id)
         membership = _active_membership_for_user(club, request.user)
         if membership is None:
@@ -778,19 +790,50 @@ class ClubLoanAssignView(APIView):
             )
 
         item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
-        if item.borrower_id is not None:
+        if _club_loan_item_is_borrowed(item):
             return Response(
                 {"status": "error", "error": "Cet objet est déjà emprunté."},
                 status=status.HTTP_409_CONFLICT,
             )
 
         borrower_user_id = str(request.data.get("borrower_user_id", "") or "").strip()
-        if not borrower_user_id.isdigit():
+        borrower_external_name = str(
+            request.data.get("borrower_external_name", "") or ""
+        ).strip()
+        borrower = None
+
+        if borrower_user_id and borrower_external_name:
             return Response(
-                {"status": "error", "error": "Emprunteur invalide."},
+                {
+                    "status": "error",
+                    "error": "Choisis soit un utilisateur uPont, soit un emprunteur externe.",
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
+        if borrower_user_id:
+            if not borrower_user_id.isdigit():
+                return Response(
+                    {"status": "error", "error": "Emprunteur invalide."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
+        elif borrower_external_name:
+            if len(borrower_external_name) > 160:
+                return Response(
+                    {
+                        "status": "error",
+                        "error": "Le nom de l'emprunteur externe est trop long (160 caractères max).",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            return Response(
+                {
+                    "status": "error",
+                    "error": "Emprunteur manquant. Sélectionne un utilisateur uPont ou saisis un nom externe.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         borrowed_on = date.today()
         borrowed_on_raw = request.data.get("borrowed_on", None)
@@ -830,14 +873,17 @@ class ClubLoanAssignView(APIView):
             )
 
         item.borrower = borrower
+        item.borrower_external_name = "" if borrower else borrower_external_name
         item.borrowed_on = borrowed_on
         item.due_on = due_on
-        item.save(update_fields=["borrower", "borrowed_on", "due_on"])
+        item.save(
+            update_fields=["borrower", "borrower_external_name", "borrowed_on", "due_on"]
+        )
 
         return Response(
             {
                 "status": "assigned",
-                "item": _serialize_club_loan_item_for_api(item, borrower.id, True),
+                "item": _serialize_club_loan_item_for_api(item, current_student.id, True),
             }
         )
 
@@ -1000,7 +1046,7 @@ class ClubLoanDeleteItemView(APIView):
             )
 
         item = get_object_or_404(ClubLoanItem, id=item_id, club_id=club_id)
-        if item.borrower_id is not None:
+        if _club_loan_item_is_borrowed(item):
             return Response(
                 {
                     "status": "error",
@@ -1167,9 +1213,10 @@ class ClubLoanReturnView(APIView):
             )
 
         item.borrower = None
+        item.borrower_external_name = ""
         item.borrowed_on = None
         item.due_on = None
-        item.save(update_fields=["borrower", "borrowed_on", "due_on"])
+        item.save(update_fields=["borrower", "borrower_external_name", "borrowed_on", "due_on"])
 
         return Response({"status": "returned", "item_id": item.id})
 
@@ -3020,7 +3067,7 @@ def view_club(request, club_id):
         .select_related("borrower__user")
         .order_by("due_on", "name", "id")
     )
-    available_loan_items = [item for item in loan_items if item.borrower_id is None]
+    available_loan_items = [item for item in loan_items if not _club_loan_item_is_borrowed(item)]
     my_borrowed_items = [
         item for item in loan_items if item.borrower_id == current_student.id
     ]
@@ -3064,6 +3111,9 @@ def club_loans(request, club_id):
         action = (request.POST.get("action") or "").strip()
         item_id = (request.POST.get("item_id") or "").strip()
         borrower_user_id = (request.POST.get("borrower_user_id") or "").strip()
+        borrower_external_name = (
+            str(request.POST.get("borrower_external_name") or "").strip()
+        )
 
         item_name = (request.POST.get("name") or "").strip()
         borrowed_on_raw = request.POST.get("borrowed_on")
@@ -3079,6 +3129,7 @@ def club_loans(request, club_id):
 
         if action == "return" and target_item:
             target_item.borrower = None
+            target_item.borrower_external_name = ""
             target_item.borrowed_on = None
             target_item.due_on = None
             target_item.save()
@@ -3097,11 +3148,15 @@ def club_loans(request, club_id):
                     due_on = None
 
             borrower = None
+            if not error and borrower_user_id and borrower_external_name:
+                error = "Choisis soit un utilisateur uPont, soit un emprunteur externe."
             if not error and borrower_user_id:
                 if not borrower_user_id.isdigit():
                     error = "Sélection de l'emprunteur invalide."
                 else:
                     borrower = get_object_or_404(Student, user__id=int(borrower_user_id))
+            if not error and borrower_external_name and len(borrower_external_name) > 160:
+                error = "Le nom de l'emprunteur externe est trop long (160 caractères max)."
 
             if not error and borrower and due_on and borrowed_on and due_on < borrowed_on:
                 error = "La date de rendu ne peut pas être avant la date d'emprunt."
@@ -3112,12 +3167,16 @@ def club_loans(request, club_id):
                         club=club,
                         name=item_name,
                         borrower=borrower,
+                        borrower_external_name="" if borrower else borrower_external_name,
                         borrowed_on=borrowed_on,
                         due_on=due_on,
                     )
                 elif target_item is not None:
                     target_item.name = item_name or target_item.name
                     target_item.borrower = borrower
+                    target_item.borrower_external_name = (
+                        "" if borrower else borrower_external_name
+                    )
                     target_item.borrowed_on = borrowed_on
                     target_item.due_on = due_on
                     target_item.save()

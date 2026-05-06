@@ -58,9 +58,22 @@ class ChannelJoinRequestAdmin(admin.ModelAdmin):
 
 
 class ClubLoanItemAdmin(admin.ModelAdmin):
-    list_display = ("club", "name", "category", "borrower", "borrowed_on", "due_on")
+    list_display = (
+        "club",
+        "name",
+        "category",
+        "borrower",
+        "borrower_external_name",
+        "borrowed_on",
+        "due_on",
+    )
     list_filter = ("club", "category", "due_on")
-    search_fields = ("name", "borrower__user__first_name", "borrower__user__last_name")
+    search_fields = (
+        "name",
+        "borrower__user__first_name",
+        "borrower__user__last_name",
+        "borrower_external_name",
+    )
     ordering = ("due_on", "club", "name")
 
 
