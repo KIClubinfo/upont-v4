@@ -406,6 +406,7 @@ class ClubLoanItem(models.Model):
         blank=True,
         related_name="borrowed_club_items",
     )
+    borrower_external_name = models.CharField(max_length=160, blank=True, default="")
     borrowed_on = models.DateField(null=True, blank=True)
     due_on = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -414,7 +415,12 @@ class ClubLoanItem(models.Model):
         ordering = ["due_on", "name", "id"]
 
     def __str__(self):
-        borrower_label = self.borrower.user.username if self.borrower else "disponible"
+        if self.borrower:
+            borrower_label = self.borrower.user.username
+        elif self.borrower_external_name:
+            borrower_label = self.borrower_external_name
+        else:
+            borrower_label = "disponible"
         return f"{self.club.name} - {self.name} ({borrower_label})"
 
 

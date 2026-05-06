@@ -32,11 +32,11 @@
                     <input type="hidden" name="action" value="add">
 
                     <div class="row">
-                        <div class="col-lg-4 mb-2">
+                        <div class="col-lg-3 mb-2">
                             <label for="name"><strong>Nom de l'objet</strong></label>
                             <input id="name" class="form-control" name="name" required>
                         </div>
-                        <div class="col-lg-3 mb-2">
+                        <div class="col-lg-2 mb-2">
                             <label for="borrower_user_id"><strong>Emprunteur</strong></label>
                             <select id="borrower_user_id" class="form-control" name="borrower_user_id">
                                 <option value="">Disponible (non prêté)</option>
@@ -46,6 +46,14 @@
                                     </option>
                                 {% endfor %}
                             </select>
+                        </div>
+                        <div class="col-lg-2 mb-2">
+                            <label for="borrower_external_name"><strong>Emprunteur externe</strong></label>
+                            <input
+                                id="borrower_external_name"
+                                class="form-control"
+                                name="borrower_external_name"
+                                placeholder="Nom (si hors uPont)">
                         </div>
                         <div class="col-lg-2 mb-2">
                             <label for="borrowed_on"><strong>Emprunté le</strong></label>
@@ -76,7 +84,7 @@
                                     <label><strong>Objet</strong></label>
                                     <input class="form-control" name="name" value="{{ item.name }}" required>
                                 </div>
-                                <div class="col-lg-3 mb-2">
+                                <div class="col-lg-2 mb-2">
                                     <label><strong>Emprunteur</strong></label>
                                     <select class="form-control" name="borrower_user_id">
                                         <option value="">Disponible</option>
@@ -94,6 +102,14 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-2 mb-2">
+                                    <label><strong>Emprunteur externe</strong></label>
+                                    <input
+                                        class="form-control"
+                                        name="borrower_external_name"
+                                        value="{{ item.borrower_external_name }}"
+                                        placeholder="Nom (si hors uPont)">
+                                </div>
+                                <div class="col-lg-2 mb-2">
                                     <label><strong>Emprunté le</strong></label>
                                     <input class="form-control" type="date" name="borrowed_on" value="{% if item.borrowed_on %}{{ item.borrowed_on|date:'Y-m-d' }}{% endif %}">
                                 </div>
@@ -101,7 +117,7 @@
                                     <label><strong>À rendre le</strong></label>
                                     <input class="form-control" type="date" name="due_on" value="{% if item.due_on %}{{ item.due_on|date:'Y-m-d' }}{% endif %}">
                                 </div>
-                                <div class="col-lg-2 mb-2 d-flex align-items-end">
+                                <div class="col-lg-1 mb-2 d-flex align-items-end">
                                     <button class="button blue-button w-100" type="submit">Enregistrer</button>
                                 </div>
                             </div>
@@ -115,12 +131,19 @@
                                                 <span style="color:#dc3545;"><strong> - En retard</strong></span>
                                             {% endif %}
                                         </span>
+                                    {% elif item.borrower_external_name %}
+                                        <span>
+                                            Emprunté par <strong>{{ item.borrower_external_name }}</strong> (hors uPont)
+                                            {% if item.due_on and item.due_on < today %}
+                                                <span style="color:#dc3545;"><strong> - En retard</strong></span>
+                                            {% endif %}
+                                        </span>
                                     {% else %}
                                         <span>Disponible</span>
                                     {% endif %}
                                 </div>
                                 <div class="col-lg-3 text-right">
-                                    {% if item.borrower %}
+                                    {% if item.borrower or item.borrower_external_name %}
                                         <button class="button green-button" type="submit" name="action" value="return">Marquer rendu</button>
                                     {% endif %}
                                     <button class="button red-button" type="submit" name="action" value="delete">Retirer</button>
