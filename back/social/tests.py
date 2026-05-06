@@ -428,7 +428,9 @@ class ClubLoansViewTest(TestCase):
         response = self.client.post(
             reverse("club_loan_assign", kwargs={"club_id": self.club.id, "item_id": loan_item.id}),
             {
-                "borrower_external_name": "Invité extérieur",
+                "borrower_external_first_name": "Invité",
+                "borrower_external_last_name": "Extérieur",
+                "borrower_external_phone_number": "+33612345678",
                 "borrowed_on": "2026-03-24",
                 "due_on": "2026-03-30",
             },
@@ -436,11 +438,14 @@ class ClubLoansViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         loan_item.refresh_from_db()
         self.assertIsNone(loan_item.borrower)
-        self.assertEqual(loan_item.borrower_external_name, "Invité extérieur")
+        self.assertEqual(loan_item.borrower_external_name, "Invité Extérieur")
+        self.assertEqual(loan_item.borrower_external_first_name, "Invité")
+        self.assertEqual(loan_item.borrower_external_last_name, "Extérieur")
+        self.assertEqual(loan_item.borrower_external_phone_number, "+33612345678")
         self.assertEqual(str(loan_item.borrowed_on), "2026-03-24")
         self.assertEqual(str(loan_item.due_on), "2026-03-30")
         payload = response.json()
-        self.assertEqual(payload["item"]["borrower_name"], "Invité extérieur")
+        self.assertEqual(payload["item"]["borrower_name"], "Invité Extérieur")
         self.assertTrue(payload["item"]["borrower_is_external"])
         self.assertFalse(payload["item"]["is_available"])
 
@@ -452,7 +457,9 @@ class ClubLoansViewTest(TestCase):
             {
                 "action": "add",
                 "name": "Sono portable",
-                "borrower_external_name": "Prestataire son",
+                "borrower_external_first_name": "Prestataire",
+                "borrower_external_last_name": "Son",
+                "borrower_external_phone_number": "+33687654321",
                 "borrowed_on": "2026-03-01",
                 "due_on": "2026-03-10",
             },
@@ -461,7 +468,30 @@ class ClubLoansViewTest(TestCase):
 
         item = ClubLoanItem.objects.get(club=self.club, name="Sono portable")
         self.assertIsNone(item.borrower)
-        self.assertEqual(item.borrower_external_name, "Prestataire son")
+        self.assertEqual(item.borrower_external_name, "Prestataire Son")
+        self.assertEqual(item.borrower_external_first_name, "Prestataire")
+        self.assertEqual(item.borrower_external_last_name, "Son")
+        self.assertEqual(item.borrower_external_phone_number, "+33687654321")
+
+    def test_member_cannot_assign_external_borrower_without_phone_via_api(self):
+        loan_item = ClubLoanItem.objects.create(
+            club=self.club,
+            name="Pack lumières",
+        )
+        self.client.force_login(self.user_member)
+        response = self.client.post(
+            reverse("club_loan_assign", kwargs={"club_id": self.club.id, "item_id": loan_item.id}),
+            {
+                "borrower_external_first_name": "Invité",
+                "borrower_external_last_name": "SansTel",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        payload = response.json()
+        self.assertIn("prénom, nom et téléphone", payload["error"])
+        loan_item.refresh_from_db()
+        self.assertIsNone(loan_item.borrower)
+        self.assertEqual(loan_item.borrower_external_name, "")
 
     def test_borrow_api_rejects_item_already_borrowed_by_external_person(self):
         loan_item = ClubLoanItem.objects.create(
