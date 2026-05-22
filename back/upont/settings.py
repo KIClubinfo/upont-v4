@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
+from datetime import timedelta
 
 import environ
 
@@ -32,11 +33,12 @@ DEBUG = env("DEBUG", default=False)
 if DEBUG:
     ALLOWED_HOSTS = [
         "192.168.130.59",
+        "192.168.0.34",
         "localhost",
         "127.0.0.1",
         "back",
     ]
-    CSRF_TRUSTED_ORIGINS = ["http://192.168.1.42:8000"]
+    CSRF_TRUSTED_ORIGINS = ["http://192.168.1.42:8000", "http://192.168.0.34:8000"]
 
 else:
     ALLOWED_HOSTS = [env("DOMAIN_NAME", default="upont.enpc.org")]
@@ -72,6 +74,7 @@ THIRD_PARTY_APPS = [
     "django_reverse_js",
     "django_celery_beat",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt"
 ]
 
 PROJECT_APPS = [
@@ -162,8 +165,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "upont.auth.EmailBackend",
+    #"django.contrib.auth.backends.ModelBackend",
+    "upont.auth.EmailOrUsernameBackend",
     "django_cas_ng.backends.CASBackend",
 ]
 
@@ -205,6 +208,13 @@ CORS_ALLOWED_ORIGINS = []
 if REMOTE_STATIC_STORAGE:
     CORS_ALLOWED_ORIGINS += [
         REMOTE_STATIC_URL,
+    ]
+
+CORS_ALLOW_CREDENTIALS = True # Required by the JWT authentication workflow to set the cookies in the browser
+
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        "http://192.168.0.34:8081"
     ]
 
 # Default primary key field type
@@ -336,6 +346,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
+        "upont.auth.CookiesJWTAuthentication"
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -347,3 +358,53 @@ REDIS_HOST = env("REDIS_HOST", default="redis")
 REDIS_PASSWORD = env("REDIS_PASSWORD", default=None)
 CELERY_BROKER_URL = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:6379/0"
 CELERY_RESULT_BACKEND = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:6379/0"
+
+# JWT auth settings
+
+SIMPLE_JWT = {
+    # TODO : Customize 
+    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=30), # TODO: Change this
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    
+    # "ROTATE_REFRESH_TOKENS": False,
+    # "BLACKLIST_AFTER_ROTATION": False,
+    # "UPDATE_LAST_LOGIN": False,
+
+    # "ALGORITHM": "HS256",
+    # "SIGNING_KEY": SECRET_KEY,
+    # "VERIFYING_KEY": "",
+    # "AUDIENCE": None,
+    # "ISSUER": None,
+    # "JSON_ENCODER": None,
+    # "JWK_URL": None,
+    # "LEEWAY": 0,
+
+    # "AUTH_HEADER_TYPES": ("Bearer",),
+    # "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    # "USER_ID_FIELD": "id",
+    # "USER_ID_CLAIM": "user_id",
+    # "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    # "ON_LOGIN_SUCCESS": "rest_framework_simplejwt.serializers.default_on_login_success",
+    # "ON_LOGIN_FAILED": "rest_framework_simplejwt.serializers.default_on_login_failed",
+
+    # "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    # "TOKEN_TYPE_CLAIM": "token_type",
+    # "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+    # "JTI_CLAIM": "jti",
+
+    # "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    # "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    # "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+
+    # "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+    # "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+    # "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+    # "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+    # "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+    # "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+
+    # "CHECK_REVOKE_TOKEN": False,
+    # "REVOKE_TOKEN_CLAIM": "hash_password",
+    # "CHECK_USER_IS_ACTIVE": True,
+}

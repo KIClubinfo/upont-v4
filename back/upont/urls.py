@@ -183,6 +183,13 @@ urlpatterns += [
         "reverse.js", urls_js, name="reverse_js"
     ),  # for reversing django urls in JavaScript
     path("api/", include(router.urls)),
+
+    # JWT Authentication
+    path('api/get_jwt_token/', views.CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/refresh_jwt_token/', views.CookieTokenRefreshView.as_view(), name='token_refresh'),
+    path('api/logout_jwt/', views.logout_jwt, name='logout_jwt'),
+    path('api/is_authenticated/', views.is_authenticated, name='is_authenticated'),
+
     path("api/current/", CurrentStudentView.as_view(), name="current_student"),
     path(
         "api/transactions/last/", LastTransactions.as_view(), name="last_transactions"

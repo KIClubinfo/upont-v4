@@ -30,6 +30,7 @@ urllib3 = "2.0.6"
 exponent_server_sdk = "2.0.0"
 psycopg2-binary = "^2.9.10"
 cryptography = "^46.0.1"
+djangorestframework-simplejwt = "^5.0.0"
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.group.dev.dependencies]

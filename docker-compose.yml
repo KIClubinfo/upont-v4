@@ -9,8 +9,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     restart: always
     volumes:
-      - ./database:/var/lib/postgresql/data
-      - ./backups:/backups
+      - database:/var/lib/postgresql/data
+      - backups:/backups
     networks:
       - db_link
     healthcheck:
@@ -85,6 +85,8 @@ services:
       - bundles:/src/upont/static/react
 
 volumes:
+  database:
+  backups:
   cache:
   bundles:
 

@@ -55,7 +55,7 @@ RUN apt-get update \
 # `development` image is used during development / testing
 FROM runtime-base as development
 
-RUN pip install cryptography
+RUN pip install cryptography poetry==1.8.2
 COPY ./entrypoint.dev.sh /usr/local/bin/
 RUN mkdir -p /src/upont/static/react \
     && chmod 777 /src/upont/static/react \
