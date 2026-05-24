@@ -27,15 +27,18 @@ class StudentAdmin(admin.ModelAdmin):
 
 class ClubAdmin(admin.ModelAdmin):
     list_display = ("name",)
-    search_fields = ("name", "nickname") # Permet la recherche par nom de club et surnom
+    search_fields = ("name", "nickname") # NOUVEAU : Permet la recherche par nom de club et surnom
 
+class RoleAdmin(admin.ModelAdmin):
+    # NOUVEAU : Définit sur quoi la recherche du rôle va s'effectuer
+    search_fields = ("name",)
 
 class MembershipsAdmin(admin.ModelAdmin):
     list_display = ("student", "club", "role")
     list_filter = ("club", "role")
 
-    # NOUVEAU : Remplace la liste déroulante par une barre de recherche asynchrone
-    autocomplete_fields = ("student", "club")   
+    # NOUVEAU : Remplace la liste déroulante par une barre de recherche
+    autocomplete_fields = ("student", "club", "role")   
 
 
 class ClubRequestAdmin(admin.ModelAdmin):
@@ -104,7 +107,7 @@ admin.site.register(ClubLoanItem, ClubLoanItemAdmin)
 admin.site.register(Promotion)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Nationality)
-admin.site.register(Role)
+admin.site.register(Role, RoleAdmin)
 admin.site.register(Membership, MembershipsAdmin)
 admin.site.register(Category)
 admin.site.register(Club, ClubAdmin)
