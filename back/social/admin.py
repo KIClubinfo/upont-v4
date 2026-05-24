@@ -22,14 +22,20 @@ class StudentAdmin(admin.ModelAdmin):
     list_display = ("user", "promo", "department")
     list_filter = ("promo", "department")
 
+    # NOUVEAU : Définit sur quoi la recherche va s'effectuer
+    search_fields = ("user__username", "user__first_name", "user__last_name")
 
 class ClubAdmin(admin.ModelAdmin):
     list_display = ("name",)
+    search_fields = ("name", "nickname") # Permet la recherche par nom de club et surnom
 
 
 class MembershipsAdmin(admin.ModelAdmin):
     list_display = ("student", "club", "role")
     list_filter = ("club", "role")
+
+    # NOUVEAU : Remplace la liste déroulante par une barre de recherche asynchrone
+    autocomplete_fields = ("student", "club")   
 
 
 class ClubRequestAdmin(admin.ModelAdmin):
