@@ -30,15 +30,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=False)
 
+DEBUG_HOST = "192.168.0.34"
+# DEBUG_HOST = "10.190.222.2"
+# DEBUG_HOST = "192.168.1.74"
+DJANGO_PORT = 8000
+
 if DEBUG:
     ALLOWED_HOSTS = [
-        "192.168.130.59",
-        "192.168.0.34",
+        DEBUG_HOST,
         "localhost",
         "127.0.0.1",
         "back",
     ]
-    CSRF_TRUSTED_ORIGINS = ["http://192.168.1.42:8000", "http://192.168.0.34:8000"]
+    CSRF_TRUSTED_ORIGINS = [f'http://${DEBUG_HOST}:8000'] # TODO : is it required to add http://DEBUG_HOST:8008 so that POST/PUT/DELETE requests work from the ReactNative app ?
 
 else:
     ALLOWED_HOSTS = [env("DOMAIN_NAME", default="upont.enpc.org")]
@@ -214,6 +218,7 @@ CORS_ALLOW_CREDENTIALS = True # Required by the JWT authentication workflow to s
 
 if DEBUG:
     CORS_ALLOWED_ORIGINS += [
+        "http://localhost:8081",
         "http://192.168.0.34:8081"
     ]
 
@@ -363,12 +368,12 @@ CELERY_RESULT_BACKEND = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:6379/0"
 
 SIMPLE_JWT = {
     # TODO : Customize 
-    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=30), # TODO: Change this
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5), # TODO: Change this
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     
     # "ROTATE_REFRESH_TOKENS": False,
     # "BLACKLIST_AFTER_ROTATION": False,
-    # "UPDATE_LAST_LOGIN": False,
+    "UPDATE_LAST_LOGIN": True,
 
     # "ALGORITHM": "HS256",
     # "SIGNING_KEY": SECRET_KEY,

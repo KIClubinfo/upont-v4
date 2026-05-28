@@ -20,7 +20,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django_cas_ng.backends import CASBackend
 from django_cas_ng.signals import cas_user_authenticated
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import (
@@ -39,7 +39,11 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from .settings import LOGIN_REDIRECT_URL, LOGIN_URL, DEBUG
+from .settings import ( 
+    LOGIN_REDIRECT_URL, 
+    LOGIN_URL, 
+    DEBUG
+)
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +53,12 @@ User = get_user_model()
 """
 JWT Authentication
 """
+
+# TODO: would it be safer to use JWT on mobile instead? seems like currently the token is always the same (not invalidated when the user logs out)
+
+# TODO : checkout why last_login (date) and first_connection (bool) aren't updated
+# - first_connection: because it has to be changed by the client
+# - last_login: ?
 
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
@@ -124,6 +134,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         
 @api_view(['POST'])
 def logout_jwt(request):
+    # TODO : Invalidate refresh token
     """
     Clears the tokens from the cookies
     """
