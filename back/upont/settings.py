@@ -41,6 +41,7 @@ if DEBUG:
         "localhost",
         "127.0.0.1",
         "back",
+        env("DOMAIN_NAME", default="upont.enpc.org")
     ]
     CSRF_TRUSTED_ORIGINS = [f'http://${DEBUG_HOST}:8000'] # TODO : is it required to add http://DEBUG_HOST:8008 so that POST/PUT/DELETE requests work from the ReactNative app ?
 
