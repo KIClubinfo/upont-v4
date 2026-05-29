@@ -135,7 +135,7 @@ On extrait la sauvegarde :
 
 # Variables d'environnement
 
-Les variables d'environnement suivantes sont placées dans le fichier *.env* :
+Les variables d'environnement suivantes sont placées dans le fichier *.env* (créer le fichier .env à partir de .env.example en le dupliquant et en le renommant)
 
 | Variable              | Description                                                                                                                            | Dev              | Prod                                      |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------|------------------|-------------------------------------------|

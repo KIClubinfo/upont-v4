@@ -134,7 +134,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         
 @api_view(['POST'])
 def logout_jwt(request):
-    # TODO : Invalidate refresh token
+    # TODO : Invalidate refresh token (see https://simplejwt-test.readthedocs.io/en/latest/blacklist_app.html)
     """
     Clears the tokens from the cookies
     """
