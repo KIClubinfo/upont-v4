@@ -127,7 +127,7 @@ urlpatterns = [
     path("pochtron/", include("pochtron.urls")),
     path("courses/", include("courses.urls")),
     path("the_calendar/", include("the_calendar.urls")),
-    path("admin/", admin.site.urls),
+    # path("admin/", admin.site.urls),
     path("tellme/", include("tellme.urls"), name="tellme"),
     path("add_promo/", views.add, name="add_promo"),
     path(
@@ -138,8 +138,8 @@ urlpatterns = [
     path("", include("django.contrib.auth.urls")),
     path("", views.root_redirect),
     path("internal/auth-check/", views.auth_check, name="internal_auth_check"),
-    path("cas/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
-    path("cas/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
+    path("api/sso/login", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
+    path("api/sso/logout", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
     path("page_not_created/", views.page_not_created, name="page_not_created"),
     path("privacy", views.privacy, name="privacy"),
     path("contact", views.contact, name="contact"),
@@ -183,12 +183,16 @@ urlpatterns += [
         "reverse.js", urls_js, name="reverse_js"
     ),  # for reversing django urls in JavaScript
     path("api/", include(router.urls)),
+    path("api/admin/", admin.site.urls),
 
     # JWT Authentication
     path('api/get_jwt_token/', views.CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/refresh_jwt_token/', views.CookieTokenRefreshView.as_view(), name='token_refresh'),
+    path('api/refresh_jwt_token/', views.CookieOrHeaderTokenRefreshView.as_view(), name='token_refresh'),
     path('api/logout_jwt/', views.logout_jwt, name='logout_jwt'),
     path('api/is_authenticated/', views.is_authenticated, name='is_authenticated'),
+    path('api/sso/callback/', views.sso_callback, name='sso_callback'),
+    path('api/sso/exchange_code/web/', views.sso_exchange_code_web, name='sso_exchange_code_web'),
+    path('api/sso/exchange_code/mobile/', views.sso_exchange_code_mobile, name='sso_exchange_code_mobile'),
 
     path("api/current/", CurrentStudentView.as_view(), name="current_student"),
     path(

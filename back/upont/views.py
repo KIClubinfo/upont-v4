@@ -3,7 +3,8 @@ import io
 import logging
 import mimetypes
 import os
-from urllib.parse import unquote
+import json
+from urllib.parse import unquote, urlparse
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -31,6 +32,13 @@ from rest_framework.decorators import (
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
+from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
+from django.core.cache import cache
+import secrets
+
 from social.models import Promotion, Student
 from upont.auth import EmailOrUsernameBackend
 
@@ -39,10 +47,10 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from .settings import ( 
-    LOGIN_REDIRECT_URL, 
-    LOGIN_URL, 
-    DEBUG
+from .settings import (
+    DEBUG,
+    SIMPLE_JWT,
+    DOMAIN_NAME
 )
 
 logger = logging.getLogger(__name__)
@@ -54,12 +62,11 @@ User = get_user_model()
 JWT Authentication
 """
 
-# TODO: would it be safer to use JWT on mobile instead? seems like currently the token is always the same (not invalidated when the user logs out)
-
 # TODO : checkout why last_login (date) and first_connection (bool) aren't updated
 # - first_connection: because it has to be changed by the client
 # - last_login: ?
 
+# TODO: adapt it for mobile
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         try:
@@ -79,7 +86,57 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                     "secure": False
                 } if DEBUG else {
                     "secure": True,
-                    "samesite":'None'
+                    "samesite":'None' # TODO: change this ?
+                }),
+                path='/'
+                #TODO : max_age=... (in seconds, use the same as in .settings.SIMPLE_JWT)
+            )
+
+            res.set_cookie(
+                key="refresh_token",
+                value=refresh_token,
+                httponly=True,
+                **({
+                    "secure": False
+                } if DEBUG else {
+                    "secure": True,
+                    "samesite":'None' # TODO : change this ?
+                }),
+                path='/'
+            )
+
+            return res
+        except Exception as e:
+            return Response({ 'success': False, 'error': str(e) }) 
+       
+class CookieOrHeaderTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        try:
+            refresh_token = request.COOKIES.get('refresh_token') or request.data.get('refresh')
+
+            request.data['refresh'] = refresh_token
+            response = super().post(request, *args, **kwargs)
+
+            tokens = response.data 
+
+            access_token = tokens.get('access')
+            new_refresh_token = tokens.get('refresh')
+
+            res = Response({ 
+                'refreshed': True, 
+                'access_token': access_token, 
+                'refresh_token': new_refresh_token 
+            })
+
+            res.set_cookie(
+                key="access_token",
+                value=access_token,
+                httponly=True,
+                **({
+                    "secure": False
+                } if DEBUG else {
+                    "secure": True,
+                    "samesite":'None' # TODO: change this ?
                 }),
                 path='/'
             )
@@ -92,38 +149,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                     "secure": False
                 } if DEBUG else {
                     "secure": True,
-                    "samesite":'None'
-                }),
-                path='/'
-            )
-
-            return res
-        except Exception as e:
-            return Response({ 'success': False, 'error': str(e) }) 
-       
-class CookieTokenRefreshView(TokenRefreshView):
-    def post(self, request, *args, **kwargs):
-        try:
-            refresh_token = request.COOKIES.get('refresh_token')
-
-            request.data['refresh'] = refresh_token
-            response = super().post(request, *args, **kwargs)
-
-            tokens = response.data 
-
-            access_token = tokens['access']
-
-            res = Response({ 'refreshed': True })
-
-            res.set_cookie(
-                key="access_token",
-                value=access_token,
-                httponly=True,
-                **({
-                    "secure": False
-                } if DEBUG else {
-                    "secure": True,
-                    "samesite":'None'
+                    "samesite":'None' # TODO: change this ?
                 }),
                 path='/'
             )
@@ -131,8 +157,10 @@ class CookieTokenRefreshView(TokenRefreshView):
             return res
         except Exception as e:
             return Response({ 'refreshed': False, 'error': str(e) })
-        
+
 @api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def logout_jwt(request):
     # TODO : Invalidate refresh token (see https://simplejwt-test.readthedocs.io/en/latest/blacklist_app.html)
     """
@@ -149,17 +177,234 @@ def logout_jwt(request):
         return res
     except Exception as e:
         return Response({ 'refreshed': False, 'error': str(e) })
-    
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def is_authenticated(request):
     return Response({ 'authenticated': True })
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def sso_callback(request):
+    """
+    CAS SSO callback endpoint for the web version.
+    """
+
+    ticket = request.GET.get("ticket")
+    service = request.build_absolute_uri(request.path)
+    service = service.replace("http://", "https://")
+
+    if not ticket:
+        return Response({ "error": "Ticket CAS manquant" }, status=400)
+
+    try:
+        # Authenticate with CAS
+        user = CASBackend().authenticate(
+            request, 
+            ticket=ticket, 
+            service=service
+        )
+
+        if user is None:
+            return Response({ "error": "CAS authentication failed" })
+    
+        logger.info(f"✓ Successfully authenticated: {user.username} ")
+        logger.info(f"User : {user.__dict__}")
+
+        User = get_user_model()
+
+        try:
+            user_obj = User.objects.get(username=user.username)
+            logger.info(f"User found")
+        except User.DoesNotExist:
+            logger.info(f"Creating user {user.username}")
+            user_obj = User.objets.create_user(
+                username=user.username,
+                email=f"{user.email}@eleves.enpc.fr",
+                first_name=f"{user.first_name}",
+                last_name=f"{user.last_name}"
+            )
+        
+        # Handle Student profile        
+        student, student_created = Student.objects.get_or_create(user=user_obj)        
+        if student_created:            
+            student.promo = Promotion.objects.order_by("-nickname").first()            
+            student.is_validated = False            
+            student.save()   
+
+        # Generate a short-lived authorization code (NOT tokens yet)        
+        auth_code = secrets.token_urlsafe(32)        
+        cache.set(            
+            f'sso_auth_code:{auth_code}',            
+            {'user_id': user_obj.id},            
+            timeout=60  # Expires in 60 seconds        
+        )
+
+        logger.info(f"✓ Generated auth code for user {user_obj.username}")
+        
+        referer = request.META.get('HTTP_REFERER', '')
+        allowed_hosts = [ # TODO: do something cleaner
+            'localhost',        
+            'localhost:8081',
+            'upont.enpc.org',
+            'www.upont.enpc.org',
+            'upont-dev.enpc.org',
+            'www.upont-dev.enpc.org'
+        ]
+
+        # Extract domain from referer
+        if referer:
+            origin = urlparse(referer).netloc
+            if origin in allowed_hosts:
+                # It's a web request - redirect to web origin
+                redirect_uri = f'{request.scheme}://{origin}/sso-callback/?code={auth_code}'
+                return HttpResponseRedirect(redirect_uri)
+        
+        # Default to mobile deep link
+        mobile_scheme = 'upontdev'
+        redirect_uri = f'{mobile_scheme}://sso-callback/?code={auth_code}'
+
+        return HttpResponse(
+            f"""
+            <html>
+            <head>
+                <meta http-equiv="refresh" content="0;url={redirect_uri}">
+            </head>
+            <body>
+                <p>Si vous n'êtes pas redirigé, <a href="{redirect_uri}">cliquez ici</a>.</p>
+            </body>
+            </html>
+            """
+        )
+
+    except Exception as e:
+        logger.error(f"SSO authentication error: {str(e)}")        
+        return Response({ "error": f"SSO authentication error: {str(e)}"})
+
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def sso_exchange_code_web(request):
+    """
+    Web only: Exchange authorization code for access and refresh tokens.    
+    Sets httpOnly cookies with SameSite=None for cross-origin support.
+    """
+    try:
+        data = json.loads(request.body)
+        auth_code = data.get("code")
+
+        if not auth_code:            
+            return Response({'error': 'Missing authorization code'}, status=400)                
+        
+        cached_data = cache.get(f'sso_auth_code:{auth_code}')
+        if not cached_data:            
+            return Response({'error': 'Invalid or expired authorization code'}, status=401)
+
+        # Delete the code immediately (one-time use)        
+        cache.delete(f'sso_auth_code:{auth_code}')
+
+        # Generate tokens        
+        user_id = cached_data['user_id']        
+        User = get_user_model()        
+        user_obj = User.objects.get(id=user_id)
+
+        refresh = RefreshToken.for_user(user_obj)        
+        refresh_token = str(refresh)        
+        access_token = str(refresh.access_token)
+
+        response = Response({            
+            "status": "ok",            
+            "user": {                
+                "id": user_obj.id,                
+                "username": user_obj.username,                
+                "email": user_obj.email            
+            }
+        })
+
+        response.set_cookie(
+            key='access_token',
+            value=str(access_token),
+            httponly=True,
+            secure=True, # TODO CHANGE
+            samesite='None',
+            max_age=SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
+            path='/'
+        )
+
+        response.set_cookie(
+            key='refresh_token',
+            value=str(refresh_token),
+            httponly=True,
+            secure=True, # TODO CHANGE
+            samesite='None',
+            max_age=SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+            path='/'
+        )
+
+        logger.info(f"✓ Tokens issued for user {user_obj.username}")
+        return response
+    except User.DoesNotExist:        
+        return Response({'error': 'User not found'}, status=404)
+    except Exception as e:
+        return Response({ "error": str(e)}, status=500)
+ 
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def sso_exchange_code_mobile(request):
+    """
+    Web only: Exchange authorization code for access and refresh tokens.    
+    Sets httpOnly cookies with SameSite=None for cross-origin support.
+    """
+    try:
+        data = json.loads(request.body)
+        auth_code = data.get("code")
+
+        if not auth_code:            
+            return Response({'error': 'Missing authorization code'}, status=400)                
+        
+        cached_data = cache.get(f'sso_auth_code:{auth_code}')
+        if not cached_data:            
+            return Response({'error': 'Invalid or expired authorization code'}, status=401)
+
+        # Delete the code immediately (one-time use)        
+        cache.delete(f'sso_auth_code:{auth_code}')
+
+        # Generate tokens        
+        user_id = cached_data['user_id']        
+        User = get_user_model()        
+        user_obj = User.objects.get(id=user_id)
+
+        refresh = RefreshToken.for_user(user_obj)        
+        refresh_token = str(refresh)        
+        access_token = str(refresh.access_token)
+
+        response = Response({            
+            "status": "ok",            
+            "user": {                
+                "id": user_obj.id,                
+                "username": user_obj.username,                
+                "email": user_obj.email            
+            },
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        })
+
+        logger.info(f"✓ Tokens issued for user {user_obj.username}")
+        return response
+    except User.DoesNotExist:        
+        return Response({'error': 'User not found'}, status=404)
+    except Exception as e:
+        return Response({ "error": str(e)}, status=500)
+
 
 def root_redirect(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse(LOGIN_REDIRECT_URL))
     else:
         return HttpResponseRedirect(reverse(LOGIN_URL))
+
 
 
 @api_view(["GET"])

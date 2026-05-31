@@ -23,12 +23,14 @@ environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DOMAIN_NAME = env("DOMAIN_NAME", default="upont.enpc.org")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=False)
+
 
 DEBUG_HOST = "192.168.0.34"
 # DEBUG_HOST = "10.190.222.2"
@@ -41,10 +43,10 @@ if DEBUG:
         "localhost",
         "127.0.0.1",
         "back",
-        env("DOMAIN_NAME", default="upont.enpc.org")
+        DOMAIN_NAME,
+        "upont-dev.enpc.org"
     ]
-    CSRF_TRUSTED_ORIGINS = [f'http://${DEBUG_HOST}:8000'] # TODO : is it required to add http://DEBUG_HOST:8008 so that POST/PUT/DELETE requests work from the ReactNative app ?
-
+    #CSRF_TRUSTED_ORIGINS = [f'http://${DEBUG_HOST}:8000', 'https://upont-dev.enpc.org']
 else:
     ALLOWED_HOSTS = [env("DOMAIN_NAME", default="upont.enpc.org")]
 
@@ -54,8 +56,8 @@ if DEBUG:
 else:
     SECRET_KEY = env("SECRET_KEY", default=None)
     SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT", default=False)
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    #SESSION_COOKIE_SECURE = True
+    #CSRF_COOKIE_SECURE = True
 
 
 # Application definition
@@ -78,7 +80,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_reverse_js",
     "django_celery_beat",
-    "rest_framework.authtoken",
+    #"rest_framework.authtoken",
     "rest_framework_simplejwt"
 ]
 
@@ -100,11 +102,11 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    #"django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_cas_ng.middleware.CASMiddleware",
+    #"django_cas_ng.middleware.CASMiddleware",
 ]
 
 ROOT_URLCONF = "upont.urls"
@@ -145,8 +147,8 @@ DATABASES = {
 
 # Login redirection
 
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "news:posts"
+#LOGIN_URL = "login"
+#LOGIN_REDIRECT_URL = "news:posts"
 
 
 # Password validation
@@ -172,7 +174,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     #"django.contrib.auth.backends.ModelBackend",
     "upont.auth.EmailOrUsernameBackend",
-    "django_cas_ng.backends.CASBackend",
+    #"django_cas_ng.backends.CASBackend"
 ]
 
 # Internationalization
@@ -195,7 +197,7 @@ USE_TZ = True
 REMOTE_STATIC_STORAGE = env("REMOTE_STATIC_STORAGE", default=False)
 
 if REMOTE_STATIC_STORAGE:
-    REMOTE_STATIC_URL = env("REMOTE_STATIC_URL", default="/static")
+    REMOTE_STATIC_URL = env("REMOTE_STATIC_URL", default="/static/")
     FTP_STORAGE_LOCATION = env("FTP_STORAGE_LOCATION")
     ENCODING = "utf-8"
     STATICFILES_STORAGE = "upont.storage.StaticStorage"
@@ -209,19 +211,20 @@ STATICFILES_DIRS = [
 ]
 
 # Allowed origins for Cross-Origin Ressource Sharing
-CORS_ALLOWED_ORIGINS = []
+CORS_ALLOWED_ORIGINS = [
+    "https://upont.enpc.org",
+    "https://www.upont.enpc.org",
+    "https://upont-dev.enpc.org",
+    "https://www.upont-dev.enpc.org",
+    "http://localhost:8081", # TODO: remove in production
+    f"http://{DEBUG_HOST}:8081", # TODO: remove in production
+]
 if REMOTE_STATIC_STORAGE:
     CORS_ALLOWED_ORIGINS += [
         REMOTE_STATIC_URL,
     ]
 
 CORS_ALLOW_CREDENTIALS = True # Required by the JWT authentication workflow to set the cookies in the browser
-
-if DEBUG:
-    CORS_ALLOWED_ORIGINS += [
-        "http://localhost:8081",
-        "http://192.168.0.34:8081"
-    ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -292,13 +295,15 @@ LOGGING = {
     },
 }
 
-# SSO CONNECT
 CAS_SERVER_URL = "http://cas.enpc.fr/cas/"
-CAS_CREATE_USER = True
-CAS_CHECK_NEXT = False
-CAS_REDIRECT_URL = "/"
-CAS_ADMIN_PREFIX = "admin/"
 CAS_FORCE_SSL_SERVICE_URL = True
+CAS_APPLY_ATTRIBUTES_TO_USER = True
+CAS_RENAME_ATTRIBUTES = {
+    'mail': 'email',
+    'cn': 'full_name',
+    'sn': 'last_name',
+    'givenName': 'first_name'
+}
 
 # Markdown
 MARKDOWNIFY = {
@@ -349,10 +354,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-        "upont.auth.CookiesJWTAuthentication"
+        "upont.auth.CookiesOrHeaderJWTAuthentication",
+        #"rest_framework.authentication.TokenAuthentication",
+        #"rest_framework.authentication.SessionAuthentication",
+        #"rest_framework.authentication.BasicAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -369,8 +374,8 @@ CELERY_RESULT_BACKEND = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:6379/0"
 
 SIMPLE_JWT = {
     # TODO : Customize 
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5), # TODO: Change this
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     
     # "ROTATE_REFRESH_TOKENS": False,
     # "BLACKLIST_AFTER_ROTATION": False,

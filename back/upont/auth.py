@@ -3,7 +3,6 @@ from django.contrib.auth.backends import ModelBackend
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models import Q
 
-
 class EmailOrUsernameBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
@@ -16,9 +15,9 @@ class EmailOrUsernameBackend(ModelBackend):
                 return user
         return None
 
-class CookiesJWTAuthentication(JWTAuthentication):
+class CookiesOrHeaderJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
-        access_token = request.COOKIES.get("access_token")
+        access_token = request.COOKIES.get("access_token") or request.META.get('HTTP_AUTHORIZATION', '').replace('Bearer ', '', 1)
 
         if not access_token:
             return None
@@ -31,4 +30,3 @@ class CookiesJWTAuthentication(JWTAuthentication):
             return None
 
         return (user, validated_token)
-
